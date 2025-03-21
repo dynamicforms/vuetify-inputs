@@ -1,9 +1,9 @@
 {
   "name": "@dynamicforms/vuetify-inputs",
   "private": false,
-  "version": "0.1.1",
+  "version": "0.1.0",
   "type": "module",
-  "description": "Data entry forms for vue - logic (no controls here)",
+  "description": "Visual components for data entry using @dynamicforms/vue-forms",
   "author": "Jure Erznožnik",
   "files": [
     "dist/*"
@@ -41,8 +41,12 @@
   },
   "issues": "https://github.com/velis74/dynamicforms-vuetify-inputs/issues",
   "peerDependencies": {
+    "@ckeditor/ckeditor5-vue": "^7.0.0",
+    "@dynamicforms/vue-forms": "^0.1.5",
+    "ckeditor5": "^43.0.0",
     "lodash-es": "^4.17.12",
     "vue": "^3.4",
+    "vue-ionicon": "^2.1.1",
     "vuetify": "^3.7"
   },
   "devDependencies": {

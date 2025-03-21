@@ -46,6 +46,7 @@ export default defineConfig({
       external: [
         'lodash-es',
         'vue',
+        'vue-ionicon',
         'vuetify',
       ],
       output: {
