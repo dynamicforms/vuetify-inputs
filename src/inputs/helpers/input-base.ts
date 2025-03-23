@@ -13,12 +13,14 @@ export interface BaseProps<T = any> {
   enabled?: boolean,
   visibility?: Form.DisplayMode,
   cssClass?: string;
+  clearable?: boolean;
 }
 
 export const defaultBaseProps = { enabled: undefined };
 
 export interface BaseEmits<T = any> {
   (e: 'update:modelValue', value: T): void;
+  (e: 'click:clear'): void;
 }
 
 export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {

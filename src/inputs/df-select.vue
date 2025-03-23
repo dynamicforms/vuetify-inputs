@@ -1,7 +1,17 @@
 <template>
   <component
     :is="taggable ? 'v-combobox' : 'v-autocomplete'"
+    v-if="visibility !== DisplayMode.SUPPRESS"
     v-model="selected"
+
+    :class="[
+      cssClass,
+      {
+        'd-none': visibility === DisplayMode.HIDDEN,
+        invisible: visibility === DisplayMode.INVISIBLE,
+      },
+    ]"
+
     density="compact"
     :items="options"
     :return-object="false"
@@ -55,6 +65,7 @@
 </template>
 
 <script setup lang="ts">
+import { DisplayMode } from '@dynamicforms/vue-forms';
 import { ref, computed, toRefs, watch, nextTick } from 'vue';
 import IonIcon from 'vue-ionicon';
 
@@ -84,7 +95,7 @@ const propsWithDefaults = withDefaults(defineProps<Props>(), {
 });
 
 const { choices } = propsWithDefaults;
-const { multiple, allowTags: taggable, allowNull } = toRefs(propsWithDefaults);
+const { multiple, allowTags: taggable, allowNull, cssClass, visibility } = toRefs(propsWithDefaults);
 const isFocused = ref(false);
 
 interface Emits extends BaseEmits {

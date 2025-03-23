@@ -1,5 +1,5 @@
 <template>
-  <input-base v-bind="{ value, vuetifyBindings }">
+  <input-base v-bind="props" clearable @click:clear="removeFile">
     <div style="position: relative; width: 100%">
       <v-progress-linear
         v-if="currentFile && progress < 100"
@@ -14,12 +14,12 @@
         :readonly="vuetifyBindings.readonly"
         :disabled="vuetifyBindings.disabled"
         :name="vuetifyBindings.name"
+        :hide-details="true"
         :show-size="true"
         :multiple="false"
-        clearable
         :style="currentFile && progress < 100 ? 'visibility: hidden' : ''"
+        :clearable="false"
         @update:model-value="handleFileChange"
-        @click:clear="removeFile"
       />
     </div>
   </input-base>

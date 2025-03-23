@@ -1,10 +1,10 @@
-# DfTextArea Component
+# df-text-area Component
 
-The DfTextArea component provides a multi-line text input that fully integrates with both Vuetify and DynamicForms.
+The df-text-area component provides a multi-line text input that fully integrates with both Vuetify and DynamicForms.
 
 ## Basic Usage
 
-Below is an example of the DfTextArea component used with DynamicForms:
+Below is an example of the df-text-area component used with DynamicForms:
 
 <textarea-basic/>
 

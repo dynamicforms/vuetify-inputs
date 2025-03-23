@@ -4,7 +4,15 @@ This section contains a collection of practical examples demonstrating the usage
 
 ## Input Fields
 
-### [DfSelect](./df-select)
+### [df-date-time](./df-datetime)
+
+A component for date and time selection.
+
+### [df-file](./df-file)
+
+A component for file uploads.
+
+### [df-select](./df-select)
 
 A component for selecting values from a list. The examples showcase:
 - Basic usage with a static list
@@ -14,10 +22,6 @@ A component for selecting values from a list. The examples showcase:
 ### [DfTextArea](./df-text-area)
 
 A component for multi-line text input.
-
-### [DfFile](./df-file)
-
-A component for file uploads.
 
 ## Other Components
 

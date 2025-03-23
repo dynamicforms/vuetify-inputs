@@ -1,11 +1,11 @@
-# DfFile Component
+# df-file Component
 
-The DfFile component provides a file input field that integrates with both Vuetify and DynamicForms. It includes file 
+The df-file component provides a file input field that integrates with both Vuetify and DynamicForms. It includes file 
 upload functionality with progress indication and handling for file operations.
 
 ## Basic Usage
 
-Below is an example of the DfFile component used with DynamicForms:
+Below is an example of the df-file component used with DynamicForms:
 
 <file-basic/>
 

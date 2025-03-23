@@ -18,19 +18,25 @@
       :hide-details="vuetifyBindings.hideDetails"
     >
       <slot/>
+      <template v-if="isClearable" #append>
+        <v-icon @click="emits('click:clear')">mdi-close-circle</v-icon>
+      </template>
     </v-input>
   </div>
 </template>
 
 <script setup lang="ts">
 import { DisplayMode } from '@dynamicforms/vue-forms';
+import { computed, unref } from 'vue';
 
 import { BaseEmits, BaseProps, useInputBase } from './input-base';
 
 const props = defineProps<BaseProps>();
 const emits = defineEmits<BaseEmits>();
 
-const { visibility, vuetifyBindings } = useInputBase(props, emits);
+const { value, visibility, vuetifyBindings } = useInputBase(props, emits);
+
+const isClearable = computed(() => (unref(props.clearable) && unref(value)));
 </script>
 
 <style scoped>

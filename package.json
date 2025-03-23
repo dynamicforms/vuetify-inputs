@@ -44,6 +44,7 @@
     "@ckeditor/ckeditor5-vue": "^7.0.0",
     "@dynamicforms/vue-forms": "^0.1.5",
     "ckeditor5": "^43.0.0",
+    "date-fns": "^4.1.0",
     "lodash-es": "^4.17.12",
     "vue": "^3.4",
     "vue-ionicon": "^2.1.1",
