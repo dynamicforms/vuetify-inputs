@@ -26,8 +26,6 @@ import {
 } from 'ckeditor5';
 import { ref, onMounted, watch } from 'vue';
 
-import { gettext } from '../../util/translations-mixin';
-
 interface Props {
   modelValue: string;
   minHeight: string;
@@ -103,7 +101,7 @@ const editorConfig: EditorConfig = {
       },
     },
   },
-  placeholder: gettext('Type or paste your content here!'),
+  placeholder: 'Type or paste your content here!',
   style: {
     definitions: [
       { name: 'Article category', element: 'h3', classes: ['category'] },

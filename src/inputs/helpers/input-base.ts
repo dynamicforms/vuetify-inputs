@@ -76,7 +76,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
 
       hint: hint.value,
       persistentHint: true, // we want persistent hint always
-      hideDetails: 'auto', // we want to hide the hint element when hit isn't there
+      hideDetails: 'auto' as boolean | 'auto' | undefined, // we want to hide the hint element when hit isn't there
       helpText: helpText.value,
     })),
   };

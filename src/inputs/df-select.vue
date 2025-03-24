@@ -41,6 +41,7 @@
         label
         size="small"
         :variant="multiple ? 'tonal' : 'text'"
+        :closable="multiple"
         @click:close="chipClose(item.value)"
       >
         <template #prepend>

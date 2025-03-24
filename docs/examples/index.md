@@ -12,6 +12,10 @@ A component for date and time selection.
 
 A component for file uploads.
 
+### [df-input](./df-input)
+
+A component for general data entry.
+
 ### [df-select](./df-select)
 
 A component for selecting values from a list. The examples showcase:
@@ -19,7 +23,7 @@ A component for selecting values from a list. The examples showcase:
 - Advanced features (multiple selection, AJAX loading, icons)
 - Integration with DynamicForms
 
-### [DfTextArea](./df-text-area)
+### [df-text-area](./df-text-area)
 
 A component for multi-line text input.
 

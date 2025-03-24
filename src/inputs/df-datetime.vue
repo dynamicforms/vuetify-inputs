@@ -170,7 +170,9 @@ const dateFormatted = computed({
     try {
       const d = parse(newValue, unref(displayFormatDate), new Date());
       setValueISOFull(formatNaive(d), 0);
-    } catch {}
+    } catch (err) {
+      console.error(err);
+    }
   },
 });
 

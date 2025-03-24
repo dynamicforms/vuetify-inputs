@@ -9,7 +9,7 @@
       },
     ]"
   >
-    <label v-if="vuetifyBindings.label">{{ vuetifyBindings.label }}</label>
+    <label v-if="vuetifyBindings.label" for="#following-v-input">{{ vuetifyBindings.label }}</label>
     <v-input
       :error-messages="vuetifyBindings['error-messages']"
       :error-count="vuetifyBindings['error-count']"

@@ -102,6 +102,7 @@ const categoryOptions = [
   and tagging.
 - [**df-textarea**](/examples/df-text-area): A textarea component with configurable rows and validation.
 - [**df-file**](/examples/df-file): A file upload component with progress indication.
+- [**df-input**](/examples/df-input): A general value input.
 - [**df-date-time**](/examples/df-datetime): A date and time selection component with configurable format and type.
 
 ## Next Steps

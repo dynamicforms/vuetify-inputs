@@ -30,6 +30,7 @@ export default defineConfig({
           items: [
             { text: 'df-date-time', link: '/examples/df-datetime' },
             { text: 'df-file', link: '/examples/df-file' },
+            { text: 'df-input', link: '/examples/df-input' },
             { text: 'df-select', link: '/examples/df-select' },
             { text: 'df-text-area', link: '/examples/df-text-area' },
           ]
