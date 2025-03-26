@@ -4,6 +4,10 @@ This section contains a collection of practical examples demonstrating the usage
 
 ## Input Fields
 
+### [df-checkbox](./df-checkbox)
+
+A component for checkbox / ternary selection.
+
 ### [df-date-time](./df-datetime)
 
 A component for date and time selection.

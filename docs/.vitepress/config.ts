@@ -28,6 +28,7 @@ export default defineConfig({
         {
           text: 'Examples',
           items: [
+            { text: 'df-checkbox', link: '/examples/df-checkbox' },
             { text: 'df-date-time', link: '/examples/df-datetime' },
             { text: 'df-file', link: '/examples/df-file' },
             { text: 'df-input', link: '/examples/df-input' },
