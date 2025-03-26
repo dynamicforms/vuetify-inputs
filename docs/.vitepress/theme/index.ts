@@ -6,6 +6,7 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
+import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue';
 
 export default {
   extends: DefaultTheme,
@@ -18,7 +19,8 @@ export default {
       }
     })
 
-    app.use(vuetify)
+    app.use(vuetify);
+    app.use(CkeditorPlugin);
   },
   Layout: () => {
     return h(DefaultTheme.Layout, null, {

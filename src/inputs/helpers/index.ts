@@ -1,4 +1,3 @@
-export { default as ClearInputButton } from './clear-input-button.vue';
 export * from './df-file.interface';
 export * from './df-select.interface';
 export * from './input-base';

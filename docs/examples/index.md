@@ -16,6 +16,10 @@ A component for file uploads.
 
 A component for general data entry.
 
+### [**df-rtf-editor**](./df-rtf-editor)
+
+A RTF editor input.
+
 ### [df-select](./df-select)
 
 A component for selecting values from a list. The examples showcase:

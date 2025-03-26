@@ -4,10 +4,12 @@
       <div ref="editorElement">
         <ckeditor
           v-if="isLayoutReady"
-          v-model="editorData"
+          :model-value="modelValue"
           :editor="editor"
           :config="editorConfig"
+          :disabled="disabled"
           @ready="onEditorReady"
+          @update:model-value="(event: any) => emit('update:modelValue', event)"
         />
       </div>
     </div>
@@ -24,21 +26,19 @@ import {
   SelectAll, Style, Table, TableCellProperties, TableColumnResize, TableProperties, TableToolbar, Undo,
   HeadingConfig, TextTransformation, Base64UploadAdapter,
 } from 'ckeditor5';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 
-interface Props {
+withDefaults(defineProps<{
   modelValue: string;
-  minHeight: string;
-}
-
-const props = withDefaults(defineProps<Props>(), { modelValue: '', minHeight: '7em' });
+  minHeight?: string;
+  disabled?: boolean;
+}>(), { modelValue: '', minHeight: '7em', disabled: false });
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>();
 
 const isLayoutReady = ref(false);
-const editorData = ref(props.modelValue);
 const editor = ClassicEditor;
 
 const editorToolbarConfig = {
@@ -127,15 +127,11 @@ const onEditorReady = (editorReady: Editor) => {
   // console.log('Editor is ready to use!', editorReady);
 };
 
-watch(editorData, (newValue: string) => {
-  emit('update:modelValue', newValue);
-});
-
-defineExpose({ editorData, onEditorReady });
+defineExpose({ onEditorReady });
 </script>
 
 <style>
-@import 'ckeditor5/dist/ckeditor5.css';
+@import 'ckeditor5/ckeditor5.css';
 @import url('https://fonts.googleapis.com/css2?family=Oswald&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
@@ -195,6 +191,11 @@ defineExpose({ editorData, onEditorReady });
   margin:      0 0 1em;
   font-weight: bold;
   padding:     0;
+}
+
+div.ck.ck-editor__editable_inline * {
+  /* disables any styles declared on the page prior to the editor */
+  all: revert;
 }
 
 .ck-content p.info-box {
