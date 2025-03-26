@@ -8,6 +8,10 @@ This section contains a collection of practical examples demonstrating the usage
 
 A component for checkbox / ternary selection.
 
+### [df-color](./df-color)
+
+A color input.
+
 ### [df-date-time](./df-datetime)
 
 A component for date and time selection.

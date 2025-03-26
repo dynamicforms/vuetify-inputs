@@ -3,7 +3,7 @@
     <v-menu
       v-model="dropdownShown"
       location="top start"
-      origin="bottom center"
+      :origin="`bottom ${inputType === 'datetime' ? 'center' : 'start'}`"
       :close-on-content-click="false"
     >
       <template #activator="{ props: menuProps }">

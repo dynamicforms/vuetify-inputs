@@ -8,8 +8,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/getting-started' },
-      { text: 'API', link: '/api/' },
-      { text: 'Examples', link: '/examples/index' }
+      { text: 'API', link: '/examples/index' }
     ],
     sidebar: {
       '/guide/': [
@@ -26,9 +25,10 @@ export default defineConfig({
       ],
       '/examples/': [
         {
-          text: 'Examples',
+          text: 'API with Examples',
           items: [
             { text: 'df-checkbox', link: '/examples/df-checkbox' },
+            { text: 'df-color', link: '/examples/df-color' },
             { text: 'df-date-time', link: '/examples/df-datetime' },
             { text: 'df-file', link: '/examples/df-file' },
             { text: 'df-input', link: '/examples/df-input' },
