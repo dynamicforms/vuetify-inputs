@@ -4,6 +4,10 @@ This section contains a collection of practical examples demonstrating the usage
 
 ## Input Fields
 
+### [df-actions](./df-actions)
+
+A component for rendering a group of actions.
+
 ### [df-checkbox](./df-checkbox)
 
 A component for checkbox / ternary selection.

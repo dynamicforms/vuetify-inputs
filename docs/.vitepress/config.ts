@@ -27,6 +27,7 @@ export default defineConfig({
         {
           text: 'API with Examples',
           items: [
+            { text: 'df-actions', link: '/examples/df-actions' },
             { text: 'df-checkbox', link: '/examples/df-checkbox' },
             { text: 'df-color', link: '/examples/df-color' },
             { text: 'df-date-time', link: '/examples/df-datetime' },

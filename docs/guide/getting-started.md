@@ -98,6 +98,7 @@ const categoryOptions = [
 
 ## Available Components
 
+- [**df-actions**](/examples/df-actions): An actions group.
 - [**df-checkbox**](/examples/df-checkbox): A checkbox component.
 - [**df-color**](/examples/df-color): A color input.
 - [**df-date-time**](/examples/df-datetime): A date and time selection component with configurable format and type.

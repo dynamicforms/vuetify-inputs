@@ -2,6 +2,7 @@ import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue';
 import { App } from 'vue';
 
 export * from './helpers';
+export { default as DfActions } from './df-actions.vue';
 export { default as DfCheckbox } from './df-checkbox.vue';
 export { default as DfColor } from './df-color.vue';
 export { default as DfDateTime } from './df-datetime.vue';
