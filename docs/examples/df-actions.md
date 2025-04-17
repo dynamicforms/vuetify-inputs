@@ -1,114 +1,127 @@
-# DfActions Component
+# df-actions Component
 
-The `DfActions` component is a lightweight wrapper that renders a set of actions as Vuetify buttons with responsive behavior.
+The `df-actions` component provides a clean and responsive way to display action buttons or links, with support for 
+responsive behavior across different screen sizes.
 
 ## Basic Example
 
-Here's a simple example of the `DfActions` component in action:
+Here's a simple example of the `df-actions` component in action:
 
 <ActionsDemo />
 
-## Usage
+## Features
 
-The component accepts an array of `Action` objects and renders them as buttons. Each action can have different display options based on the current screen size.
+- Renders actions as buttons or text links
+- Supports responsive display based on screen size
+- Automatic icon and label handling
+- Grouping options for button layouts
+- Integration with DynamicForms action system
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `actions` | `Action[]` or `Ref<Action[]>` | `[]` | Array of Action objects to render |
+| `buttonSize` | `string` or `number` | `'default'` | Size of buttons (see Vuetify's v-btn size prop) |
+| `showAsGroup` | `'no'` \| `'grouped'` \| `'grouped-no-borders'` | `'no'` | Controls how buttons are grouped |
+
+## Action Object
+
+The component expects an array of `Action` objects with the following structure:
+
+```typescript
+interface Action {
+  renderAs: ActionDisplayStyle;  // BUTTON or TEXT
+  name: string;                  // Unique identifier for the action
+  label?: string;                // Display text (optional)
+  icon?: string;                 // Icon name (optional)
+  displayStyle: {                // Display options
+    renderAs: ActionDisplayStyle;  // BUTTON or TEXT
+    showIcon?: boolean;            // Whether to show the icon
+    showLabel?: boolean;           // Whether to show the label
+    // Responsive breakpoints
+    sm?: {...};                    // Small screen options
+    md?: {...};                    // Medium screen options
+    lg?: {...};                    // Large screen options
+    xl?: {...};                    // Extra large screen options
+  };
+  formAction: FormAction;        // DynamicForms action handler
+}
+```
+
+## Responsive Behavior
+
+The component automatically adapts to different screen sizes based on the `displayStyle` configuration:
+
+```javascript
+const saveAction = new Action({
+  name: 'save',
+  label: 'Save',
+  icon: 'save-outline',
+  displayStyle: {
+    renderAs: ActionDisplayStyle.BUTTON,
+    showIcon: true,
+    showLabel: false,
+    md: { showLabel: true, showIcon: false }, // Medium screens and up
+    lg: { showIcon: true }                    // Large screens and up
+  }
+}, formSaveAction);
+```
+
+With this configuration:
+- On small screens: Only the icon is shown
+- On medium screens: Only the label is shown
+- On large screens: Both icon and label are shown
+
+## Button Grouping
+
+The `showAsGroup` property allows you to control the visual grouping of buttons:
+
+- `'no'`: Buttons are displayed as separate elements
+- `'grouped'`: Buttons are grouped with borders
+- `'grouped-no-borders'`: Buttons are grouped without borders
+
+## Usage with DynamicForms
 
 ```vue
 <template>
-  <df-actions :actions="actions" button-size="default" />
+  <df-actions :actions="actions" button-size="small" />
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import { Action, DisplayStyle } from '@dynamicforms/vuetify-actions';
-import { DfActions } from '@dynamicforms/vuetify-actions';
+import { Action, ActionDisplayStyle } from '@dynamicforms/vuetify-inputs';
 import { Action as FormAction } from '@dynamicforms/vue-forms';
 
-// Create actions
+// Create form actions
+const saveAction = new FormAction();
+const cancelAction = new FormAction();
+
+// Create actions for the component
 const actions = ref([
   new Action({
     name: 'save',
     label: 'Save',
     icon: 'save-outline',
     displayStyle: {
-      renderAs: DisplayStyle.BUTTON,
+      renderAs: ActionDisplayStyle.BUTTON,
       showIcon: true,
-      showLabel: true,
-      sm: { showLabel: false } // On small screens, only show icon
+      showLabel: true
     }
-  }, new FormAction()),
+  }, saveAction),
   
   new Action({
     name: 'cancel',
     label: 'Cancel',
     icon: 'close-outline',
     displayStyle: {
-      renderAs: DisplayStyle.BUTTON,
+      renderAs: ActionDisplayStyle.BUTTON,
       showIcon: true,
-      showLabel: true,
-      sm: { showLabel: false } // On small screens, only show icon
+      showLabel: true
     }
-  }, new FormAction())
+  }, cancelAction)
 ]);
 </script>
-```
-
-## Props
-
-The component accepts the following props:
-
-| Prop | Type                                             | Default     | Description |
-|------|--------------------------------------------------|-------------|-------------|
-| `actions` | `Action[]`                                  | `[]`        | Array of Action objects to render |
-| `buttonSize` | `string` or `number`                     | `'default'` | Size of buttons (see Vuetify's v-btn size prop) |
-| `groupMode` | 'no' \| 'grouped' \| 'grouped-no-borders' | `'no'`      | Controls how buttons are grouped |
-
-## Responsive Behavior
-
-The component uses Vuetify's `useDisplay` composable to detect the current screen size and renders each action according to its responsive configuration:
-
-```js
-// Inside the component
-const display = useDisplay();
-const displayStyle = computed(() => {
-  const res = {};
-  for (const action of props.actions) {
-    res[action.name] = action.displayStyle.getOptionsForBreakpoint(getBreakpointName(display));
-  }
-  return res;
-});
-```
-
-This allows each action to adapt its appearance based on the current breakpoint.
-
-## Implementation Details
-
-The component:
-
-1. Renders a container div with right-aligned text
-2. Maps each action to a Vuetify button
-3. Controls the display of icons and labels based on the current breakpoint
-4. Handles clicks by executing the action's formAction
-
-The source code is quite straightforward:
-
-```vue
-<template>
-  <div v-if="actions.length > 0" class="text-end">
-    <v-btn
-      v-for="(action, idx) in actions"
-      :key="idx"
-      variant="tonal"
-      :elevation="0"
-      :class="idx === 0 ? '' : 'ms-3'"
-      :size="buttonSize"
-      @click.stop="(event: MouseEvent) => action.formAction.execute(event)"
-    >
-      <IonIcon v-if="displayIcon(action)" class="action-icon" :name="action.formAction.icon"/>
-      <span v-if="displayIcon(action) && displayLabel(action)" style="width: .5rem"/>
-      <span v-if="displayLabel(action)">{{ labelText(action) }}</span>
-    </v-btn>
-  </div>
-</template>
 ```
 
 <script setup>

@@ -3,7 +3,7 @@ layout: home
 hero:
   name: DynamicForms Vuetify
   text: A powerful collection of Vuetify input components
-  tagline: Beautifully styled form components that integrate with DynamicForms
+  tagline: Beautifully styled form components that integrate with DynamicForms vue-forms package
   actions:
     - theme: brand
       text: Get Started

@@ -114,7 +114,6 @@ const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, '
 const valueISOFull = ref<string | null>(null);
 function setValueISOFull(newISOValue: string | null, dateOrTimeIdx: number) {
   if (newISOValue == null) {
-    console.log('aha!');
     valueISOFull.value = null;
   } else if (dateOrTimeIdx === -1) {
     // setting valueISOFull from value

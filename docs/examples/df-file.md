@@ -14,22 +14,34 @@ Below is an example of the df-file component used with DynamicForms:
 - Integration with `@dynamicforms/vue-forms` for state management
 - File upload with progress indication
 - File deletion support
+- Automatic periodic "touches" to keep uploaded files active
 - Customizable labels, hints, and error messages
 - Backend communication abstraction through the FileComms interface
 
 ## Props
 
+In addition to [common props from InputBase](./input-base), this component requires:
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| control | `Field` | `undefined` | DynamicForms field object |
-| modelValue | `string` | `null` | The file identifier (v-model) when used without control |
 | comms | `FileComms` | **Required** | Object with methods for file operations |
-| label | `string` | `''` | Input label |
-| hint | `string` | `''` | Hint text displayed below the input |
-| helpText | `string` | `''` | Additional help text |
-| enabled | `boolean` | `true` | Whether the input is enabled |
-| visibility | `DisplayMode` | `FULL` | Visibility mode of the component |
-| cssClass | `string` | `''` | Additional CSS classes |
+
+### Inherited Props
+
+This component inherits all common props from [InputBase](./input-base), including:
+- `control` - DynamicForms field object
+- `modelValue` - The file identifier string (v-model)
+- `label` - Input label
+- `hint` - Hint text
+- And more...
+
+## Value Format
+
+The component stores and emits a string identifier for the file, not the file itself. This identifier is:
+
+1. Obtained from the `upload` method in the `comms` object when a file is selected
+2. Used in subsequent operations (delete, touch) to reference the file
+3. Stored in the form data when using DynamicForms
 
 ## FileComms Interface
 
@@ -67,14 +79,88 @@ type FileProgressCallback = (loaded: number, total: number) => void;
 The component displays a progress bar during file upload, using the values provided by the `progressCallback` in the
 `upload` method.
 
-After a file has been uploaded to the backend, it will be touched every 60 seconds to let backend know that it's still 
+After a file has been uploaded to the backend, it will be touched every 60 seconds to let the backend know that it's still 
 relevant.
 
 ## Events
 
-| Event | Arguments | Description |
-|-------|-----------|-------------|
-| update:modelValue | `value: string` | Emitted when the file identifier changes (when used without control) |
+This component emits all [common events from InputBase](./input-base):
+- `update:modelValue` - When the file identifier changes
+
+## Examples
+
+### Basic Example with Direct API Communication
+
+```vue
+<template>
+  <df-file
+    v-model="fileId"
+    :comms="fileComms"
+    label="Upload Document"
+    hint="Accepted file formats: PDF, DOCX (max 5MB)"
+  />
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import axios from 'axios';
+import { DfFile } from '@dynamicforms/vuetify-inputs';
+
+const fileId = ref(null);
+
+// Implementation of FileComms for API communication
+const fileComms = {
+  upload: async (file, progressCallback) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await axios.post('/api/upload', formData, {
+      onUploadProgress: (progressEvent) => {
+        if (progressCallback) {
+          progressCallback(progressEvent.loaded, progressEvent.total);
+        }
+      }
+    });
+    
+    return response.data.fileId;
+  },
+  
+  delete: async (fileId) => {
+    await axios.delete(`/api/files/${fileId}`);
+  },
+  
+  touch: async (fileId) => {
+    await axios.post(`/api/files/${fileId}/touch`);
+  }
+};
+</script>
+```
+
+### With DynamicForms Integration
+
+```vue
+<template>
+  <df-file
+    :control="form.fields.document"
+    :comms="fileComms"
+    label="Upload Document"
+  />
+</template>
+
+<script setup>
+import { Group, Field } from '@dynamicforms/vue-forms';
+import { DfFile } from '@dynamicforms/vuetify-inputs';
+
+const form = new Group({
+  document: Field.create({ value: null })
+});
+
+// Implementation of FileComms (same as above)
+const fileComms = {
+  // ... implementation as in previous example
+};
+</script>
+```
 
 <script setup>
 import FileBasic from '../components/file-basic.vue';

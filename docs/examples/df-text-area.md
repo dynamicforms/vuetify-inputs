@@ -18,34 +18,84 @@ Below is an example of the df-text-area component used with DynamicForms:
 
 ## Props
 
+In addition to [common props from InputBase](./input-base), this component supports:
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| control | `Field` | `undefined` | DynamicForms field object |
-| modelValue | `string` | `''` | The input value (v-model) when used without control |
-| label | `string` | `''` | Input label |
-| hint | `string` | `''` | Hint text displayed below the input |
-| helpText | `string` | `''` | Additional help text |
 | rows | `number` | `undefined` | Number of visible text rows |
 | maxRows | `number` | `undefined` | Maximum number of rows when auto-grow is enabled |
-| enabled | `boolean` | `true` | Whether the input is enabled |
-| visibility | `DisplayMode` | `FULL` | Visibility mode of the component |
-| cssClass | `string` | `''` | Additional CSS classes |
+
+### Inherited Props
+
+This component inherits all common props from [InputBase](./input-base), including:
+- `control` - DynamicForms field object
+- `modelValue` - The textarea content (v-model)
+- `label` - Input label
+- `hint` - Hint text
+- And more...
 
 ## Auto-Growing Behavior
 
 The textarea will automatically grow when content exceeds the visible space, but only if `maxRows` is set to a positive
 value. This prevents the textarea from growing indefinitely.
 
-## Length Validation
-
-Setting `maxLength` adds a validation rule that ensures the text doesn't exceed the specified number of characters.
-The validation message will be displayed if the text is too long.
+When auto-grow is enabled:
+- The textarea starts with the height specified by `rows`
+- It grows as content is added, up to the limit specified by `maxRows`
+- A scrollbar appears if content exceeds the maximum height
 
 ## Events
 
-| Event | Arguments | Description |
-|-------|-----------|-------------|
-| update:modelValue | `value: string` | Emitted when the input value changes (when used without control) |
+This component emits all [common events from InputBase](./input-base):
+- `update:modelValue` - When the textarea content changes
+
+## Examples
+
+### Basic Textarea
+
+```vue
+<template>
+  <df-text-area
+    v-model="description"
+    label="Description"
+    hint="Enter a detailed description"
+    :rows="4"
+    :max-rows="8"
+  />
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { DfTextArea } from '@dynamicforms/vuetify-inputs';
+
+const description = ref('');
+</script>
+```
+
+### With DynamicForms Integration
+
+```vue
+<template>
+  <df-text-area
+    :control="form.fields.notes"
+    label="Additional Notes"
+    hint="Any extra information (optional)"
+    :rows="3"
+  />
+</template>
+
+<script setup>
+import { Group, Field } from '@dynamicforms/vue-forms';
+import { DfTextArea, Validators } from '@dynamicforms/vuetify-inputs';
+
+const form = new Group({
+  notes: Field.create({ 
+    value: '',
+    validators: [new Validators.LengthInRange(minLength, maxLength)]
+  })
+});
+</script>
+```
 
 <script setup>
 import TextareaBasic from '../components/textarea-basic.vue';

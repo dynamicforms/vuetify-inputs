@@ -19,17 +19,21 @@ Below is an example demonstrating different configurations of the df-checkbox co
 
 ## Props
 
+In addition to [common props from InputBase](./input-base), this component supports:
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| control | `Field` | `undefined` | DynamicForms field object |
-| modelValue | `boolean \| null` | `false` | The checkbox value (v-model) when used without control |
-| label | `string` | `''` | Checkbox label |
-| hint | `string` | `''` | Hint text displayed below the checkbox |
-| helpText | `string` | `''` | Additional help text |
 | allowNull | `boolean` | `false` | Whether to allow null (indeterminate) state |
-| enabled | `boolean` | `true` | Whether the input is enabled |
-| visibility | `DisplayMode` | `FULL` | Component visibility mode |
-| cssClass | `string` | `''` | Additional CSS classes |
+
+### Inherited Props
+
+This component inherits all common props from [InputBase](./input-base), including:
+- `control` - DynamicForms field object
+- `modelValue` - The checkbox value (v-model)
+- `label` - Checkbox label
+- `hint` - Hint text
+- `enabled` - Whether the input is enabled
+- And more...
 
 ## State Cycling Behavior
 
@@ -40,9 +44,50 @@ When clicked, the checkbox cycles through states in the following order:
 
 ## Events
 
-| Event | Arguments | Description |
-|-------|-----------|-------------|
-| update:modelValue | `value: boolean \| null` | Emitted when the checkbox value changes |
+This component emits all [common events from InputBase](./input-base):
+- `update:modelValue` - When the checkbox value changes
+
+## Examples
+
+### Basic Binary Checkbox
+
+```vue
+<template>
+  <df-checkbox
+    v-model="agreeToTerms"
+    label="I agree to the terms and conditions"
+  />
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { DfCheckbox } from '@dynamicforms/vuetify-inputs';
+
+const agreeToTerms = ref(false);
+</script>
+```
+
+### Ternary Checkbox with DynamicForms
+
+```vue
+<template>
+  <df-checkbox
+    :control="form.fields.isVerified"
+    :allow-null="true"
+    label="Verification status"
+    hint="Check: verified, Indeterminate: pending, Unchecked: not verified"
+  />
+</template>
+
+<script setup>
+import { Group, Field } from '@dynamicforms/vue-forms';
+import { DfCheckbox } from '@dynamicforms/vuetify-inputs';
+
+const form = new Group({
+  isVerified: Field.create({ value: null })
+});
+</script>
+```
 
 <script setup>
 import CheckboxBasic from '../components/checkbox-basic.vue';

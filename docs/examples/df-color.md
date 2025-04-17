@@ -5,14 +5,14 @@ a visual color picker interface with hex color input support.
 
 ## Basic Usage
 
-Below is an example of the df-color-picker component used with DynamicForms:
+Below is an example of the df-color component used with DynamicForms:
 
 <color-basic/>
 
 ## Features
 
 - Integration with `@dynamicforms/vue-forms` for state management and validation
-- Visual color picker interface
+- Visual color picker interface based on Vuetify's color picker
 - Support for hex color input
 - Visual color indicator preview
 - Validation for proper hex color format
@@ -20,17 +20,20 @@ Below is an example of the df-color-picker component used with DynamicForms:
 
 ## Props
 
+In addition to [common props from InputBase](./input-base), this component supports:
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| control | `Field` | `undefined` | DynamicForms field object |
-| modelValue | `string` | `''` | The color value in hex format (v-model) when used without control |
-| label | `string` | `''` | Input label |
-| hint | `string` | `''` | Hint text displayed below the input |
-| helpText | `string` | `''` | Additional help text |
 | allowNull | `boolean` | `false` | Whether to allow null (empty) values |
-| enabled | `boolean` | `true` | Whether the input is enabled |
-| visibility | `DisplayMode` | `FULL` | Component visibility mode |
-| cssClass | `string` | `''` | Additional CSS classes |
+
+### Inherited Props
+
+This component inherits all common props from [InputBase](./input-base), including:
+- `control` - DynamicForms field object
+- `modelValue` - The color value in hex format
+- `label` - Input label
+- `hint` - Hint text
+- And more...
 
 ## Color Format
 
@@ -39,14 +42,69 @@ alpha channel (e.g., `#FF0000FF`).
 
 ## Validation
 
-The component includes built-in validation for proper hex color format. The validation can be customized or 
-extended as needed.
+The component includes built-in validation for proper hex color format. By default, it validates that the value is:
+
+1. A valid hex color string
+2. Has the correct format (#RRGGBB or #RRGGBBAA)
+
+You can extend this validation by adding custom validators to the DynamicForms Field:
+
+```javascript
+const colorField = Field.create({
+  value: '#FF0000',
+  validators: [
+    {
+      validate: (value) => {
+        // Your custom validation logic
+        if (value && !value.startsWith('#')) {
+          return 'Color must start with #';
+        }
+        return null; // Return null for valid values
+      }
+    }
+  ]
+});
+```
 
 ## Events
 
-| Event | Arguments | Description |
-|-------|-----------|-------------|
-| update:modelValue | `value: string` | Emitted when the color value changes |
+This component emits all [common events from InputBase](./input-base):
+- `update:modelValue` - When the color value changes
+
+## Example: Custom Validation
+
+```vue
+<template>
+  <df-color
+    :control="colorField"
+    label="Brand Color"
+    hint="Select a color from the brand palette"
+  />
+</template>
+
+<script setup>
+import { Field } from '@dynamicforms/vue-forms';
+import { DfColor } from '@dynamicforms/vuetify-inputs';
+
+// Valid brand colors
+const brandColors = ['#C41E3A', '#1B4D3E', '#0F52BA', '#FFA500'];
+
+const colorField = Field.create({
+  value: '#C41E3A',
+  validators: [
+    {
+      validate: (value) => {
+        if (!value) return null;
+        if (!brandColors.includes(value)) {
+          return 'Please select a color from the brand palette';
+        }
+        return null;
+      }
+    }
+  ]
+});
+</script>
+```
 
 <script setup>
 import ColorBasic from '../components/color-basic.vue';
