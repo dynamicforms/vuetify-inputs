@@ -21,12 +21,6 @@ v-number-input component:
 - Integration with `@dynamicforms/vue-forms` for state management and validation
 - Support for multiple input types: text, email, password, URL, and number
 - Automatic use of specialized Vuetify number input for numerical fields
-- Built-in validation for:
-  - Pattern matching
-  - Min/max length restrictions
-  - Min/max value restrictions (for number inputs)
-  - Number format validation
-- Optional null value handling
 
 ## Props
 
@@ -39,10 +33,6 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | max | `number` | `undefined` | Maximum value (for number inputs) |
 | step | `number` | `undefined` | Step value (for number inputs) |
 | precision | `number` | `undefined` | Decimal precision (for number inputs) |
-| minLength | `number` | `undefined` | Minimum text length |
-| maxLength | `number` | `undefined` | Maximum text length |
-| pattern | `string` \| `RegExp` | `undefined` | Validation pattern for text |
-| allowNull | `boolean` | `true` | Whether null values are allowed |
 
 ### Inherited Props
 
@@ -59,7 +49,6 @@ When `inputType` is set to 'number', the component:
 
 1. Applies min, max, and step controls
 2. Validates for proper numeric format
-3. Provides specialized number validation rules
 
 The number input supports:
 - Integer and decimal values
@@ -117,18 +106,7 @@ import { Group, Field } from '@dynamicforms/vue-forms';
 import { DfInput } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
-  quantity: Field.create({
-    value: 1,
-    validators: [
-      {
-        validate: (value) => {
-          if (value === null) return 'Quantity is required';
-          if (value < 1) return 'Minimum quantity is 1';
-          return null;
-        }
-      }
-    ]
-  })
+  quantity: Field.create({ value: 1 }),
 });
 </script>
 ```

@@ -75,19 +75,7 @@ const selectedType = ref('text');
 const inputValue = ref('');
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-const inputField = Field.create({
-  value: '',
-  validators: [
-    {
-      validate: (value) => {
-        if (selectedType.value === 'email' && value && !value.match(emailPattern)) {
-          return 'Please enter a valid email address';
-        }
-        return null;
-      }
-    }
-  ]
-});
+const inputField = Field.create({ value: '' });
 
 watch(selectedType, (newType) => {
   // Reset field when changing input type

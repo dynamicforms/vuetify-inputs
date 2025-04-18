@@ -27,6 +27,8 @@ export default defineConfig({
         {
           text: 'API with Examples',
           items: [
+            { text: 'input base', link: '/examples/input-base' },
+            { text: 'validation', link: '/examples/validators' },
             { text: 'df-actions', link: '/examples/df-actions' },
             { text: 'df-checkbox', link: '/examples/df-checkbox' },
             { text: 'df-color', link: '/examples/df-color' },

@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref } from 'vue';
 import { Field } from '@dynamicforms/vue-forms';
 import { DfInput } from '../../src';
 
@@ -99,31 +99,6 @@ const allowNull = ref(false);
 
 const quantityField = Field.create({ value: 1 });
 const priceField = Field.create({ value: 10.99 });
-
-// Watch for changes to allowNull and update field settings
-watch(allowNull, (newValue) => {
-  quantityField.validators = [
-    {
-      validate: (value) => {
-        if (value === null && !newValue) {
-          return 'Quantity cannot be null';
-        }
-        return null;
-      }
-    }
-  ];
-
-  priceField.validators = [
-    {
-      validate: (value) => {
-        if (value === null && !newValue) {
-          return 'Price cannot be null';
-        }
-        return null;
-      }
-    }
-  ];
-});
 
 function increaseQuantity() {
   if (quantityField.value === null) {

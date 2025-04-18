@@ -1,4 +1,4 @@
-import Form from '@dynamicforms/vue-forms';
+import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
 import { isEmpty } from 'lodash-es';
 import { computed } from 'vue';
 
@@ -20,6 +20,7 @@ export const defaultBaseProps = { enabled: undefined };
 
 export interface BaseEmits<T = any> {
   (e: 'update:modelValue', value: T): void;
+
   (e: 'click:clear'): void;
 }
 
@@ -43,8 +44,11 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
 
   const valid = computed(() => (props.control ? props.control.valid : true));
   const errors = computed(
-    () => (props.control ? props.control.errors.map((error) => error.toString()) : (props.errors || [])),
+    () => (props.control ?
+      props.control.errors :
+      (props.errors || []).map((error) => new ValidationErrorRenderContent(error))),
   );
+  const anyErrors = computed(() => (errors.value.length > 0 ? ' ' : undefined));
   const enabled = computed(() => (props.control ? props.control.enabled : (props.enabled !== false)));
   const visibility = computed(
     () => (props.control ? props.control.visibility : (props.visibility || Form.DisplayMode.FULL)),
@@ -59,6 +63,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     value,
     valid,
     enabled,
+    errors,
     visibility,
 
     vuetifyBindings: computed(() => ({
@@ -66,8 +71,8 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
       class: cssClass.value,
 
       label: label.value,
-      'error-messages': errors.value,
-      'error-count': errors?.value.length || 0,
+      messages: anyErrors.value,
+      // 'error-count': errors?.value.length || 0,
       readonly: !enabled.value,
       disabled: !enabled.value,
 
@@ -76,7 +81,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
 
       hint: hint.value,
       persistentHint: true, // we want persistent hint always
-      hideDetails: 'auto' as boolean | 'auto' | undefined, // we want to hide the hint element when hit isn't there
+      hideDetails: <boolean | 'auto' | undefined>'auto', // we want to hide the hint element when hint isn't there
       helpText: helpText.value,
     })),
   };

@@ -62,6 +62,9 @@
         </template>
       </v-list-item>
     </template>
+    <template #message>
+      <errors-widget :errors="errors"/>
+    </template>
   </component>
 </template>
 
@@ -70,7 +73,15 @@ import { DisplayMode } from '@dynamicforms/vue-forms';
 import { ref, computed, toRefs, watch, nextTick } from 'vue';
 import IonIcon from 'vue-ionicon';
 
-import { BaseEmits, BaseProps, defaultBaseProps, SelectChoice, SelectFetchChoices, useInputBase } from './helpers';
+import {
+  BaseEmits,
+  BaseProps,
+  defaultBaseProps,
+  ErrorsWidget,
+  SelectChoice,
+  SelectFetchChoices,
+  useInputBase,
+} from './helpers';
 import {
   convertItems,
   getSelectedChoices,
@@ -102,9 +113,10 @@ const isFocused = ref(false);
 interface Emits extends BaseEmits {
   (e: 'update:modelValueDisplay', value: SelectChoice[]): any;
 }
+
 const emits = defineEmits<Emits>();
 
-const { value: resultingValue, vuetifyBindings } = useInputBase(propsWithDefaults, emits);
+const { errors, value: resultingValue, vuetifyBindings } = useInputBase(propsWithDefaults, emits);
 
 const selected = ref<any>(null);
 const loadedChoices = ref<SelectChoice[]>(choices || []);
@@ -164,16 +176,19 @@ function initialValueCheck() {
   emitModelValueDisplay(val);
   resultingValue.value = val;
 }
+
 initialValueCheck();
 
 // Starting settings: check if ajax and current value is not loaded yet - then load the value from back-end
 if (propsWithDefaults.fetchChoices !== undefined) {
-  queryOptions(undefined, resultingValue.value).then(() => { initialValueCheck(); });
+  queryOptions(undefined, resultingValue.value).then(() => {
+    initialValueCheck();
+  });
 }
 </script>
 <style scoped>
 .action-icon {
-  width:  1.5em;
+  width: 1.5em;
   height: 1.5em;
 }
 </style>

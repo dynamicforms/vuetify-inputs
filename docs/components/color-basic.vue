@@ -50,19 +50,16 @@
 
 <script setup>
 import { ref } from 'vue';
-import { Field } from '@dynamicforms/vue-forms';
+import {Field, MdString, Validators} from '@dynamicforms/vue-forms';
 import { DfColor } from '../../src';
 
 const colorField = Field.create({
   value: '#42A5F5',
   validators: [
-    {
-      validate: (value) => {
-        if (!value) return null;
-        const regex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;
-        return regex.test(value) ? null : 'Please enter a valid hex color code (e.g., #FF0000 or #FF0000FF)';
-      }
-    }
+    new Validators.Pattern(
+      /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/,
+      new MdString('Please enter a valid **hex color code** (e.g., *#FF0000* or *#FF0000FF*)'),
+    ),
   ]
 });
 

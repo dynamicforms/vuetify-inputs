@@ -1,21 +1,23 @@
 <template>
   <v-checkbox
     v-model="boolValue"
-    v-bind="vuetifyBindings"
+    v-bind="vuetifyBindings as any"
 
     density="compact"
     :indeterminate="indeterminate"
     :false-value="false"
     :true-value="true"
     @change="change"
-  />
+  >
+    <template #message><errors-widget :errors="errors"/></template>
+  </v-checkbox>
 </template>
 
 <script setup lang="ts">
 import { clone } from 'lodash-es';
 import { computed, watch } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, ErrorsWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   allowNull?: boolean;
@@ -25,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), { ...defaultBaseProps, allowNul
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { value, vuetifyBindings } = useInputBase(props, emits);
+const { errors, value, vuetifyBindings } = useInputBase(props, emits);
 
 const indeterminate = computed(() => props.allowNull && (value.value == null));
 

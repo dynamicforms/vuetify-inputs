@@ -8,13 +8,13 @@
     <template #activator="{ props: menuProps }">
       <v-text-field
         v-model="value"
-        v-bind="{ ...vuetifyBindings, ...menuProps }"
-        :hide-details="true"
+        v-bind="{ ...vuetifyBindings, ...menuProps } as any"
         :clearable="allowNull"
         type="text"
         variant="underlined"
         :rules="rules"
       >
+        <template #message><errors-widget :errors="errors"/></template>
         <template #prepend-inner>
           <div
             style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid #ccc;"
@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, ErrorsWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   allowNull?: boolean;
@@ -46,7 +46,7 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
-const { value, vuetifyBindings } = useInputBase(props, emits);
+const { errors, value, vuetifyBindings } = useInputBase(props, emits);
 const dropdownShown = ref(false);
 
 const rules = computed<((val: string) => boolean | string)[]>(() => ([

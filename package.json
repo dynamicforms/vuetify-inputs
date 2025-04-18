@@ -42,13 +42,14 @@
   "issues": "https://github.com/velis74/dynamicforms-vuetify-inputs/issues",
   "peerDependencies": {
     "@ckeditor/ckeditor5-vue": "^7.0.0",
-    "@dynamicforms/vue-forms": "^0.1.5",
+    "@dynamicforms/vue-forms": "^0.2.3",
     "ckeditor5": "^43.0.0",
     "date-fns": "^4.1.0",
     "lodash-es": "^4.17.12",
     "vue": "^3.4",
     "vue-ionicon": "^2.1.1",
-    "vuetify": "^3.7"
+    "vue-markdown-render": "^2.2.1",
+    "vuetify": "^3.8.2"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",

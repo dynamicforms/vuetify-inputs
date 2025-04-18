@@ -15,8 +15,10 @@
       :rows="rows"
       :auto-grow="(maxRows || 0) > 0"
       :max-rows="maxRows"
-      v-bind="vuetifyBindings"
-    />
+      v-bind="vuetifyBindings as any"
+    >
+      <template #message><errors-widget :errors="errors"/></template>
+    </v-textarea>
   </div>
 </template>
 
@@ -24,7 +26,7 @@
 import { DisplayMode } from '@dynamicforms/vue-forms';
 import { toRefs } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, ErrorsWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   rows?: number;
@@ -39,7 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { value, vuetifyBindings } = useInputBase(props, emits);
+const { errors, value, vuetifyBindings } = useInputBase(props, emits);
 const { cssClass, visibility } = toRefs(props);
 </script>
 
