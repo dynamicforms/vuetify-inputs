@@ -59,6 +59,7 @@
     "@vue/tsconfig": "^0.7.0",
     "eslint-config-velis": "^1.1.16",
     "jsdom": "^26.0.0",
+    "rollup-plugin-visualizer": "^5.14.0",
     "typescript": "^5",
     "vite": "^5",
     "vite-plugin-dts": "^4",
