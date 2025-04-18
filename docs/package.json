@@ -15,7 +15,6 @@
     "countries-and-timezones": "^3.7.2"
   },
   "devDependencies": {
-    "@mdi/font": "^7.4.47",
     "sass": "^1.85.1",
     "vitepress": "^1.6.3"
   }

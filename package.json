@@ -1,7 +1,7 @@
 {
   "name": "@dynamicforms/vuetify-inputs",
   "private": false,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Visual components for data entry using @dynamicforms/vue-forms",
   "author": "Jure Erznožnik",
@@ -43,6 +43,7 @@
   "peerDependencies": {
     "@ckeditor/ckeditor5-vue": "^7.0.0",
     "@dynamicforms/vue-forms": "^0.2.3",
+    "@mdi/font": "^7.4.47",
     "ckeditor5": "^43.0.0",
     "date-fns": "^4.1.0",
     "lodash-es": "^4.17.12",
