@@ -8,6 +8,7 @@
           :editor="editor"
           :config="editorConfig"
           :disabled="disabled"
+          :style="`min-height: ${minHeight}`"
           @ready="onEditorReady"
           @update:model-value="(event: any) => emit('update:modelValue', event)"
         />
