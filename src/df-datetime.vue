@@ -133,7 +133,7 @@ function setValueISOFull(newISOValue: string | null, dateOrTimeIdx: number) {
 
     if (unref(inputType) === 'date') value.value = vif[0];
     else if (unref(inputType) === 'time') value.value = vif[1];
-    else value.value = unref(valueISOFull);
+    else value.value = unref(valueISOFull) + format(new Date(), 'XXX');
   }
 }
 watch(value, (newValue: string | null) => setValueISOFull(newValue, -1), { immediate: true });

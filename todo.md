@@ -2,6 +2,7 @@ Immediate todo
 
 - show errors only after a field has been changed or if form submit forced form validation
 
+- support serialization format for datetime component
 - df-list (basically a table-editing field) - requires the new table component
 - df-select should be able to render as checkbox group or radio group based on a threshold value provided.
   this should provide an alternate representation of (multi) selections. The threshold would be null (disabled) by 

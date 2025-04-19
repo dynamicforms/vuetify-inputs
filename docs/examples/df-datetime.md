@@ -45,7 +45,8 @@ This component inherits all common props from [InputBase](./input-base), includi
 
 The component accepts and outputs values in the following formats:
 
-- **datetime** mode: ISO 8601 format (`YYYY-MM-DDTHH:mm:ss`)
+- **datetime** mode: ISO 8601 format (`YYYY-MM-DDTHH:mm:ssXXX`)
+  :::info note that resulting value will always carry user's local timezone value
 - **date** mode: ISO 8601 date format (`YYYY-MM-DD`)
 - **time** mode: 24-hour time format (`HH:mm:ss`)
 
