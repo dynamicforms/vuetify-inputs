@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { clone } from 'lodash-es';
-import { computed, watch } from 'vue';
+import { computed } from 'vue';
 
 import { BaseEmits, BaseProps, defaultBaseProps, ErrorsWidget, useInputBase } from './helpers';
 
@@ -33,14 +33,8 @@ const indeterminate = computed(() => props.allowNull && (value.value == null));
 
 const boolValue = computed({
   get(): any { return value.value; },
-  set(unused: boolean) { }, // eslint-disable-line @typescript-eslint/no-unused-vars
+  set() { },
 });
-
-watch(value, (newVal: boolean | null) => {
-  if (newVal) value.value = true;
-  else if (props.allowNull && newVal == null) value.value = null;
-  else value.value = false;
-}, { immediate: true });
 
 function change() {
   const oldVal = clone(value.value);
