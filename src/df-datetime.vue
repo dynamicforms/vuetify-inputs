@@ -80,7 +80,6 @@
 import { format, parse } from 'date-fns';
 import { toNumber, isNaN } from 'lodash-es';
 import { ref, computed, watch, toRefs, unref } from 'vue';
-import { VTimePicker } from 'vuetify/labs/VTimePicker'; // eslint-disable-line import/extensions
 
 import { BaseEmits, BaseProps, defaultBaseProps, InputBase, useInputBase } from './helpers';
 

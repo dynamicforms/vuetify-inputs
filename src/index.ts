@@ -1,19 +1,26 @@
 import { CkeditorPlugin } from '@ckeditor/ckeditor5-vue';
 import { App } from 'vue';
 
-export * from './helpers';
-export { default as DfActions } from './df-actions.vue';
-export { default as DfCheckbox } from './df-checkbox.vue';
-export { default as DfColor } from './df-color.vue';
-export { default as DfDateTime } from './df-datetime.vue';
-export { default as DfFile } from './df-file.vue';
-export { default as DfInput } from './df-input.vue';
-export { default as DfRtfEditor } from './df-rtf-editor.vue';
-export { default as DfSelect } from './df-select.vue';
-export { default as DfTextArea } from './df-text-area.vue';
+import * as Inputs from './dynamicforms-components';
+import * as VuetifyComponents from './vuetify-components';
 
-export const VuetifyInputs = {
-  install: (app: App) => {
+export * from './helpers';
+export * as VuetifyComponents from './vuetify-components';
+export * from './dynamicforms-components';
+
+export interface DynamicFormsInputsOptions {
+  registerComponents: boolean;
+  registerVuetifyComponents: boolean;
+}
+
+export const DynamicFormsInputs = {
+  install: (app: App, options?: Partial<DynamicFormsInputsOptions>) => {
     app.use(CkeditorPlugin);
+    if (options?.registerComponents ?? false) {
+      Object.entries(Inputs).map(([name, component]) => app.component(name, component));
+    }
+    if (options?.registerVuetifyComponents ?? false) {
+      Object.entries(VuetifyComponents).map(([name, component]) => app.component(name, component));
+    }
   },
 };

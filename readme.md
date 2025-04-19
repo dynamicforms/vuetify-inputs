@@ -22,6 +22,18 @@ visual implementation of logical concepts from
 npm install @dynamicforms/vuetify-inputs
 ```
 
+In your main.py
+```typescript
+import { DynamicFormsInputs } from '@dynamicforms/vuetify-inputs';
+
+...
+const app = createApp(MyApp);
+app.use(router);
+app.use(vuetify);
+// registers the library for use and optionally inputs globally
+app.use(DynamicFormsInputs, { registerComponents: true, registerVuetifyComponents: false });
+```
+
 ## Basic Usage Example
 
 The library offers various components, including:

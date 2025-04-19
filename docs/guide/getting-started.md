@@ -6,6 +6,30 @@
 npm install @dynamicforms/vuetify-inputs
 ```
 
+In your main.py
+```typescript
+import { DynamicFormsInputs } from '@dynamicforms/vuetify-inputs';
+
+...
+const app = createApp(MyApp);
+app.use(router);
+app.use(vuetify);
+// registers the library for use and optionally inputs globally
+app.use(DynamicFormsInputs, { registerComponents: true, registerVuetifyComponents: false });
+```
+
+::: tip
+you may also import a list of components like so:
+
+```typescript
+import { VuetifyComponents } from '@dynamicforms/vuetify-inputs';
+
+...
+
+Object.entries(VuetifyComponents).map(([name, component]) => app.component(name, component));
+```
+:::
+
 ## Basic Usage
 
 `@dynamicforms/vuetify-inputs` provides Vuetify-based input components that work with `@dynamicforms/vue-forms` for form 

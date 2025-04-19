@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import eslint from 'vite-plugin-eslint';
 import dts from 'vite-plugin-dts';
-// import { visualizer } from 'rollup-plugin-visualizer';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 /** @type {import('vite').UserConfig} */
 export default defineConfig({
@@ -22,12 +22,12 @@ export default defineConfig({
       tsconfigPath: './tsconfig.build.json',
       rollupTypes: true
     }),
-    // visualizer({
-    //   open: true,
-    //   filename: 'stats.html',
-    //   gzipSize: true,
-    //   brotliSize: true,
-    // }),
+    visualizer({
+      open: false,
+      filename: 'coverage/stats.html',
+      gzipSize: true,
+      brotliSize: true,
+    }),
   ],
   resolve: {
     alias: {
@@ -60,6 +60,7 @@ export default defineConfig({
         'vue-ionicon',
         'vue-markdown-render',
         'vuetify',
+        /^vuetify\/.*/,
       ],
       output: {
         globals: (id: string) => id, // all external modules are currently not aliased to anything but their own names
