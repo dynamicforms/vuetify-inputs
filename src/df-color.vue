@@ -23,11 +23,7 @@
         </template>
       </v-text-field>
     </template>
-    <v-color-picker
-      v-model="value"
-      mode="hexa"
-      @update:model-value="handleClose"
-    />
+    <v-color-picker v-model="value" mode="hexa"/>
   </v-menu>
 </template>
 
