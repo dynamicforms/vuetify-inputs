@@ -23,13 +23,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs } from 'vue';
+import { computed, toRefs, unref } from 'vue';
 
 import { BaseEmits, BaseProps, defaultBaseProps, ErrorsWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   inputType?: 'text' | 'password' | 'email' | 'url' | 'number';
-  precision?: number;
+  precision?: number | null;
   step?: number;
   min?: number;
   max?: number;
@@ -38,7 +38,7 @@ interface Props extends BaseProps {
 const props = withDefaults(defineProps<Props>(), {
   ...defaultBaseProps,
   inputType: 'text',
-  precision: undefined,
+  precision: null,
   step: undefined,
   min: undefined,
   max: undefined,
@@ -54,7 +54,7 @@ const { inputType, max, min, precision, step } = toRefs(props);
 
 const isNumber = computed(() => inputType.value === 'number');
 const numberInputBindings = computed(() => (
-  !isNumber.value ? {} : { min: min.value, max: max.value, precision: precision.value, step: step.value }
+  !isNumber.value ? {} : { min: unref(min), max: unref(max), precision: unref(precision), step: unref(step) }
 ));
 </script>
 

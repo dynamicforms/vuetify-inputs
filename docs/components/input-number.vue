@@ -144,4 +144,8 @@ function calculateTotal() {
 .error-text {
   color: #ff5252;
 }
+
+:deep(hr) {
+  margin: 0 !important;
+}
 </style>
