@@ -31,7 +31,7 @@
     hide-details="auto"
     @update:search="(query: any) => queryOptions(query, undefined)"
     @update:model-value="onSelect"
-    @click:clear="selected.value = null"
+    @click:clear="selected = null"
     @focus="isFocused = true"
     @blur="isFocused = false"
   >
