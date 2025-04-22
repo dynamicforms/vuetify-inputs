@@ -16,7 +16,7 @@
     :return-object="false"
 
     v-bind="vuetifyBindings"
-    :label="isFocused ? '' : vuetifyBindings.label"
+    :label="vuetifyBindings.label"
 
     chips
     :auto-select-first="true"
@@ -31,24 +31,21 @@
     @update:search="(query: any) => queryOptions(query, undefined)"
     @update:model-value="onSelect"
     @click:clear="selected = null"
-    @focus="isFocused = true"
-    @blur="isFocused = false"
   >
     <template #chip="{ item }">
       <v-chip
         :key="item.value"
         label
         size="small"
+        class="d-flex align-middle"
         :variant="multiple ? 'tonal' : 'text'"
         :closable="multiple"
         @click:close="chipClose(item.value)"
       >
         <template #prepend>
-          <span v-if="item.raw?.icon" class="me-1">
-            <IonIcon class="action-icon d-inline-block" :name="item.raw.icon"/>
-          </span>
+          <IonIcon v-if="item.raw?.icon" class="me-1 action-icon d-inline-block" :name="item.raw.icon"/>
         </template>
-        {{ item.title }}
+        <span :class="{ 'text-body-1': !multiple }">{{ item.title }}</span>
       </v-chip>
     </template>
 
@@ -105,7 +102,6 @@ const propsWithDefaults = withDefaults(defineProps<Props>(), {
 
 const { choices } = propsWithDefaults;
 const { multiple, allowTags: taggable, allowNull, cssClass, visibility } = toRefs(propsWithDefaults);
-const isFocused = ref(false);
 
 interface Emits extends BaseEmits {
   (e: 'update:modelValueDisplay', value: SelectChoice[]): any;
