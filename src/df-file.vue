@@ -82,9 +82,6 @@ async function upload(file: File) {
   progress.value = -1;
   currentFile.value = file;
 
-  const formData = new FormData();
-  formData.append('file', file, file.name);
-
   try {
     value.value = await props.comms.upload(
       file,
