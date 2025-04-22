@@ -70,6 +70,9 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
       name: props.control?.fieldName,
       class: cssClass.value,
 
+      density: 'default' as 'default',
+      variant: 'underlined' as 'underlined',
+
       label: label.value,
       messages: anyErrors.value,
       // 'error-count': errors?.value.length || 0,

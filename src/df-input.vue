@@ -4,10 +4,9 @@
       v-if="!isNumber"
       v-model="value"
       v-bind="vuetifyBindings as any"
-      variant="underlined"
       :type="inputType"
     >
-      <template #message><errors-widget :errors="errors"/></template>
+      <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
     </v-text-field>
     <v-number-input
       v-else
@@ -15,9 +14,8 @@
       v-bind="{ ...vuetifyBindings, ...numberInputBindings } as any"
       density="compact"
       control-variant="stacked"
-      variant="underlined"
     >
-      <template #message><errors-widget :errors="errors"/></template>
+      <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
     </v-number-input>
   </div>
 </template>
@@ -25,7 +23,7 @@
 <script setup lang="ts">
 import { computed, toRefs, unref } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, ErrorsWidget, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, MessagesWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   inputType?: 'text' | 'password' | 'email' | 'url' | 'number';

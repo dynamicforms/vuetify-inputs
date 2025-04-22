@@ -11,6 +11,8 @@
       <v-file-input
         v-model="selectedFile"
         :label="fileLabel"
+        :density="vuetifyBindings.density"
+        :variant="vuetifyBindings.variant"
         :readonly="vuetifyBindings.readonly"
         :disabled="vuetifyBindings.disabled"
         :name="vuetifyBindings.name"

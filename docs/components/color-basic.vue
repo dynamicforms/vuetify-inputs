@@ -16,7 +16,6 @@
             <df-color
               v-model="directColor"
               label="Direct v-model color"
-              hint="Using v-model directly without Field control"
               :allow-null="true"
             />
           </v-col>

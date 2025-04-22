@@ -12,7 +12,6 @@
       },
     ]"
 
-    density="compact"
     :items="options"
     :return-object="false"
 
@@ -62,9 +61,7 @@
         </template>
       </v-list-item>
     </template>
-    <template #message>
-      <errors-widget :errors="errors"/>
-    </template>
+    <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
   </component>
 </template>
 
@@ -77,7 +74,7 @@ import {
   BaseEmits,
   BaseProps,
   defaultBaseProps,
-  ErrorsWidget,
+  MessagesWidget,
   SelectChoice,
   SelectFetchChoices,
   useInputBase,

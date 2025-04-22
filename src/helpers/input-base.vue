@@ -15,7 +15,7 @@
       :persistent-hint="vuetifyBindings.persistentHint"
       :hide-details="vuetifyBindings.hideDetails"
     >
-      <template #message><errors-widget :errors="errors"/></template>
+      <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
       <slot/>
       <template v-if="isClearable" #append>
         <v-icon @click="emits('click:clear')">mdi-close-circle</v-icon>
@@ -28,8 +28,8 @@
 import { DisplayMode } from '@dynamicforms/vue-forms';
 import { computed, unref } from 'vue';
 
-import ErrorsWidget from './errors-widget.vue';
 import { BaseEmits, BaseProps, useInputBase } from './input-base';
+import MessagesWidget from './messages-widget.vue';
 
 const props = defineProps<BaseProps>();
 const emits = defineEmits<BaseEmits>();

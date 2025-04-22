@@ -10,14 +10,13 @@
           invisible: visibility === DisplayMode.INVISIBLE,
         },
       ]"
-      variant="underlined"
 
       :rows="rows"
       :auto-grow="(maxRows || 0) > 0"
       :max-rows="maxRows"
       v-bind="vuetifyBindings as any"
     >
-      <template #message><errors-widget :errors="errors"/></template>
+      <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
     </v-textarea>
   </div>
 </template>
@@ -26,7 +25,7 @@
 import { DisplayMode } from '@dynamicforms/vue-forms';
 import { toRefs } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, ErrorsWidget, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, MessagesWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   rows?: number;

@@ -9,7 +9,7 @@
     :true-value="true"
     @change="change"
   >
-    <template #message><errors-widget :errors="errors"/></template>
+    <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
   </v-checkbox>
 </template>
 
@@ -17,7 +17,7 @@
 import { clone } from 'lodash-es';
 import { computed } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, ErrorsWidget, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, MessagesWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   allowNull?: boolean;

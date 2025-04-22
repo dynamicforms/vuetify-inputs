@@ -1,5 +1,5 @@
 <template>
-  <div class="custom-error-display text-error">
+  <div v-if="message === ' '" class="custom-error-display text-error">
     <div
       v-for="(err, idx) in errors"
       :key="idx"
@@ -12,6 +12,7 @@
       </component>
     </div>
   </div>
+  <span v-else>{{ message }}</span>
 </template>
 
 <script setup lang="ts">
@@ -20,6 +21,7 @@ import VueMarkdown from 'vue-markdown-render';
 
 interface Props {
   errors: ValidationError[];
+  message: string;
 }
 
 defineProps<Props>();
