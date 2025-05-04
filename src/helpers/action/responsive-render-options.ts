@@ -10,18 +10,17 @@ export interface LabelRenderOptions {
   label?: string;
 }
 
-export type BreakpointNames = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+export const responsiveBreakpoints = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
+export type BreakpointNames = typeof responsiveBreakpoints[number];
 export type BreakpointsJSON<T extends Record<string, any>> = T & Partial<Record<BreakpointNames, T>>;
 
-const breakpoints: BreakpointNames[] = ['xs', 'sm', 'md', 'lg', 'xl'];
-
 export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
-  private readonly _value: BreakpointsJSON<T>;
+  protected readonly _value: BreakpointsJSON<T>;
 
   constructor(data?: BreakpointsJSON<T>) {
     this._value = this.cleanBreakpoint(data as T, true)!;
     if (data) {
-      breakpoints.forEach((bp) => {
+      responsiveBreakpoints.forEach((bp) => {
         const options = this.cleanBreakpoint(data[bp]);
         if (options) this._value[bp] = options;
       });
@@ -31,7 +30,7 @@ export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
   getOptionsForBreakpoint(breakpoint: BreakpointNames): T {
     const result = this.cleanBreakpoint(this._value as T) as BreakpointsJSON<T>;
     const fields = Object.keys(result);
-    for (const bp of breakpoints) {
+    for (const bp of responsiveBreakpoints) {
       const bpData = this._value[bp];
       for (const field of fields) {
         if (bpData?.[field] != null) (<any> result)[field] = bpData[field];
