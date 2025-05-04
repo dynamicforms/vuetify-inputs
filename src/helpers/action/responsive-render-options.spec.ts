@@ -1,9 +1,9 @@
 import { ActionDisplayStyle } from './action-display-style';
-import ResponsiveRenderOptions from './responsive-render-options';
+import { ResponsiveLabelRenderOptions } from './responsive-render-options';
 
 describe('ResponsiveRenderOptions', () => {
   it('check parsing and correct breakpoint resolution', () => {
-    const options = new ResponsiveRenderOptions({
+    const options = new ResponsiveLabelRenderOptions({
       renderAs: 'BUTTON' as unknown as ActionDisplayStyle, // hack to still pass it as string
       showIcon: true,
       sm: { showLabel: false },
@@ -36,10 +36,11 @@ describe('ResponsiveRenderOptions', () => {
     });
   });
   it('check correct breakpoint carry-over between breakpoints', () => {
-    const options = new ResponsiveRenderOptions({
+    const options = new ResponsiveLabelRenderOptions({
       renderAs: 'BUTTON' as unknown as ActionDisplayStyle, // hack to still pass it as string
       showIcon: true,
       sm: { showLabel: false },
+      md: { },
       lg: {
         showIcon: false,
         showLabel: true,

@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 
 import { Action, ActionJSON } from './action';
 import { ActionDisplayStyle } from './action-display-style';
-import ResponsiveRenderOptions from './responsive-render-options';
+import { ResponsiveLabelRenderOptions } from './responsive-render-options';
 
 describe('Action', () => {
   describe('Action class', () => {
@@ -24,7 +24,7 @@ describe('Action', () => {
       expect(action).toHaveProperty('labelAvailable', true);
       expect(action).toHaveProperty('icon', 'test-icon');
       expect(action).toHaveProperty('iconAvailable', true);
-      expect(action).toHaveProperty('displayStyle', new ResponsiveRenderOptions({
+      expect(action).toHaveProperty('displayStyle', new ResponsiveLabelRenderOptions({
         label: 'Test action',
         xl: { showLabel: true, showIcon: true, renderAs: ActionDisplayStyle.TEXT },
         sm: { showLabel: false, showIcon: false, renderAs: ActionDisplayStyle.BUTTON },

@@ -1,8 +1,9 @@
+// eslint-disable-next-line max-classes-per-file
 import { isBoolean, isObjectLike, isString } from 'lodash-es';
 
 import { ActionDisplayStyle } from './action-display-style';
 
-export interface BreakpointJSON {
+export interface LabelRenderOptions {
   renderAs?: ActionDisplayStyle;
   showLabel?: boolean;
   showIcon?: boolean;
@@ -10,59 +11,57 @@ export interface BreakpointJSON {
 }
 
 export type BreakpointNames = 'xl' | 'lg' | 'md' | 'sm' | 'xs';
-export interface BreakpointsJSON extends BreakpointJSON, Partial<Record<BreakpointNames, BreakpointJSON>> { }
+export type BreakpointsJSON<T extends Record<string, any>> = T & Partial<Record<BreakpointNames, T>>;
 
-const breakpoints: BreakpointNames[] = ['xl', 'lg', 'md', 'sm', 'xs'];
+const breakpoints: BreakpointNames[] = ['xs', 'sm', 'md', 'lg', 'xl'];
 
-export default class ResponsiveRenderOptions {
-  private readonly _value: BreakpointsJSON;
+export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
+  private readonly _value: BreakpointsJSON<T>;
 
-  constructor(data: BreakpointsJSON | undefined, label?: string) {
-    this._value = {};
-    if (!data) return;
-    let baseOptions = ResponsiveRenderOptions.cleanBreakpoint(data);
-    if (!baseOptions?.label && label) {
-      if (!baseOptions) baseOptions = { label };
-      else if (!baseOptions.label) baseOptions.label = label;
+  constructor(data?: BreakpointsJSON<T>) {
+    this._value = this.cleanBreakpoint(data as T, true)!;
+    if (data) {
+      breakpoints.forEach((bp) => {
+        const options = this.cleanBreakpoint(data[bp]);
+        if (options) this._value[bp] = options;
+      });
     }
-    if (baseOptions) this._value = baseOptions;
-
-    breakpoints.forEach((bp) => {
-      const options = ResponsiveRenderOptions.cleanBreakpoint(data[bp]);
-      if (options) this._value[bp] = options;
-    });
   }
 
-  getOptionsForBreakpoint(breakpoint: BreakpointNames): BreakpointJSON {
-    const result = {
-      label: this._value.label,
-      renderAs: this._value.renderAs ?? ActionDisplayStyle.BUTTON,
-      showLabel: this._value.showLabel ?? true,
-      showIcon: this._value.showIcon ?? true,
-    } as BreakpointJSON;
-    const bps = [...breakpoints].reverse();
-    for (const bp of bps) {
+  getOptionsForBreakpoint(breakpoint: BreakpointNames): T {
+    const result = this.cleanBreakpoint(this._value as T) as BreakpointsJSON<T>;
+    const fields = Object.keys(result);
+    for (const bp of breakpoints) {
       const bpData = this._value[bp];
-      if (bpData) {
-        if (bpData.label != null) result.label = bpData.label;
-        if (bpData.renderAs != null) result.renderAs = bpData.renderAs;
-        if (bpData.showIcon != null) result.showIcon = bpData.showIcon;
-        if (bpData.showLabel != null) result.showLabel = bpData.showLabel;
+      for (const field of fields) {
+        if (bpData?.[field] != null) (<any> result)[field] = bpData[field];
       }
       if (bp === breakpoint) break;
     }
     return result;
   }
 
-  private static cleanBreakpoint(bp?: BreakpointJSON): BreakpointJSON | null {
-    if (!bp || !isObjectLike(bp)) return null;
+  protected abstract cleanBreakpoint(bp?: T, defaultIfEmpty?: boolean): T | null;
+}
 
-    const result: BreakpointJSON = {};
+export class ResponsiveLabelRenderOptions extends ResponsiveRenderOptions<LabelRenderOptions> {
+  // eslint-disable-next-line class-methods-use-this
+  protected cleanBreakpoint(bp?: LabelRenderOptions, defaultIfEmpty: boolean = false): LabelRenderOptions | null {
+    if ((!bp || !isObjectLike(bp)) && !defaultIfEmpty) return null;
 
-    if (bp.renderAs !== undefined) result.renderAs = ActionDisplayStyle.fromAny(bp.renderAs);
-    if (isString(bp.label)) result.label = bp.label;
-    if (isBoolean(bp.showLabel)) result.showLabel = bp.showLabel;
-    if (isBoolean(bp.showIcon)) result.showIcon = bp.showIcon;
+    const result: LabelRenderOptions = {};
+    if (defaultIfEmpty) {
+      result.renderAs = ActionDisplayStyle.BUTTON;
+      result.showLabel = true;
+      result.showIcon = true;
+    }
+
+    if (bp) {
+      if (bp.renderAs != null) result.renderAs = ActionDisplayStyle.fromAny(bp.renderAs);
+      if (isString(bp.label)) result.label = bp.label;
+      if (isBoolean(bp.showLabel)) result.showLabel = bp.showLabel;
+      if (isBoolean(bp.showIcon)) result.showIcon = bp.showIcon;
+    }
 
     return Object.keys(result).length ? result : null;
   }

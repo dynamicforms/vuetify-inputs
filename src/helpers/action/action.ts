@@ -2,14 +2,14 @@ import { Action as FormAction, ExecuteAction } from '@dynamicforms/vue-forms';
 import { isString } from 'lodash-es';
 
 import { ActionDisplayStyle } from './action-display-style';
-import ResponsiveRenderOptions, { BreakpointsJSON } from './responsive-render-options';
+import { ResponsiveLabelRenderOptions, BreakpointsJSON, LabelRenderOptions } from './responsive-render-options';
 
 export interface ActionJSON {
   // [key: `action${string}`]: ActionHandler;
   name?: string;
   label?: string;
   icon?: string;
-  displayStyle?: BreakpointsJSON;
+  displayStyle?: BreakpointsJSON<LabelRenderOptions>;
   field_name?: string;
 }
 
@@ -20,7 +20,7 @@ export interface ActionsJSON {
 class Action {
   public readonly name: string;
 
-  public displayStyle: ResponsiveRenderOptions;
+  public displayStyle: ResponsiveLabelRenderOptions;
 
   public formAction: FormAction;
 
@@ -32,7 +32,7 @@ class Action {
     const icon = !isString(data.icon) || data.icon.length === 0 ? undefined : data.icon;
 
     this.name = data.name;
-    this.displayStyle = new ResponsiveRenderOptions(data.displayStyle, label);
+    this.displayStyle = new ResponsiveLabelRenderOptions({ label, ...data.displayStyle });
     this.formAction = formAction;
 
     this.formAction.icon = icon;

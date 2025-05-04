@@ -28,7 +28,7 @@ import { computed, isRef, ref, Ref } from 'vue';
 import IonIcon from 'vue-ionicon';
 import { useDisplay } from 'vuetify';
 
-import { Action, BreakpointJSON, BreakpointNames, ActionDisplayStyle } from './helpers';
+import { Action, LabelRenderOptions, BreakpointNames, ActionDisplayStyle } from './helpers';
 
 type ShowAsGroup = 'no' | 'grouped' | 'grouped-no-borders';
 
@@ -55,7 +55,7 @@ function getBreakpointName(dp: ReturnType<typeof useDisplay>): BreakpointNames {
 
 const display = useDisplay();
 const displayStyle = computed(() => {
-  const res: Record<string, BreakpointJSON> = {};
+  const res: Record<string, LabelRenderOptions> = {};
   res['%breakpoint%'] = getBreakpointName(display) as any;
   for (const action of actionsRef.value) {
     res[action.name] = action.displayStyle.getOptionsForBreakpoint(getBreakpointName(display));
