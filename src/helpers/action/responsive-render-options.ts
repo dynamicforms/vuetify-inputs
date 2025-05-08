@@ -1,5 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { isBoolean, isObjectLike, isString } from 'lodash-es';
+import { useDisplay } from 'vuetify';
 
 import { ActionDisplayStyle } from './action-display-style';
 
@@ -64,4 +65,12 @@ export class ResponsiveLabelRenderOptions extends ResponsiveRenderOptions<LabelR
 
     return Object.keys(result).length ? result : null;
   }
+}
+
+export function getBreakpointName(dp: ReturnType<typeof useDisplay>): BreakpointNames {
+  if (dp.xlAndUp.value) return 'xl';
+  if (dp.lgAndUp.value) return 'lg';
+  if (dp.mdAndUp.value) return 'md';
+  if (dp.smAndUp.value) return 'sm';
+  return 'xs';
 }
