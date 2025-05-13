@@ -1,29 +1,28 @@
 <template>
-  <v-menu
-    v-model="dropdownShown"
-    location="top start"
-    origin="bottom start"
-    :close-on-content-click="false"
+  <v-text-field
+    v-model="value"
+    v-bind="vuetifyBindings"
+    :clearable="allowNull"
+    type="text"
+    :rules="rules"
   >
-    <template #activator="{ props: menuProps }">
-      <v-text-field
-        v-model="value"
-        v-bind="{ ...vuetifyBindings, ...menuProps } as any"
-        :clearable="allowNull"
-        type="text"
-        :rules="rules"
-      >
-        <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
-        <template #prepend-inner>
-          <div
-            style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid #ccc;"
-            :style="{ backgroundColor: value }"
-          />
-        </template>
-      </v-text-field>
+    <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
+    <template #prepend-inner>
+      <div
+        style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid #ccc;"
+        :style="{ backgroundColor: value }"
+      />
     </template>
-    <v-color-picker v-model="value" mode="hexa"/>
-  </v-menu>
+    <template #default>
+      <v-menu
+        v-model="dropdownShown"
+        :close-on-content-click="false"
+        activator="parent"
+      >
+        <v-color-picker v-model="value" mode="hexa"/>
+      </v-menu>
+    </template>
+  </v-text-field>
 </template>
 
 <script setup lang="ts">
@@ -46,8 +45,10 @@ const dropdownShown = ref(false);
 
 const rules = computed<((val: string) => boolean | string)[]>(() => ([
   (val: string) => {
-    if (!val && props.allowNull) return true;
-    const regex = /^#?([a-fA-F0-9]{6}[a-fA-F0-9]{0,2})$/;
+    if (props.control) return true; // if there's a form field, we expect there to be a validator
+    if (!val && props.allowNull) return true; // allowed empty values are also not a problem
+
+    const regex = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{4}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;
     return regex.test(val) ? true : 'Not a valid hex string.';
   },
 ]));

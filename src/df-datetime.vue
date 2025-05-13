@@ -1,80 +1,88 @@
 <template>
   <input-base v-bind="props" clearable @click:clear="value = null">
-    <v-menu
-      v-model="dropdownShown"
-      location="top start"
-      :origin="`bottom ${inputType === 'datetime' ? 'center' : 'start'}`"
-      :close-on-content-click="false"
-    >
-      <template #activator="{ props: menuProps }">
-        <div class="d-flex w-100">
-          <v-text-field
-            v-if="['date', 'datetime'].includes(inputType)"
-            v-model="dateFormatted"
-            style="flex-grow: 4"
-            :density="vuetifyBindings.density"
-            :variant="vuetifyBindings.variant"
-            :clearable="false"
-            :hide-details="true"
-            :readonly="vuetifyBindings.readonly"
-            :disabled="vuetifyBindings.disabled"
-            :name="`${vuetifyBindings.name}-date`"
-            v-bind="menuProps"
-            @click="dropdown = 'date'"
-            @keydown.space="dropdown = 'date'"
-          />
-          <v-text-field
-            v-if="['time', 'datetime'].includes(inputType)"
-            v-model="timeFormatted"
-            style="flex-grow: 3"
-            :density="vuetifyBindings.density"
-            :variant="vuetifyBindings.variant"
-            :clearable="false"
-            :hide-details="true"
-            :readonly="vuetifyBindings.readonly"
-            :disabled="vuetifyBindings.disabled"
-            :name="`${vuetifyBindings.name}-time`"
-            v-bind="menuProps"
-            @click="dropdown = 'time'"
-            @keydown.space="dropdown = 'time'"
-          />
-        </div>
-      </template>
-      <v-confirm-edit
-        v-if="dropdown === 'date'"
-        v-model="valueAsDate"
-        @cancel="dropdown = ''"
-        @save="dropdown = ''"
-      >
-        <template #default="{ model: proxyModel, actions }">
-          <v-date-picker
-            v-model="proxyModel.value"
-            :hide-header="true"
-            :first-day-of-week="1"
-            :show-adjacent-months="true"
-            :show-week="true"
-          >
-            <template #actions><component :is="actions"/></template>
-          </v-date-picker>
-        </template>
-      </v-confirm-edit>
-      <v-confirm-edit
-        v-if="dropdown === 'time'"
-        v-model="valueAsTimeString"
-        @cancel="dropdown = ''"
-        @save="dropdown = ''"
-      >
-        <template #default="{ model: proxyModel, actions }">
-          <v-time-picker
-            v-model="proxyModel.value"
-            :hide-header="true"
-            format="24hr"
-          >
-            <template #actions><component :is="actions"/></template>
-          </v-time-picker>
-        </template>
-      </v-confirm-edit>
-    </v-menu>
+    <template #default>
+      <div class="d-flex w-100">
+        <v-text-field
+          v-if="['date', 'datetime'].includes(inputType)"
+          v-model="dateFormatted"
+          style="flex-grow: 4"
+          :density="vuetifyBindings.density"
+          :variant="vuetifyBindings.variant"
+          :clearable="false"
+          :hide-details="true"
+          :readonly="vuetifyBindings.readonly"
+          :disabled="vuetifyBindings.disabled"
+          :name="`${vuetifyBindings.name}-date`"
+          @click="dropdown = 'date'"
+          @keydown.space="dropdown = 'date'"
+        >
+          <template #default>
+            <v-menu
+              v-model="dateMenuShown"
+              :close-on-content-click="false"
+              activator="parent"
+            >
+              <v-confirm-edit
+                v-model="valueAsDate"
+                @cancel="dropdown = ''"
+                @save="dropdown = ''"
+              >
+                <template #default="{ model: proxyModel, actions }">
+                  <v-date-picker
+                    v-model="proxyModel.value"
+                    :hide-header="true"
+                    :first-day-of-week="1"
+                    :show-adjacent-months="true"
+                    :show-week="true"
+                  >
+                    <template #actions><component :is="actions"/></template>
+                  </v-date-picker>
+                </template>
+              </v-confirm-edit>
+            </v-menu>
+          </template>
+        </v-text-field>
+
+        <v-text-field
+          v-if="['time', 'datetime'].includes(inputType)"
+          v-model="timeFormatted"
+          style="flex-grow: 3"
+          :density="vuetifyBindings.density"
+          :variant="vuetifyBindings.variant"
+          :clearable="false"
+          :hide-details="true"
+          :readonly="vuetifyBindings.readonly"
+          :disabled="vuetifyBindings.disabled"
+          :name="`${vuetifyBindings.name}-time`"
+          @click="dropdown = 'time'"
+          @keydown.space="dropdown = 'time'"
+        >
+          <template #default>
+            <v-menu
+              v-model="timeMenuShown"
+              :close-on-content-click="false"
+              activator="parent"
+            >
+              <v-confirm-edit
+                v-model="valueAsTimeString"
+                @cancel="dropdown = ''"
+                @save="dropdown = ''"
+              >
+                <template #default="{ model: proxyModel, actions }">
+                  <v-time-picker
+                    v-model="proxyModel.value"
+                    :hide-header="true"
+                    format="24hr"
+                  >
+                    <template #actions><component :is="actions"/></template>
+                  </v-time-picker>
+                </template>
+              </v-confirm-edit>
+            </v-menu>
+          </template>
+        </v-text-field>
+      </div>
+    </template>
   </input-base>
 </template>
 
@@ -105,9 +113,13 @@ const { value, vuetifyBindings } = useInputBase<string | null>(props, emits);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 const dropdown = ref('');
-const dropdownShown = computed({
-  get() { return unref(dropdown) !== ''; },
-  set(newValue: boolean) { if (newValue) dropdown.value = 'date'; else dropdown.value = ''; },
+const dateMenuShown = computed({
+  get() { return unref(dropdown) === 'date'; },
+  set(newValue: boolean) { dropdown.value = newValue ? 'date' : ''; },
+});
+const timeMenuShown = computed({
+  get() { return unref(dropdown) === 'time'; },
+  set(newValue: boolean) { dropdown.value = newValue ? 'time' : ''; },
 });
 
 const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, 'HH:mm')}:00`;
@@ -193,6 +205,3 @@ const timeFormatted = computed({
   },
 });
 </script>
-
-<style scoped>
-</style>
