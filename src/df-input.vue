@@ -6,6 +6,7 @@
       v-bind="vuetifyBindings as any"
       :type="inputType"
     >
+      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
       <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
     </v-text-field>
     <v-number-input
@@ -15,6 +16,7 @@
       density="compact"
       control-variant="stacked"
     >
+      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
       <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
     </v-number-input>
   </div>
@@ -23,7 +25,7 @@
 <script setup lang="ts">
 import { computed, toRefs, unref } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, MessagesWidget, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   inputType?: 'text' | 'password' | 'email' | 'url' | 'number';
@@ -47,7 +49,7 @@ interface Emits extends BaseEmits {
 
 const emits = defineEmits<Emits>();
 
-const { errors, value, vuetifyBindings } = useInputBase(props, emits);
+const { errors, label, value, vuetifyBindings } = useInputBase(props, emits);
 const { inputType, max, min, precision, step } = toRefs(props);
 
 const isNumber = computed(() => inputType.value === 'number');

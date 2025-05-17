@@ -15,7 +15,7 @@
           :multiple="multiple"
           :allow-null="allowNull"
           :allow-tags="allowTags"
-          label="Programming languages"
+          :label="new Label('Programming languages', 'mdi-abacus')"
         />
 
         <div class="mt-4">
@@ -28,7 +28,7 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import { DfSelect } from '../../src';
+import { DfSelect, Label } from '../../src';
 
 const multiple = ref(false);
 const allowNull = ref(true);

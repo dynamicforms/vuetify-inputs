@@ -16,6 +16,7 @@
           @click="dropdown = 'date'"
           @keydown.space="dropdown = 'date'"
         >
+          <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
           <template #default>
             <v-menu
               v-model="dateMenuShown"
@@ -57,6 +58,7 @@
           @click="dropdown = 'time'"
           @keydown.space="dropdown = 'time'"
         >
+          <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
           <template #default>
             <v-menu
               v-model="timeMenuShown"
@@ -91,7 +93,7 @@ import { format, parse } from 'date-fns';
 import { toNumber, isNaN } from 'lodash-es';
 import { ref, computed, watch, toRefs, unref } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, InputBase, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, DfLabel, InputBase, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   inputType?: 'datetime' | 'date' | 'time';
@@ -109,7 +111,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { value, vuetifyBindings } = useInputBase<string | null>(props, emits);
+const { label, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 const dropdown = ref('');

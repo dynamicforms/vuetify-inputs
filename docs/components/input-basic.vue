@@ -21,7 +21,7 @@
           :min-length="3"
           :max-length="50"
           :pattern="selectedType === 'email' ? emailPattern : undefined"
-          label="Input Field"
+          :label="new Label('Input Field', 'mdi-text-box-outline')"
           :hint="getHintForType(selectedType)"
         />
 
@@ -62,7 +62,7 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { Field } from '@dynamicforms/vue-forms';
-import { DfInput, DfSelect } from '../../src';
+import { DfInput, DfSelect, Label } from '../../src';
 
 const inputTypes = [
   { text: 'Text', id: 'text' },

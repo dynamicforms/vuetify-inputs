@@ -16,6 +16,7 @@
       :max-rows="maxRows"
       v-bind="vuetifyBindings as any"
     >
+      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
       <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
     </v-textarea>
   </div>
@@ -25,7 +26,7 @@
 import { DisplayMode } from '@dynamicforms/vue-forms';
 import { toRefs } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, MessagesWidget, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   rows?: number;
@@ -40,7 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { errors, value, vuetifyBindings } = useInputBase(props, emits);
+const { errors, label, value, vuetifyBindings } = useInputBase(props, emits);
 const { cssClass, visibility } = toRefs(props);
 </script>
 

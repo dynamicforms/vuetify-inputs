@@ -9,7 +9,7 @@
       },
     ]"
   >
-    <label v-if="vuetifyBindings.label" for="#following-v-input">{{ vuetifyBindings.label }}</label>
+    <label v-if="vuetifyBindings.label" for="#following-v-input"><df-label :label="label"/></label>
     <v-input
       :hint="vuetifyBindings.hint"
       :persistent-hint="vuetifyBindings.persistentHint"
@@ -28,13 +28,14 @@
 import { DisplayMode } from '@dynamicforms/vue-forms';
 import { computed, unref } from 'vue';
 
+import DfLabel from './df-label.vue';
 import { BaseEmits, BaseProps, useInputBase } from './input-base';
 import MessagesWidget from './messages-widget.vue';
 
 const props = defineProps<BaseProps>();
 const emits = defineEmits<BaseEmits>();
 
-const { errors, value, visibility, vuetifyBindings } = useInputBase(props, emits);
+const { errors, label, value, visibility, vuetifyBindings } = useInputBase(props, emits);
 
 const isClearable = computed(() => (unref(props.clearable) && unref(value)));
 </script>

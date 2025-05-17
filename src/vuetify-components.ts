@@ -9,6 +9,7 @@ export { VDatePicker } from 'vuetify/components/VDatePicker';
 export { VFileInput } from 'vuetify/components/VFileInput';
 export { VRow, VCol } from 'vuetify/components/VGrid';
 export { VIcon } from 'vuetify/components/VIcon';
+export { VImg } from 'vuetify/components/VImg';
 export { VInput } from 'vuetify/components/VInput';
 export { VListItem } from 'vuetify/components/VList';
 export { VMenu } from 'vuetify/components/VMenu';

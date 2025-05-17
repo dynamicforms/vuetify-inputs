@@ -32,6 +32,7 @@
     @update:model-value="onSelect"
     @click:clear="selected = null"
   >
+    <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
     <template #chip="{ item }">
       <v-chip
         :key="item.value"
@@ -64,6 +65,7 @@
 
 <script setup lang="ts">
 import { DisplayMode } from '@dynamicforms/vue-forms';
+import { unionBy } from 'lodash-es';
 import { ref, computed, toRefs, watch, nextTick } from 'vue';
 import IonIcon from 'vue-ionicon';
 
@@ -71,6 +73,7 @@ import {
   BaseEmits,
   BaseProps,
   defaultBaseProps,
+  DfLabel,
   MessagesWidget,
   SelectChoice,
   SelectFetchChoices,
@@ -109,7 +112,7 @@ interface Emits extends BaseEmits {
 
 const emits = defineEmits<Emits>();
 
-const { errors, value: resultingValue, vuetifyBindings } = useInputBase(propsWithDefaults, emits);
+const { errors, label, value: resultingValue, vuetifyBindings } = useInputBase(propsWithDefaults, emits);
 
 const selected = ref<any>(null);
 const loadedChoices = ref<SelectChoice[]>(choices || []);
@@ -152,7 +155,10 @@ async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
   if (choices || propsWithDefaults.fetchChoices === undefined) return;
   loading.value = true;
   try {
-    loadedChoices.value = await propsWithDefaults.fetchChoices(queryValue, idValue);
+    const selectedChoices =
+      getSelectedChoices(loadedChoices.value, multipleCompliantValue(selected.value, multiple.value));
+    const newChoices = await propsWithDefaults.fetchChoices(queryValue, idValue);
+    loadedChoices.value = unionBy([...selectedChoices, ...newChoices], 'id');
   } finally {
     loading.value = false;
   }

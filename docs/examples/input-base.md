@@ -7,18 +7,18 @@ It provides common functionality and properties that are available to all input 
 
 All input components inherit the following properties:
 
-| Property | Type | Default | Description                                                                                                     |
-|----------|-----|----------|-----------------------------------------------------------------------------------------------------------------|
-| control | `Field` | `undefined` | [https://github.com/velis74/dynamicforms-vue-forms](DynamicForms) field object for state management integration |
-| modelValue | `any` | component dependent | The field value (v-model) when used without control                                                             |
-| label | `string` | `''` | Input field label                                                                                               |
-| hint | `string` | `''` | Hint text displayed below the input field                                                                       |
-| helpText | `string` | `''` | Additional help text                                                                                            |
-| errors | `string[]` | `[]` | List of errors (used only without control)                                                                      |
-| enabled | `boolean` | `true` | Whether the input field is enabled                                                                              |
-| visibility | `DisplayMode` | `FULL` | Component visibility mode (FULL, HIDDEN, INVISIBLE, SUPPRESS)                                                   |
-| cssClass | `string` | `''` | Additional CSS classes                                                                                          |
-| clearable | `boolean` | component dependent | Whether the value can be cleared                                                                                |
+| Property   | Type              | Default        | Description                                                                                                     |
+|------------|-------------------|----------------|-----------------------------------------------------------------------------------------------------------------|
+| control    | `Field`           | `undefined`    | [https://github.com/velis74/dynamicforms-vue-forms](DynamicForms) field object for state management integration |
+| modelValue | `any`             | component dependent | The field value (v-model) when used without control                                                        |
+| label      | `string \| Label` | `''` | Input field label. supports icons by creating a Label class (see below)                                                |
+| hint       | `string`          | `''`           | Hint text displayed below the input field                                                                       |
+| helpText   | `string`          | `''`           | Additional help text                                                                                            |
+| errors     | `string[]`        | `[]`           | List of errors (used only without control)                                                                      |
+| enabled    | `boolean`         | `true`         | Whether the input field is enabled                                                                              |
+| visibility | `DisplayMode`     | `FULL`         | Component visibility mode (FULL, HIDDEN, INVISIBLE, SUPPRESS)                                                   |
+| cssClass   | `string`          | `''`           | Additional CSS classes                                                                                          |
+| clearable  | `boolean`         | component dependent | Whether the value can be cleared                                                                                |
 
 ## Events
 
@@ -33,6 +33,26 @@ All input components inherit the following properties:
 - `HIDDEN`: Component is hidden but still takes up space in the layout
 - `INVISIBLE`: Component is invisible but still takes up space
 - `SUPPRESS`: Component is not rendered in the DOM at all
+
+## Label
+
+Component label may be provided as a string (just like in Vuetify). Alternatively you may choose to add an icon, 
+in which case you provide a Label class, e.g. new Label('my label text', 'mdi-abacus'). This will show abacus icon next
+to the text.
+
+declaration of the Label class:
+```typescript
+export class Label {
+  constructor(
+    public text: string, 
+    public icon?: string, 
+    public iconComponent: string = 'v-icon'
+  ) {}
+}
+```
+
+Supported icon types are `v-icon`, `v-img` and any other component which takes a single `src: string` parameter.
+If you need multiple parameters for your component, wrap it such that the `src` parameter is a JSON serialized string.
 
 ## Integration with DynamicForms forms
 

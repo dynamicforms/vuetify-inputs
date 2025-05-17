@@ -9,7 +9,7 @@
               <div class="text-subtitle-1 mb-2">Binary Checkbox (allowNull: false)</div>
               <df-checkbox
                 :control="form.fields.binaryField"
-                label="Binary checkbox"
+                :label="new Label('Binary checkbox', 'mdi-abacus')"
                 hint="Can only be true or false"
               />
 
@@ -104,7 +104,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { Group, Field } from '@dynamicforms/vue-forms';
-import { DfCheckbox } from '../../src';
+import { DfCheckbox, Label } from '../../src';
 
 const form = new Group({
   binaryField: Field.create({ value: false }),

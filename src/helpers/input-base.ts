@@ -1,11 +1,15 @@
 import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
-import { isEmpty } from 'lodash-es';
+import { isEmpty, isString } from 'lodash-es';
 import { computed } from 'vue';
+
+export class Label {
+  constructor(public text: string, public icon?: string, public iconComponent: string = 'v-icon') {}
+}
 
 export interface BaseProps<T = any> {
   control?: Form.IField<T>,
   modelValue?: T;
-  label?: string;
+  label?: string | Label;
   errors?: string[];
   placeholder?: string;
   helpText?: string;
@@ -53,7 +57,9 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const visibility = computed(
     () => (props.control ? props.control.visibility : (props.visibility || Form.DisplayMode.FULL)),
   );
-  const label = computed(() => (props.label || ''));
+  const label = computed(
+    (): Label => (isString(props.label || '') ? new Label((<string>props.label) || '') : <Label> props.label),
+  );
   const placeholder = computed(() => (props.placeholder || ''));
   const helpText = computed(() => props.helpText || '');
   const hint = computed(() => props.hint || '');
@@ -65,6 +71,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     enabled,
     errors,
     visibility,
+    label,
 
     vuetifyBindings: computed(() => ({
       name: props.control?.fieldName,
@@ -73,7 +80,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
       density: 'default' as 'default',
       variant: 'underlined' as 'underlined',
 
-      label: label.value,
+      label: label.value.text,
       messages: anyErrors.value,
       // 'error-count': errors?.value.length || 0,
       readonly: !enabled.value,

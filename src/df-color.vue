@@ -6,6 +6,7 @@
     type="text"
     :rules="rules"
   >
+    <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
     <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
     <template #prepend-inner>
       <div
@@ -28,7 +29,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, MessagesWidget, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   allowNull?: boolean;
@@ -40,7 +41,7 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
-const { errors, value, vuetifyBindings } = useInputBase(props, emits);
+const { errors, label, value, vuetifyBindings } = useInputBase(props, emits);
 const dropdownShown = ref(false);
 
 const rules = computed<((val: string) => boolean | string)[]>(() => ([
