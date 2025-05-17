@@ -6,8 +6,8 @@
           v-if="['date', 'datetime'].includes(inputType)"
           v-model="dateFormatted"
           style="flex-grow: 4"
-          :density="vuetifyBindings.density"
-          :variant="vuetifyBindings.variant"
+          :density="<'compact'>$attrs.density ?? vuetifyBindings.density"
+          :variant="<'filled'>$attrs.variant ?? vuetifyBindings.variant"
           :clearable="false"
           :hide-details="true"
           :readonly="vuetifyBindings.readonly"
@@ -16,7 +16,6 @@
           @click="dropdown = 'date'"
           @keydown.space="dropdown = 'date'"
         >
-          <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
           <template #default>
             <v-menu
               v-model="dateMenuShown"
@@ -48,8 +47,8 @@
           v-if="['time', 'datetime'].includes(inputType)"
           v-model="timeFormatted"
           style="flex-grow: 3"
-          :density="vuetifyBindings.density"
-          :variant="vuetifyBindings.variant"
+          :density="<'compact'>$attrs.density ?? vuetifyBindings.density"
+          :variant="<'filled'>$attrs.variant ?? vuetifyBindings.variant"
           :clearable="false"
           :hide-details="true"
           :readonly="vuetifyBindings.readonly"
@@ -58,7 +57,6 @@
           @click="dropdown = 'time'"
           @keydown.space="dropdown = 'time'"
         >
-          <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
           <template #default>
             <v-menu
               v-model="timeMenuShown"
@@ -111,7 +109,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { label, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
+const { value, vuetifyBindings } = useInputBase<string | null>(props, emits);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 const dropdown = ref('');

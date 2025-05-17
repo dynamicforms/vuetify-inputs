@@ -5,7 +5,7 @@
       <v-card-text>
         <df-date-time
           :control="dateTimeField"
-          label="Select date and time"
+          :label="new Label('Select date and time', 'mdi-calendar-blank')"
           hint="Click to select date and time"
         />
 
@@ -30,7 +30,7 @@
       <v-card-text>
         <df-date-time
           :control="dateField"
-          label="Select date"
+          :label="new Label('Select date', 'mdi-calendar-blank')"
           input-type="date"
           display-format="dd.MM.yyyy"
           hint="Date only, no time"
@@ -65,7 +65,7 @@
 
 <script setup>
 import { Field } from '@dynamicforms/vue-forms';
-import { DfDateTime } from '../../src';
+import { DfDateTime, Label } from '../../src';
 
 const dateTimeField = Field.create({
   value: new Date().toISOString(),
