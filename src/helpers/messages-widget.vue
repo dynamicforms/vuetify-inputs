@@ -1,5 +1,5 @@
 <template>
-  <div v-if="message === ' '" class="custom-error-display text-error">
+  <div v-if="errors.length" class="custom-error-display text-error">
     <div
       v-for="(err, idx) in errors"
       :key="idx"

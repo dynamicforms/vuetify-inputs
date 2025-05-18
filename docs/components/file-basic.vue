@@ -52,10 +52,10 @@ const fileComms = {
     // Simulate network delay and progress updates
     const totalSize = file.size;
     let loaded = 0;
-    const chunkSize = totalSize / 10;
+    const chunkSize = totalSize / 1000;
 
-    for (let i = 0; i < 10; i++) {
-      await new Promise(resolve => setTimeout(resolve, 300));
+    for (let i = 0; i < 1000; i++) {
+      await new Promise(resolve => setTimeout(resolve, 3));
       loaded += chunkSize;
       if (progressCallback) {
         progressCallback(loaded, totalSize);

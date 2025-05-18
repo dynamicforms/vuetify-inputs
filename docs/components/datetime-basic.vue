@@ -64,11 +64,12 @@
 </template>
 
 <script setup>
-import { Field } from '@dynamicforms/vue-forms';
+import { Field, Validators } from '@dynamicforms/vue-forms';
 import { DfDateTime, Label } from '../../src';
 
 const dateTimeField = Field.create({
   value: new Date().toISOString(),
+  validators: [new Validators.Required()],
 });
 
 const dateField = Field.create({

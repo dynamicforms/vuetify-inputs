@@ -1,6 +1,16 @@
 <template>
   <input-base v-bind="props">
-    <ck-editor-custom ref="$editor" v-model="value" :min-height="minHeight" :disabled="vuetifyBindings.disabled"/>
+    <template #default="slotProps">
+      <ck-editor-custom
+        ref="$editor"
+        v-model="value"
+        :class="{ 'mt-8': !!label }"
+        :min-height="minHeight"
+        :disabled="vuetifyBindings.disabled"
+        @focusin="slotProps.focus()"
+        @focusout="slotProps.blur()"
+      />
+    </template>
   </input-base>
 </template>
 

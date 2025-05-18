@@ -1,6 +1,11 @@
 <template>
-  <div
+  <v-input
     v-if="visibility !== DisplayMode.SUPPRESS"
+    :name="vuetifyBindings.name"
+    :hint="vuetifyBindings.hint"
+    :persistent-hint="vuetifyBindings.persistentHint"
+    :hide-details="vuetifyBindings.hideDetails"
+    :messages="vuetifyBindings.messages"
     :class="[
       cssClass,
       {
@@ -9,37 +14,57 @@
       },
     ]"
   >
-    <label v-if="vuetifyBindings.label" for="#following-v-input"><df-label :label="label"/></label>
-    <v-input
-      :hint="vuetifyBindings.hint"
-      :persistent-hint="vuetifyBindings.persistentHint"
-      :hide-details="vuetifyBindings.hideDetails"
+    <v-field
+      :variant="vuetifyBindings.variant"
+      :label="vuetifyBindings.label"
+      :disabled="vuetifyBindings.disabled"
+      :clearable="isClearable"
+      :persistent-clear="true"
+      :dirty="!!value"
+      :active="focused"
+      :loading="loading"
+      @click:clear="emits('click:clear')"
+      @update:focused="(event) => (focused = event)"
     >
-      <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
-      <slot/>
-      <template v-if="isClearable" #append>
-        <v-icon @click="emits('click:clear')">mdi-close-circle</v-icon>
+      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
+      <template #default="slotProps">
+        <div class="d-flex w-100 style-resetting"><slot v-bind="slotProps"/></div>
       </template>
-    </v-input>
-  </div>
+      <template v-if="$slots.loader" #loader="loaderProps"><slot name="loader" v-bind="loaderProps"/></template>
+      <template v-if="$slots['prepend-inner']" #prepend-inner="prependInnerProps">
+        <slot name="prepend-inner" v-bind="prependInnerProps"/>
+      </template>
+    </v-field>
+    <template v-if="$slots.message" #message="{ message }">
+      <messages-widget :message="message" :errors="errors"/>
+    </template>
+    <template v-if="$slots.prepend" #prepend="prependProps"><slot name="prepend" v-bind="prependProps"/></template>
+  </v-input>
 </template>
 
 <script setup lang="ts">
 import { DisplayMode } from '@dynamicforms/vue-forms';
-import { computed, unref } from 'vue';
+import { computed, ref, unref } from 'vue';
 
 import DfLabel from './df-label.vue';
 import { BaseEmits, BaseProps, useInputBase } from './input-base';
 import MessagesWidget from './messages-widget.vue';
 
-const props = defineProps<BaseProps>();
+const props = defineProps<BaseProps & { loading?: boolean }>();
 const emits = defineEmits<BaseEmits>();
 
 const { errors, label, value, visibility, vuetifyBindings } = useInputBase(props, emits);
 
-const isClearable = computed(() => (unref(props.clearable) && unref(value)));
+const isClearable = computed(() => !!(unref(props.clearable) && unref(value)));
+const focused = ref<boolean>(false);
 </script>
 
 <style scoped>
-
+:deep(.style-resetting .v-field__overlay) {
+  background-color: transparent;
+}
+:deep(.style-resetting .v-field__outline::before),
+:deep(.style-resetting .v-field__outline::after) {
+  content: none !important;
+}
 </style>

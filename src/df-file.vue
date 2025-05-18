@@ -1,29 +1,31 @@
 <template>
-  <input-base v-bind="props" clearable @click:clear="removeFile">
-    <div style="position: relative; width: 100%">
-      <v-progress-linear
-        v-if="currentFile && progress < 100"
-        :model-value="progress"
-        :indeterminate="progress === -1"
-        height="10"
-        style="position: absolute; top: 50%; transform: translateY(-50%); width: 100%;"
-      />
-      <v-file-input
-        v-model="selectedFile"
-        :label="fileLabel"
-        :density="vuetifyBindings.density"
-        :variant="vuetifyBindings.variant"
-        :readonly="vuetifyBindings.readonly"
-        :disabled="vuetifyBindings.disabled"
-        :name="vuetifyBindings.name"
-        :hide-details="true"
-        :show-size="true"
-        :multiple="false"
-        :style="currentFile && progress < 100 ? 'visibility: hidden' : ''"
-        :clearable="false"
-        @update:model-value="handleFileChange"
-      />
-    </div>
+  <input-base v-bind="{ ...props, loading } as any" clearable @click:clear="removeFile">
+    <template #prepend-inner><v-icon icon="$file"/></template>
+    <template #loader>
+      <v-progress-linear v-if="currentFile && progress < 100" :model-value="progress" :indeterminate="progress === -1"/>
+    </template>
+    <template #default="slotProps">
+      <div class="d-flex w-100 pt-5 pl-2 pb-1" style="position: relative">
+        <v-file-input
+          v-model="selectedFile"
+          :label="fileLabel"
+          density="compact"
+          variant="plain"
+          :readonly="vuetifyBindings.readonly"
+          :disabled="vuetifyBindings.disabled"
+          :name="vuetifyBindings.name"
+          :hide-details="true"
+          :show-size="true"
+          :multiple="false"
+          :style="currentFile && progress < 100 ? 'visibility: hidden' : ''"
+          :clearable="false"
+          :prepend-icon="null"
+          @update:model-value="handleFileChange"
+          @focus="slotProps.focus()"
+          @blur="slotProps.blur()"
+        />
+      </div>
+    </template>
   </input-base>
 </template>
 
@@ -48,6 +50,7 @@ const currentFile = ref<File | null>(null);
 const progress = ref(0);
 const fileInputKey = ref(Math.round(Math.random() * 1000));
 const selectedFile = ref<File | null>();
+const loading = computed(() => (currentFile.value && progress.value < 100));
 
 const fileLabel = computed(() => {
   if (!selectedFile.value && value.value) {

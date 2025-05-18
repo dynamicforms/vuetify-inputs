@@ -22,7 +22,7 @@ export default {
     })
 
     app.use(vuetify);
-    app.use(DynamicFormsInputs);
+    app.use(DynamicFormsInputs); //, { defaultVariant: 'underlined' });
     app.component('VTimePicker', VTimePicker);
     // app.use(DynamicFormsInputsVuetify);
   },

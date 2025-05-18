@@ -1,13 +1,13 @@
 <template>
   <input-base v-bind="props" clearable @click:clear="value = null">
-    <template #default>
-      <div class="d-flex w-100">
+    <template #default="slotProps">
+      <div class="d-flex w-100 pt-5 pl-2 pb-1">
         <v-text-field
           v-if="['date', 'datetime'].includes(inputType)"
           v-model="dateFormatted"
           style="flex-grow: 4"
-          :density="<'compact'>$attrs.density ?? vuetifyBindings.density"
-          :variant="<'filled'>$attrs.variant ?? vuetifyBindings.variant"
+          density="compact"
+          variant="plain"
           :clearable="false"
           :hide-details="true"
           :readonly="vuetifyBindings.readonly"
@@ -15,6 +15,8 @@
           :name="`${vuetifyBindings.name}-date`"
           @click="dropdown = 'date'"
           @keydown.space="dropdown = 'date'"
+          @focus="slotProps.focus()"
+          @blur="slotProps.blur()"
         >
           <template #default>
             <v-menu
@@ -47,8 +49,8 @@
           v-if="['time', 'datetime'].includes(inputType)"
           v-model="timeFormatted"
           style="flex-grow: 3"
-          :density="<'compact'>$attrs.density ?? vuetifyBindings.density"
-          :variant="<'filled'>$attrs.variant ?? vuetifyBindings.variant"
+          density="compact"
+          variant="plain"
           :clearable="false"
           :hide-details="true"
           :readonly="vuetifyBindings.readonly"
@@ -56,6 +58,8 @@
           :name="`${vuetifyBindings.name}-time`"
           @click="dropdown = 'time'"
           @keydown.space="dropdown = 'time'"
+          @focus="slotProps.focus()"
+          @blur="slotProps.blur()"
         >
           <template #default>
             <v-menu

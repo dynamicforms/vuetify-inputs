@@ -1,6 +1,8 @@
 import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
 import { isEmpty, isString } from 'lodash-es';
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
+
+import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
 export class Label {
   constructor(public text: string, public icon?: string, public iconComponent: string = 'v-icon') {}
@@ -29,6 +31,7 @@ export interface BaseEmits<T = any> {
 }
 
 export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
+  const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, { });
   const value = computed({
     get(): T {
       if (props.control) {
@@ -78,7 +81,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
       class: cssClass.value,
 
       density: 'default' as 'default',
-      variant: 'underlined' as 'underlined',
+      variant: (settings.defaultVariant ?? 'underlined') as 'underlined',
 
       label: label.value.text,
       messages: anyErrors.value,
