@@ -5,7 +5,7 @@
     :hint="vuetifyBindings.hint"
     :persistent-hint="vuetifyBindings.persistentHint"
     :hide-details="vuetifyBindings.hideDetails"
-    :messages="vuetifyBindings.messages"
+    :error-messages="vuetifyBindings.errorMessages"
     :class="[
       cssClass,
       {
@@ -24,18 +24,18 @@
       :active="focused"
       :loading="loading"
       @click:clear="emits('click:clear')"
-      @update:focused="(event) => (focused = event)"
+      @update:focused="(isFocused) => setFocused(isFocused)"
     >
       <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
       <template #default="slotProps">
         <div class="d-flex w-100 style-resetting"><slot v-bind="slotProps"/></div>
       </template>
-      <template v-if="$slots.loader" #loader="loaderProps"><slot name="loader" v-bind="loaderProps"/></template>
+      <template #loader="loaderProps"><slot name="loader" v-bind="loaderProps"/></template>
       <template v-if="$slots['prepend-inner']" #prepend-inner="prependInnerProps">
         <slot name="prepend-inner" v-bind="prependInnerProps"/>
       </template>
     </v-field>
-    <template v-if="$slots.message" #message="{ message }">
+    <template #message="{ message }">
       <messages-widget :message="message" :errors="errors"/>
     </template>
     <template v-if="$slots.prepend" #prepend="prependProps"><slot name="prepend" v-bind="prependProps"/></template>
@@ -51,12 +51,21 @@ import { BaseEmits, BaseProps, useInputBase } from './input-base';
 import MessagesWidget from './messages-widget.vue';
 
 const props = defineProps<BaseProps & { loading?: boolean }>();
-const emits = defineEmits<BaseEmits>();
+const emits = defineEmits<BaseEmits & { (e: 'blur'): void; }>();
 
-const { errors, label, value, visibility, vuetifyBindings } = useInputBase(props, emits);
+const { errors, label, value, touched, visibility, vuetifyBindings } = useInputBase(props, emits);
 
 const isClearable = computed(() => !!(unref(props.clearable) && unref(value)));
 const focused = ref<boolean>(false);
+
+function setFocused(isFocused: boolean) {
+  console.log(isFocused);
+  focused.value = isFocused;
+  if (!isFocused) {
+    touched.value = true;
+    emits('blur');
+  }
+}
 </script>
 
 <style scoped>

@@ -15,6 +15,7 @@
       :auto-grow="(maxRows || 0) > 0"
       :max-rows="maxRows"
       v-bind="vuetifyBindings as any"
+      @blur="touched = true"
     >
       <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
       <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
@@ -41,7 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { errors, label, value, vuetifyBindings } = useInputBase(props, emits);
+const { errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const { cssClass, visibility } = toRefs(props);
 </script>
 

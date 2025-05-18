@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { Group, Field, ValueChangedAction } from '@dynamicforms/vue-forms';
+import { Group, Field, Validators, ValueChangedAction } from '@dynamicforms/vue-forms';
 import { DfSelect } from "../../src"; //from '@dynamicforms/vue-forms'
 import { getAllCountries } from 'countries-and-timezones';
 
@@ -98,7 +98,7 @@ const personForm = new Group({
   lastName: Field.create({ value: 'Doe' }),
   age: Field.create({ value: 30 }),
   active: Field.create({ value: true }),
-  country: Field.create({ value: 'si' }),
+  country: Field.create({ value: 'si', validators: [new Validators.Required()] }),
 });
 
 // Create a reactive reference for form output

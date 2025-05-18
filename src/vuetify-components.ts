@@ -6,6 +6,7 @@ export { VCombobox } from 'vuetify/components/VCombobox';
 export { VColorPicker } from 'vuetify/components/VColorPicker';
 export { VConfirmEdit } from 'vuetify/components/VConfirmEdit';
 export { VDatePicker } from 'vuetify/components/VDatePicker';
+export { VField } from 'vuetify/components/VField';
 export { VFileInput } from 'vuetify/components/VFileInput';
 export { VRow, VCol } from 'vuetify/components/VGrid';
 export { VIcon } from 'vuetify/components/VIcon';

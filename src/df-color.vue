@@ -5,6 +5,7 @@
     :clearable="allowNull"
     type="text"
     :rules="rules"
+    @blur="touched = true"
   >
     <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
     <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
@@ -41,7 +42,7 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
-const { errors, label, value, vuetifyBindings } = useInputBase(props, emits);
+const { errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const dropdownShown = ref(false);
 
 const rules = computed<((val: string) => boolean | string)[]>(() => ([

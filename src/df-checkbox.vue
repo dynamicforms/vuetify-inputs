@@ -8,6 +8,7 @@
     :false-value="false"
     :true-value="true"
     @change="change"
+    @blur="touched = true"
   >
     <template v-if="label.icon" #label="labelData"><df-label :data="labelData as any" :label="label"/></template>
     <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
@@ -28,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), { ...defaultBaseProps, allowNul
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { errors, label, value, vuetifyBindings } = useInputBase(props, emits);
+const { errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
 
 const indeterminate = computed(() => props.allowNull && (value.value == null));
 

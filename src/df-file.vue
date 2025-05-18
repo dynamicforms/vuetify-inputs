@@ -1,5 +1,5 @@
 <template>
-  <input-base v-bind="{ ...props, loading } as any" clearable @click:clear="removeFile">
+  <input-base v-bind="{ ...props, loading } as any" clearable @click:clear="removeFile" @blur="touched = true">
     <template #prepend-inner><v-icon icon="$file"/></template>
     <template #loader>
       <v-progress-linear v-if="currentFile && progress < 100" :model-value="progress" :indeterminate="progress === -1"/>
@@ -19,7 +19,7 @@
           :multiple="false"
           :style="currentFile && progress < 100 ? 'visibility: hidden' : ''"
           :clearable="false"
-          :prepend-icon="null"
+          prepend-icon=""
           @update:model-value="handleFileChange"
           @focus="slotProps.focus()"
           @blur="slotProps.blur()"
@@ -42,7 +42,7 @@ const props = withDefaults(defineProps<Props>(), defaultBaseProps);
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { value, vuetifyBindings } = useInputBase(props, emits);
+const { touched, value, vuetifyBindings } = useInputBase(props, emits);
 const touchInterval = ref<number | null>(null);
 
 // State

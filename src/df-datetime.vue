@@ -1,5 +1,5 @@
 <template>
-  <input-base v-bind="props" clearable @click:clear="value = null">
+  <input-base v-bind="props" clearable @click:clear="value = null" @blur="touched = true">
     <template #default="slotProps">
       <div class="d-flex w-100 pt-5 pl-2 pb-1">
         <v-text-field
@@ -95,7 +95,7 @@ import { format, parse } from 'date-fns';
 import { toNumber, isNaN } from 'lodash-es';
 import { ref, computed, watch, toRefs, unref } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, DfLabel, InputBase, useInputBase } from './helpers';
+import { BaseEmits, BaseProps, defaultBaseProps, InputBase, useInputBase } from './helpers';
 
 interface Props extends BaseProps {
   inputType?: 'datetime' | 'date' | 'time';
@@ -113,7 +113,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { value, vuetifyBindings } = useInputBase<string | null>(props, emits);
+const { touched, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 const dropdown = ref('');

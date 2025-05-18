@@ -31,6 +31,7 @@
     @update:search="(query: any) => queryOptions(query, undefined)"
     @update:model-value="onSelect"
     @click:clear="selected = null"
+    @blur="touched = true"
   >
     <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
     <template #chip="{ item }">
@@ -112,7 +113,7 @@ interface Emits extends BaseEmits {
 
 const emits = defineEmits<Emits>();
 
-const { errors, label, value: resultingValue, vuetifyBindings } = useInputBase(propsWithDefaults, emits);
+const { errors, label, touched, value: resultingValue, vuetifyBindings } = useInputBase(propsWithDefaults, emits);
 
 const selected = ref<any>(null);
 const loadedChoices = ref<SelectChoice[]>(choices || []);

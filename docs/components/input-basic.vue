@@ -12,18 +12,18 @@
               label="Select Input Type"
             />
           </v-col>
+          <v-col cols="12" md="8">
+            <df-input
+              :control="inputField"
+              :input-type="selectedType"
+              :min-length="3"
+              :max-length="50"
+              :pattern="selectedType === 'email' ? emailPattern : undefined"
+              :label="new Label('Input Field', 'mdi-text-box-outline')"
+              :hint="getHintForType(selectedType)"
+            />
+          </v-col>
         </v-row>
-
-        <df-input
-          v-model="inputValue"
-          :control="inputField"
-          :input-type="selectedType"
-          :min-length="3"
-          :max-length="50"
-          :pattern="selectedType === 'email' ? emailPattern : undefined"
-          :label="new Label('Input Field', 'mdi-text-box-outline')"
-          :hint="getHintForType(selectedType)"
-        />
 
         <div class="mt-4">
           <v-btn @click="toggleEnabled" color="primary" class="mr-2">
@@ -36,7 +36,7 @@
 
         <div class="mt-4">
           <strong>Field value:</strong>
-          <pre>{{ inputValue }}</pre>
+          <pre>{{ inputField.value }}</pre>
         </div>
 
         <div class="mt-4">
@@ -59,9 +59,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch } from 'vue';
-import { Field } from '@dynamicforms/vue-forms';
+import { Field, Validators } from '@dynamicforms/vue-forms';
 import { DfInput, DfSelect, Label } from '../../src';
 
 const inputTypes = [
@@ -72,23 +72,26 @@ const inputTypes = [
 ];
 
 const selectedType = ref('text');
-const inputValue = ref('');
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-const inputField = Field.create({ value: '' });
+const inputField = Field.create<string>({ value: '' });
+inputField.registerAction(new Validators.LengthInRange(3, 50));
 
 watch(selectedType, (newType) => {
   // Reset field when changing input type
   console.log(newType);
-  inputValue.value = '';
+  inputField.value = '';
+  inputField.clearValidators();
 
   // Set default value based on type
   if (newType === 'text') {
-    inputValue.value = 'Sample text';
+    inputField.value = 'Sample text';
+    inputField.registerAction(new Validators.LengthInRange(3, 50));
   } else if (newType === 'email') {
-    inputValue.value = '';
+    inputField.value = '';
+    inputField.registerAction(new Validators.RegexValidator(emailPattern));
   } else if (newType === 'url') {
-    inputValue.value = 'https://';
+    inputField.value = 'https://';
   }
 });
 
@@ -97,7 +100,6 @@ function toggleEnabled() {
 }
 
 function resetField() {
-  inputValue.value = '';
   inputField.value = '';
 }
 

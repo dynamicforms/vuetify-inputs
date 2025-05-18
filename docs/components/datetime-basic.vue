@@ -68,7 +68,7 @@ import { Field, Validators } from '@dynamicforms/vue-forms';
 import { DfDateTime, Label } from '../../src';
 
 const dateTimeField = Field.create({
-  value: new Date().toISOString(),
+  value: null,
   validators: [new Validators.Required()],
 });
 
