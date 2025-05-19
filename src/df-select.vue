@@ -61,6 +61,10 @@
       </v-list-item>
     </template>
     <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
+    <template v-if="$slots['append-inner']" #append-inner="props"><slot name="append-inner" v-bind="props"/></template>
+    <template v-if="$slots['prepend-inner']" #prepend-inner="props">
+      <slot name="prepend-inner" v-bind="props"/>
+    </template>
   </component>
 </template>
 
@@ -112,6 +116,10 @@ interface Emits extends BaseEmits {
 }
 
 const emits = defineEmits<Emits>();
+defineSlots<{
+  'append-inner'?: (props: any) => any;
+  'prepend-inner'?: (props: any) => any;
+}>();
 
 const { errors, label, touched, value: resultingValue, vuetifyBindings } = useInputBase(propsWithDefaults, emits);
 
