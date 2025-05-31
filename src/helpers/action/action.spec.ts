@@ -1,76 +1,120 @@
-import { Action as FormAction } from '@dynamicforms/vue-forms';
-import { vi } from 'vitest';
+import { ref } from 'vue';
 
-import { Action, ActionJSON } from './action';
+import { Action } from './action';
 import { ActionDisplayStyle } from './action-display-style';
-import { ResponsiveLabelRenderOptions } from './responsive-render-options';
+import { BreakpointNames } from './responsive-render-options';
 
 describe('Action', () => {
   describe('Action class', () => {
-    it('creates an action with the expected properties', () => {
-      const actionData: ActionJSON = {
-        name: 'test-action',
+    it('creates an action with basic value properties', () => {
+      const actionData = {
         label: 'Test action',
         icon: 'test-icon',
-        displayStyle: {
-          xl: { showLabel: true, showIcon: true, renderAs: 'TEXT' as unknown as ActionDisplayStyle },
-          sm: { showLabel: false, showIcon: false, renderAs: 'BUTTON' as unknown as ActionDisplayStyle },
-        },
+        renderAs: ActionDisplayStyle.BUTTON,
+        showLabel: true,
+        showIcon: true,
       };
-      const action = new Action(actionData, FormAction.create());
-
-      expect(action).toHaveProperty('name', 'test-action');
-      expect(action).toHaveProperty('label', 'Test action');
-      expect(action).toHaveProperty('labelAvailable', true);
-      expect(action).toHaveProperty('icon', 'test-icon');
-      expect(action).toHaveProperty('iconAvailable', true);
-      expect(action).toHaveProperty('displayStyle', new ResponsiveLabelRenderOptions({
-        label: 'Test action',
-        xl: { showLabel: true, showIcon: true, renderAs: ActionDisplayStyle.TEXT },
-        sm: { showLabel: false, showIcon: false, renderAs: ActionDisplayStyle.BUTTON },
-      }));
-      expect(action).toHaveProperty('formAction');
+      const action: Action = Action.create({ value: actionData });
+      expect(action).toBeInstanceOf(Action);
+      expect(action.label).toBe('Test action');
+      expect(action.icon).toBe('test-icon');
+      expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
+      expect(action.showLabel).toBe(true);
+      expect(action.showIcon).toBe(true);
     });
 
-    it('does not throw an error if the name matches the pattern', () => {
-      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
-      const actionData = { name: 'valid-name' };
-      new Action(actionData, FormAction.create()); // eslint-disable-line no-new
-      expect(consoleWarnSpy).not.toHaveBeenCalled();
+    it('handles showLabel/showIcon logic correctly', () => {
+      const actionWithEmptyLabel = Action.create({
+        value: {
+          label: '',
+          icon: 'test-icon',
+          showLabel: true,
+          showIcon: true,
+        },
+      });
+      expect(actionWithEmptyLabel.showLabel).toBe(false); // empty label means showLabel is false
+      expect(actionWithEmptyLabel.showIcon).toBe(true);
 
-      consoleWarnSpy.mockRestore();
+      const actionWithEmptyIcon = Action.create({
+        value: {
+          label: 'Test',
+          icon: '',
+          showLabel: true,
+          showIcon: true,
+        },
+      });
+      expect(actionWithEmptyIcon.showLabel).toBe(true);
+      expect(actionWithEmptyIcon.showIcon).toBe(false); // empty icon means showIcon is false
+    });
+  });
+
+  describe('getBreakpointValue method', () => {
+    it('returns computed with responsive values', () => {
+      const breakpoint = ref('md' as BreakpointNames);
+      const actionData = {
+        label: 'Test action',
+        icon: 'test-icon',
+        renderAs: ActionDisplayStyle.BUTTON,
+        showLabel: false,
+        showIcon: true,
+        md: { showLabel: true, showIcon: false },
+        xl: { renderAs: ActionDisplayStyle.TEXT },
+      };
+      const action = Action.create({ value: actionData });
+
+      const breakpointValue = action.getBreakpointValue(breakpoint);
+
+      expect(breakpointValue.value.label).toBe('Test action');
+      expect(breakpointValue.value.icon).toBeUndefined(); // showIcon is false for md
+      expect(breakpointValue.value.showLabel).toBe(true); // overridden for md
+      expect(breakpointValue.value.showIcon).toBe(false); // overridden for md
+      expect(breakpointValue.value.renderAs).toBe(ActionDisplayStyle.BUTTON);
+
+      // Test reactivity - change breakpoint
+      breakpoint.value = 'xl';
+      expect(breakpointValue.value.renderAs).toBe(ActionDisplayStyle.TEXT); // overridden for xl
     });
   });
 
   describe('Action template functions', () => {
-    it('actionClose() should return an Action object with correct values', () => {
-      const action = Action.closeAction({}, FormAction.create());
+    const breakpoint = ref('xl' as BreakpointNames);
+
+    it('closeAction() should return an Action object with correct values', () => {
+      const action = Action.closeAction(breakpoint);
       expect(action).toBeInstanceOf(Action);
-      expect(action).toHaveProperty('name', 'close');
-      expect(action).toHaveProperty('label', 'Close');
-      expect(action).toHaveProperty('labelAvailable', true);
-      expect(action).toHaveProperty('icon', 'close-outline');
-      expect(action).toHaveProperty('iconAvailable', true);
+      expect(action.label).toBe('Close');
+      expect(action.icon).toBe('close-outline');
+      expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
     });
 
-    it('actionYes() should return an Action object with correct values', () => {
-      const action = Action.yesAction({}, FormAction.create());
+    it('yesAction() should return an Action object with correct values', () => {
+      const action = Action.yesAction(breakpoint);
       expect(action).toBeInstanceOf(Action);
-      expect(action).toHaveProperty('name', 'yes');
-      expect(action).toHaveProperty('label', 'Yes');
-      expect(action).toHaveProperty('labelAvailable', true);
-      expect(action).toHaveProperty('icon', 'thumbs-up-outline');
-      expect(action).toHaveProperty('iconAvailable', true);
+      expect(action.label).toBe('Yes');
+      expect(action.icon).toBe('thumbs-up-outline');
+      expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
     });
 
-    it('actionNo() should return an Action object with correct values', () => {
-      const action = Action.noAction({}, FormAction.create());
+    it('noAction() should return an Action object with correct values', () => {
+      const action = Action.noAction(breakpoint);
       expect(action).toBeInstanceOf(Action);
-      expect(action).toHaveProperty('name', 'no');
-      expect(action).toHaveProperty('label', 'No');
-      expect(action).toHaveProperty('labelAvailable', true);
-      expect(action).toHaveProperty('icon', 'thumbs-down-outline');
-      expect(action).toHaveProperty('iconAvailable', true);
+      expect(action.label).toBe('No');
+      expect(action.icon).toBe('thumbs-down-outline');
+      expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
+    });
+
+    it('template functions accept override data', () => {
+      const customData = {
+        value: {
+          label: 'Custom Close',
+          renderAs: ActionDisplayStyle.TEXT,
+        },
+      };
+      const action = Action.closeAction(breakpoint, customData);
+
+      expect(action.label).toBe('Custom Close');
+      expect(action.icon).toBe('close-outline'); // should keep default icon
+      expect(action.renderAs).toBe(ActionDisplayStyle.TEXT); // should use override
     });
   });
 });

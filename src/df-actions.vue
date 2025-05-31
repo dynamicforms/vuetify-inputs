@@ -8,27 +8,26 @@
     }"
   >
     <v-btn
-      v-for="(action, idx) in actionsRef"
+      v-for="(action, idx) in actionsWithBreakpoint"
       :key="idx"
-      :variant="displayAsStyle(action) === ActionDisplayStyle.BUTTON ? 'tonal' : 'text'"
+      :variant="action.renderAs === ActionDisplayStyle.BUTTON ? 'tonal' : 'text'"
       :elevation="0"
       :class="idx !== -1 ? '' : 'ms-3'"
       :size="buttonSize"
-      @click.stop="(event: MouseEvent) => action.formAction.execute(event)"
+      @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >
-      <IonIcon v-if="displayIcon(action)" class="action-icon" :name="<string> action.formAction.icon"/>
-      <span v-if="displayIcon(action) && displayLabel(action)" style="width: .5rem"/>
-      <span v-if="displayLabel(action)">{{ labelText(action) }}</span>
+      <IonIcon v-if="action.icon" class="action-icon" :name="action.icon"/>
+      <span v-if="action.icon && action.label" style="width: .5rem"/>
+      <span v-if="action.label">{{ action.label }}</span>
     </v-btn>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, isRef, ref, Ref } from 'vue';
+import { computed, isRef, ref, Ref, unref } from 'vue';
 import IonIcon from 'vue-ionicon';
-import { useDisplay } from 'vuetify';
 
-import { Action, LabelRenderOptions, ActionDisplayStyle, getBreakpointName } from './helpers';
+import { Action, ActionDisplayStyle, useBreakpoint } from './helpers';
 
 type ShowAsGroup = 'no' | 'grouped' | 'grouped-no-borders';
 
@@ -43,45 +42,12 @@ const props = withDefaults(defineProps<ActionComponentProps>(), {
   showAsGroup: 'no',
 });
 
+const breakpoint = useBreakpoint();
 const actionsRef = <Ref<Action[]>>(isRef(props.actions) ? props.actions : ref(props.actions));
-
-const display = useDisplay();
-const displayStyle = computed(() => {
-  const res: Record<string, LabelRenderOptions> = {};
-  res['%breakpoint%'] = getBreakpointName(display) as any;
-  for (const action of actionsRef.value) {
-    res[action.name] = action.displayStyle.getOptionsForBreakpoint(getBreakpointName(display));
-  }
-  return res;
-});
-
-/*
-function asText(action: Action) {
-  return displayStyle.value[action.name].renderAs !== ActionDisplayStyle.BUTTON;
-}
-
-function buttonVariant(action: Action) {
-  return displayStyle.value[action.name].renderAs === ActionDisplayStyle.BUTTON ? 'info' : 'link';
-}
-*/
-
-function displayIcon(action: Action): boolean {
-  return (displayStyle.value[action.name].showIcon && action.iconAvailable) ?? true;
-}
-
-function displayLabel(action: Action): boolean {
-  if (displayStyle.value[action.name].showLabel && action.labelAvailable) return true;
-  return !displayIcon(action);
-}
-
-function displayAsStyle(action: Action) : ActionDisplayStyle {
-  return displayStyle.value[action.name].renderAs ?? ActionDisplayStyle.BUTTON;
-}
-
-function labelText(action: Action): string {
-  if (action.labelAvailable) return action.formAction.label ?? '';
-  return action.name;
-}
+const actionsWithBreakpoint = computed(() => actionsRef.value.map((action) => ({
+  action,
+  ...unref(action.getBreakpointValue(breakpoint)),
+})));
 </script>
 
 <style scoped>

@@ -1,116 +1,94 @@
-import { Action as FormAction, ExecuteAction } from '@dynamicforms/vue-forms';
-import { isString } from 'lodash-es';
+import { Action as FormAction, IField, IFieldConstructorParams } from '@dynamicforms/vue-forms';
+import { isEmpty, isString } from 'lodash-es';
+import { computed, Ref } from 'vue';
 
 import { ActionDisplayStyle } from './action-display-style';
-import { ResponsiveLabelRenderOptions, BreakpointsJSON, LabelRenderOptions } from './responsive-render-options';
+import { ActionBreakpointOptions, ActionRenderOptions, ResponsiveActionRenderOptions } from './action-render-options';
+import { BreakpointNames } from './responsive-render-options';
 
-export interface ActionJSON {
-  // [key: `action${string}`]: ActionHandler;
-  name?: string;
-  label?: string;
-  icon?: string;
-  displayStyle?: BreakpointsJSON<LabelRenderOptions>;
-  field_name?: string;
-}
-
-export interface ActionsJSON {
-  [key: string]: ActionJSON;
-}
-
-class Action {
-  public readonly name: string;
-
-  public displayStyle: ResponsiveLabelRenderOptions;
-
-  public formAction: FormAction;
-
-  constructor(data: ActionJSON, formAction: FormAction) {
-    if (data.name == null) throw new Error(`Action name must not be empty ${data}`);
-    // any non-string or empty string must resolve as null for label
-    const label = !isString(data.label) || data.label.length === 0 ? undefined : data.label;
-    // any non-string or empty string must resolve as null for icon
-    const icon = !isString(data.icon) || data.icon.length === 0 ? undefined : data.icon;
-
-    this.name = data.name;
-    this.displayStyle = new ResponsiveLabelRenderOptions({ label, ...data.displayStyle });
-    this.formAction = formAction;
-
-    this.formAction.icon = icon;
-    this.formAction.label = label;
+// @ts-ignore: prevent TS from complaining how create method is not ok because its declaration differs from Field's
+class Action extends FormAction<ActionBreakpointOptions> {
+  static create<T extends ActionBreakpointOptions = ActionBreakpointOptions>(
+    params?: Partial<IFieldConstructorParams<T>>,
+  ): Action {
+    return super.create<T>(params) as any as Action;
   }
 
-  get label() {
-    return this.formAction?.label;
+  getBreakpointValue(breakpoint: Ref<BreakpointNames>) {
+    return computed(() => {
+      const responsiveValue = new ResponsiveActionRenderOptions(this.value);
+      const partial = responsiveValue.getOptionsForBreakpoint(breakpoint.value);
+      return {
+        name: partial.name,
+        label: partial.showLabel ? partial.label : undefined,
+        icon: partial.showIcon ? partial.icon : undefined,
+        renderAs: partial.renderAs,
+        showLabel: isString(partial.label) && !isEmpty(partial.label) ? partial.showLabel : false,
+        showIcon: isString(partial.icon) && !isEmpty(partial.icon) ? partial.showIcon : false,
+      } as ActionRenderOptions;
+    });
   }
 
-  get labelAvailable() {
-    return this.formAction.label !== undefined;
-  }
+  get name() { return this.value.name; }
 
-  get icon() {
-    return this.formAction?.icon;
-  }
+  get label() { return this.value.showLabel ? this.value.label : undefined; }
 
-  get iconAvailable() {
-    return this.formAction.icon !== undefined;
-  }
+  get showLabel() { return isString(this.value.label) && !isEmpty(this.value.label) ? this.value.showLabel : false; }
 
-  static actionFormName(actionName: string): string {
-    return `$action${actionName.charAt(0).toUpperCase()}${actionName.slice(1)}`;
-  }
+  get icon() { return this.value.showIcon ? this.value.icon : undefined; }
 
-  private static makeFormAction(actionOrExecuteHandler?: FormAction | ExecuteAction): FormAction {
-    let fa: FormAction;
-    if (actionOrExecuteHandler instanceof ExecuteAction) {
-      fa = FormAction.create().registerAction(actionOrExecuteHandler);
-    } else if (actionOrExecuteHandler === undefined) {
-      fa = FormAction.create();
-    } else if (actionOrExecuteHandler instanceof FormAction) {
-      fa = actionOrExecuteHandler;
-    } else {
-      throw new Error('actionOrExecuteHandler is not of any of supported types');
-    }
-    return fa;
-  }
+  get showIcon() { return isString(this.value.icon) && !isEmpty(this.value.icon) ? this.value.showIcon : false; }
 
-  static closeAction(data: ActionJSON, actionOrExecuteHandler?: FormAction | ExecuteAction) {
-    return new Action(
-      {
+  get renderAs() { return this.value.renderAs; }
+
+  static closeAction(breakpoint: Ref<BreakpointNames>, data?: Partial<IField<ActionBreakpointOptions>>) {
+    const init: Partial<IField<ActionBreakpointOptions>> = {
+      ...(data ?? {}), // any properties in data should overwrite properties in the constant
+      value: {
         name: 'close',
         label: 'Close', // TODO: needs translation
         icon: 'close-outline',
-        displayStyle: { renderAs: ActionDisplayStyle.BUTTON, showLabel: true, showIcon: true },
-        ...data, // any properties in data should overwrite properties in the constant
+        renderAs: ActionDisplayStyle.BUTTON,
+        showLabel: true,
+        showIcon: true,
       },
-      this.makeFormAction(actionOrExecuteHandler),
-    );
+    };
+    init.value = { ...init.value, ...(data?.value ?? { }) }; // data may only contain partial info of the value
+    return Action.create(init);
   }
 
-  static yesAction(data: ActionJSON, actionOrExecuteHandler?: FormAction | ExecuteAction) {
-    return new Action(
-      {
+  static yesAction(breakpoint: Ref<BreakpointNames>, data?: Partial<IField<ActionBreakpointOptions>>) {
+    const init: Partial<IField<ActionBreakpointOptions>> = {
+      ...(data ?? { }), // any properties in data should overwrite properties in the constant
+      value: {
         name: 'yes',
         label: 'Yes', // TODO: needs translation
         icon: 'thumbs-up-outline',
-        displayStyle: { renderAs: ActionDisplayStyle.BUTTON, showLabel: true, showIcon: true },
-        ...data, // any properties in data should overwrite properties in the constant
+        renderAs: ActionDisplayStyle.BUTTON,
+        showLabel: true,
+        showIcon: true,
       },
-      this.makeFormAction(actionOrExecuteHandler),
-    );
+    };
+    init.value = { ...init.value, ...(data?.value ?? { }) }; // data may only contain partial info of the value
+    return Action.create(init);
   }
 
-  static noAction(data: ActionJSON, actionOrExecuteHandler?: FormAction | ExecuteAction) {
-    return new Action(
-      {
+  static noAction(breakpoint: Ref<BreakpointNames>, data?: Partial<IField<ActionBreakpointOptions>>) {
+    const init: Partial<IField<ActionBreakpointOptions>> = {
+      ...(data ?? { }), // any properties in data should overwrite properties in the constant
+      value: {
         name: 'no',
         label: 'No', // TODO: needs translation
         icon: 'thumbs-down-outline',
-        displayStyle: { renderAs: ActionDisplayStyle.BUTTON, showLabel: true, showIcon: true },
-        ...data, // any properties in data should overwrite properties in the constant
+        renderAs: ActionDisplayStyle.BUTTON,
+        showLabel: true,
+        showIcon: true,
       },
-      this.makeFormAction(actionOrExecuteHandler),
-    );
+    };
+    init.value = { ...init.value, ...(data?.value ?? { }) }; // data may only contain partial info of the value
+    return Action.create(init);
   }
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export { Action };

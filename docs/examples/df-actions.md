@@ -1,6 +1,6 @@
 # df-actions Component
 
-The `df-actions` component provides a clean and responsive way to display action buttons or links, with support for 
+The `df-actions` component provides a clean and responsive way to display action buttons or links, with support for
 responsive behavior across different screen sizes.
 
 ## Basic Example
@@ -27,45 +27,43 @@ Here's a simple example of the `df-actions` component in action:
 
 ## Action Object
 
-The component expects an array of `Action` objects with the following structure:
+The component expects an array of `Action` objects created using `Action.create()` with the following structure:
 
 ```typescript
-interface Action {
-  renderAs: ActionDisplayStyle;  // BUTTON or TEXT
-  name: string;                  // Unique identifier for the action
-  label?: string;                // Display text (optional)
-  icon?: string;                 // Icon name (optional)
-  displayStyle: {                // Display options
-    renderAs: ActionDisplayStyle;  // BUTTON or TEXT
-    showIcon?: boolean;            // Whether to show the icon
-    showLabel?: boolean;           // Whether to show the label
-    // Responsive breakpoints
-    sm?: {...};                    // Small screen options
-    md?: {...};                    // Medium screen options
-    lg?: {...};                    // Large screen options
-    xl?: {...};                    // Extra large screen options
-  };
-  formAction: FormAction;        // DynamicForms action handler
+interface ActionBreakpointOptions {
+  name?: string;                    // Unique identifier for the action
+  label?: string;                   // Display text
+  icon?: string;                    // Icon name (Ionicons format)
+  renderAs?: ActionDisplayStyle;    // BUTTON or TEXT
+  showIcon?: boolean;               // Whether to show the icon
+  showLabel?: boolean;              // Whether to show the label
+  // Responsive breakpoints
+  xs?: Partial<ActionRenderOptions>;
+  sm?: Partial<ActionRenderOptions>;
+  md?: Partial<ActionRenderOptions>;
+  lg?: Partial<ActionRenderOptions>;
+  xl?: Partial<ActionRenderOptions>;
 }
 ```
 
 ## Responsive Behavior
 
-The component automatically adapts to different screen sizes based on the `displayStyle` configuration:
+The component automatically adapts to different screen sizes based on the breakpoint configuration:
 
 ```javascript
-const saveAction = new Action({
-  name: 'save',
-  label: 'Save',
-  icon: 'save-outline',
-  displayStyle: {
+const saveAction = Action.create({
+  value: {
+    name: 'save',
+    label: 'Save',
+    icon: 'save-outline',
     renderAs: ActionDisplayStyle.BUTTON,
     showIcon: true,
     showLabel: false,
     md: { showLabel: true, showIcon: false }, // Medium screens and up
     lg: { showIcon: true }                    // Large screens and up
-  }
-}, formSaveAction);
+  },
+  actions: [formSaveAction]
+});
 ```
 
 With this configuration:
@@ -89,38 +87,41 @@ The `showAsGroup` property allows you to control the visual grouping of buttons:
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Action, ActionDisplayStyle } from '@dynamicforms/vuetify-inputs';
-import { Action as FormAction } from '@dynamicforms/vue-forms';
+  import { ExecuteAction } from '@dynamicforms/vue-forms';
+  import { Action, ActionDisplayStyle } from '@dynamicforms/vuetify-inputs';
 
-// Create form actions
-const saveAction = new FormAction();
-const cancelAction = new FormAction();
+  // Create form action
+  const saveFormAction = new ExecuteAction((action, supr, params) => {
+    // Your save logic here
+    console.log('Save action executed');
+    return supr(action, params);
+  });
 
-// Create actions for the component
-const actions = ref([
-  new Action({
-    name: 'save',
-    label: 'Save',
-    icon: 'save-outline',
-    displayStyle: {
-      renderAs: ActionDisplayStyle.BUTTON,
-      showIcon: true,
-      showLabel: true
-    }
-  }, saveAction),
-  
-  new Action({
-    name: 'cancel',
-    label: 'Cancel',
-    icon: 'close-outline',
-    displayStyle: {
-      renderAs: ActionDisplayStyle.BUTTON,
-      showIcon: true,
-      showLabel: true
-    }
-  }, cancelAction)
-]);
+  // Create actions for the component
+  const actions = ref([
+    Action.create({
+      value: {
+        name: 'save',
+        label: 'Save',
+        icon: 'save-outline',
+        renderAs: ActionDisplayStyle.BUTTON,
+        showIcon: true,
+        showLabel: true
+      },
+      actions: [saveFormAction]
+    }),
+
+    Action.create({
+      value: {
+        name: 'cancel',
+        label: 'Cancel',
+        icon: 'close-outline',
+        renderAs: ActionDisplayStyle.BUTTON,
+        showIcon: true,
+        showLabel: true
+      }
+    })
+  ]);
 </script>
 ```
 

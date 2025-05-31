@@ -30,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { ExecuteAction } from '@dynamicforms/vue-forms';
 import { ref, computed, Ref } from 'vue';
 import { useDisplay } from 'vuetify';
 import { Action, ActionDisplayStyle, DfActions } from '../../src';
@@ -58,65 +59,54 @@ const showAsGroup = computed(() => {
   return 'no';
 });
 
-// Mock FormAction class for documentation
-class MockFormAction {
-  public icon?: string;
-  public label?: string;
-
-  execute(event: MouseEvent) {
-    console.log('Action executed', this.label, event);
-    alert(`Action "${this.label}" clicked`);
-  }
-}
+const mockFormAction = new ExecuteAction((action, supr, params) => {
+  console.log('Action executed', action, params);
+  alert(`Action "${(<Action> action).name}" clicked`);
+  supr(action, params);
+});
 
 // Create actions
-const saveAction = new Action(
-  {
+const saveAction = Action.create({
+  value: {
     name: 'save',
     label: 'Save',
     icon: 'save-outline',
-    displayStyle: {
-      renderAs: ActionDisplayStyle.BUTTON,
-      showIcon: true,
-      showLabel: false,
-      md: { showLabel: true, showIcon: false }, // Medium screen and bigger, show label, but not icon
-      lg: { showIcon: true } // Large screen and bigger, show label (carried over from md), and icon
-    }
+    renderAs: ActionDisplayStyle.BUTTON,
+    showIcon: true,
+    showLabel: false,
+    md: { showLabel: true, showIcon: false }, // Medium screen and bigger, show label, but not icon
+    lg: { showIcon: true } // Large screen and bigger, show label (carried over from md), and icon
   },
-  new MockFormAction() as any
-);
+  actions: [mockFormAction],
+});
 
-const deleteAction = new Action(
-  {
+const deleteAction = Action.create({
+  value: {
     name: 'delete',
     label: 'Delete',
     icon: 'trash-outline',
-    displayStyle: {
-      renderAs: ActionDisplayStyle.BUTTON,
-      showIcon: true,
-      showLabel: false,
-      md: { showLabel: true, showIcon: false }, // Medium screen and bigger, show label, but not icon
-      lg: { showIcon: true, renderAs: ActionDisplayStyle.TEXT } // On large screens, show as text
-    }
+    renderAs: ActionDisplayStyle.BUTTON,
+    showIcon: true,
+    showLabel: false,
+    md: { showLabel: true, showIcon: false }, // Medium screen and bigger, show label, but not icon
+    lg: { showIcon: true, renderAs: ActionDisplayStyle.TEXT } // On large screens, show as text
   },
-  new MockFormAction() as any
-);
+  actions: [mockFormAction],
+});
 
-const cancelAction = new Action(
-  {
+const cancelAction = Action.create({
+  value: {
     name: 'cancel',
     label: 'Cancel',
     icon: 'close-outline',
-    displayStyle: {
-      renderAs: ActionDisplayStyle.BUTTON,
-      showIcon: true,
-      showLabel: false,
-      md: { showLabel: true, showIcon: false }, // On small screens, only show icon
-      lg: { showIcon: true } // Large screen and bigger, show label (carried over from md), and icon
-    }
+    renderAs: ActionDisplayStyle.BUTTON,
+    showIcon: true,
+    showLabel: false,
+    md: { showLabel: true, showIcon: false }, // On small screens, only show icon
+    lg: { showIcon: true } // Large screen and bigger, show label (carried over from md), and icon
   },
-  new MockFormAction() as any
-);
+  actions: [mockFormAction],
+});
 
 const actions: Ref<Action[]> = ref([saveAction, deleteAction, cancelAction]);
 
