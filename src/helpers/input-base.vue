@@ -59,7 +59,6 @@ const isClearable = computed(() => !!(unref(props.clearable) && unref(value)));
 const focused = ref<boolean>(false);
 
 function setFocused(isFocused: boolean) {
-  console.log(isFocused);
   focused.value = isFocused;
   if (!isFocused) {
     touched.value = true;

@@ -31,8 +31,6 @@ const fruits = [
   { id: 'durian', text: 'Durian' },
   { id: 'elder', text: 'Elderflower' }
 ];
-
-window.setInterval(() => { selectedFruit.value = fruits[Math.floor(Math.random() * 5)].id; }, 500)
 </script>
 
 <style scoped>

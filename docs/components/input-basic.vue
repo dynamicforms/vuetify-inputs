@@ -89,7 +89,7 @@ watch(selectedType, (newType) => {
     inputField.registerAction(new Validators.LengthInRange(3, 50));
   } else if (newType === 'email') {
     inputField.value = '';
-    inputField.registerAction(new Validators.RegexValidator(emailPattern));
+    inputField.registerAction(new Validators.Pattern(emailPattern));
   } else if (newType === 'url') {
     inputField.value = 'https://';
   }

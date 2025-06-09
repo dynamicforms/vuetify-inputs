@@ -2,6 +2,8 @@ import { Action as FormAction, IField, IFieldConstructorParams } from '@dynamicf
 import { isEmpty, isString } from 'lodash-es';
 import { computed, Ref } from 'vue';
 
+import { translatableStrings } from '../translations';
+
 import { ActionDisplayStyle } from './action-display-style';
 import { ActionBreakpointOptions, ActionRenderOptions, ResponsiveActionRenderOptions } from './action-render-options';
 import { BreakpointNames } from './responsive-render-options';
@@ -41,12 +43,12 @@ class Action extends FormAction<ActionBreakpointOptions> {
 
   get renderAs() { return this.value.renderAs; }
 
-  static closeAction(breakpoint: Ref<BreakpointNames>, data?: Partial<IField<ActionBreakpointOptions>>) {
+  static closeAction(data?: Partial<IField<ActionBreakpointOptions>>) {
     const init: Partial<IField<ActionBreakpointOptions>> = {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'close',
-        label: 'Close', // TODO: needs translation
+        label: translatableStrings.Close,
         icon: 'close-outline',
         renderAs: ActionDisplayStyle.BUTTON,
         showLabel: true,
@@ -57,12 +59,12 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return Action.create(init);
   }
 
-  static yesAction(breakpoint: Ref<BreakpointNames>, data?: Partial<IField<ActionBreakpointOptions>>) {
+  static yesAction(data?: Partial<IField<ActionBreakpointOptions>>) {
     const init: Partial<IField<ActionBreakpointOptions>> = {
       ...(data ?? { }), // any properties in data should overwrite properties in the constant
       value: {
         name: 'yes',
-        label: 'Yes', // TODO: needs translation
+        label: translatableStrings.Yes,
         icon: 'thumbs-up-outline',
         renderAs: ActionDisplayStyle.BUTTON,
         showLabel: true,
@@ -73,12 +75,12 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return Action.create(init);
   }
 
-  static noAction(breakpoint: Ref<BreakpointNames>, data?: Partial<IField<ActionBreakpointOptions>>) {
+  static noAction(data?: Partial<IField<ActionBreakpointOptions>>) {
     const init: Partial<IField<ActionBreakpointOptions>> = {
       ...(data ?? { }), // any properties in data should overwrite properties in the constant
       value: {
         name: 'no',
-        label: 'No', // TODO: needs translation
+        label: translatableStrings.No,
         icon: 'thumbs-down-outline',
         renderAs: ActionDisplayStyle.BUTTON,
         showLabel: true,

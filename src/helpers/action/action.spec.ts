@@ -77,10 +77,8 @@ describe('Action', () => {
   });
 
   describe('Action template functions', () => {
-    const breakpoint = ref('xl' as BreakpointNames);
-
     it('closeAction() should return an Action object with correct values', () => {
-      const action = Action.closeAction(breakpoint);
+      const action = Action.closeAction();
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('Close');
       expect(action.icon).toBe('close-outline');
@@ -88,7 +86,7 @@ describe('Action', () => {
     });
 
     it('yesAction() should return an Action object with correct values', () => {
-      const action = Action.yesAction(breakpoint);
+      const action = Action.yesAction();
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('Yes');
       expect(action.icon).toBe('thumbs-up-outline');
@@ -96,7 +94,7 @@ describe('Action', () => {
     });
 
     it('noAction() should return an Action object with correct values', () => {
-      const action = Action.noAction(breakpoint);
+      const action = Action.noAction();
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('No');
       expect(action.icon).toBe('thumbs-down-outline');
@@ -110,7 +108,7 @@ describe('Action', () => {
           renderAs: ActionDisplayStyle.TEXT,
         },
       };
-      const action = Action.closeAction(breakpoint, customData);
+      const action = Action.closeAction(customData);
 
       expect(action.label).toBe('Custom Close');
       expect(action.icon).toBe('close-outline'); // should keep default icon
