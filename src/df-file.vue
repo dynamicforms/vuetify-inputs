@@ -32,12 +32,10 @@
 <script setup lang="ts">
 import { ref, computed, onBeforeUnmount, watch } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, FileComms, InputBase, useInputBase } from './helpers';
+import { DfFileProps } from './dynamicforms-component-props';
+import { BaseEmits, defaultBaseProps, InputBase, useInputBase } from './helpers';
 
-interface Props extends BaseProps {
-  comms: FileComms;
-}
-const props = withDefaults(defineProps<Props>(), defaultBaseProps);
+const props = withDefaults(defineProps<DfFileProps>(), defaultBaseProps);
 
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();

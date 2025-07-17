@@ -12,7 +12,6 @@
       :key="idx"
       :variant="action.renderAs === ActionDisplayStyle.BUTTON ? 'tonal' : 'text'"
       :elevation="0"
-      :class="idx !== -1 ? '' : 'ms-3'"
       :size="buttonSize"
       @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >
@@ -24,26 +23,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, isRef, ref, Ref, unref } from 'vue';
+import { computed, unref } from 'vue';
 import IonIcon from 'vue-ionicon';
 
-import { Action, ActionDisplayStyle, useBreakpoint } from './helpers';
+import { DfActionsProps } from './dynamicforms-component-props';
+import { ActionDisplayStyle, useBreakpoint } from './helpers';
 
-type ShowAsGroup = 'no' | 'grouped' | 'grouped-no-borders';
-
-interface ActionComponentProps {
-  actions: Action[] | Ref<Action[]>;
-  buttonSize?: string | number; // see https://vuetifyjs.com/en/api/v-btn/#props-size
-  showAsGroup?: ShowAsGroup
-}
-
-const props = withDefaults(defineProps<ActionComponentProps>(), {
+const props = withDefaults(defineProps<DfActionsProps>(), {
   buttonSize: 'default',
   showAsGroup: 'no',
 });
 
 const breakpoint = useBreakpoint();
-const actionsRef = <Ref<Action[]>>(isRef(props.actions) ? props.actions : ref(props.actions));
+const actionsRef = computed(() => unref(props.actions));
 const actionsWithBreakpoint = computed(() => actionsRef.value.map((action) => ({
   action,
   ...unref(action.getBreakpointValue(breakpoint)),
@@ -82,6 +74,6 @@ const actionsWithBreakpoint = computed(() => actionsRef.value.map((action) => ({
   border-inline-start: .1em solid currentColor;
 }
 .v-btn:not(:first-child) {
-  margin-left: 1em;
+  margin-left: .5em;
 }
 </style>

@@ -8,6 +8,8 @@ import * as VuetifyComponents from './vuetify-components';
 export * from './helpers';
 export * as VuetifyComponents from './vuetify-components';
 export * from './dynamicforms-components';
+export * as DfInputComponents from './dynamicforms-components';
+export * as DfInputComponentProps from './dynamicforms-component-props';
 
 export interface DynamicFormsInputsOptions extends VuetifyInputsSettings {
   registerComponents: boolean;

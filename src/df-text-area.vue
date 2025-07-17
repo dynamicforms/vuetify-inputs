@@ -27,13 +27,10 @@
 import { DisplayMode } from '@dynamicforms/vue-forms';
 import { toRefs } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
+import { DfTextAreaProps } from './dynamicforms-component-props';
+import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
 
-interface Props extends BaseProps {
-  rows?: number;
-  maxRows?: number;
-}
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<DfTextAreaProps>(), {
   ...defaultBaseProps,
   rows: undefined,
   maxRows: undefined,

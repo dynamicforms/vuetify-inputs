@@ -15,13 +15,11 @@
 </template>
 
 <script setup lang="ts">
-import { BaseEmits, BaseProps, defaultBaseProps, InputBase, useInputBase } from './helpers';
+import { DfRtfEditorProps } from './dynamicforms-component-props';
+import { BaseEmits, defaultBaseProps, InputBase, useInputBase } from './helpers';
 import CkEditorCustom from './helpers/ck-editor-custom.vue';
 
-interface Props extends BaseProps {
-  minHeight?: string;
-}
-const props = withDefaults(defineProps<Props>(), { ...defaultBaseProps, minHeight: undefined });
+const props = withDefaults(defineProps<DfRtfEditorProps>(), { ...defaultBaseProps, minHeight: undefined });
 
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();

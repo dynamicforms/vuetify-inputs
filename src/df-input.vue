@@ -26,17 +26,10 @@
 <script setup lang="ts">
 import { computed, toRefs, unref } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
+import { DfInputProps } from './dynamicforms-component-props';
+import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
 
-interface Props extends BaseProps {
-  inputType?: 'text' | 'password' | 'email' | 'url' | 'number';
-  precision?: number | null;
-  step?: number;
-  min?: number;
-  max?: number;
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<DfInputProps>(), {
   ...defaultBaseProps,
   inputType: 'text',
   precision: null,

@@ -79,7 +79,7 @@ export default defineConfig({
     },
     server: {
       deps: {
-        // inline: ['vuetify']
+        inline: ['vuetify']
       },
     },
     globals: true,

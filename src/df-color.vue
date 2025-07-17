@@ -30,13 +30,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
+import { DfColorProps } from './dynamicforms-component-props';
+import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
 
-interface Props extends BaseProps {
-  allowNull?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), { ...defaultBaseProps, allowNull: false });
+const props = withDefaults(defineProps<DfColorProps>(), { ...defaultBaseProps, allowNull: false });
 
 interface Emits extends BaseEmits {}
 

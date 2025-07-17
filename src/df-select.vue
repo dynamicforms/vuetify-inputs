@@ -33,7 +33,9 @@
     @click:clear="selected = null"
     @blur="touched = true"
   >
-    <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
+    <template v-if="label.icon" #label="labelData">
+      <df-label :data="labelData" :label="label"/>
+    </template>
     <template #chip="{ item }">
       <v-chip
         :key="item.value"
@@ -60,8 +62,12 @@
         </template>
       </v-list-item>
     </template>
-    <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
-    <template v-if="$slots['append-inner']" #append-inner="props"><slot name="append-inner" v-bind="props"/></template>
+    <template #message="{ message }">
+      <messages-widget :message="message" :errors="errors"/>
+    </template>
+    <template v-if="$slots['append-inner']" #append-inner="props">
+      <slot name="append-inner" v-bind="props"/>
+    </template>
     <template v-if="$slots['prepend-inner']" #prepend-inner="props">
       <slot name="prepend-inner" v-bind="props"/>
     </template>
@@ -74,16 +80,8 @@ import { unionBy } from 'lodash-es';
 import { ref, computed, toRefs, watch, nextTick, unref } from 'vue';
 import IonIcon from 'vue-ionicon';
 
-import {
-  BaseEmits,
-  BaseProps,
-  defaultBaseProps,
-  DfLabel,
-  MessagesWidget,
-  SelectChoice,
-  SelectFetchChoices,
-  useInputBase,
-} from './helpers';
+import { DfSelectProps } from './dynamicforms-component-props';
+import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, SelectChoice, useInputBase } from './helpers';
 import {
   convertItems,
   getSelectedChoices,
@@ -91,15 +89,7 @@ import {
   updateSelectedFromValue,
 } from './helpers/df-select.helper';
 
-interface Props extends BaseProps {
-  choices?: SelectChoice[];
-  multiple?: boolean;
-  allowTags?: boolean;
-  allowNull?: boolean;
-  fetchChoices?: SelectFetchChoices;
-}
-
-const propsWithDefaults = withDefaults(defineProps<Props>(), {
+const propsWithDefaults = withDefaults(defineProps<DfSelectProps>(), {
   ...defaultBaseProps,
   choices: undefined,
   multiple: false,
@@ -135,10 +125,13 @@ function emitModelValueDisplay(mcVal: any) {
 }
 
 let setResultingValueGuard = false;
+
 function setResultingValue(newValue: any) {
   setResultingValueGuard = true;
   resultingValue.value = newValue;
-  nextTick(() => { setResultingValueGuard = false; });
+  nextTick(() => {
+    setResultingValueGuard = false;
+  });
 }
 
 watch(selected, (newValue) => {

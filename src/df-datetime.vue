@@ -95,15 +95,10 @@ import { format, parse } from 'date-fns';
 import { toNumber, isNaN } from 'lodash-es';
 import { ref, computed, watch, toRefs, unref } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, InputBase, useInputBase } from './helpers';
+import { DfDateTimeProps } from './dynamicforms-component-props';
+import { BaseEmits, defaultBaseProps, InputBase, useInputBase } from './helpers';
 
-interface Props extends BaseProps {
-  inputType?: 'datetime' | 'date' | 'time';
-  displayFormatDate?: string;
-  displayFormatTime?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<DfDateTimeProps>(), {
   ...defaultBaseProps,
   inputType: 'datetime',
   displayFormatDate: 'P',

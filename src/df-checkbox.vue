@@ -19,12 +19,10 @@
 import { clone } from 'lodash-es';
 import { computed } from 'vue';
 
-import { BaseEmits, BaseProps, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
+import { DfCheckboxProps } from './dynamicforms-component-props';
+import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
 
-interface Props extends BaseProps {
-  allowNull?: boolean;
-}
-const props = withDefaults(defineProps<Props>(), { ...defaultBaseProps, allowNull: false });
+const props = withDefaults(defineProps<DfCheckboxProps>(), { ...defaultBaseProps, allowNull: false });
 
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
