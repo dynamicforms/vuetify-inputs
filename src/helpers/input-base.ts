@@ -26,21 +26,22 @@ export const defaultBaseProps = { enabled: undefined };
 
 export interface BaseEmits<T = any> {
   (e: 'update:modelValue', value: T): void;
-
   (e: 'click:clear'): void;
 }
 
 export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, { });
+  const internalValue = ref<T | null>(null);
+
   const value = computed({
     get(): T {
-      if (props.control) {
-        return props.control.value as T;
-      }
+      if (props.control) return props.control.value as T;
+      if (props.modelValue === undefined) return internalValue.value as T;
       return props.modelValue as T;
     },
     set(newValue: T) {
       if (props.control) props.control.value = newValue;
+      if (props.modelValue === undefined) internalValue.value = newValue;
       emit('update:modelValue', newValue);
     },
   });

@@ -71,7 +71,7 @@ const inputTypes = [
   { text: 'URL', id: 'url' }
 ];
 
-const selectedType = ref('text');
+const selectedType = ref<'text' | 'password' | 'email' | 'url' | 'number'>('text');
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const inputField = Field.create<string>({ value: '' });
