@@ -22,7 +22,7 @@ export interface BaseProps<T = any> {
   clearable?: boolean;
 }
 
-export const defaultBaseProps = { enabled: undefined };
+export const defaultBaseProps = { enabled: undefined, clearable: true };
 
 export interface BaseEmits<T = any> {
   (e: 'update:modelValue', value: T): void;

@@ -1,5 +1,5 @@
 <template>
-  <input-base v-bind="props" clearable @click:clear="value = null" @blur="touched = true">
+  <input-base v-bind="props" :clearable="clearable" @click:clear="value = null" @blur="touched = true">
     <template #default="slotProps">
       <div class="d-flex w-100 pt-5 pl-2 pb-1">
         <v-text-field

@@ -35,7 +35,6 @@
           display-format="dd.MM.yyyy"
           hint="Date only, no time"
         />
-
         <div class="mt-4">
           <strong>Field value:</strong>
           <pre>{{ dateField.value == null ? 'null' : dateField.value }}</pre>
