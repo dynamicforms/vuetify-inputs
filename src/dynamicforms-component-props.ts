@@ -1,3 +1,4 @@
+import { type Locale } from 'date-fns';
 import { MaybeRef } from 'vue';
 
 import { Action, BaseProps, FileComms, SelectChoice, SelectFetchChoices } from './helpers';
@@ -22,6 +23,7 @@ export interface DfDateTimeProps extends BaseProps {
   inputType?: 'datetime' | 'date' | 'time';
   displayFormatDate?: string;
   displayFormatTime?: string;
+  locale?: Locale;
 }
 
 export interface DfFileProps extends BaseProps {

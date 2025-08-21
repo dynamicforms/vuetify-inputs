@@ -33,7 +33,7 @@
                   <v-date-picker
                     v-model="proxyModel.value"
                     :hide-header="true"
-                    :first-day-of-week="1"
+                    :first-day-of-week="firstDayOfWeek"
                     :show-adjacent-months="true"
                     :show-week="true"
                   >
@@ -96,7 +96,7 @@ import { toNumber, isNaN } from 'lodash-es';
 import { ref, computed, watch, toRefs, unref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, InputBase, useInputBase } from './helpers';
+import { BaseEmits, DateTimeLocaleConfig, defaultBaseProps, InputBase, useInputBase } from './helpers';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {
   ...defaultBaseProps,
@@ -108,6 +108,8 @@ const props = withDefaults(defineProps<DfDateTimeProps>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
+const currentLocale = computed(() => props.locale ?? unref(DateTimeLocaleConfig.dateTimeLocale));
+const firstDayOfWeek = computed(() => currentLocale.value.options?.weekStartsOn ?? 1);
 const { touched, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
@@ -175,11 +177,11 @@ const dateFormatted = computed({
   get() {
     const vad = unref(valueAsDate);
     if (vad == null) return '';
-    return format(vad, unref(displayFormatDate));
+    return format(vad, unref(displayFormatDate), { locale: currentLocale.value });
   },
   set(newValue: string) {
     try {
-      const d = parse(newValue, unref(displayFormatDate), new Date());
+      const d = parse(newValue, unref(displayFormatDate), new Date(), { locale: currentLocale.value });
       setValueISOFull(formatNaive(d), 0);
     } catch (err) {
       console.error(err);
@@ -191,7 +193,7 @@ const timeFormatted = computed({
   get() {
     const vad = unref(valueAsDate);
     if (vad == null) return '';
-    return format(vad, unref(displayFormatTime));
+    return format(vad, unref(displayFormatTime), { locale: currentLocale.value });
   },
   set(newValue: string) {
     const d = newValue.match(/(\d+):(\d+)\s?([a-zA-Z]+)?/);

@@ -59,12 +59,20 @@
         </div>
       </v-card-text>
     </v-card>
+
+    <v-card class="mt-4">
+      <v-card-title>Multilingual Date Picker</v-card-title>
+      <v-card-text>
+        <datetime-multilingual />
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
 <script setup>
 import { Field, Validators } from '@dynamicforms/vue-forms';
 import { DfDateTime, Label } from '../../src';
+import DatetimeMultilingual from './datetime-multilingual.vue';
 
 const dateTimeField = Field.create({
   value: null,

@@ -31,6 +31,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | inputType         | `'datetime'` \| `'date'` \| `'time'` | `'datetime'` | Input type - date and time, date only, or time only  |
 | displayFormatDate | `string` | `'P'`        | Date display format (date-fns format)              |
 | displayFormatTime | `string` | `'p'`        | Time display format (date-fns format)              |
+| locale            | `Locale` | `undefined`  | date-fns locale object for formatting and parsing. Falls back to global `DateTimeLocaleConfig` if not provided |
 
 ### Inherited Props
 
@@ -62,6 +63,78 @@ Common format strings:
 - `'dd.MM.yyyy'` - 17.04.2023
 - `'HH:mm'` - 14:30
 - `'HH:mm:ss'` - 14:30:45
+
+## Locale Configuration
+
+The component supports internationalization through date-fns locale objects. You can configure locales in two ways:
+
+### 1. Global Locale Configuration
+
+Use `DateTimeLocaleConfig` to set a global locale for all df-date-time components:
+
+```vue
+<script setup>
+import { DateTimeLocaleConfig } from '@dynamicforms/vuetify-inputs';
+import { enUS, de, fr } from 'date-fns/locale';
+
+// Set global locale (affects all df-date-time components)
+DateTimeLocaleConfig.setDateTimeLocale(enUS);
+
+// You can also use a reactive ref
+import { ref } from 'vue';
+const currentLocale = ref(de);
+DateTimeLocaleConfig.setDateTimeLocale(currentLocale);
+
+// Change locale dynamically
+currentLocale.value = fr;
+</script>
+```
+
+### 2. Component-specific Locale
+
+Override the global locale for specific components using the `locale` prop:
+
+```vue
+<template>
+  <df-date-time
+    v-model="selectedDate"
+    :locale="germanLocale"
+    display-format-date="dd.MM.yyyy"
+    label="Deutsches Datum"
+  />
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { de } from 'date-fns/locale';
+import { DfDateTime } from '@dynamicforms/vuetify-inputs';
+
+const germanLocale = de;
+const selectedDate = ref('2023-04-17');
+</script>
+```
+
+### Available Locales
+
+You can import any date-fns locale:
+
+```typescript
+import { 
+  sl,     // Slovenian (default)
+  enUS,   // English (US)
+  de,     // German
+  fr,     // French
+  es,     // Spanish
+  it,     // Italian
+  // ... and many more
+} from 'date-fns/locale';
+```
+
+The locale affects:
+- Display formatting (how dates/times appear)
+- Parsing (how manual input is interpreted)
+- First day of week in date picker
+- Month and weekday names
 
 ## Events
 
@@ -111,6 +184,39 @@ const form = new Group({
     value: new Date().toISOString()
   })
 });
+</script>
+```
+
+### Multilingual Date Picker
+
+```vue
+<template>
+  <div>
+    <v-btn-toggle v-model="selectedLocaleIndex" mandatory>
+      <v-btn value="0">Slovenščina</v-btn>
+      <v-btn value="1">U.S. English</v-btn>
+      <v-btn value="2">Deutsch</v-btn>
+    </v-btn-toggle>
+    
+    <df-date-time
+      v-model="selectedDate"
+      :locale="locales[selectedLocaleIndex]"
+      display-format-date="PP"
+      display-format-time="pp"
+      label="Izberite datum"
+      hint="Datum se prikaže v izbrani lokali"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue';
+import { sl, enUS, de } from 'date-fns/locale';
+import { DfDateTime } from '@dynamicforms/vuetify-inputs';
+
+const selectedLocaleIndex = ref(0);
+const locales = [sl, enUS, de];
+const selectedDate = ref('2023-04-17T14:30:00');
 </script>
 ```
 
