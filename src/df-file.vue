@@ -19,6 +19,7 @@
           :multiple="false"
           :style="currentFile && progress < 100 ? 'visibility: hidden' : ''"
           :clearable="false"
+          v-bind="passthroughAttrs"
           prepend-icon=""
           @update:model-value="handleFileChange"
           @focus="slotProps.focus()"

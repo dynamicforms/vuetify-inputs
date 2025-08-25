@@ -21,6 +21,7 @@
               :pattern="selectedType === 'email' ? emailPattern : undefined"
               :label="new Label('Input Field', 'mdi-text-box-outline')"
               :hint="getHintForType(selectedType)"
+              :passthrough-attrs="{ autocomplete: 'new-password' }"
             />
           </v-col>
         </v-row>

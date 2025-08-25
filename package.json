@@ -1,11 +1,13 @@
 {
   "name": "@dynamicforms/vuetify-inputs",
   "private": false,
-  "version": "0.5.5",
+  "version": "0.5.6",
   "type": "module",
   "description": "Visual components for data entry using @dynamicforms/vue-forms",
   "author": "Jure Erznožnik",
-  "files": ["dist/*"],
+  "files": [
+    "dist/*"
+  ],
   "main": "dist/dynamicforms-vuetify-inputs.umd.cjs",
   "types": "./dist/index.d.ts",
   "exports": {

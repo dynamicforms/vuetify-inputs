@@ -1,4 +1,4 @@
-# InputBase Component
+input-base.md# InputBase Component
 
 InputBase is the foundation component used by all input components in the `@dynamicforms/vuetify-inputs` library. 
 It provides common functionality and properties that are available to all input components.
@@ -19,6 +19,7 @@ All input components inherit the following properties:
 | visibility | `DisplayMode`     | `FULL`         | Component visibility mode (FULL, HIDDEN, INVISIBLE, SUPPRESS)                                                   |
 | cssClass   | `string`          | `''`           | Additional CSS classes                                                                                          |
 | clearable  | `boolean`         | component dependent | Whether the value can be cleared                                                                                |
+| passthroughAttrs | `Record<string, any>` | `undefined` | Additional attributes to pass through to the underlying Vuetify component                                       |
 
 ## Events
 

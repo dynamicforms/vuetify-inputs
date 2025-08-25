@@ -20,6 +20,7 @@ export interface BaseProps<T = any> {
   visibility?: Form.DisplayMode,
   cssClass?: string;
   clearable?: boolean;
+  passthroughAttrs?: Record<string, any>;
 }
 
 export const defaultBaseProps = { enabled: undefined, clearable: true };
@@ -100,6 +101,8 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
       persistentHint: true, // we want persistent hint always
       hideDetails: <boolean | 'auto' | undefined>'auto', // we want to hide the hint element when hint isn't there
       helpText: helpText.value,
+
+      ...(props.passthroughAttrs || {}),
     })),
   };
 }
