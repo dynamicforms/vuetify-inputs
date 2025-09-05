@@ -1,41 +1,54 @@
 <template>
-  <div v-if="message === ' '" class="custom-error-display text-error">
-    <div
-      v-for="(err, idx) in errors"
-      :key="idx"
-      :class="{ 'first-error': idx === 0, 'last-error': idx === errors.length - 1 }"
-    >
-      <div v-if="err.componentName === 'template'">{{ err.componentBody }}</div>
-      <vue-markdown v-else-if="err.componentName === 'vue-markdown'" :source="(<any>err.componentBindings)?.source"/>
-      <component :is="err.componentName" v-else v-bind="err.componentBindings">
-        {{ err.componentBody }}
-      </component>
-    </div>
-  </div>
-  <span v-else>{{ message }}</span>
+  <render/>
 </template>
 
 <script setup lang="ts">
 import { ValidationError } from '@dynamicforms/vue-forms';
+import { h } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
+
+type ClassTypes = string | string[] | Record<string, boolean>;
 
 interface Props {
   errors: ValidationError[];
   message: string;
+  classes?: ClassTypes | ClassTypes[];
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), { classes: 'text-error' });
+
+const render = () => {
+  if (props.message !== ' ') return h('span', { class: props.classes }, props.message);
+  const res: ReturnType<typeof h>[] = [];
+  props.errors.forEach((error: ValidationError) => {
+    switch (error.componentName) {
+    case 'template':
+      res.push(h('div', { class: props.classes }, error.componentBody));
+      break;
+    case 'vue-markdown':
+      res.push(h(
+        VueMarkdown,
+        { class: [props.classes, 'df-messages-widget-markdown'], source: (<any>error.componentBindings).source },
+      ));
+      break;
+    default:
+      res.push(
+        h(error.componentName, { class: props.classes, ...error.componentBindings, innerHTML: error.componentBody }),
+      );
+      break;
+    }
+  });
+  return res;
+};
 </script>
 
-<style scoped>
+<style>
 /* we would like there to be no margins for the displayed errors at the very top and very bottom. rest of it is fine */
-.custom-error-display .first-error :deep(*:first-child) {
+.df-messages-widget-markdown > :first-child, .df-messages-widget-markdown > :last-child {
   margin-top: 0 !important;
   padding-top: 0 !important;
-}
-
-.custom-error-display .last-error :deep(*:last-child) {
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
+  line-height: 1.35em !important; /* inspired by vitepress' aggressive settings */
 }
 </style>

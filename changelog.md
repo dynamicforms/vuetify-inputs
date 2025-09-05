@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.7] - 2025-09-05
+
+### Added
+- messages-widget now takes additional parameter "classes" to be used on its generated elements. default `'text-error'`
+
+### Changed
+- messages-widget modified to render functions to speed up rendering and remove redundancies in DOM elements
+
 ## [0.5.6] - 2025-08-25
 
 ### Added
