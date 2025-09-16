@@ -15,7 +15,7 @@
       :size="buttonSize"
       @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >
-      <IonIcon v-if="action.icon" class="action-icon" :name="action.icon"/>
+      <v-icon v-if="action.icon" size="24" :icon="action.icon"/>
       <span v-if="action.icon && action.label" style="width: .5rem"/>
       <span v-if="action.label">{{ action.label }}</span>
     </v-btn>
@@ -24,7 +24,6 @@
 
 <script setup lang="ts">
 import { computed, unref } from 'vue';
-import IonIcon from 'vue-ionicon';
 
 import { DfActionsProps } from './dynamicforms-component-props';
 import { ActionDisplayStyle, useBreakpoint } from './helpers';
@@ -43,10 +42,6 @@ const actionsWithBreakpoint = computed(() => actionsRef.value.map((action) => ({
 </script>
 
 <style scoped>
-.action-icon {
-  width:  1.5em;
-  height: 1.5em;
-}
 .button-group {
   border-radius: .5em;
   /* the following two make the container fit the small buttons. without them there would be a top margin */

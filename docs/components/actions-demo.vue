@@ -70,7 +70,7 @@ const saveAction = Action.create({
   value: {
     name: 'save',
     label: 'Save',
-    icon: 'save-outline',
+    icon: 'mdi-content-save',
     renderAs: ActionDisplayStyle.BUTTON,
     showIcon: true,
     showLabel: false,
@@ -84,7 +84,7 @@ const deleteAction = Action.create({
   value: {
     name: 'delete',
     label: 'Delete',
-    icon: 'trash-outline',
+    icon: 'mdi-delete',
     renderAs: ActionDisplayStyle.BUTTON,
     showIcon: true,
     showLabel: false,
@@ -98,7 +98,7 @@ const cancelAction = Action.create({
   value: {
     name: 'cancel',
     label: 'Cancel',
-    icon: 'close-outline',
+    icon: 'mdi-close-box',
     renderAs: ActionDisplayStyle.BUTTON,
     showIcon: true,
     showLabel: false,

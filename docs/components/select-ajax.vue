@@ -41,16 +41,16 @@ watch(multiple, (newValue) => {
 });
 
 const programmingLanguages = [
-  { id: 'js', text: 'JavaScript', icon: 'logo-javascript' },
-  { id: 'ts', text: 'TypeScript', icon: 'code-slash-outline' },
-  { id: 'py', text: 'Python', icon: 'logo-python' },
-  { id: 'java', text: 'Java', icon: 'cafe-outline' },
-  { id: 'csharp', text: 'C#', icon: 'hash-outline' },
-  { id: 'cpp', text: 'C++', icon: 'add-circle-outline' },
-  { id: 'go', text: 'Go', icon: 'fish-outline' },
-  { id: 'ruby', text: 'Ruby', icon: 'diamond-outline' },
-  { id: 'php', text: 'PHP', icon: 'logo-html5' },
-  { id: 'swift', text: 'Swift', icon: 'rocket-outline' }
+  { id: 'js', text: 'JavaScript', icon: 'mdi-language-javascript' },
+  { id: 'ts', text: 'TypeScript', icon: 'mdi-language-typescript' },
+  { id: 'py', text: 'Python', icon: 'mdi-language-python' },
+  { id: 'java', text: 'Java', icon: 'mdi-language-java' },
+  { id: 'csharp', text: 'C#', icon: 'mdi-language-csharp' },
+  { id: 'cpp', text: 'C++', icon: 'mdi-language-cpp' },
+  { id: 'go', text: 'Go', icon: 'mdi-language-go' },
+  { id: 'ruby', text: 'Ruby', icon: 'mdi-language-ruby' },
+  { id: 'php', text: 'PHP', icon: 'mdi-language-php' },
+  { id: 'swift', text: 'Swift', icon: 'mdi-language-swift' }
 ];
 
 // Simulate AJAX loading
