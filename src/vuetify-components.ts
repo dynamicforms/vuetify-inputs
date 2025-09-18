@@ -20,7 +20,7 @@ export { VSelect } from 'vuetify/components/VSelect';
 export { VSwitch } from 'vuetify/components/VSwitch';
 export { VTextarea } from 'vuetify/components/VTextarea';
 export { VTextField } from 'vuetify/components/VTextField';
-export { VTimePicker } from 'vuetify/labs/VTimePicker';
+export { VTimePicker } from 'vuetify/components/VTimePicker';
 
 // run this in the src folder to get list of used components
 // grep -r -o "<v-[a-zA-Z0-9-]*" --include="*.vue" . | sed 's/.*:<//' | sort | uniq

@@ -1,7 +1,7 @@
 {
   "name": "@dynamicforms/vuetify-inputs",
   "private": false,
-  "version": "0.5.7",
+  "version": "0.5.8",
   "type": "module",
   "description": "Visual components for data entry using @dynamicforms/vue-forms",
   "author": "Jure Erznožnik",
@@ -50,7 +50,7 @@
     "lodash-es": "^4.17.12",
     "vue": "^3.4",
     "vue-markdown-render": "^2.2.1",
-    "vuetify": "^3.8.2"
+    "vuetify": "^3.9"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",

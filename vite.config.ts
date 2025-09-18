@@ -76,6 +76,7 @@ export default defineConfig({
         '**/index.ts',
       ],
     },
+    setupFiles: './src/test-setup.ts',
     server: {
       deps: {
         inline: ['vuetify']

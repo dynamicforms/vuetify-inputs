@@ -8,15 +8,6 @@ import { VBtn } from 'vuetify/components';
 import DfActions from '@/df-actions.vue';
 import { Action, ActionDisplayStyle } from '@/helpers';
 
-// Mock vue-ionicon
-vi.mock('vue-ionicon', () => ({
-  default: {
-    name: 'IonIcon',
-    props: ['name'],
-    template: '<span class="ion-icon" :data-icon="name"></span>',
-  },
-}));
-
 describe('DfActions', () => {
   let vuetify: any;
 

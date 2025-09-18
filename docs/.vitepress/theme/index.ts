@@ -8,7 +8,6 @@ import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import { DynamicFormsInputs } from '../../../src';
 // import DynamicFormsInputsVuetify from '../../../src/vuetify-components';
-import { VTimePicker } from 'vuetify/labs/VTimePicker'; // eslint-disable-line import/extensions
 
 export default {
   extends: DefaultTheme,
@@ -23,7 +22,6 @@ export default {
 
     app.use(vuetify);
     app.use(DynamicFormsInputs); //, { defaultVariant: 'underlined' });
-    app.component('VTimePicker', VTimePicker);
     // app.use(DynamicFormsInputsVuetify);
   },
   Layout: () => {
