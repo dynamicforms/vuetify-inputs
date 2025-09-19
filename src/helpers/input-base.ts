@@ -53,10 +53,10 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
 
   const controlTouch = computed({
     get() {
-      return props.control?.touched;
+      return props.control!.touched;
     },
     set(val: boolean) {
-      props.control?.touched = val;
+      props.control!.touched = val;
     },
   });
   const touched = props.control ? controlTouch : ref(false);
