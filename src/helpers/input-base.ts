@@ -51,7 +51,15 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     throw new Error('control prop is not a vue-form control instance');
   }
 
-  const touched = ref(false);
+  const controlTouch = computed({
+    get() {
+      return props.control?.touched;
+    },
+    set(val: boolean) {
+      props.control?.touched = val;
+    },
+  });
+  const touched = props.control ? controlTouch : ref(false);
   const valid = computed(() => (props.control ? props.control.valid : true));
   const errors = computed(
     () => (props.control ?
