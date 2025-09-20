@@ -102,7 +102,7 @@ const editorConfig: EditorConfig = {
       },
     },
   },
-  placeholder: 'Type or paste your content here!',
+  placeholder: '',
   style: {
     definitions: [
       { name: 'Article category', element: 'h3', classes: ['category'] },

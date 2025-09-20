@@ -1,12 +1,13 @@
 <template>
-  <input-base v-bind="props">
+  <input-base v-bind="props" class="ck-editor-custom">
     <template #default="slotProps">
       <ck-editor-custom
         ref="$editor"
         v-model="value"
-        :class="{ 'mt-8': !!label }"
+        :class="{ 'mt-6': !!label }"
         :min-height="minHeight"
         :disabled="vuetifyBindings.disabled"
+        placeholder="dfsjghdf"
         v-bind="passthroughAttrs"
         @focusin="slotProps.focus()"
         @focusout="slotProps.blur()"
@@ -27,3 +28,9 @@ const emits = defineEmits<Emits>();
 
 const { value, vuetifyBindings } = useInputBase(props, emits);
 </script>
+
+<style>
+.ck-editor-custom .v-field:not(.v-field--active) .v-label.v-field-label:not(.v-field-label--floating) {
+  transform: translate(.5em, 3em);
+}
+</style>
