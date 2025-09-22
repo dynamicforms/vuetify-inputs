@@ -119,6 +119,10 @@ const loading = ref<boolean>(false);
 
 const options = computed(() => convertItems(loadedChoices.value));
 
+if (options.value && propsWithDefaults.fetchChoices !== undefined) {
+  console.warn('Both options and fetchChoices are set. Only one of them should be set.');
+}
+
 function emitModelValueDisplay(mcVal: any) {
   emits('update:modelValueDisplay', getSelectedChoices(loadedChoices.value, mcVal));
 }
