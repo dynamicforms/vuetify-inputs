@@ -1,6 +1,6 @@
 <template>
   <input-base v-bind="{ ...props, loading } as any" clearable @click:clear="removeFile" @blur="touched = true">
-    <template #prepend-inner><v-icon icon="$file"/></template>
+    <template #prepend-inner><cached-icon name="mdi-paperclip"/></template>
     <template #loader>
       <v-progress-linear v-if="currentFile && progress < 100" :model-value="progress" :indeterminate="progress === -1"/>
     </template>
@@ -32,6 +32,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onBeforeUnmount, watch } from 'vue';
+import { CachedIcon } from 'vue-cached-icon';
 
 import { DfFileProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, InputBase, useInputBase } from './helpers';

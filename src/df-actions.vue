@@ -15,7 +15,7 @@
       :size="buttonSize"
       @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >
-      <v-icon v-if="action.icon" size="24" :icon="action.icon"/>
+      <cached-icon v-if="action.icon" :name="action.icon"/>
       <span v-if="action.icon && action.label" style="width: .5rem"/>
       <span v-if="action.label">{{ action.label }}</span>
     </v-btn>
@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 import { computed, unref } from 'vue';
+import { CachedIcon } from 'vue-cached-icon';
 
 import { DfActionsProps } from './dynamicforms-component-props';
 import { ActionDisplayStyle, useBreakpoint } from './helpers';

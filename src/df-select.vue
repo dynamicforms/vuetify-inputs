@@ -47,7 +47,7 @@
         @click:close="chipClose(item.value)"
       >
         <template #prepend>
-          <v-icon v-if="item.raw?.icon" size="24" class="me-1" :icon="item.raw.icon"/>
+          <cached-icon v-if="item.raw?.icon" class="me-1" :name="item.raw.icon"/>
         </template>
         <span :class="{ 'text-body-1': !multiple }">{{ item.title }}</span>
       </v-chip>
@@ -57,7 +57,7 @@
       <v-list-item v-bind="prps">
         <template #prepend>
           <span v-if="item.raw?.icon" class="me-1">
-            <v-icon class="action-icon" :icon="item.raw.icon"/>
+            <cached-icon class="action-icon" :name="item.raw.icon"/>
           </span>
         </template>
       </v-list-item>
@@ -78,6 +78,7 @@
 import { DisplayMode } from '@dynamicforms/vue-forms';
 import { unionBy } from 'lodash-es';
 import { ref, computed, toRefs, watch, nextTick, unref } from 'vue';
+import { CachedIcon } from 'vue-cached-icon';
 
 import { DfSelectProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, SelectChoice, useInputBase } from './helpers';

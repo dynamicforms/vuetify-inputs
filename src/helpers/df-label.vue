@@ -1,7 +1,7 @@
 <template>
   <div class="label">
     <template v-if="label.icon">
-      <v-icon v-if="label.iconComponent === 'v-icon'" :icon="label.icon" size="1.25em"/>
+      <cached-icon v-if="label.iconComponent === 'v-icon'" :name="label.icon" size="1.25em"/>
       <v-img v-else-if="label.iconComponent === 'v-img'" class="icon" :src="label.icon"/>
       <component :is="label.iconComponent" v-else :src="label.icon"/>
     </template>
@@ -10,6 +10,7 @@
 </template>
 
 <script setup lang="ts">
+import { CachedIcon } from 'vue-cached-icon';
 import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
 
 import { Label } from './input-base';

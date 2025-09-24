@@ -26,7 +26,7 @@
           <ul>
             <li v-for="(file, index) in uploadedFiles" :key="index">
               {{ file.name }} ({{ formatFileSize(file.size) }})
-              <v-icon color="green">check</v-icon>
+              <cached-icon style="color: green" name="mdi-check" />
             </li>
           </ul>
         </div>
@@ -36,8 +36,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { Field } from '@dynamicforms/vue-forms';
+import { ref } from 'vue';
+import { CachedIcon } from 'vue-cached-icon';
+
 import { DfFile } from '../../src';
 
 const fileField = Field.create({

@@ -57,6 +57,7 @@ export default defineConfig({
         'date-fns',
         'lodash-es',
         'vue',
+        'vue-cached-icon',
         'vue-markdown-render',
         'vuetify',
         /^vuetify\/.*/,

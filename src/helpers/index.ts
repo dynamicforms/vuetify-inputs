@@ -1,3 +1,5 @@
+import './global.css';
+
 export * from './date-time-locale';
 export * from './df-file.interface';
 export { default as DfLabel } from './df-label.vue';
