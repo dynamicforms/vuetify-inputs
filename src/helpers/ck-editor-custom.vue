@@ -20,23 +20,63 @@
 <script setup lang="ts">
 import type { Editor, EditorConfig } from '@ckeditor/ckeditor5-core';
 import {
-  ClassicEditor, AccessibilityHelp, Alignment, AutoImage, AutoLink, Autosave, BalloonToolbar, BlockQuote,
-  Bold, CloudServices, Essentials, GeneralHtmlSupport, Heading, HorizontalLine, ImageBlock, ImageCaption,
-  ImageInline, ImageInsertViaUrl, ImageResize, ImageStyle, ImageToolbar, ImageUpload, Indent, IndentBlock,
-  Italic, Link, List, MediaEmbed, Paragraph, PasteFromMarkdownExperimental, PasteFromOffice, Autoformat,
-  SelectAll, Style, Table, TableCellProperties, TableColumnResize, TableProperties, TableToolbar, Undo,
-  HeadingConfig, TextTransformation, Base64UploadAdapter,
+  ClassicEditor,
+  AccessibilityHelp,
+  Alignment,
+  AutoImage,
+  AutoLink,
+  Autosave,
+  BalloonToolbar,
+  BlockQuote,
+  Bold,
+  CloudServices,
+  Essentials,
+  GeneralHtmlSupport,
+  Heading,
+  HorizontalLine,
+  ImageBlock,
+  ImageCaption,
+  ImageInline,
+  ImageInsertViaUrl,
+  ImageResize,
+  ImageStyle,
+  ImageToolbar,
+  ImageUpload,
+  Indent,
+  IndentBlock,
+  Italic,
+  Link,
+  List,
+  MediaEmbed,
+  Paragraph,
+  PasteFromMarkdownExperimental,
+  PasteFromOffice,
+  Autoformat,
+  SelectAll,
+  Style,
+  Table,
+  TableCellProperties,
+  TableColumnResize,
+  TableProperties,
+  TableToolbar,
+  Undo,
+  HeadingConfig,
+  TextTransformation,
+  Base64UploadAdapter,
 } from 'ckeditor5';
 import { ref, onMounted } from 'vue';
 
-withDefaults(defineProps<{
-  modelValue: string;
-  minHeight?: string;
-  disabled?: boolean;
-}>(), { modelValue: '', minHeight: '7em', disabled: false });
+withDefaults(
+  defineProps<{
+    modelValue?: string;
+    minHeight?: string;
+    disabled?: boolean;
+  }>(),
+  { modelValue: '', minHeight: '7em', disabled: false },
+);
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void
+  (e: 'update:modelValue', value: string): void;
 }>();
 
 const isLayoutReady = ref(false);
@@ -44,23 +84,76 @@ const editor = ClassicEditor;
 
 const editorToolbarConfig = {
   items: [
-    'undo', 'redo', '|',
-    'selectAll', '|',
-    'heading', 'style', '|',
-    'bold', 'italic', '|',
-    'horizontalLine', 'link', 'mediaEmbed', 'insertTable', 'blockQuote', '|',
-    'alignment', '|',
-    'bulletedList', 'numberedList', 'outdent', 'indent', '|',
+    'undo',
+    'redo',
+    '|',
+    'selectAll',
+    '|',
+    'heading',
+    'style',
+    '|',
+    'bold',
+    'italic',
+    '|',
+    'horizontalLine',
+    'link',
+    'mediaEmbed',
+    'insertTable',
+    'blockQuote',
+    '|',
+    'alignment',
+    '|',
+    'bulletedList',
+    'numberedList',
+    'outdent',
+    'indent',
+    '|',
     'accessibilityHelp',
   ],
   shouldNotGroupWhenFull: false,
 };
 const editorPlugins = [
-  AccessibilityHelp, Alignment, AutoImage, AutoLink, Autosave, BalloonToolbar, BlockQuote, Bold, CloudServices,
-  Essentials, GeneralHtmlSupport, Heading, HorizontalLine, ImageBlock, ImageCaption, ImageInline, ImageInsertViaUrl,
-  ImageResize, ImageStyle, ImageToolbar, ImageUpload, Indent, IndentBlock, Italic, Link, List, Autoformat,
-  MediaEmbed, Paragraph, PasteFromMarkdownExperimental, PasteFromOffice, SelectAll, Style, Table, TableCellProperties,
-  TableColumnResize, TableProperties, TableToolbar, Undo, TextTransformation, Base64UploadAdapter,
+  AccessibilityHelp,
+  Alignment,
+  AutoImage,
+  AutoLink,
+  Autosave,
+  BalloonToolbar,
+  BlockQuote,
+  Bold,
+  CloudServices,
+  Essentials,
+  GeneralHtmlSupport,
+  Heading,
+  HorizontalLine,
+  ImageBlock,
+  ImageCaption,
+  ImageInline,
+  ImageInsertViaUrl,
+  ImageResize,
+  ImageStyle,
+  ImageToolbar,
+  ImageUpload,
+  Indent,
+  IndentBlock,
+  Italic,
+  Link,
+  List,
+  Autoformat,
+  MediaEmbed,
+  Paragraph,
+  PasteFromMarkdownExperimental,
+  PasteFromOffice,
+  SelectAll,
+  Style,
+  Table,
+  TableCellProperties,
+  TableColumnResize,
+  TableProperties,
+  TableToolbar,
+  Undo,
+  TextTransformation,
+  Base64UploadAdapter,
 ];
 const editorHeadings: HeadingConfig = {
   options: [
@@ -79,14 +172,17 @@ const editorConfig: EditorConfig = {
   balloonToolbar: ['bold', 'italic', '|', 'link', '|', 'bulletedList', 'numberedList'],
   heading: editorHeadings,
   htmlSupport: {
-    allow: [
-      { name: /^.*$/, styles: true, attributes: true, classes: true },
-    ],
+    allow: [{ name: /^.*$/, styles: true, attributes: true, classes: true }],
   },
   image: {
     toolbar: [
-      'toggleImageCaption', 'imageTextAlternative', '|',
-      'imageStyle:inline', 'imageStyle:wrapText', 'imageStyle:breakText', '|',
+      'toggleImageCaption',
+      'imageTextAlternative',
+      '|',
+      'imageStyle:inline',
+      'imageStyle:wrapText',
+      'imageStyle:breakText',
+      '|',
       'resizeImage',
     ],
   },
@@ -138,8 +234,8 @@ defineExpose({ onEditorReady });
 
 :root {
   /* In addition to this, any v-dialog must also have :retain-focus="false" */
-  --ck-z-default: 20000!important;
-  --ck-z-modal: calc( var(--ck-z-default) + 20999 );
+  --ck-z-default: 20000 !important;
+  --ck-z-modal: calc(var(--ck-z-default) + 20999);
 }
 
 @media print {
@@ -149,16 +245,17 @@ defineExpose({ onEditorReady });
 }
 
 .editor-container {
-  font-family:  'Lato';
+  font-family: 'Lato';
 }
 
 .ck-content {
   font-family: 'Lato';
   line-height: 1.6;
-  word-break:  break-word;
+  word-break: break-word;
 }
 
-.editor-container, .editor-container__editor {
+.editor-container,
+.editor-container__editor {
   width: 100%;
 }
 
@@ -167,31 +264,31 @@ defineExpose({ onEditorReady });
 }
 
 .ck-content h3.category {
-  font-family:    'Oswald';
-  font-size:      20px;
-  font-weight:    bold;
-  color:          #555;
+  font-family: 'Oswald';
+  font-size: 20px;
+  font-weight: bold;
+  color: #555;
   letter-spacing: 10px;
-  margin:         0;
-  padding:        0;
+  margin: 0;
+  padding: 0;
 }
 
 .ck-content h2.document-title {
   font-family: 'Oswald';
-  font-size:   50px;
+  font-size: 50px;
   font-weight: bold;
-  margin:      0;
-  padding:     0;
-  border:      0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .ck-content h3.document-subtitle {
   font-family: 'Oswald';
-  font-size:   20px;
-  color:       #555;
-  margin:      0 0 1em;
+  font-size: 20px;
+  color: #555;
+  margin: 0 0 1em;
   font-weight: bold;
-  padding:     0;
+  padding: 0;
 }
 
 div.ck.ck-editor__editable_inline * {
@@ -200,60 +297,61 @@ div.ck.ck-editor__editable_inline * {
 }
 
 .ck-content p.info-box {
-  --background-size:  30px;
+  --background-size: 30px;
   --background-color: #e91e63;
-  padding:            1.2em 2em;
-  border:             1px solid var(--background-color);
-  background:         linear-gradient(
-                        135deg,
-                        var(--background-color) 0%,
-                        var(--background-color) var(--background-size),
-                        transparent var(--background-size)
-                      ),
-                      linear-gradient(
-                        135deg,
-                        transparent calc(100% - var(--background-size)),
-                        var(--background-color) calc(100% - var(--background-size)),
-                        var(--background-color)
-                      );
-  border-radius:      10px;
-  margin:             1.5em 2em;
-  box-shadow:         5px 5px 0 #ffe6ef;
+  padding: 1.2em 2em;
+  border: 1px solid var(--background-color);
+  background:
+    linear-gradient(
+      135deg,
+      var(--background-color) 0%,
+      var(--background-color) var(--background-size),
+      transparent var(--background-size)
+    ),
+    linear-gradient(
+      135deg,
+      transparent calc(100% - var(--background-size)),
+      var(--background-color) calc(100% - var(--background-size)),
+      var(--background-color)
+    );
+  border-radius: 10px;
+  margin: 1.5em 2em;
+  box-shadow: 5px 5px 0 #ffe6ef;
 }
 
 .ck-content blockquote.side-quote {
   font-family: 'Oswald';
-  font-style:  normal;
-  float:       right;
-  width:       35%;
-  position:    relative;
-  border:      0;
-  overflow:    visible;
-  z-index:     1;
+  font-style: normal;
+  float: right;
+  width: 35%;
+  position: relative;
+  border: 0;
+  overflow: visible;
+  z-index: 1;
   margin-left: 1em;
 }
 
 .ck-content blockquote.side-quote::before {
-  content:     '“';
-  position:    absolute;
-  top:         -37px;
-  left:        -10px;
-  display:     block;
-  font-size:   200px;
-  color:       #e7e7e7;
-  z-index:     -1;
+  content: '“';
+  position: absolute;
+  top: -37px;
+  left: -10px;
+  display: block;
+  font-size: 200px;
+  color: #e7e7e7;
+  z-index: -1;
   line-height: 1;
 }
 
 .ck-content blockquote.side-quote p {
-  font-size:   2em;
+  font-size: 2em;
   line-height: 1;
 }
 
 .ck-content blockquote.side-quote p:last-child:not(:first-child) {
-  font-size:  1.3em;
+  font-size: 1.3em;
   text-align: right;
-  color:      #555;
+  color: #555;
 }
 
 .ck-content span.marker {
@@ -262,39 +360,39 @@ div.ck.ck-editor__editable_inline * {
 
 .ck-content span.spoiler {
   background: #000;
-  color:      #000;
+  color: #000;
 }
 
 .ck-content span.spoiler:hover {
   background: #000;
-  color:      #fff;
+  color: #fff;
 }
 
 .ck-content pre.fancy-code {
-  border:        0;
-  margin-left:   2em;
-  margin-right:  2em;
+  border: 0;
+  margin-left: 2em;
+  margin-right: 2em;
   border-radius: 10px;
 }
 
 .ck-content pre.fancy-code::before {
-  content:           '';
-  display:           block;
-  height:            13px;
-  background:        url(data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NCAxMyI+CiAgPGNpcmNsZSBjeD0iNi41IiBjeT0iNi41IiByPSI2LjUiIGZpbGw9IiNGMzZCNUMiLz4KICA8Y2lyY2xlIGN4PSIyNi41IiBjeT0iNi41IiByPSI2LjUiIGZpbGw9IiNGOUJFNEQiLz4KICA8Y2lyY2xlIGN4PSI0Ny41IiBjeT0iNi41IiByPSI2LjUiIGZpbGw9IiM1NkM0NTMiLz4KPC9zdmc+Cg==);
-  margin-bottom:     8px;
+  content: '';
+  display: block;
+  height: 13px;
+  background: url(data:image/svg+xml;base64,PHN2ZyBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NCAxMyI+CiAgPGNpcmNsZSBjeD0iNi41IiBjeT0iNi41IiByPSI2LjUiIGZpbGw9IiNGMzZCNUMiLz4KICA8Y2lyY2xlIGN4PSIyNi41IiBjeT0iNi41IiByPSI2LjUiIGZpbGw9IiNGOUJFNEQiLz4KICA8Y2lyY2xlIGN4PSI0Ny41IiBjeT0iNi41IiByPSI2LjUiIGZpbGw9IiM1NkM0NTMiLz4KPC9zdmc+Cg==);
+  margin-bottom: 8px;
   background-repeat: no-repeat;
 }
 
 .ck-content pre.fancy-code-dark {
   background: #272822;
-  color:      #fff;
+  color: #fff;
   box-shadow: 5px 5px 0 #0000001f;
 }
 
 .ck-content pre.fancy-code-bright {
   background: #dddfe0;
-  color:      #000;
+  color: #000;
   box-shadow: 5px 5px 0 #b3b3b3;
 }
 </style>

@@ -61,7 +61,6 @@ export function updateSelectedFromValue(
       selected.value = getSelectedChoices(loadedChoices, mcValue).map((choice) => choice.id);
     }
   } else {
-    // eslint-disable-next-line no-lonely-if
     if (taggable) {
       // if taggable, we just keep the selected value
       selected.value = mcValue;

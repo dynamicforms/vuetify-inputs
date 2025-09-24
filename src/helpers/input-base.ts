@@ -5,19 +5,23 @@ import { computed, inject, ref } from 'vue';
 import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
 export class Label {
-  constructor(public text: string, public icon?: string, public iconComponent: string = 'v-icon') {}
+  constructor(
+    public text: string,
+    public icon?: string,
+    public iconComponent: string = 'v-icon',
+  ) {}
 }
 
 export interface BaseProps<T = any> {
-  control?: Form.IField<T>,
+  control?: Form.IField<T>;
   modelValue?: T;
   label?: string | Label;
   errors?: string[];
   placeholder?: string;
   helpText?: string;
-  hint?: string,
-  enabled?: boolean,
-  visibility?: Form.DisplayMode,
+  hint?: string;
+  enabled?: boolean;
+  visibility?: Form.DisplayMode;
   cssClass?: string;
   clearable?: boolean;
   passthroughAttrs?: Record<string, any>;
@@ -31,7 +35,7 @@ export interface BaseEmits<T = any> {
 }
 
 export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
-  const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, { });
+  const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
   const internalValue = ref<T | null>(null);
 
   const value = computed({
@@ -61,20 +65,18 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   });
   const touched = props.control ? controlTouch : ref(false);
   const valid = computed(() => (props.control ? props.control.valid : true));
-  const errors = computed(
-    () => (props.control ?
-      props.control.errors :
-      (props.errors || []).map((error) => new ValidationErrorRenderContent(error))),
+  const errors = computed(() =>
+    props.control ? props.control.errors : (props.errors || []).map((error) => new ValidationErrorRenderContent(error)),
   );
   const anyErrors = computed(() => (touched.value && errors.value.length > 0 ? ' ' : undefined));
-  const enabled = computed(() => (props.control ? props.control.enabled : (props.enabled !== false)));
-  const visibility = computed(
-    () => (props.control ? props.control.visibility : (props.visibility || Form.DisplayMode.FULL)),
+  const enabled = computed(() => (props.control ? props.control.enabled : props.enabled !== false));
+  const visibility = computed(() =>
+    props.control ? props.control.visibility : props.visibility || Form.DisplayMode.FULL,
   );
   const label = computed(
-    (): Label => (isString(props.label || '') ? new Label((<string>props.label) || '') : <Label> props.label),
+    (): Label => (isString(props.label || '') ? new Label(<string>props.label || '') : <Label>props.label),
   );
-  const placeholder = computed(() => (props.placeholder || ''));
+  const placeholder = computed(() => props.placeholder || '');
   const helpText = computed(() => props.helpText || '');
   const hint = computed(() => props.hint || '');
   const cssClass = computed(() => props.cssClass || '');
@@ -92,7 +94,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
       name: props.control?.fieldName,
       class: cssClass.value,
 
-      density: 'default' as 'default',
+      density: 'default' as const,
       variant: (settings.defaultVariant ?? 'underlined') as 'underlined',
 
       label: label.value.text,

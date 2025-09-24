@@ -31,6 +31,6 @@ const { value, vuetifyBindings } = useInputBase(props, emits);
 
 <style>
 .ck-editor-custom .v-field:not(.v-field--active) .v-label.v-field-label:not(.v-field-label--floating) {
-  transform: translate(.5em, 3em);
+  transform: translate(0.5em, 3em);
 }
 </style>

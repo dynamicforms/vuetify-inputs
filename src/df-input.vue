@@ -7,8 +7,8 @@
       :type="inputType"
       @blur="touched = true"
     >
-      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
-      <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
+      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label" /></template>
+      <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
     </v-text-field>
     <v-number-input
       v-else
@@ -17,8 +17,8 @@
       density="compact"
       control-variant="stacked"
     >
-      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
-      <template #message="{ message }"><messages-widget :message="message" :errors="errors"/></template>
+      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label" /></template>
+      <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
     </v-number-input>
   </div>
 </template>
@@ -38,8 +38,7 @@ const props = withDefaults(defineProps<DfInputProps>(), {
   max: undefined,
 });
 
-interface Emits extends BaseEmits {
-}
+interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
@@ -47,9 +46,9 @@ const { errors, label, touched, value, vuetifyBindings } = useInputBase(props, e
 const { inputType, max, min, precision, step } = toRefs(props);
 
 const isNumber = computed(() => inputType.value === 'number');
-const numberInputBindings = computed(() => (
-  !isNumber.value ? {} : { min: unref(min), max: unref(max), precision: unref(precision), step: unref(step) }
-));
+const numberInputBindings = computed(() =>
+  !isNumber.value ? {} : { min: unref(min), max: unref(max), precision: unref(precision), step: unref(step) },
+);
 </script>
 
 <style scoped>

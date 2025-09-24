@@ -20,16 +20,8 @@
           @blur="slotProps.blur()"
         >
           <template #default>
-            <v-menu
-              v-model="dateMenuShown"
-              :close-on-content-click="false"
-              activator="parent"
-            >
-              <v-confirm-edit
-                v-model="valueAsDate"
-                @cancel="dropdown = ''"
-                @save="dropdown = ''"
-              >
+            <v-menu v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
+              <v-confirm-edit v-model="valueAsDate" @cancel="dropdown = ''" @save="dropdown = ''">
                 <template #default="{ model: proxyModel, actions }">
                   <v-date-picker
                     v-model="proxyModel.value"
@@ -38,7 +30,7 @@
                     :show-adjacent-months="true"
                     :show-week="true"
                   >
-                    <template #actions><component :is="actions"/></template>
+                    <template #actions><component :is="actions" /></template>
                   </v-date-picker>
                 </template>
               </v-confirm-edit>
@@ -64,23 +56,11 @@
           @blur="slotProps.blur()"
         >
           <template #default>
-            <v-menu
-              v-model="timeMenuShown"
-              :close-on-content-click="false"
-              activator="parent"
-            >
-              <v-confirm-edit
-                v-model="valueAsTimeString"
-                @cancel="dropdown = ''"
-                @save="dropdown = ''"
-              >
+            <v-menu v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
+              <v-confirm-edit v-model="valueAsTimeString" @cancel="dropdown = ''" @save="dropdown = ''">
                 <template #default="{ model: proxyModel, actions }">
-                  <v-time-picker
-                    v-model="proxyModel.value"
-                    :hide-header="true"
-                    format="24hr"
-                  >
-                    <template #actions><component :is="actions"/></template>
+                  <v-time-picker v-model="proxyModel.value" :hide-header="true" format="24hr">
+                    <template #actions><component :is="actions" /></template>
                   </v-time-picker>
                 </template>
               </v-confirm-edit>
@@ -117,12 +97,20 @@ const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 const dropdown = ref('');
 const dateMenuShown = computed({
-  get() { return unref(dropdown) === 'date'; },
-  set(newValue: boolean) { dropdown.value = newValue ? 'date' : ''; },
+  get() {
+    return unref(dropdown) === 'date';
+  },
+  set(newValue: boolean) {
+    dropdown.value = newValue ? 'date' : '';
+  },
 });
 const timeMenuShown = computed({
-  get() { return unref(dropdown) === 'time'; },
-  set(newValue: boolean) { dropdown.value = newValue ? 'time' : ''; },
+  get() {
+    return unref(dropdown) === 'time';
+  },
+  set(newValue: boolean) {
+    dropdown.value = newValue ? 'time' : '';
+  },
 });
 
 const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, 'HH:mm')}:00`;
@@ -162,7 +150,9 @@ const valueAsDate = computed({
     const res = new Date(uValue);
     return !Number.isNaN(res.getTime()) ? res : null;
   },
-  set(newValue: Date) { setValueISOFull(formatNaive(newValue), 0); },
+  set(newValue: Date) {
+    setValueISOFull(formatNaive(newValue), 0);
+  },
 });
 
 const valueAsTimeString = computed({
@@ -172,7 +162,9 @@ const valueAsTimeString = computed({
     const vif = val.split(/[TZ]/g);
     return vif[1].split('.')[0];
   },
-  set(newValue: string) { setValueISOFull(`T${newValue}`, 1); },
+  set(newValue: string) {
+    setValueISOFull(`T${newValue}`, 1);
+  },
 });
 
 const dateFormatted = computed({

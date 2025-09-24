@@ -9,6 +9,7 @@ enum ActionDisplayStyle {
 
 export const defaultDisplayStyle = ActionDisplayStyle.BUTTON;
 
+// eslint-disable-next-line @typescript-eslint/no-namespace, no-redeclare
 namespace ActionDisplayStyle {
   export function fromString(mode: string): ActionDisplayStyle {
     if (mode.toUpperCase() === 'BUTTON') return ActionDisplayStyle.BUTTON;
@@ -17,13 +18,13 @@ namespace ActionDisplayStyle {
   }
 
   export function fromAny(mode: any): ActionDisplayStyle {
-    const input = (typeof mode === 'number') ? mode : ActionDisplayStyle.fromString(mode as string);
+    const input = typeof mode === 'number' ? mode : ActionDisplayStyle.fromString(mode as string);
     if (Object.values(ActionDisplayStyle).includes(input)) return input;
     return defaultDisplayStyle;
   }
 
   export function isDefined(mode: number | string): boolean {
-    const check = (typeof mode === 'number') ? mode : ActionDisplayStyle.fromString(mode as string);
+    const check = typeof mode === 'number' ? mode : ActionDisplayStyle.fromString(mode as string);
     return Object.values(ActionDisplayStyle).includes(check);
   }
 }

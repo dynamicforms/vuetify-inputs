@@ -15,8 +15,8 @@
       :size="buttonSize"
       @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >
-      <cached-icon v-if="action.icon" :name="action.icon"/>
-      <span v-if="action.icon && action.label" style="width: .5rem"/>
+      <cached-icon v-if="action.icon" :name="action.icon" />
+      <span v-if="action.icon && action.label" style="width: 0.5rem" />
       <span v-if="action.label">{{ action.label }}</span>
     </v-btn>
   </div>
@@ -36,15 +36,17 @@ const props = withDefaults(defineProps<DfActionsProps>(), {
 
 const breakpoint = useBreakpoint();
 const actionsRef = computed(() => unref(props.actions));
-const actionsWithBreakpoint = computed(() => actionsRef.value.map((action) => ({
-  action,
-  ...unref(action.getBreakpointValue(breakpoint)),
-})));
+const actionsWithBreakpoint = computed(() =>
+  actionsRef.value.map((action) => ({
+    action,
+    ...unref(action.getBreakpointValue(breakpoint)),
+  })),
+);
 </script>
 
 <style scoped>
 .button-group {
-  border-radius: .5em;
+  border-radius: 0.5em;
   /* the following two make the container fit the small buttons. without them there would be a top margin */
   line-height: 0;
   height: fit-content;
@@ -53,23 +55,23 @@ const actionsWithBreakpoint = computed(() => actionsRef.value.map((action) => ({
   border: none;
   border-radius: 0;
   margin: 0 !important;
-  padding: 0 .25em;
+  padding: 0 0.25em;
 }
 .button-group .v-btn:first-child {
-  border-start-start-radius: .5em;
-  border-end-start-radius: .5em;
+  border-start-start-radius: 0.5em;
+  border-end-start-radius: 0.5em;
 }
 .button-group .v-btn:last-child {
-  border-start-end-radius: .5em;
-  border-end-end-radius: .5em;
+  border-start-end-radius: 0.5em;
+  border-end-end-radius: 0.5em;
 }
 .button-group.with-border {
-  border: .1em solid currentColor;
+  border: 0.1em solid currentColor;
 }
 .button-group.with-border .v-btn:not(:first-child) {
-  border-inline-start: .1em solid currentColor;
+  border-inline-start: 0.1em solid currentColor;
 }
 .v-btn:not(:first-child) {
-  margin-left: .5em;
+  margin-left: 0.5em;
 }
 </style>

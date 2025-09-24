@@ -40,7 +40,7 @@ describe('ResponsiveRenderOptions', () => {
       renderAs: 'BUTTON' as unknown as ActionDisplayStyle, // hack to still pass it as string
       showIcon: true,
       sm: { showLabel: false },
-      md: { },
+      md: {},
       lg: {
         showIcon: false,
         showLabel: true,

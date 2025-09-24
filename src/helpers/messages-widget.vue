@@ -1,5 +1,5 @@
 <template>
-  <render/>
+  <render />
 </template>
 
 <script setup lang="ts">
@@ -22,20 +22,22 @@ const render = () => {
   const res: ReturnType<typeof h>[] = [];
   props.errors.forEach((error: ValidationError) => {
     switch (error.componentName) {
-    case 'template':
-      res.push(h('div', { class: props.classes }, error.componentBody));
-      break;
-    case 'vue-markdown':
-      res.push(h(
-        VueMarkdown,
-        { class: [props.classes, 'df-messages-widget-markdown'], source: (<any>error.componentBindings).source },
-      ));
-      break;
-    default:
-      res.push(
-        h(error.componentName, { class: props.classes, ...error.componentBindings, innerHTML: error.componentBody }),
-      );
-      break;
+      case 'template':
+        res.push(h('div', { class: props.classes }, error.componentBody));
+        break;
+      case 'vue-markdown':
+        res.push(
+          h(VueMarkdown, {
+            class: [props.classes, 'df-messages-widget-markdown'],
+            source: (<any>error.componentBindings).source,
+          }),
+        );
+        break;
+      default:
+        res.push(
+          h(error.componentName, { class: props.classes, ...error.componentBindings, innerHTML: error.componentBody }),
+        );
+        break;
     }
   });
   return res;
@@ -44,7 +46,8 @@ const render = () => {
 
 <style>
 /* we would like there to be no margins for the displayed errors at the very top and very bottom. rest of it is fine */
-.df-messages-widget-markdown > :first-child, .df-messages-widget-markdown > :last-child {
+.df-messages-widget-markdown > :first-child,
+.df-messages-widget-markdown > :last-child {
   margin-top: 0 !important;
   padding-top: 0 !important;
   margin-bottom: 0 !important;

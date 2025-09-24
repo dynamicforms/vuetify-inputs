@@ -19,7 +19,7 @@ export interface DynamicFormsInputsOptions extends VuetifyInputsSettings {
 export const DynamicFormsInputs = {
   install: (app: App, options?: Partial<DynamicFormsInputsOptions>) => {
     app.use(CkeditorPlugin);
-    app.provide(vuetifyInputsSettingsKey, options ?? { });
+    app.provide(vuetifyInputsSettingsKey, options ?? {});
     if (options?.registerComponents ?? false) {
       Object.entries(Inputs).map(([name, component]) => app.component(name, component));
     }

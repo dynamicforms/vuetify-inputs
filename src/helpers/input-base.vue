@@ -26,19 +26,19 @@
       @click:clear="emits('click:clear')"
       @update:focused="(isFocused) => setFocused(isFocused)"
     >
-      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label"/></template>
+      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label" /></template>
       <template #default="slotProps">
-        <div class="d-flex w-100 style-resetting"><slot v-bind="slotProps"/></div>
+        <div class="d-flex w-100 style-resetting"><slot v-bind="slotProps" /></div>
       </template>
-      <template #loader="loaderProps"><slot name="loader" v-bind="loaderProps"/></template>
+      <template #loader="loaderProps"><slot name="loader" v-bind="loaderProps" /></template>
       <template v-if="$slots['prepend-inner']" #prepend-inner="prependInnerProps">
-        <slot name="prepend-inner" v-bind="prependInnerProps"/>
+        <slot name="prepend-inner" v-bind="prependInnerProps" />
       </template>
     </v-field>
     <template #message="{ message }">
-      <messages-widget :message="message" :errors="errors"/>
+      <messages-widget :message="message" :errors="errors" />
     </template>
-    <template v-if="$slots.prepend" #prepend="prependProps"><slot name="prepend" v-bind="prependProps"/></template>
+    <template v-if="$slots.prepend" #prepend="prependProps"><slot name="prepend" v-bind="prependProps" /></template>
   </v-input>
 </template>
 
@@ -51,7 +51,7 @@ import { BaseEmits, BaseProps, useInputBase } from './input-base';
 import MessagesWidget from './messages-widget.vue';
 
 const props = defineProps<BaseProps & { loading?: boolean }>();
-const emits = defineEmits<BaseEmits & { (e: 'blur'): void; }>();
+const emits = defineEmits<BaseEmits & { (e: 'blur'): void }>();
 
 const { errors, label, value, touched, visibility, vuetifyBindings } = useInputBase(props, emits);
 

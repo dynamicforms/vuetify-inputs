@@ -1,6 +1,7 @@
 // df-actions.spec.ts
 import { ExecuteAction } from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
+import { vi } from 'vitest';
 import { Ref, ref } from 'vue';
 import { createVuetify } from 'vuetify';
 import { VBtn } from 'vuetify/components';
@@ -134,7 +135,7 @@ describe('DfActions', () => {
     });
 
     // Išči span z width: .5rem
-    const spacer = wrapper.find('span[style*="width: .5rem"]');
+    const spacer = wrapper.find('span[style*="width: 0.5rem"]');
     expect(spacer.exists()).toBe(true);
   });
 
@@ -174,10 +175,7 @@ describe('DfActions', () => {
     expect(wrapper.findAll('.v-btn')).toHaveLength(1);
 
     // Dodaj novo akcijo v array
-    const newActions = [
-      ...initialActions,
-      createMockAction('delete', 'Delete', 'trash-outline'),
-    ];
+    const newActions = [...initialActions, createMockAction('delete', 'Delete', 'trash-outline')];
 
     // Posodobi prop
     await wrapper.setProps({ actions: newActions });
@@ -229,7 +227,7 @@ describe('DfActions', () => {
     expect(wrapper.find('div').exists()).toBe(false);
   });
   it('reagira na spremembe v reaktivnem actions ref-u', async () => {
-    const actionsRef = <Ref<Action[]>> ref([createMockAction('save', 'Save')]);
+    const actionsRef = <Ref<Action[]>>ref([createMockAction('save', 'Save')]);
 
     const wrapper = mount(DfActions, {
       props: { actions: actionsRef },
@@ -248,11 +246,13 @@ describe('DfActions', () => {
   });
 
   it('reagira na splice operacije', async () => {
-    const actionsRef = <Ref<Action[]>> ref([
-      createMockAction('save', 'Save'),
-      createMockAction('delete', 'Delete'),
-      createMockAction('cancel', 'Cancel'),
-    ]);
+    const actionsRef = <Ref<Action[]>>(
+      ref([
+        createMockAction('save', 'Save'),
+        createMockAction('delete', 'Delete'),
+        createMockAction('cancel', 'Cancel'),
+      ])
+    );
 
     const wrapper = mount(DfActions, {
       props: { actions: actionsRef },

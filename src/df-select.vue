@@ -3,7 +3,6 @@
     :is="taggable ? 'v-combobox' : 'v-autocomplete'"
     v-if="visibility !== DisplayMode.SUPPRESS"
     v-model="selected"
-
     :class="[
       cssClass,
       {
@@ -11,13 +10,10 @@
         invisible: visibility === DisplayMode.INVISIBLE,
       },
     ]"
-
     :items="options"
     :return-object="false"
-
     v-bind="vuetifyBindings"
     :label="vuetifyBindings.label"
-
     chips
     :auto-select-first="true"
     :closable-chips="allowNull || (multiple && selected.length > 1)"
@@ -34,7 +30,7 @@
     @blur="touched = true"
   >
     <template v-if="label.icon" #label="labelData">
-      <df-label :data="labelData" :label="label"/>
+      <df-label :data="labelData" :label="label" />
     </template>
     <template #chip="{ item }">
       <v-chip
@@ -47,7 +43,7 @@
         @click:close="chipClose(item.value)"
       >
         <template #prepend>
-          <cached-icon v-if="item.raw?.icon" class="me-1" :name="item.raw.icon"/>
+          <cached-icon v-if="item.raw?.icon" class="me-1" :name="item.raw.icon" />
         </template>
         <span :class="{ 'text-body-1': !multiple }">{{ item.title }}</span>
       </v-chip>
@@ -57,19 +53,19 @@
       <v-list-item v-bind="prps">
         <template #prepend>
           <span v-if="item.raw?.icon" class="me-1">
-            <cached-icon class="action-icon" :name="item.raw.icon"/>
+            <cached-icon class="action-icon" :name="item.raw.icon" />
           </span>
         </template>
       </v-list-item>
     </template>
     <template #message="{ message }">
-      <messages-widget :message="message" :errors="errors"/>
+      <messages-widget :message="message" :errors="errors" />
     </template>
     <template v-if="$slots['append-inner']" #append-inner="props">
-      <slot name="append-inner" v-bind="props"/>
+      <slot name="append-inner" v-bind="props" />
     </template>
     <template v-if="$slots['prepend-inner']" #prepend-inner="props">
-      <slot name="prepend-inner" v-bind="props"/>
+      <slot name="prepend-inner" v-bind="props" />
     </template>
   </component>
 </template>
@@ -138,20 +134,28 @@ function setResultingValue(newValue: any) {
   });
 }
 
-watch(selected, (newValue) => {
-  if (vuetifyBindings.value.readonly) return;
-  nextTick(() => {
-    const mcVal = multipleCompliantValue(newValue, multiple.value);
-    emitModelValueDisplay(mcVal);
-    setResultingValue(mcVal);
-  });
-}, { deep: true });
-watch(resultingValue, (newValue: any) => {
-  if (!setResultingValueGuard) {
-    const mcVal = multipleCompliantValue(newValue, multiple.value);
-    updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
-  }
-}, { deep: true });
+watch(
+  selected,
+  (newValue) => {
+    if (vuetifyBindings.value.readonly) return;
+    nextTick(() => {
+      const mcVal = multipleCompliantValue(newValue, multiple.value);
+      emitModelValueDisplay(mcVal);
+      setResultingValue(mcVal);
+    });
+  },
+  { deep: true },
+);
+watch(
+  resultingValue,
+  (newValue: any) => {
+    if (!setResultingValueGuard) {
+      const mcVal = multipleCompliantValue(newValue, multiple.value);
+      updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
+    }
+  },
+  { deep: true },
+);
 
 function onSelect(/* val: any */) {
   if (vuetifyBindings.value.readonly || taggable.value) return;
@@ -163,7 +167,10 @@ function onSelect(/* val: any */) {
 function chipClose(itemValue: any) {
   let mcVal;
   if (multiple.value && Array.isArray(selected.value)) {
-    mcVal = multipleCompliantValue(selected.value.filter((v) => v !== itemValue), multiple.value);
+    mcVal = multipleCompliantValue(
+      selected.value.filter((v) => v !== itemValue),
+      multiple.value,
+    );
   } else {
     mcVal = null;
   }
@@ -175,8 +182,10 @@ async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
   if (choices.value || propsWithDefaults.fetchChoices === undefined) return;
   loading.value = true;
   try {
-    const selectedChoices =
-      getSelectedChoices(loadedChoices.value, multipleCompliantValue(selected.value, multiple.value));
+    const selectedChoices = getSelectedChoices(
+      loadedChoices.value,
+      multipleCompliantValue(selected.value, multiple.value),
+    );
     const newChoices = await propsWithDefaults.fetchChoices(queryValue, idValue);
     loaded.value = unionBy([...selectedChoices, ...newChoices], 'id');
     takeLoaded.value = true;

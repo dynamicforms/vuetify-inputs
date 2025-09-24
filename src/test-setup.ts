@@ -1,10 +1,8 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { config } from '@vue/test-utils';
+import { vi } from 'vitest';
 
-import { VIcon } from './vuetify-components';
-
-// eslint-disable-next-line object-curly-newline
-config.global.components = {
-  VIcon,
-// eslint-disable-next-line object-curly-newline
-};
+vi.mock('vue-cached-icon', () => ({
+  CachedIcon: {
+    template: '<div class="cached-icon-wrapper"><svg title="{{ name }}" /></div>',
+    props: ['name'],
+  },
+}));

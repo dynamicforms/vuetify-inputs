@@ -1,8 +1,12 @@
 <template>
   <input-base v-bind="{ ...props, loading } as any" clearable @click:clear="removeFile" @blur="touched = true">
-    <template #prepend-inner><cached-icon name="mdi-paperclip"/></template>
+    <template #prepend-inner><cached-icon name="mdi-paperclip" /></template>
     <template #loader>
-      <v-progress-linear v-if="currentFile && progress < 100" :model-value="progress" :indeterminate="progress === -1"/>
+      <v-progress-linear
+        v-if="currentFile && progress < 100"
+        :model-value="progress"
+        :indeterminate="progress === -1"
+      />
     </template>
     <template #default="slotProps">
       <div class="d-flex w-100 pt-5 pl-2 pb-1" style="position: relative">
@@ -50,7 +54,7 @@ const currentFile = ref<File | null>(null);
 const progress = ref(0);
 const fileInputKey = ref(Math.round(Math.random() * 1000));
 const selectedFile = ref<File | null>();
-const loading = computed(() => (currentFile.value && progress.value < 100));
+const loading = computed(() => currentFile.value && progress.value < 100);
 
 const fileLabel = computed(() => {
   if (!selectedFile.value && value.value) {
@@ -59,7 +63,9 @@ const fileLabel = computed(() => {
   return '';
 });
 
-function clearTouchInterval() { if (touchInterval.value) window.clearInterval(touchInterval.value); }
+function clearTouchInterval() {
+  if (touchInterval.value) window.clearInterval(touchInterval.value);
+}
 function setupTouchInterval() {
   clearTouchInterval();
   touchInterval.value = window.setInterval(() => {
@@ -68,7 +74,10 @@ function setupTouchInterval() {
 }
 
 onBeforeUnmount(() => clearTouchInterval());
-watch(value, (newValue) => { if (newValue) setupTouchInterval(); else clearTouchInterval(); });
+watch(value, (newValue) => {
+  if (newValue) setupTouchInterval();
+  else clearTouchInterval();
+});
 
 async function removeFile() {
   if (value.value) {
@@ -88,12 +97,9 @@ async function upload(file: File) {
   currentFile.value = file;
 
   try {
-    value.value = await props.comms.upload(
-      file,
-      (loaded: number, total: number) => {
-        progress.value = Math.round((loaded * 100) / total);
-      },
-    );
+    value.value = await props.comms.upload(file, (loaded: number, total: number) => {
+      progress.value = Math.round((loaded * 100) / total);
+    });
     progress.value = 100;
     setupTouchInterval();
   } catch (err) {

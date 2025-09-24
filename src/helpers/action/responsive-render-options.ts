@@ -1,9 +1,8 @@
-// eslint-disable-next-line max-classes-per-file
 import { computed } from 'vue';
 import { useDisplay } from 'vuetify';
 
 export const responsiveBreakpoints = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
-export type BreakpointNames = typeof responsiveBreakpoints[number];
+export type BreakpointNames = (typeof responsiveBreakpoints)[number];
 export type BreakpointsJSON<T extends Record<string, any>> = T & Partial<Record<BreakpointNames, T>>;
 
 export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
@@ -25,7 +24,7 @@ export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
     for (const bp of responsiveBreakpoints) {
       const bpData = this._value[bp];
       for (const field of fields) {
-        if (bpData?.[field] != null) (<any> result)[field] = bpData[field];
+        if (bpData?.[field] != null) (<any>result)[field] = bpData[field];
       }
       if (bp === breakpoint) break;
     }

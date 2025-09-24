@@ -8,7 +8,7 @@ import { ActionDisplayStyle } from './action-display-style';
 import { ActionBreakpointOptions, ActionRenderOptions, ResponsiveActionRenderOptions } from './action-render-options';
 import { BreakpointNames } from './responsive-render-options';
 
-// @ts-ignore: prevent TS from complaining how create method is not ok because its declaration differs from Field's
+// @ts-expect-error: prevent TS from complaining how create method is not ok because its declaration differs from Fld's
 class Action extends FormAction<ActionBreakpointOptions> {
   static create<T extends ActionBreakpointOptions = ActionBreakpointOptions>(
     params?: Partial<IFieldConstructorParams<T>>,
@@ -31,17 +31,29 @@ class Action extends FormAction<ActionBreakpointOptions> {
     });
   }
 
-  get name() { return this.value.name; }
+  get name() {
+    return this.value.name;
+  }
 
-  get label() { return this.value.showLabel ? this.value.label : undefined; }
+  get label() {
+    return this.value.showLabel ? this.value.label : undefined;
+  }
 
-  get showLabel() { return isString(this.value.label) && !isEmpty(this.value.label) ? this.value.showLabel : false; }
+  get showLabel() {
+    return isString(this.value.label) && !isEmpty(this.value.label) ? this.value.showLabel : false;
+  }
 
-  get icon() { return this.value.showIcon ? this.value.icon : undefined; }
+  get icon() {
+    return this.value.showIcon ? this.value.icon : undefined;
+  }
 
-  get showIcon() { return isString(this.value.icon) && !isEmpty(this.value.icon) ? this.value.showIcon : false; }
+  get showIcon() {
+    return isString(this.value.icon) && !isEmpty(this.value.icon) ? this.value.showIcon : false;
+  }
 
-  get renderAs() { return this.value.renderAs; }
+  get renderAs() {
+    return this.value.renderAs;
+  }
 
   static closeAction(data?: Partial<IField<ActionBreakpointOptions>>) {
     const init: Partial<IField<ActionBreakpointOptions>> = {
@@ -55,13 +67,13 @@ class Action extends FormAction<ActionBreakpointOptions> {
         showIcon: true,
       },
     };
-    init.value = { ...init.value, ...(data?.value ?? { }) }; // data may only contain partial info of the value
+    init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
     return Action.create(init);
   }
 
   static yesAction(data?: Partial<IField<ActionBreakpointOptions>>) {
     const init: Partial<IField<ActionBreakpointOptions>> = {
-      ...(data ?? { }), // any properties in data should overwrite properties in the constant
+      ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'yes',
         label: translatableStrings.Yes,
@@ -71,13 +83,13 @@ class Action extends FormAction<ActionBreakpointOptions> {
         showIcon: true,
       },
     };
-    init.value = { ...init.value, ...(data?.value ?? { }) }; // data may only contain partial info of the value
+    init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
     return Action.create(init);
   }
 
   static noAction(data?: Partial<IField<ActionBreakpointOptions>>) {
     const init: Partial<IField<ActionBreakpointOptions>> = {
-      ...(data ?? { }), // any properties in data should overwrite properties in the constant
+      ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'no',
         label: translatableStrings.No,
@@ -87,10 +99,9 @@ class Action extends FormAction<ActionBreakpointOptions> {
         showIcon: true,
       },
     };
-    init.value = { ...init.value, ...(data?.value ?? { }) }; // data may only contain partial info of the value
+    init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
     return Action.create(init);
   }
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export { Action };

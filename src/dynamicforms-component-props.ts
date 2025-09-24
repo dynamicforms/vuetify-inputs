@@ -8,7 +8,7 @@ type ShowAsGroup = 'no' | 'grouped' | 'grouped-no-borders';
 export interface DfActionsProps {
   actions: MaybeRef<Action[]>;
   buttonSize?: string | number; // see https://vuetifyjs.com/en/api/v-btn/#props-size
-  showAsGroup?: ShowAsGroup
+  showAsGroup?: ShowAsGroup;
 }
 
 export interface DfCheckboxProps extends BaseProps {

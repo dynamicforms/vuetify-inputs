@@ -1,9 +1,9 @@
 <template>
   <div class="label">
     <template v-if="label.icon">
-      <cached-icon v-if="label.iconComponent === 'v-icon'" :name="label.icon" size="1.25em"/>
-      <v-img v-else-if="label.iconComponent === 'v-img'" class="icon" :src="label.icon"/>
-      <component :is="label.iconComponent" v-else :src="label.icon"/>
+      <cached-icon v-if="label.iconComponent === 'v-icon'" :name="label.icon" size="1.25em" />
+      <v-img v-else-if="label.iconComponent === 'v-img'" class="icon" :src="label.icon" />
+      <component :is="label.iconComponent" v-else :src="label.icon" />
     </template>
     {{ data ? data.label : label.text }}
   </div>

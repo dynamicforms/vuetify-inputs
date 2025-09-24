@@ -13,7 +13,6 @@ export interface ActionRenderOptions extends ActionValue {
 export type ActionBreakpointOptions = BreakpointsJSON<ActionRenderOptions>;
 
 export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<ActionRenderOptions> {
-  // eslint-disable-next-line class-methods-use-this
   protected cleanBreakpoint(bp?: ActionRenderOptions, defaultIfEmpty: boolean = false): ActionRenderOptions | null {
     if ((!bp || !isObjectLike(bp)) && !defaultIfEmpty) return null;
 
