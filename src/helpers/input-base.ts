@@ -12,6 +12,10 @@ export class Label {
   ) {}
 }
 
+export type FieldVariant = 'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled';
+export type VuetifyDensity = 'default' | 'comfortable' | 'compact';
+export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
+
 export interface BaseProps<T = any> {
   control?: Form.IField<T>;
   modelValue?: T;
@@ -25,6 +29,8 @@ export interface BaseProps<T = any> {
   cssClass?: string;
   clearable?: boolean;
   passthroughAttrs?: Record<string, any>;
+  density?: FieldDensity;
+  variant?: FieldVariant;
 }
 
 export const defaultBaseProps = { enabled: undefined, clearable: true };
@@ -81,6 +87,14 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const hint = computed(() => props.hint || '');
   const cssClass = computed(() => props.cssClass || '');
 
+  const density = computed(
+    (): FieldDensity => props.density ?? inject('field-density') ?? settings.defaultDensity ?? 'default',
+  );
+  const boundDensity = computed((): VuetifyDensity => (density.value === 'inline' ? 'default' : density.value));
+  const variant = computed(
+    (): FieldVariant => props.variant ?? inject('field-variant') ?? settings.defaultVariant ?? 'underlined',
+  );
+
   return {
     value,
     valid,
@@ -89,13 +103,15 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     visibility,
     label,
     touched,
+    density: density.value,
+    densityClass: computed(() => `df-density-${density.value}`),
 
     vuetifyBindings: computed(() => ({
       name: props.control?.fieldName,
       class: cssClass.value,
 
-      density: 'default' as const,
-      variant: (settings.defaultVariant ?? 'underlined') as 'underlined',
+      density: boundDensity.value,
+      variant: variant.value,
 
       label: label.value.text,
       messages: anyErrors.value,

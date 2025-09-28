@@ -5,6 +5,7 @@
     v-model="selected"
     :class="[
       cssClass,
+      densityClass,
       {
         'd-none': visibility === DisplayMode.HIDDEN,
         invisible: visibility === DisplayMode.INVISIBLE,
@@ -106,7 +107,14 @@ defineSlots<{
   'prepend-inner'?: (props: any) => any;
 }>();
 
-const { errors, label, touched, value: resultingValue, vuetifyBindings } = useInputBase(propsWithDefaults, emits);
+const {
+  densityClass,
+  errors,
+  label,
+  touched,
+  value: resultingValue,
+  vuetifyBindings,
+} = useInputBase(propsWithDefaults, emits);
 
 const selected = ref<any>(null);
 const takeLoaded = ref(false);

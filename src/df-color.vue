@@ -2,6 +2,7 @@
   <v-text-field
     v-model="value"
     v-bind="vuetifyBindings"
+    :class="densityClass"
     :clearable="allowNull"
     type="text"
     :rules="rules"
@@ -35,7 +36,7 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
-const { errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const dropdownShown = ref(false);
 
 const rules = computed<((val: string) => boolean | string)[]>(() => [

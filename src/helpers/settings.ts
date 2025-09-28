@@ -1,5 +1,8 @@
+import { FieldDensity, type FieldVariant } from '@/helpers/input-base';
+
 export interface VuetifyInputsSettings {
-  defaultVariant?: 'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled';
+  defaultVariant?: FieldVariant;
+  defaultDensity?: FieldDensity;
 }
 
 export const vuetifyInputsSettingsKey = Symbol('vuetifyInputsSettingsKey');

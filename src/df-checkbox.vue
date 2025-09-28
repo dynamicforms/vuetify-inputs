@@ -3,6 +3,7 @@
     v-model="boolValue"
     v-bind="vuetifyBindings as any"
     density="compact"
+    :class="densityClass"
     :indeterminate="indeterminate"
     :false-value="false"
     :true-value="true"
@@ -26,7 +27,7 @@ const props = withDefaults(defineProps<DfCheckboxProps>(), { ...defaultBaseProps
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
 
 const indeterminate = computed(() => props.allowNull && value.value == null);
 

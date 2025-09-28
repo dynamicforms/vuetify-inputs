@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="actionsRef.length > 0"
-    class="text-end"
+    class="text-end df-actions"
     :class="{
       'button-group': showAsGroup === 'grouped' || showAsGroup === 'grouped-no-borders',
       'with-border': showAsGroup === 'grouped',
@@ -44,34 +44,34 @@ const actionsWithBreakpoint = computed(() =>
 );
 </script>
 
-<style scoped>
-.button-group {
+<style>
+.df-actions.button-group {
   border-radius: 0.5em;
   /* the following two make the container fit the small buttons. without them there would be a top margin */
   line-height: 0;
   height: fit-content;
 }
-.button-group .v-btn {
+.df-actions.button-group .v-btn {
   border: none;
   border-radius: 0;
   margin: 0 !important;
   padding: 0 0.25em;
 }
-.button-group .v-btn:first-child {
+.df-actions.button-group .v-btn:first-child {
   border-start-start-radius: 0.5em;
   border-end-start-radius: 0.5em;
 }
-.button-group .v-btn:last-child {
+.df-actions.button-group .v-btn:last-child {
   border-start-end-radius: 0.5em;
   border-end-end-radius: 0.5em;
 }
-.button-group.with-border {
+.df-actions.button-group.with-border {
   border: 0.1em solid currentColor;
 }
-.button-group.with-border .v-btn:not(:first-child) {
+.df-actions.button-group.with-border .v-btn:not(:first-child) {
   border-inline-start: 0.1em solid currentColor;
 }
-.v-btn:not(:first-child) {
+.df-actions .v-btn:not(:first-child) {
   margin-left: 0.5em;
 }
 </style>

@@ -1,5 +1,11 @@
 <template>
-  <input-base v-bind="{ ...props, loading } as any" clearable @click:clear="removeFile" @blur="touched = true">
+  <input-base
+    v-bind="{ ...props, loading } as any"
+    :class="densityClass"
+    clearable
+    @click:clear="removeFile"
+    @blur="touched = true"
+  >
     <template #prepend-inner><cached-icon name="mdi-paperclip" /></template>
     <template #loader>
       <v-progress-linear
@@ -9,7 +15,7 @@
       />
     </template>
     <template #default="slotProps">
-      <div class="d-flex w-100 pt-5 pl-2 pb-1" style="position: relative">
+      <div class="d-flex w-100 position-relative df-input-wrapper" :class="density">
         <v-file-input
           v-model="selectedFile"
           :label="fileLabel"
@@ -46,7 +52,7 @@ const props = withDefaults(defineProps<DfFileProps>(), defaultBaseProps);
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const touchInterval = ref<number | null>(null);
 
 // State

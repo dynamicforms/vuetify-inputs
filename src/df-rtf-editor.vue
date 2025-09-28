@@ -1,5 +1,5 @@
 <template>
-  <input-base v-bind="props" class="ck-editor-custom">
+  <input-base v-bind="props" class="ck-editor-custom" :class="densityClass">
     <template #default="slotProps">
       <ck-editor-custom
         ref="$editor"
@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<DfRtfEditorProps>(), { ...defaultBaseProp
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, value, vuetifyBindings } = useInputBase(props, emits);
 </script>
 
 <style>

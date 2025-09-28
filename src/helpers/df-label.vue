@@ -1,5 +1,5 @@
 <template>
-  <div class="label">
+  <div class="df-label">
     <template v-if="label.icon">
       <cached-icon v-if="label.iconComponent === 'v-icon'" :name="label.icon" size="1.25em" />
       <v-img v-else-if="label.iconComponent === 'v-img'" class="icon" :src="label.icon" />
@@ -21,8 +21,8 @@ defineProps<{
 }>();
 </script>
 
-<style scoped>
-.label {
+<style>
+.df-label {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -30,7 +30,7 @@ defineProps<{
   justify-content: flex-start;
 }
 
-.label .icon {
+.df-label .icon {
   width: 1.25em;
 }
 </style>

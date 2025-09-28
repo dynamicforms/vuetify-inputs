@@ -1,7 +1,13 @@
 <template>
-  <input-base v-bind="props" :clearable="clearable" @click:clear="value = null" @blur="touched = true">
+  <input-base
+    v-bind="props"
+    :class="densityClass"
+    :clearable="clearable"
+    @click:clear="value = null"
+    @blur="touched = true"
+  >
     <template #default="slotProps">
-      <div class="d-flex w-100 pt-5 pl-2 pb-1">
+      <div class="d-flex w-100 ml-4 df-input-wrapper" :class="density">
         <v-text-field
           v-if="['date', 'datetime'].includes(inputType)"
           v-model="dateFormatted"
@@ -92,7 +98,7 @@ const emits = defineEmits<Emits>();
 
 const currentLocale = computed(() => props.locale ?? unref(DateTimeLocaleConfig.dateTimeLocale));
 const firstDayOfWeek = computed(() => currentLocale.value.options?.weekStartsOn ?? 1);
-const { touched, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
+const { densityClass, touched, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 const dropdown = ref('');

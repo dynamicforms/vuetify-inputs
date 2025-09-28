@@ -4,3 +4,113 @@
   width: 1.5em;
   height: 1.5em;
 }
+
+.df-input-container {
+  width: 100%;
+}
+
+.df-textarea-container {
+  width: 100%;
+}
+
+.df-textarea-container.df-density-compact > div {
+  min-height: 44px;
+}
+.df-textarea-container.df-density-compact > div.v-input--plain-underlined {
+  min-height: 36px;
+}
+
+.v-field {
+  --df-base-top-margin: 8px;
+  --df-add-top-margin: 0px;
+  --df-add-top-margin-variant: 0px;
+  --df-base-bottom-margin: 16px;
+  --df-add-bottom-margin: 0px;
+  --df-add-bottom-margin-variant: 0px;
+}
+
+.v-field .df-input-wrapper {
+  margin-top: calc(var(--df-base-top-margin) + var(--df-add-top-margin) + var(--df-add-top-margin-variant));
+  margin-bottom: calc(var(--df-base-bottom-margin) + var(--df-add-bottom-margin) + var(--df-add-bottom-margin-variant));
+}
+.v-field .df-input-wrapper.compact {
+  --df-add-top-margin: -4px;
+  --df-add-bottom-margin: -8px;
+}
+.v-field .df-input-wrapper.comfortable {
+  --df-add-top-margin: -4px;
+  --df-add-bottom-margin: -4px;
+}
+
+.v-field.v-field--variant-filled .df-input-wrapper {
+  --df-add-top-margin-variant: 10px;
+  --df-add-bottom-margin-variant: -10px;
+}
+.v-field.v-field--variant-filled .df-input-wrapper.compact {
+  --df-add-top-margin-variant: 8px;
+  --df-add-bottom-margin-variant: -8px;
+}
+
+.v-field.v-field--variant-underlined .df-input-wrapper,
+.v-field.v-field--variant-plain .df-input-wrapper {
+  --df-add-top-margin-variant: 6px;
+  --df-add-bottom-margin-variant: -14px;
+}
+.v-field.v-field--variant-underlined .df-input-wrapper.compact,
+.v-field.v-field--variant-plain .df-input-wrapper.compact {
+  --df-add-top-margin-variant: -2px;
+  --df-add-bottom-margin-variant: -18px;
+  min-height: 44px;
+}
+.v-field.v-field--variant-underlined .df-input-wrapper.comfortable,
+.v-field.v-field--variant-plain .df-input-wrapper.comfortable {
+  --df-add-top-margin-variant:    4px;
+  --df-add-bottom-margin-variant: -20px;
+  min-height: 40px;
+}
+
+.v-field.v-field--variant-solo .df-input-wrapper,
+.v-field.v-field--variant-solo-inverted .df-input-wrapper,
+.v-field.v-field--variant-solo-filled .df-input-wrapper {
+  --df-add-top-margin-variant: 10px;
+  --df-add-bottom-margin-variant: -14px;
+}
+.v-field.v-field--variant-solo .df-input-wrapper.compact,
+.v-field.v-field--variant-solo-inverted .df-input-wrapper.compact,
+.v-field.v-field--variant-solo-filled .df-input-wrapper.compact {
+  --df-add-top-margin-variant: 8px;
+  --df-add-bottom-margin-variant: -8px;
+}
+.v-field.v-field--variant-solo .df-input-wrapper.comfortable,
+.v-field.v-field--variant-solo-inverted .df-input-wrapper.comfortable,
+.v-field.v-field--variant-solo-filled .df-input-wrapper.comfortable {
+  --df-add-top-margin-variant: 10px;
+  --df-add-bottom-margin-variant: -10px;
+}
+
+.df-density-inline .v-field__outline,
+.df-density-inline .v-field--variant-filled .v-field-label--floating,
+.df-density-inline .v-field--variant-solo .v-field-label--floating,
+.df-density-inline .v-field--variant-solo-inverted .v-field-label--floating,
+.df-density-inline .v-field--variant-solo-filled .v-field-label--floating {
+  display: none;
+}
+.df-density-inline .v-field__input,
+.df-density-inline .v-field__prepend-inner,
+.df-density-inline .v-field__append-inner,
+.df-density-inline .v-field__clearable,
+.df-density-inline .v-selection-control {
+  padding: 0 !important;
+  min-height: 1em;
+  mask-image: none;
+}
+.df-density-inline .df-input-wrapper.inline {
+  margin: 0;
+}
+.df-density-inline .v-field--variant-underlined .v-field-label,
+.df-density-inline .v-field--variant-plain .v-field-label {
+  margin-top: -20px;
+}
+.df-density-inline .v-field__field {
+  min-height: 24px;
+}

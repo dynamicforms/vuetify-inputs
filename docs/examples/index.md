@@ -3,6 +3,11 @@
 This section contains a collection of practical examples demonstrating the usage of various components from the 
 `@dynamicforms/vuetify-inputs` library. Each example includes a working demo component and its corresponding code.
 
+## Density and Variant demo
+
+This [demo](./density) showcases support for various component variants and densities. It also demonstrates vertical 
+alignment of component parts so that your forms look perfectly aligned in all respects. 
+
 ## Common Base Component
 
 ### [InputBase](./input-base)
@@ -53,10 +58,10 @@ A component for multi-line text input.
 
 ## Integration Options
 
-### [Using with DynamicForms](./dynamic-forms-integration)
+### [Using with vue-forms](./dynamic-forms-integration)
 
-Examples of integrating Vuetify input fields with the `@dynamicforms/vue-forms` library. *(Documentation in progress)*
+Examples of integrating Vuetify input fields with the `@dynamicforms/vue-forms` library. 
 
-### [Validation](./validation)
+### [Validation](./validators)
 
-Various ways to validate input fields. *(Documentation in progress)*
+Various ways to validate input fields.

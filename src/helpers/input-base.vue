@@ -2,6 +2,7 @@
   <v-input
     v-if="visibility !== DisplayMode.SUPPRESS"
     :name="vuetifyBindings.name"
+    :density="vuetifyBindings.density"
     :hint="vuetifyBindings.hint"
     :persistent-hint="vuetifyBindings.persistentHint"
     :hide-details="vuetifyBindings.hideDetails"
@@ -16,6 +17,7 @@
   >
     <v-field
       :variant="vuetifyBindings.variant"
+      :density="vuetifyBindings.density"
       :label="vuetifyBindings.label"
       :disabled="vuetifyBindings.disabled"
       :clearable="isClearable"
@@ -28,7 +30,7 @@
     >
       <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label" /></template>
       <template #default="slotProps">
-        <div class="d-flex w-100 style-resetting"><slot v-bind="slotProps" /></div>
+        <div class="d-flex w-100 df-style-resetting"><slot v-bind="slotProps" /></div>
       </template>
       <template #loader="loaderProps"><slot name="loader" v-bind="loaderProps" /></template>
       <template v-if="$slots['prepend-inner']" #prepend-inner="prependInnerProps">
@@ -67,12 +69,12 @@ function setFocused(isFocused: boolean) {
 }
 </script>
 
-<style scoped>
-:deep(.style-resetting .v-field__overlay) {
+<style>
+.df-style-resetting .v-field__overlay {
   background-color: transparent;
 }
-:deep(.style-resetting .v-field__outline::before),
-:deep(.style-resetting .v-field__outline::after) {
+.df-style-resetting .v-field__outline::before,
+.df-style-resetting .v-field__outline::after {
   content: none !important;
 }
 </style>
