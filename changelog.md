@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-09-28
+
+### Added
+- Initial effort for all the inputs to be correctly vertically aligned
+- Initial effort for all inputs to render correctly in all Vuetify variants
+- Density: inline for use in tables
+
+## [0.5.13] - 2025-09-25
+
+### Fixed
+- Fix SSR
+
+## [0.5.10 - 0.5.12] - 2025-09-24
+
+### Fixed
+- Version bumps
+- Fixed CSS location in package.json
+
 ## [0.5.9] - 2025-09-19
 
 ### Added
