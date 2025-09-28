@@ -5,8 +5,8 @@ Visual components based on Vuetify library to support @dynamicforms/vue-forms.
 ## Introduction
 
 `@dynamicforms/vuetify-inputs` provides input components for data entry that will be stored in form data. It is the 
-visual implementation of logical concepts from 
-[@dynamicforms/vue-forms](https://github.com/velis74/dynamicforms-vue-forms).
+visual implementation of logical concepts from
+[@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
 
 ## Features
 
@@ -107,10 +107,16 @@ npm run docs:dev
 
 ## Available Components
 
+- **InputBase**: The base component for all input elements
+- **df-actions**: An actions group.
+- **df-checkbox**: A checkbox component.
+- **df-color**: A color input.
+- **df-date-time**: A date and time selection component with configurable format and type.
+- **df-file**: A file upload component with progress indication
+- **df-input**: A general value input.
+- **df-rtf-editor**: A RTF editor input.
 - **df-select**: A selection component supporting static or dynamic options, multiple selection, and tagging
 - **df-textarea**: A textarea component with configurable rows and validation
-- **df-file**: A file upload component with progress indication
-- **InputBase**: The base component for all input elements
 
 ## TypeScript Support
 
