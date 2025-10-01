@@ -1,4 +1,4 @@
-import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import Form, { MdString, ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
 import { isEmpty, isString } from 'lodash-es';
 import { computed, inject, ref } from 'vue';
 
@@ -19,7 +19,7 @@ export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
 export interface BaseProps<T = any> {
   control?: Form.IField<T>;
   modelValue?: T;
-  label?: string | Label;
+  label?: string | Label | MdString;
   errors?: string[];
   placeholder?: string;
   helpText?: string;
@@ -88,11 +88,11 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const cssClass = computed(() => props.cssClass || '');
 
   const density = computed(
-    (): FieldDensity => props.density ?? inject('field-density') ?? settings.defaultDensity ?? 'default',
+    (): FieldDensity => props.density ?? inject('field-density', null) ?? settings.defaultDensity ?? 'default',
   );
   const boundDensity = computed((): VuetifyDensity => (density.value === 'inline' ? 'default' : density.value));
   const variant = computed(
-    (): FieldVariant => props.variant ?? inject('field-variant') ?? settings.defaultVariant ?? 'underlined',
+    (): FieldVariant => props.variant ?? inject('field-variant', null) ?? settings.defaultVariant ?? 'underlined',
   );
 
   return {

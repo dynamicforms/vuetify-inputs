@@ -15,7 +15,7 @@
           <v-col cols="12" md="6">
             <df-color
               v-model="directColor"
-              label="Direct v-model color"
+              :label="new MdString('Direct *v-model* color')"
               :allow-null="true"
             />
           </v-col>
@@ -49,7 +49,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import {Field, MdString, Validators} from '@dynamicforms/vue-forms';
+import { Field, MdString, Validators } from '@dynamicforms/vue-forms';
 import { DfColor } from '../../src';
 
 const colorField = Field.create({

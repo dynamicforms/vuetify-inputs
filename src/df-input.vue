@@ -7,7 +7,7 @@
       :type="inputType"
       @blur="touched = true"
     >
-      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label" /></template>
+      <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
       <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
     </v-text-field>
     <v-number-input
@@ -17,7 +17,7 @@
       density="compact"
       control-variant="stacked"
     >
-      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label" /></template>
+      <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
       <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
     </v-number-input>
   </div>

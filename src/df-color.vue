@@ -8,7 +8,7 @@
     :rules="rules"
     @blur="touched = true"
   >
-    <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label" /></template>
+    <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
     <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
     <template #prepend-inner>
       <div

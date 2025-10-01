@@ -43,7 +43,7 @@
               <df-checkbox
                 :control="form.fields.ternaryField"
                 :allow-null="true"
-                label="Ternary checkbox"
+                label="Ternary checkbox should wrap all the way"
                 hint="Can be true, false, or null (indeterminate)"
               />
 
@@ -76,7 +76,7 @@
               <div class="text-subtitle-1 mb-2">Auto-Toggling Checkbox</div>
               <df-checkbox
                 :control="form.fields.autoToggleField"
-                label="Auto-toggling every second"
+                :label="new MdString('**Auto-toggling** every second')"
                 hint="Value changes automatically"
               />
 
@@ -103,7 +103,7 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { Group, Field } from '@dynamicforms/vue-forms';
+import { Group, Field, MdString } from '@dynamicforms/vue-forms';
 import { DfCheckbox, Label } from '../../src';
 
 const form = new Group({

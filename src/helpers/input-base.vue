@@ -28,7 +28,7 @@
       @click:clear="emits('click:clear')"
       @update:focused="(isFocused) => setFocused(isFocused)"
     >
-      <template v-if="label.icon" #label="labelData"><df-label :data="labelData" :label="label" /></template>
+      <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
       <template #default="slotProps">
         <div class="d-flex w-100 df-style-resetting"><slot v-bind="slotProps" /></div>
       </template>

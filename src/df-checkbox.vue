@@ -10,7 +10,7 @@
     @change="change"
     @blur="touched = true"
   >
-    <template v-if="label.icon" #label="labelData"><df-label :data="labelData as any" :label="label" /></template>
+    <template #label="labelData"><df-label :allow-wrap="true" :data="labelData as any" :label="label" /></template>
     <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
   </v-checkbox>
 </template>

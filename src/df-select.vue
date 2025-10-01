@@ -30,9 +30,6 @@
     @click:clear="selected = null"
     @blur="touched = true"
   >
-    <template v-if="label.icon" #label="labelData">
-      <df-label :data="labelData" :label="label" />
-    </template>
     <template #chip="{ item }">
       <v-chip
         :key="item.value"
@@ -49,6 +46,7 @@
         <span :class="{ 'text-body-1': !multiple }">{{ item.title }}</span>
       </v-chip>
     </template>
+    <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
 
     <template #item="{ props: prps, item }">
       <v-list-item v-bind="prps">

@@ -1,24 +1,31 @@
 <template>
-  <div class="df-label">
+  <div class="df-label" :class="{ 'allow-wrap': allowWrap }">
     <template v-if="label.icon">
       <cached-icon v-if="label.iconComponent === 'v-icon'" :name="label.icon" size="1.25em" />
       <v-img v-else-if="label.iconComponent === 'v-img'" class="icon" :src="label.icon" />
       <component :is="label.iconComponent" v-else :src="label.icon" />
     </template>
-    {{ data ? data.label : label.text }}
+    <vue-markdown class="markdown" v-if="lbl instanceof MdString" :source="lbl.toString()" />
+    <template v-else>{{ lbl }}</template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { MdString } from '@dynamicforms/vue-forms';
+import { computed } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
+import VueMarkdown from 'vue-markdown-render';
 import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
 
 import { Label } from './input-base';
 
-defineProps<{
-  data?: DefaultInputSlot & { label?: string };
+const props = defineProps<{
+  data?: DefaultInputSlot & { label?: string | MdString };
   label: Label;
+  allowWrap?: boolean;
 }>();
+
+const lbl = computed(() => (props.data ? props.data.label : props.label.text));
 </script>
 
 <style>
@@ -29,8 +36,18 @@ defineProps<{
   white-space: nowrap;
   justify-content: flex-start;
 }
-
+.df-label.allow-wrap {
+  white-space: initial;
+}
 .df-label .icon {
   width: 1.25em;
+}
+.df-label .markdown :first-child,
+.df-label .markdown :last-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 1.35em !important; /* inspired by vitepress' aggressive settings */
 }
 </style>
