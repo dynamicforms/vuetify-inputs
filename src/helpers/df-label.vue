@@ -5,13 +5,19 @@
       <v-img v-else-if="label.iconComponent === 'v-img'" class="icon" :src="label.icon" />
       <component :is="label.iconComponent" v-else :src="label.icon" />
     </template>
-    <vue-markdown class="markdown" v-if="lbl instanceof MdString" :source="lbl.toString()" />
+    <vue-markdown
+      v-if="lbl instanceof MdString"
+      class="markdown"
+      :source="lbl.toString()"
+      :plugins="[markdownItAttrs]"
+    />
     <template v-else>{{ lbl }}</template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { MdString } from '@dynamicforms/vue-forms';
+import markdownItAttrs from 'markdown-it-attrs';
 import { computed } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import VueMarkdown from 'vue-markdown-render';
@@ -36,12 +42,15 @@ const lbl = computed(() => (props.data ? props.data.label : props.label.text));
   white-space: nowrap;
   justify-content: flex-start;
 }
+
 .df-label.allow-wrap {
   white-space: initial;
 }
+
 .df-label .icon {
   width: 1.25em;
 }
+
 .df-label .markdown :first-child,
 .df-label .markdown :last-child {
   margin-top: 0 !important;
