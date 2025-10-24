@@ -25,14 +25,18 @@ const render = () => {
       case 'template':
         res.push(h('div', { class: props.classes }, error.componentBody));
         break;
-      case 'vue-markdown':
+      case 'vue-markdown': {
+        const componentBindings = <any>error.componentBindings;
         res.push(
           h(VueMarkdown, {
             class: [props.classes, 'df-messages-widget-markdown'],
-            source: (<any>error.componentBindings).source,
+            source: componentBindings.source,
+            options: componentBindings.options,
+            plugins: componentBindings.plugins,
           }),
         );
         break;
+      }
       default:
         res.push(
           h(error.componentName, { class: props.classes, ...error.componentBindings, innerHTML: error.componentBody }),
