@@ -9,7 +9,8 @@
       v-if="lbl instanceof MdString"
       class="markdown"
       :source="lbl.toString()"
-      :plugins="[markdownItAttrs]"
+      :options="lbl.options"
+      :plugins="lbl.plugins"
     />
     <template v-else>{{ lbl }}</template>
   </div>
@@ -17,7 +18,6 @@
 
 <script setup lang="ts">
 import { MdString } from '@dynamicforms/vue-forms';
-import markdownItAttrs from 'markdown-it-attrs';
 import { computed } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import VueMarkdown from 'vue-markdown-render';
