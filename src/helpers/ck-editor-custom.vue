@@ -20,19 +20,22 @@
 <script setup lang="ts">
 import type { Editor, EditorConfig } from '@ckeditor/ckeditor5-core';
 import {
-  ClassicEditor,
   AccessibilityHelp,
   Alignment,
+  Autoformat,
   AutoImage,
   AutoLink,
   Autosave,
   BalloonToolbar,
+  Base64UploadAdapter,
   BlockQuote,
   Bold,
+  ClassicEditor,
   CloudServices,
   Essentials,
   GeneralHtmlSupport,
   Heading,
+  HeadingConfig,
   HorizontalLine,
   ImageBlock,
   ImageCaption,
@@ -51,7 +54,6 @@ import {
   Paragraph,
   PasteFromMarkdownExperimental,
   PasteFromOffice,
-  Autoformat,
   SelectAll,
   Style,
   Table,
@@ -59,12 +61,12 @@ import {
   TableColumnResize,
   TableProperties,
   TableToolbar,
-  Undo,
-  HeadingConfig,
   TextTransformation,
-  Base64UploadAdapter,
+  Undo,
 } from 'ckeditor5';
-import { ref, onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+
+import { ckEditorLanguage, translatableStrings } from './translations';
 
 withDefaults(
   defineProps<{
@@ -157,16 +159,17 @@ const editorPlugins = [
 ];
 const editorHeadings: HeadingConfig = {
   options: [
-    { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-    { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-    { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-    { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-    { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
-    { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
-    { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' },
+    { model: 'paragraph', title: translatableStrings.Paragraph, class: 'ck-heading_paragraph' },
+    { model: 'heading1', view: 'h1', title: translatableStrings.Heading1, class: 'ck-heading_heading1' },
+    { model: 'heading2', view: 'h2', title: translatableStrings.Heading2, class: 'ck-heading_heading2' },
+    { model: 'heading3', view: 'h3', title: translatableStrings.Heading3, class: 'ck-heading_heading3' },
+    { model: 'heading4', view: 'h4', title: translatableStrings.Heading4, class: 'ck-heading_heading4' },
+    { model: 'heading5', view: 'h5', title: translatableStrings.Heading5, class: 'ck-heading_heading5' },
+    { model: 'heading6', view: 'h6', title: translatableStrings.Heading6, class: 'ck-heading_heading6' },
   ],
 };
 const editorConfig: EditorConfig = {
+  language: ckEditorLanguage.language,
   toolbar: editorToolbarConfig,
   plugins: editorPlugins,
   balloonToolbar: ['bold', 'italic', '|', 'link', '|', 'bulletedList', 'numberedList'],
@@ -193,7 +196,7 @@ const editorConfig: EditorConfig = {
     decorators: {
       toggleDownloadable: {
         mode: 'manual',
-        label: 'Downloadable',
+        label: translatableStrings.Downloadable,
         attributes: { download: 'file' },
       },
     },
@@ -201,18 +204,19 @@ const editorConfig: EditorConfig = {
   placeholder: '',
   style: {
     definitions: [
-      { name: 'Article category', element: 'h3', classes: ['category'] },
-      { name: 'Title', element: 'h2', classes: ['document-title'] },
-      { name: 'Subtitle', element: 'h3', classes: ['document-subtitle'] },
-      { name: 'Info box', element: 'p', classes: ['info-box'] },
-      { name: 'Side quote', element: 'blockquote', classes: ['side-quote'] },
-      { name: 'Marker', element: 'span', classes: ['marker'] },
-      { name: 'Spoiler', element: 'span', classes: ['spoiler'] },
-      { name: 'Code (dark)', element: 'pre', classes: ['fancy-code', 'fancy-code-dark'] },
-      { name: 'Code (bright)', element: 'pre', classes: ['fancy-code', 'fancy-code-bright'] },
+      { name: translatableStrings.ArticleCategory, element: 'h3', classes: ['category'] },
+      { name: translatableStrings.Title, element: 'h2', classes: ['document-title'] },
+      { name: translatableStrings.Subtitle, element: 'h3', classes: ['document-subtitle'] },
+      { name: translatableStrings.InfoBox, element: 'p', classes: ['info-box'] },
+      { name: translatableStrings.SideQuote, element: 'blockquote', classes: ['side-quote'] },
+      { name: translatableStrings.Marker, element: 'span', classes: ['marker'] },
+      { name: translatableStrings.Spoiler, element: 'span', classes: ['spoiler'] },
+      { name: translatableStrings.CodeDark, element: 'pre', classes: ['fancy-code', 'fancy-code-dark'] },
+      { name: translatableStrings.CodeBright, element: 'pre', classes: ['fancy-code', 'fancy-code-bright'] },
     ],
   },
   table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties'] },
+  translations: ckEditorLanguage.translations,
 };
 
 onMounted(() => {
