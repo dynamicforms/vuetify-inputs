@@ -134,7 +134,50 @@ const categoryOptions = [
   and tagging.
 - [**df-textarea**](/examples/df-text-area): A textarea component with configurable rows and validation.
 
+## Localisation
+
+- You can translate strings that are used in this library by calling ```translateStrings``` function. This function
+  takes a callback function which is called with string code as a parameter. Function should return a translated string.
+  If you can't provide translation for string code, return null and default (English) string will be used.
+- All translatable strings are available in ```translatableStrings``` variable. Those strings are used on info and
+  yes/no dialog and on rtf editor.
+- Example of usage:
+
+```
+import { translateStrings } from '@dynamicforms/vuetify-inputs';
+
+function translateDFText() {
+  return (textCode: string) => {
+    const translationsTextCode = `df_modal.${textCode}`;
+    const translation = t(translationsTextCode);
+    if (translation !== translationsTextCode) return translation;
+    return null;
+  };
+}
+
+watch(locale, () => {
+  translateStrings(translateDFText());
+});
+```
+- If you want to use ckEditor in your language you have to set it using ```setCkEditorLanguage``` function. This function takes locale code and ckEditor translations as parameter.  
+- Example of usage:
+```
+import { setCkEditorLanguage } from '@dynamicforms/vuetify-inputs';
+
+import coreTranslationsDe from 'ckeditor5/translations/de';
+
+const ckEditorTranslations = {
+  de: coreTranslationsDe,
+  en: undefined,
+}
+
+onMounted(() => {
+  const localeCode = locale.value;
+  setCkEditorLanguage(localeCode, ckEditorTranslations[localeCode])
+});
+```
+
 ## Next Steps
 
-Check out the [Examples](/examples/) section to see more advanced usage patterns, or dive into the [API](/api/) 
+Check out the [Examples](/examples/) section to see more advanced usage patterns or dive into the [API](/api/)
 documentation to learn about all available features.
