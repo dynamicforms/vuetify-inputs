@@ -41,6 +41,7 @@ const sizeOptions = [
   'group small',
   'bordered group x-small',
   'bordered group small',
+  'bordered group x-large',
   'x-small',
   'small',
   'default',

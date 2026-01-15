@@ -16,7 +16,7 @@ or grid layouts.
 ## Features Demonstrated
 
 - **Vertical Alignment**: All components align perfectly regardless of their type
-- **Density Consistency**: Each density level (default, compact, comfortable) affects all components uniformly
+- **Density Consistency**: Each density level (default, compact, comfortable, inline) affects all components uniformly
 - **Variant Support**: All Vuetify variants work consistently across components
 - **Visual Harmony**: Components maintain visual consistency when used together
 

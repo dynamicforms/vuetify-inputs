@@ -8,3 +8,8 @@ Immediate todo
   otherwise the component would render as the new radio / check group. 
   
   Likely an additional parameter would be needed specifying the layout (wrapping horizontal, vertical)
+- df-actions
+  - vertical layout
+  - icon position
+  - icon size
+  
