@@ -81,7 +81,7 @@ describe('Action', () => {
       const action = Action.closeAction();
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('Close');
-      expect(action.icon).toBe('close-outline');
+      expect(action.icon).toBe('ion-close-outline');
       expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
     });
 
@@ -89,7 +89,7 @@ describe('Action', () => {
       const action = Action.yesAction();
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('Yes');
-      expect(action.icon).toBe('thumbs-up-outline');
+      expect(action.icon).toBe('ion-thumbs-up-outline');
       expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
     });
 
@@ -97,7 +97,7 @@ describe('Action', () => {
       const action = Action.noAction();
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('No');
-      expect(action.icon).toBe('thumbs-down-outline');
+      expect(action.icon).toBe('ion-thumbs-down-outline');
       expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
     });
 
@@ -111,7 +111,7 @@ describe('Action', () => {
       const action = Action.closeAction(customData);
 
       expect(action.label).toBe('Custom Close');
-      expect(action.icon).toBe('close-outline'); // should keep default icon
+      expect(action.icon).toBe('ion-close-outline'); // should keep default icon
       expect(action.renderAs).toBe(ActionDisplayStyle.TEXT); // should use override
     });
   });

@@ -61,7 +61,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       value: {
         name: 'close',
         label: translatableStrings.Close,
-        icon: 'close-outline',
+        icon: 'ion-close-outline',
         renderAs: ActionDisplayStyle.BUTTON,
         showLabel: true,
         showIcon: true,
@@ -77,7 +77,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       value: {
         name: 'yes',
         label: translatableStrings.Yes,
-        icon: 'thumbs-up-outline',
+        icon: 'ion-thumbs-up-outline',
         renderAs: ActionDisplayStyle.BUTTON,
         showLabel: true,
         showIcon: true,
@@ -93,7 +93,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       value: {
         name: 'no',
         label: translatableStrings.No,
-        icon: 'thumbs-down-outline',
+        icon: 'ion-thumbs-down-outline',
         renderAs: ActionDisplayStyle.BUTTON,
         showLabel: true,
         showIcon: true,
