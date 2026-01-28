@@ -75,6 +75,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     props.control ? props.control.errors : (props.errors || []).map((error) => new ValidationErrorRenderContent(error)),
   );
   const anyErrors = computed(() => (touched.value && errors.value.length > 0 ? ' ' : undefined));
+  const showErrors = computed(() => (touched.value ? errors.value : undefined));
   const enabled = computed(() => (props.control ? props.control.enabled : props.enabled !== false));
   const visibility = computed(() =>
     props.control ? props.control.visibility : props.visibility || Form.DisplayMode.FULL,
@@ -100,6 +101,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     valid,
     enabled,
     errors,
+    showErrors,
     visibility,
     label,
     touched,
@@ -114,7 +116,6 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
       variant: variant.value,
 
       label: label.value.text,
-      messages: anyErrors.value,
       errorMessages: anyErrors.value,
       // 'error-count': errors?.value.length || 0,
       readonly: !enabled.value,

@@ -38,7 +38,7 @@
       </template>
     </v-field>
     <template #message="{ message }">
-      <messages-widget :message="message" :errors="errors" />
+      <df-input-hint :message="message" :errors="showErrors" />
     </template>
     <template v-if="$slots.prepend" #prepend="prependProps"><slot name="prepend" v-bind="prependProps" /></template>
   </v-input>
@@ -48,14 +48,14 @@
 import { DisplayMode } from '@dynamicforms/vue-forms';
 import { computed, ref, unref } from 'vue';
 
+import DfInputHint from './df-input-hint.vue';
 import DfLabel from './df-label.vue';
 import { BaseEmits, BaseProps, useInputBase } from './input-base';
-import MessagesWidget from './messages-widget.vue';
 
 const props = defineProps<BaseProps & { loading?: boolean }>();
 const emits = defineEmits<BaseEmits & { (e: 'blur'): void }>();
 
-const { errors, label, value, touched, visibility, vuetifyBindings } = useInputBase(props, emits);
+const { label, showErrors, touched, value, visibility, vuetifyBindings } = useInputBase(props, emits);
 
 const isClearable = computed(() => !!(unref(props.clearable) && unref(value)));
 const focused = ref<boolean>(false);

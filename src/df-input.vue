@@ -8,7 +8,7 @@
       @blur="touched = true"
     >
       <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
-      <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
+      <template #message="{ message }"><df-input-hint :message="message" :errors="showErrors" /></template>
     </v-text-field>
     <v-number-input
       v-else
@@ -18,7 +18,7 @@
       control-variant="stacked"
     >
       <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
-      <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
+      <template #message="{ message }"><df-input-hint :message="message" :errors="showErrors" /></template>
     </v-number-input>
   </div>
 </template>
@@ -27,7 +27,7 @@
 import { computed, toRefs, unref } from 'vue';
 
 import { DfInputProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
+import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 
 const props = withDefaults(defineProps<DfInputProps>(), {
   ...defaultBaseProps,
@@ -42,7 +42,7 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
-const { densityClass, errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, label, showErrors, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const { inputType, max, min, precision, step } = toRefs(props);
 
 const isNumber = computed(() => inputType.value === 'number');

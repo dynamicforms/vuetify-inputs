@@ -43,7 +43,7 @@
   "issues": "https://github.com/dynamicforms/vuetify-inputs/issues",
   "peerDependencies": {
     "@ckeditor/ckeditor5-vue": "^7.0.0",
-    "@dynamicforms/vue-forms": "^0.4.6",
+    "@dynamicforms/vue-forms": "^0.5.0",
     "@mdi/font": "^7.4.47",
     "ckeditor5": "^43.0.0",
     "date-fns": "^4.1.0",
@@ -71,17 +71,5 @@
     "vitest": "^3",
     "vue-tsc": "^2",
     "markdown-it-attrs": "^4.3.1"
-  },
-  "eslintConfig": {
-    "extends": [
-      "velis"
-    ],
-    "ignorePatterns": [
-      "dist/*",
-      "coverage/*",
-      "node_modules/*",
-      "docs/*",
-      "vite.config.ts"
-    ]
   }
 }
