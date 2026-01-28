@@ -1,8 +1,30 @@
 import { MessagesWidget, ValidationError, ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
-import { mount } from '@vue/test-utils';
+import { mount, VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 
 import DfInputHint from './df-input-hint.vue';
+
+const messagesWidgetStub = {
+  template: '<div class="messages-widget">{{ message }}</div>',
+  props: ['message', 'classes'],
+};
+
+const createWrapper = (props: Record<string, any>) => {
+  return mount(DfInputHint, {
+    props,
+    global: {
+      stubs: {
+        MessagesWidget: messagesWidgetStub,
+      },
+    },
+  });
+};
+
+const expectMessagesWidget = (wrapper: VueWrapper, expectedMessage: any, expectedClasses: string) => {
+  const messagesWidget = wrapper.findComponent(MessagesWidget);
+  expect(messagesWidget.props('message')).toEqual(expectedMessage);
+  expect(messagesWidget.props('classes')).toBe(expectedClasses);
+};
 
 describe('DfInputHint', () => {
   it('renders MessagesWidget component', () => {
@@ -21,88 +43,23 @@ describe('DfInputHint', () => {
   });
 
   it('displays message when there are no errors', () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: undefined,
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('Helper text');
-    expect(messagesWidget.props('classes')).toBe('');
+    const wrapper = createWrapper({ message: 'Helper text', errors: undefined });
+    expectMessagesWidget(wrapper, 'Helper text', '');
   });
 
   it('displays error when errors is a non-empty string', () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: 'This field is required',
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('This field is required');
-    expect(messagesWidget.props('classes')).toBe('text-error');
+    const wrapper = createWrapper({ message: 'Helper text', errors: 'This field is required' });
+    expectMessagesWidget(wrapper, 'This field is required', 'text-error');
   });
 
   it('displays message when errors is an empty string', () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: '',
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('Helper text');
-    expect(messagesWidget.props('classes')).toBe('');
+    const wrapper = createWrapper({ message: 'Helper text', errors: '' });
+    expectMessagesWidget(wrapper, 'Helper text', '');
   });
 
   it('displays message when errors is a whitespace-only string', () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: '   ',
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    // Empty string after trim() -> no error
-    expect(messagesWidget.props('message')).toBe('Helper text');
-    expect(messagesWidget.props('classes')).toBe('');
+    const wrapper = createWrapper({ message: 'Helper text', errors: '   ' });
+    expectMessagesWidget(wrapper, 'Helper text', '');
   });
 
   it('displays errors when errors is an array of ValidationError objects', () => {
@@ -110,207 +67,62 @@ describe('DfInputHint', () => {
       new ValidationErrorRenderContent('Field is required'),
       new ValidationErrorRenderContent('Invalid format'),
     ];
-
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: validationErrors,
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toEqual(validationErrors);
-    expect(messagesWidget.props('classes')).toBe('text-error');
+    const wrapper = createWrapper({ message: 'Helper text', errors: validationErrors });
+    expectMessagesWidget(wrapper, validationErrors, 'text-error');
   });
 
   it('displays message when errors is an empty array', () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: [],
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('Helper text');
-    expect(messagesWidget.props('classes')).toBe('');
+    const wrapper = createWrapper({ message: 'Helper text', errors: [] });
+    expectMessagesWidget(wrapper, 'Helper text', '');
   });
 
   it('uses custom errorClasses', () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: 'Error message',
-        errorClasses: 'custom-error-class',
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
+    const wrapper = createWrapper({
+      message: 'Helper text',
+      errors: 'Error message',
+      errorClasses: 'custom-error-class',
     });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('classes')).toBe('custom-error-class');
+    expectMessagesWidget(wrapper, 'Error message', 'custom-error-class');
   });
 
   it('uses custom messageClasses', () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: undefined,
-        messageClasses: 'custom-message-class',
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
+    const wrapper = createWrapper({
+      message: 'Helper text',
+      errors: undefined,
+      messageClasses: 'custom-message-class',
     });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('classes')).toBe('custom-message-class');
+    expectMessagesWidget(wrapper, 'Helper text', 'custom-message-class');
   });
 
   it('displays only message when errors is not defined', () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'This is a hint',
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('This is a hint');
-    expect(messagesWidget.props('classes')).toBe('');
+    const wrapper = createWrapper({ message: 'This is a hint' });
+    expectMessagesWidget(wrapper, 'This is a hint', '');
   });
 
   it('correctly reacts to changes from message to error', async () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Initial message',
-        errors: undefined,
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
+    const wrapper = createWrapper({ message: 'Initial message', errors: undefined });
+    expectMessagesWidget(wrapper, 'Initial message', '');
 
-    let messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('Initial message');
-    expect(messagesWidget.props('classes')).toBe('');
-
-    // Add error
     await wrapper.setProps({ errors: 'Error occurred' });
-
-    messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('Error occurred');
-    expect(messagesWidget.props('classes')).toBe('text-error');
+    expectMessagesWidget(wrapper, 'Error occurred', 'text-error');
   });
 
   it('correctly reacts to changes from error to message', async () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: 'Initial error',
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
+    const wrapper = createWrapper({ message: 'Helper text', errors: 'Initial error' });
+    expectMessagesWidget(wrapper, 'Initial error', 'text-error');
 
-    let messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('Initial error');
-    expect(messagesWidget.props('classes')).toBe('text-error');
-
-    // Remove error
     await wrapper.setProps({ errors: '' });
-
-    messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('Helper text');
-    expect(messagesWidget.props('classes')).toBe('');
+    expectMessagesWidget(wrapper, 'Helper text', '');
   });
 
   it('handles undefined for both props values', () => {
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: undefined,
-        errors: undefined,
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toBe('');
-    expect(messagesWidget.props('classes')).toBe('');
+    const wrapper = createWrapper({ message: undefined, errors: undefined });
+    expectMessagesWidget(wrapper, '', '');
   });
 
   it('displays complex ValidationError object', () => {
     const complexError = new ValidationErrorRenderContent('Complex error with details');
-
-    const wrapper = mount(DfInputHint, {
-      props: {
-        message: 'Helper text',
-        errors: [complexError],
-      },
-      global: {
-        stubs: {
-          MessagesWidget: {
-            template: '<div class="messages-widget">{{ message }}</div>',
-            props: ['message', 'classes'],
-          },
-        },
-      },
-    });
-
-    const messagesWidget = wrapper.findComponent(MessagesWidget);
-    expect(messagesWidget.props('message')).toEqual([complexError]);
-    expect(messagesWidget.props('classes')).toBe('text-error');
+    const wrapper = createWrapper({ message: 'Helper text', errors: [complexError] });
+    expectMessagesWidget(wrapper, [complexError], 'text-error');
   });
 });

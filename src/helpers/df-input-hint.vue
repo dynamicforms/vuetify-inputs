@@ -1,3 +1,7 @@
+<template>
+  <messages-widget :message="widgetMessage" :classes="widgetClasses" />
+</template>
+
 <script setup lang="ts">
 import { ClassTypes, MessagesWidget, ValidationError } from '@dynamicforms/vue-forms';
 import { computed } from 'vue';
@@ -34,9 +38,5 @@ const widgetClasses = computed(() => {
   return isError.value ? props.errorClasses : props.messageClasses;
 });
 </script>
-
-<template>
-  <messages-widget :message="widgetMessage" :classes="widgetClasses" />
-</template>
 
 <style scoped></style>
