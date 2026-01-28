@@ -9,7 +9,7 @@
     @blur="touched = true"
   >
     <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
-    <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
+    <template #message="{ message }"><df-input-hint :message="message" :errors="showErrors" /></template>
     <template #prepend-inner>
       <div
         style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid #ccc"
@@ -28,7 +28,7 @@
 import { computed, ref } from 'vue';
 
 import { DfColorProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
+import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 
 const props = withDefaults(defineProps<DfColorProps>(), { ...defaultBaseProps, allowNull: false });
 
@@ -36,7 +36,7 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
-const { densityClass, errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, label, showErrors, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const dropdownShown = ref(false);
 
 const rules = computed<((val: string) => boolean | string)[]>(() => [

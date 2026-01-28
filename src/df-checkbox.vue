@@ -11,7 +11,7 @@
     @blur="touched = true"
   >
     <template #label="labelData"><df-label :allow-wrap="true" :data="labelData as any" :label="label" /></template>
-    <template #message="{ message }"><messages-widget :message="message" :errors="errors" /></template>
+    <template #message="{ message }"><df-input-hint :message="message" :errors="showErrors" /></template>
   </v-checkbox>
 </template>
 
@@ -20,14 +20,14 @@ import { clone } from 'lodash-es';
 import { computed } from 'vue';
 
 import { DfCheckboxProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, useInputBase } from './helpers';
+import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 
 const props = withDefaults(defineProps<DfCheckboxProps>(), { ...defaultBaseProps, allowNull: false });
 
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { densityClass, errors, label, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, label, showErrors, touched, value, vuetifyBindings } = useInputBase(props, emits);
 
 const indeterminate = computed(() => props.allowNull && value.value == null);
 

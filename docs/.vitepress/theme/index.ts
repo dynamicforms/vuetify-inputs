@@ -7,6 +7,7 @@ import * as directives from 'vuetify/directives'
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import { DynamicFormsInputs } from '../../../src';
+import VueMarkdown from 'vue-markdown-render'; // or your preferred markdown component
 // import DynamicFormsInputsVuetify from '../../../src/vuetify-components';
 
 export default {
@@ -22,6 +23,8 @@ export default {
 
     app.use(vuetify);
     app.use(DynamicFormsInputs); //, { defaultVariant: 'underlined' });
+    app.component('VueMarkdown', VueMarkdown); // make sure it's not vue-markdown
+
     // app.use(DynamicFormsInputsVuetify);
   },
   Layout: () => {

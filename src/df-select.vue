@@ -58,7 +58,7 @@
       </v-list-item>
     </template>
     <template #message="{ message }">
-      <messages-widget :message="message" :errors="errors" />
+      <df-input-hint :message="message" :errors="showErrors" />
     </template>
     <template v-if="$slots['append-inner']" #append-inner="props">
       <slot name="append-inner" v-bind="props" />
@@ -76,7 +76,7 @@ import { ref, computed, toRefs, watch, nextTick, unref } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfSelectProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, DfLabel, MessagesWidget, SelectChoice, useInputBase } from './helpers';
+import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, SelectChoice, useInputBase } from './helpers';
 import {
   convertItems,
   getSelectedChoices,
@@ -107,8 +107,8 @@ defineSlots<{
 
 const {
   densityClass,
-  errors,
   label,
+  showErrors,
   touched,
   value: resultingValue,
   vuetifyBindings,
