@@ -3,8 +3,8 @@
     <v-text-field
       v-if="!isNumber"
       v-model="value"
-      v-bind="vuetifyBindings as any"
       :type="inputType"
+      v-bind="vuetifyBindings as any"
       @blur="touched = true"
     >
       <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
@@ -13,9 +13,9 @@
     <v-number-input
       v-else
       v-model="value"
-      v-bind="{ ...vuetifyBindings, ...numberInputBindings } as any"
       density="compact"
       control-variant="stacked"
+      v-bind="{ ...vuetifyBindings, ...numberInputBindings } as any"
     >
       <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
       <template #message="{ message }"><df-input-hint :message="message" :errors="showErrors" /></template>
