@@ -13,8 +13,6 @@
     ]"
     :items="options"
     :return-object="false"
-    v-bind="vuetifyBindings"
-    :label="vuetifyBindings.label"
     chips
     :auto-select-first="true"
     :closable-chips="allowNull || (multiple && selected.length > 1)"
@@ -24,7 +22,7 @@
     :hide-selected="false"
     :aria-describedby="vuetifyBindings.helpText ? `${vuetifyBindings.name}-help` : null"
     :menu-props="{ maxHeight: '400' }"
-    hide-details="auto"
+    v-bind="vuetifyBindings"
     @update:search="(query: any) => queryOptions(query, undefined)"
     @update:model-value="onSelect"
     @click:clear="selected = null"

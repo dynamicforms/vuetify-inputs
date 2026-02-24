@@ -1,12 +1,12 @@
 <template>
   <v-checkbox
     v-model="boolValue"
-    v-bind="vuetifyBindings as any"
     density="compact"
     :class="densityClass"
     :indeterminate="indeterminate"
     :false-value="false"
     :true-value="true"
+    v-bind="vuetifyBindings as any"
     @change="change"
     @blur="touched = true"
   >

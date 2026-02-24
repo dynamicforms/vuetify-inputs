@@ -1,11 +1,11 @@
 <template>
   <v-text-field
     v-model="value"
-    v-bind="vuetifyBindings"
     :class="densityClass"
     :clearable="allowNull"
     type="text"
     :rules="rules"
+    v-bind="vuetifyBindings"
     @blur="touched = true"
   >
     <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
