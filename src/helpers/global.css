@@ -104,6 +104,9 @@
   min-height: 1em;
   mask-image: none;
 }
+.df-density-inline .v-selection-control {
+  --v-selection-control-size: 24px;
+}
 .df-density-inline .df-input-wrapper.inline {
   margin: 0;
 }
