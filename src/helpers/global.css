@@ -14,7 +14,7 @@
 }
 
 .df-textarea-container.df-density-compact > div {
-  min-height: 44px;
+  min-height: 40px;
 }
 .df-textarea-container.df-density-compact > div.v-input--plain-underlined {
   min-height: 36px;
@@ -47,25 +47,30 @@
   --df-add-bottom-margin-variant: -10px;
 }
 .v-field.v-field--variant-filled .df-input-wrapper.compact {
-  --df-add-top-margin-variant: 8px;
+  --df-add-top-margin-variant: 4px;
   --df-add-bottom-margin-variant: -8px;
+}
+
+.v-field.v-field--variant-outlined .df-input-wrapper.compact {
+  --df-add-top-margin-variant: -4px;
+  --df-add-bottom-margin-variant: 0px;
 }
 
 .v-field.v-field--variant-underlined .df-input-wrapper,
 .v-field.v-field--variant-plain .df-input-wrapper {
-  --df-add-top-margin-variant: 6px;
+  --df-add-top-margin-variant: 4px;
   --df-add-bottom-margin-variant: -14px;
 }
 .v-field.v-field--variant-underlined .df-input-wrapper.compact,
 .v-field.v-field--variant-plain .df-input-wrapper.compact {
-  --df-add-top-margin-variant: -2px;
+  --df-add-top-margin-variant: -4px;
   --df-add-bottom-margin-variant: -18px;
   min-height: 44px;
 }
 .v-field.v-field--variant-underlined .df-input-wrapper.comfortable,
 .v-field.v-field--variant-plain .df-input-wrapper.comfortable {
-  --df-add-top-margin-variant:    4px;
-  --df-add-bottom-margin-variant: -20px;
+  --df-add-top-margin-variant:    2px;
+  --df-add-bottom-margin-variant: -18px;
   min-height: 40px;
 }
 
@@ -73,12 +78,12 @@
 .v-field.v-field--variant-solo-inverted .df-input-wrapper,
 .v-field.v-field--variant-solo-filled .df-input-wrapper {
   --df-add-top-margin-variant: 10px;
-  --df-add-bottom-margin-variant: -14px;
+  --df-add-bottom-margin-variant: -10px;
 }
 .v-field.v-field--variant-solo .df-input-wrapper.compact,
 .v-field.v-field--variant-solo-inverted .df-input-wrapper.compact,
 .v-field.v-field--variant-solo-filled .df-input-wrapper.compact {
-  --df-add-top-margin-variant: 8px;
+  --df-add-top-margin-variant: 4px;
   --df-add-bottom-margin-variant: -8px;
 }
 .v-field.v-field--variant-solo .df-input-wrapper.comfortable,
@@ -116,4 +121,21 @@
 }
 .df-density-inline .v-field__field {
   min-height: 24px;
+}
+.df-textarea-container.df-density-compact .v-textarea .v-field {
+  --v-textarea-control-height: 40px !important;
+}
+
+.df-textarea-container.df-density-compact .v-textarea.v-input--plain-underlined .v-field {
+  --v-textarea-control-height: 32px !important;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.df-textarea-container.df-density-default .v-textarea.v-input--plain-underlined .v-field {
+    margin-bottom: 2px;
+}
+
+.v-autocomplete--single.v-autocomplete--chips .v-field__input .v-autocomplete__selection:first-child {
+    margin-left: -10px;
 }

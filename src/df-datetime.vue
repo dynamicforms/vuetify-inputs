@@ -7,7 +7,15 @@
     @blur="touched = true"
   >
     <template #default="slotProps">
-      <div class="d-flex w-100 ml-4 df-input-wrapper" :class="density">
+      <div
+        :class="[
+          'd-flex',
+          'w-100',
+          ['plain', 'underlined'].includes(vuetifyBindings.variant) ? undefined : 'ml-4',
+          'df-input-wrapper',
+          density,
+        ]"
+      >
         <v-text-field
           v-if="['date', 'datetime'].includes(inputType)"
           v-model="dateFormatted"
@@ -19,6 +27,7 @@
           :readonly="vuetifyBindings.readonly"
           :disabled="vuetifyBindings.disabled"
           :name="`${vuetifyBindings.name}-date`"
+          :placeholder="vuetifyBindings.placeholder"
           v-bind="passthroughAttrs"
           @click="dropdown = 'date'"
           @keydown.space="dropdown = 'date'"
@@ -55,6 +64,7 @@
           :readonly="vuetifyBindings.readonly"
           :disabled="vuetifyBindings.disabled"
           :name="`${vuetifyBindings.name}-time`"
+          :placeholder="inputType === 'time' ? vuetifyBindings.placeholder : undefined"
           v-bind="passthroughAttrs"
           @click="dropdown = 'time'"
           @keydown.space="dropdown = 'time'"

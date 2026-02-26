@@ -22,7 +22,7 @@
       :disabled="vuetifyBindings.disabled"
       :clearable="isClearable"
       :persistent-clear="true"
-      :dirty="!!value"
+      :dirty="!!value || !!vuetifyBindings.placeholder"
       :active="focused"
       :loading="loading"
       @click:clear="emits('click:clear')"
@@ -30,7 +30,7 @@
     >
       <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
       <template #default="slotProps">
-        <div class="d-flex w-100 df-style-resetting"><slot v-bind="slotProps" /></div>
+        <div class="d-flex w-100 df-style-resetting df-sub-field"><slot v-bind="slotProps" /></div>
       </template>
       <template #loader="loaderProps"><slot name="loader" v-bind="loaderProps" /></template>
       <template v-if="$slots['prepend-inner']" #prepend-inner="prependInnerProps">
@@ -76,5 +76,9 @@ function setFocused(isFocused: boolean) {
 .df-style-resetting .v-field__outline::before,
 .df-style-resetting .v-field__outline::after {
   content: none !important;
+}
+
+.df-sub-field {
+  max-height: var(--v-input-control-height);
 }
 </style>
