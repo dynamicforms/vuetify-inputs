@@ -8,6 +8,7 @@ import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import { DynamicFormsInputs } from '../../../src';
 import VueMarkdown from 'vue-markdown-render'; // or your preferred markdown component
+import '../../../src/helpers/global.css';
 // import DynamicFormsInputsVuetify from '../../../src/vuetify-components';
 
 export default {
