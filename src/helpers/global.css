@@ -139,3 +139,12 @@
 .v-autocomplete--single.v-autocomplete--chips .v-field__input .v-autocomplete__selection:first-child {
     margin-left: -10px;
 }
+
+.v-file-input .v-field-label {
+    visibility: visible !important;
+}
+
+.v-file-input .v-field__outline .v-field-label {
+    visibility: hidden !important;
+}
+
