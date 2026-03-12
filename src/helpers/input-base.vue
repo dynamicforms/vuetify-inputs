@@ -81,4 +81,8 @@ function setFocused(isFocused: boolean) {
 .df-sub-field {
   max-height: var(--v-input-control-height);
 }
+
+.ck-editor-custom .df-sub-field {
+  max-height: revert;
+}
 </style>
