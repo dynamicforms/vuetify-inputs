@@ -7,7 +7,6 @@
         :class="{ 'mt-6': !!label }"
         :min-height="minHeight"
         :disabled="vuetifyBindings.disabled"
-        placeholder="dfsjghdf"
         v-bind="passthroughAttrs"
         @focusin="slotProps.focus()"
         @focusout="slotProps.blur()"
@@ -32,5 +31,10 @@ const { densityClass, value, vuetifyBindings } = useInputBase(props, emits);
 <style>
 .ck-editor-custom .v-field:not(.v-field--active) .v-label.v-field-label:not(.v-field-label--floating) {
   transform: translate(0.5em, 3em);
+}
+
+.ck-editor-custom .v-input__control {
+  /* So the dropdowns of ckeditor will draw over vuetify inputs that are positioned underneath */
+  z-index: 1;
 }
 </style>
