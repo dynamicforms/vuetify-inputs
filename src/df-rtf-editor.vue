@@ -131,6 +131,10 @@ const { densityClass, value, vuetifyBindings } = useInputBase(props, emits);
   border: 1px solid rgb(var(--v-theme-surface-variant));
 }
 
+.ck.ck-balloon-panel.ck-tooltip .ck-tooltip__text {
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
 .ck .marker {
   background: rgb(var(--v-theme-accent), 0.6) !important;
 }
