@@ -40,8 +40,8 @@ const { densityClass, value, vuetifyBindings } = useInputBase(props, emits);
 
 .ck {
   /* ========== BASE ========== */
-  --ck-color-base-background: rgb(var(--v-theme-background));
-  --ck-color-base-foreground: rgb(var(--v-theme-surface));
+  --ck-color-base-background: rgb(var(--v-theme-surface));
+  --ck-color-base-foreground: rgb(var(--v-theme-background));
   --ck-color-base-border: rgb(var(--v-theme-surface-variant));
 
   --ck-color-text: rgb(var(--v-theme-on-surface));
@@ -79,7 +79,7 @@ const { densityClass, value, vuetifyBindings } = useInputBase(props, emits);
   --ck-color-list-button-on-color: rgb(var(--v-theme-primary));
 
   /* ========== INPUTS ========== */
-  --ck-color-input-background: rgb(var(--v-theme-background));
+  --ck-color-input-background: rgb(var(--v-theme-surface));
   --ck-color-input-border: rgb(var(--v-theme-surface-variant));
   --ck-color-input-text: rgb(var(--v-theme-on-surface));
   --ck-color-input-disabled-background: rgba(var(--v-theme-on-surface), 0.05);
@@ -115,7 +115,7 @@ const { densityClass, value, vuetifyBindings } = useInputBase(props, emits);
 
 /* Editable (content area) */
 .ck-editor__editable {
-  background: rgb(var(--v-theme-background));
+  background: rgb(var(--v-theme-surface));
   color: rgb(var(--v-theme-on-surface));
 }
 
