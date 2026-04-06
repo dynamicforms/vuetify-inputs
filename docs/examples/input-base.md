@@ -7,21 +7,21 @@ It provides common functionality and properties that are available to all input 
 
 All input components inherit the following properties:
 
-| Property         | Type                  | Default             | Description                                                                                                     |
-|------------------|-----------------------|---------------------|-----------------------------------------------------------------------------------------------------------------|
-| control          | `Field`               | `undefined`         | [https://github.com/velis74/dynamicforms-vue-forms](DynamicForms) field object for state management integration |
-| modelValue       | `any`                 | component dependent | The field value (v-model) when used without control                                                             |
-| label            | `string \| Label`     | `''`                | Input field label. supports icons by creating a Label class (see below)                                         |
-| hint             | `string`              | `''`                | Hint text displayed below the input field                                                                       |
-| helpText         | `string`              | `''`                | Additional help text                                                                                            |
-| errors           | `string[]`            | `[]`                | List of errors (used only without control)                                                                      |
-| enabled          | `boolean`             | `true`              | Whether the input field is enabled                                                                              |
-| visibility       | `DisplayMode`         | `FULL`              | Component visibility mode (FULL, HIDDEN, INVISIBLE, SUPPRESS)                                                   |
-| cssClass         | `string`              | `''`                | Additional CSS classes                                                                                          |
-| clearable        | `boolean`             | component dependent | Whether the value can be cleared                                                                                |
-| passthroughAttrs | `Record<string, any>` | `undefined`         | Additional attributes to pass through to the underlying Vuetify component                                       |
-| variant          | `FieldVariant`        | `'underlined'`      | Input field variant (outlined, filled, underlined, plain, solo, solo-inverted, solo-filled)                     |
-| density          | `FieldDensity`        | `'default'`         | Input field density (default, comfortable, compact, inline)                                                     |
+| Property         | Type                  | Default             | Description                                                                                 |
+|------------------|-----------------------|---------------------|---------------------------------------------------------------------------------------------|
+| control          | `Field`               | `undefined`         | [vue-forms](:vue-forms:) field object for state management integration                      |
+| modelValue       | `any`                 | component dependent | The field value (v-model) when used without control                                         |
+| label            | `string \| Label`     | `''`                | Input field label. supports icons by creating a Label class (see below)                     |
+| hint             | `string`              | `''`                | Hint text displayed below the input field                                                   |
+| helpText         | `string`              | `''`                | Additional help text                                                                        |
+| errors           | `string[]`            | `[]`                | List of errors (used only without control)                                                  |
+| enabled          | `boolean`             | `true`              | Whether the input field is enabled                                                          |
+| visibility       | `DisplayMode`         | `FULL`              | Component visibility mode (FULL, HIDDEN, INVISIBLE, SUPPRESS)                               |
+| cssClass         | `string`              | `''`                | Additional CSS classes                                                                      |
+| clearable        | `boolean`             | component dependent | Whether the value can be cleared                                                            |
+| passthroughAttrs | `Record<string, any>` | `undefined`         | Additional attributes to pass through to the underlying Vuetify component                   |
+| variant          | `FieldVariant`        | `'underlined'`      | Input field variant (outlined, filled, underlined, plain, solo, solo-inverted, solo-filled) |
+| density          | `FieldDensity`        | `'default'`         | Input field density (default, comfortable, compact, inline)                                 |
 
 ### Density
 

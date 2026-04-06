@@ -179,5 +179,4 @@ onMounted(() => {
 
 ## Next Steps
 
-Check out the [Examples](/examples/) section to see more advanced usage patterns or dive into the [API](/api/)
-documentation to learn about all available features.
+Check out the [Examples](/examples/) section to see more advanced usage patterns to learn about all available features.

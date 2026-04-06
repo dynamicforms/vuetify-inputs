@@ -1,7 +1,7 @@
 {
   "name": "@dynamicforms/vuetify-inputs",
   "private": false,
-  "version": "0.7.9",
+  "version": "0.7.10",
   "type": "module",
   "description": "Visual components for data entry using @dynamicforms/vue-forms",
   "author": "Jure Erznožnik",
@@ -51,6 +51,7 @@
     "vue": "^3.4",
     "vue-cached-icon": "^3.0.3",
     "vue-markdown-render": "^2.2.1",
+    "vitepress-plugin-crosslinks": "^1.0.0",
     "vuetify": "^3.9"
   },
   "devDependencies": {

@@ -58,7 +58,7 @@ A component for multi-line text input.
 
 ## Integration Options
 
-### [Using with vue-forms](./dynamic-forms-integration)
+### [Using with vue-forms](:vue-forms:)
 
 Examples of integrating Vuetify input fields with the `@dynamicforms/vue-forms` library. 
 
