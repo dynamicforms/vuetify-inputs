@@ -2,6 +2,7 @@
   <component
     :is="taggable ? 'v-combobox' : 'v-autocomplete'"
     v-if="visibility !== DisplayMode.SUPPRESS"
+    ref="dfSelectRef"
     v-model="selected"
     :class="[
       cssClass,
@@ -9,6 +10,7 @@
       {
         'd-none': visibility === DisplayMode.HIDDEN,
         invisible: visibility === DisplayMode.INVISIBLE,
+        'df-select-multirow': isMultiline,
       },
     ]"
     :items="options"
@@ -22,11 +24,13 @@
     :hide-selected="false"
     :aria-describedby="vuetifyBindings.helpText ? `${vuetifyBindings.name}-help` : null"
     :menu-props="{ maxHeight: '400' }"
+    :search="searchText"
     v-bind="vuetifyBindings"
     @update:search="(query: any) => queryOptions(query, undefined)"
     @update:model-value="onSelect"
     @click:clear="selected = null"
     @blur="touched = true"
+    @mousedown.capture="onMouseDown($event)"
   >
     <template #chip="{ item }">
       <v-chip
@@ -36,7 +40,7 @@
         class="d-flex align-middle"
         :variant="multiple ? 'tonal' : 'text'"
         :closable="multiple"
-        @click:close="chipClose(item.value)"
+        @click:close="chipClose($event, item.value)"
       >
         <template #prepend>
           <cached-icon v-if="item.raw?.icon" class="me-1" :name="item.raw.icon" />
@@ -44,7 +48,9 @@
         <span :class="{ 'text-body-1': !multiple }">{{ item.title }}</span>
       </v-chip>
     </template>
-    <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+    <template #label="labelData">
+      <df-label :data="labelData" :label="label" />
+    </template>
 
     <template #item="{ props: prps, item }">
       <v-list-item v-bind="prps">
@@ -70,8 +76,9 @@
 <script setup lang="ts">
 import { DisplayMode } from '@dynamicforms/vue-forms';
 import { unionBy } from 'lodash-es';
-import { ref, computed, toRefs, watch, nextTick, unref } from 'vue';
+import { computed, nextTick, ref, toRefs, unref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
+import { VAutocomplete, VCombobox } from 'vuetify/components';
 
 import { DfSelectProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, SelectChoice, useInputBase } from './helpers';
@@ -103,6 +110,8 @@ defineSlots<{
   'prepend-inner'?: (props: any) => any;
 }>();
 
+const dfSelectRef = ref<InstanceType<typeof VAutocomplete> | InstanceType<typeof VCombobox> | null>(null);
+
 const {
   densityClass,
   label,
@@ -119,6 +128,9 @@ const loadedChoices = computed<SelectChoice[]>(() => (unref(takeLoaded) ? unref(
 const loading = ref<boolean>(false);
 
 const options = computed(() => convertItems(loadedChoices.value));
+const searchText = ref<string | null>(null);
+const fetchCounterGlobal = ref(0);
+const isMultiline = ref(false);
 
 if (options.value && propsWithDefaults.fetchChoices !== undefined) {
   console.warn('Both options and fetchChoices are set. Only one of them should be set.');
@@ -128,14 +140,54 @@ function emitModelValueDisplay(mcVal: any) {
   emits('update:modelValueDisplay', getSelectedChoices(loadedChoices.value, mcVal));
 }
 
-let setResultingValueGuard = false;
+const setResultingValueGuard = ref(false);
 
 function setResultingValue(newValue: any) {
-  setResultingValueGuard = true;
+  setResultingValueGuard.value = true;
   resultingValue.value = newValue;
   nextTick(() => {
-    setResultingValueGuard = false;
+    setResultingValueGuard.value = false;
   });
+}
+
+function getFullWidth(item: HTMLElement | null) {
+  if (!item) return 0;
+  const rect = item.getBoundingClientRect();
+  const style = window.getComputedStyle(item);
+
+  return rect.width + parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+}
+
+function checkMultiline() {
+  if (multiple.value && allowNull.value && selected.value != null && selected.value.length > 0 && dfSelectRef.value) {
+    const dfSelect = dfSelectRef.value.$el;
+    const inputWidth = dfSelect.querySelector('.v-input__control')?.clientWidth;
+    const container = dfSelect.querySelector('.v-field__input');
+    const items = container.querySelectorAll('.v-autocomplete__selection, .v-combobox__selection');
+
+    const style = window.getComputedStyle(container);
+    let selectedWidth = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+
+    items.forEach((item: HTMLElement) => {
+      selectedWidth += getFullWidth(item);
+    });
+
+    const clearableWidth = getFullWidth(dfSelect.querySelector('.v-field .v-field__clearable'));
+    const appendWidth = getFullWidth(dfSelect.querySelector('.v-field .v-field__append-inner'));
+    const chipGap = 2;
+    isMultiline.value = inputWidth - selectedWidth - items.length * chipGap - appendWidth < clearableWidth;
+  } else {
+    isMultiline.value = false;
+  }
+}
+
+function onMouseDown(event: MouseEvent) {
+  // če je klik na close ikoni ali njenem childu
+  const target = event.target;
+  if (target instanceof HTMLElement && target.closest('.v-chip__close')) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
 }
 
 watch(
@@ -153,7 +205,7 @@ watch(
 watch(
   resultingValue,
   (newValue: any) => {
-    if (!setResultingValueGuard) {
+    if (!setResultingValueGuard.value) {
       const mcVal = multipleCompliantValue(newValue, multiple.value);
       updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
     }
@@ -161,14 +213,35 @@ watch(
   { deep: true },
 );
 
+watch(setResultingValueGuard, () => {
+  if (!setResultingValueGuard.value) {
+    checkMultiline();
+  }
+});
+
+function resetQuery() {
+  if (searchText.value != null && searchText.value.length > 0) {
+    searchText.value = null;
+    queryOptions();
+  }
+}
+
 function onSelect(/* val: any */) {
+  resetQuery();
   if (vuetifyBindings.value.readonly || taggable.value) return;
   const mcVal = multipleCompliantValue(selected.value, multiple.value);
   updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
   setResultingValue(mcVal);
 }
 
-function chipClose(itemValue: any) {
+function chipClose(event: MouseEvent, itemValue: any) {
+  event.stopPropagation();
+  if (vuetifyBindings.value.readonly || taggable.value) {
+    if (taggable.value) {
+      selected.value = selected.value.filter((v: any) => v !== itemValue);
+    }
+    return;
+  }
   let mcVal;
   if (multiple.value && Array.isArray(selected.value)) {
     mcVal = multipleCompliantValue(
@@ -183,7 +256,10 @@ function chipClose(itemValue: any) {
 }
 
 async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
+  if (vuetifyBindings.value.readonly) return;
+  searchText.value = queryValue;
   if (choices.value || propsWithDefaults.fetchChoices === undefined) return;
+  const fetchCounter = ++fetchCounterGlobal.value;
   loading.value = true;
   try {
     const selectedChoices = getSelectedChoices(
@@ -191,6 +267,7 @@ async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
       multipleCompliantValue(selected.value, multiple.value),
     );
     const newChoices = await propsWithDefaults.fetchChoices(queryValue, idValue);
+    if (fetchCounter !== fetchCounterGlobal.value) return;
     loaded.value = unionBy([...selectedChoices, ...newChoices], 'id');
     takeLoaded.value = true;
   } finally {
@@ -219,3 +296,17 @@ if (propsWithDefaults.fetchChoices !== undefined) {
   });
 }
 </script>
+
+<style scoped>
+.df-select-multirow :deep(.v-field__clearable) {
+  position: absolute;
+}
+
+.df-select-multirow :deep(.v-field__append-inner) {
+  margin-top: 24px;
+}
+
+.df-select-multirow :deep(.v-autocomplete .v-field:not(.v-field--focused) input) {
+  min-width: 24px;
+}
+</style>

@@ -132,10 +132,6 @@
     margin-bottom: 2px;
 }
 
-.df-textarea-container.df-density-default .v-textarea.v-input--plain-underlined .v-field {
-    margin-bottom: 2px;
-}
-
 .v-autocomplete--single.v-autocomplete--chips .v-field__input .v-autocomplete__selection:first-child {
     margin-left: -10px;
 }

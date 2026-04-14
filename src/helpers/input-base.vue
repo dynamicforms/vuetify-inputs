@@ -80,6 +80,14 @@ function setFocused(isFocused: boolean) {
 
 .df-sub-field {
   max-height: var(--v-input-control-height);
+  min-height: max(
+    var(--v-input-control-height, 56px),
+    1.5rem + var(--v-field-input-padding-top) + var(--v-field-input-padding-bottom)
+  );
+}
+
+.df-density-inline .df-sub-field {
+  min-height: revert;
 }
 
 .ck-editor-custom .df-sub-field {
