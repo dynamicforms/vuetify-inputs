@@ -38,7 +38,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:dynamicforms/vuetify-inputs.git"
+    "url": "git+ssh://git@github.com/dynamicforms/vuetify-inputs.git"
   },
   "issues": "https://github.com/dynamicforms/vuetify-inputs/issues",
   "peerDependencies": {
