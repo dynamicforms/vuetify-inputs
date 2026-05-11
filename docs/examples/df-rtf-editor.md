@@ -24,7 +24,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| minHeight | `string` | `'7em'` | Minimum height of the editor |
+| minHeight | `string` | `undefined` | Minimum height of the editor |
 
 ### Inherited Props
 

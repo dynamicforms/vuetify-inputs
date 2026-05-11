@@ -86,7 +86,8 @@ const description = ref('');
 
 <script setup>
 import { Group, Field } from '@dynamicforms/vue-forms';
-import { DfTextArea, Validators } from '@dynamicforms/vuetify-inputs';
+import { DfTextArea } from '@dynamicforms/vuetify-inputs';
+import { Validators } from '@dynamicforms/vue-forms';
 
 const form = new Group({
   notes: Field.create({ 

@@ -6,7 +6,7 @@
 npm install @dynamicforms/vuetify-inputs
 ```
 
-In your main.py
+In your main.ts
 ```typescript
 import { DynamicFormsInputs } from '@dynamicforms/vuetify-inputs';
 import '@dynamicforms/vuetify-inputs/styles.css';

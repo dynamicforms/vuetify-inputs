@@ -32,7 +32,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | min | `number` | `undefined` | Minimum value (for number inputs) |
 | max | `number` | `undefined` | Maximum value (for number inputs) |
 | step | `number` | `undefined` | Step value (for number inputs) |
-| precision | `number` | `undefined` | Decimal precision (for number inputs) |
+| precision | `number` | `null` | Decimal precision (for number inputs) |
 
 ### Inherited Props
 

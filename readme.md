@@ -8,6 +8,28 @@ Visual components based on Vuetify library to support @dynamicforms/vue-forms.
 visual implementation of logical concepts from
 [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
 
+## Design Goals
+
+The primary goal of this library is **visual consistency**: every input component should look and behave the same
+regardless of which component is used or where it appears in the application. This means that mixing `df-input`,
+`df-select`, `df-checkbox`, `df-date-time`, and others on the same form row should produce a coherent, aligned result
+without any per-component tweaking.
+
+To achieve this, the library introduces a **density/variant system** that applies uniformly to all components:
+
+- **Density** controls the vertical compactness of a component and can be set globally, injected per-section, or
+  overridden per-component. Supported values are `default`, `comfortable`, `compact`, and `inline`.
+- **Variant** controls the visual style (e.g. `outlined`, `underlined`, `filled`, `solo`, …) and follows the same
+  hierarchy.
+- The `inline` density is a custom extension beyond standard Vuetify — it strips labels and decorations so components
+  render cleanly inside table cells.
+
+Global defaults can be set once at application startup via `VuetifyInputsSettings` and propagated down through Vue's
+provide/inject, so the entire application can switch density or variant with a single change.
+
+The [density example](/docs/examples/density.md) in the documentation demonstrates all components rendered side-by-side across every density
+and variant combination to verify alignment and consistent appearance.
+
 ## Features
 
 - **DynamicForms Integration**: Seamlessly works with `@dynamicforms/vue-forms` for state management and validation
@@ -22,7 +44,7 @@ visual implementation of logical concepts from
 npm install @dynamicforms/vuetify-inputs
 ```
 
-In your main.py
+In your main.ts
 ```typescript
 import { DynamicFormsInputs } from '@dynamicforms/vuetify-inputs';
 import '@dynamicforms/vuetify-inputs/styles.css';
@@ -116,7 +138,7 @@ npm run docs:dev
 - **df-input**: A general value input.
 - **df-rtf-editor**: A RTF editor input.
 - **df-select**: A selection component supporting static or dynamic options, multiple selection, and tagging
-- **df-textarea**: A textarea component with configurable rows and validation
+- **df-text-area**: A textarea component with configurable rows and validation
 
 ## TypeScript Support
 
