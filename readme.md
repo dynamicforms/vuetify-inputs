@@ -1,6 +1,6 @@
 # @dynamicforms/vuetify-inputs
 
-Visual components based on Vuetify library to support @dynamicforms/vue-forms.
+Vuetify input components with guaranteed visual consistency across all form fields — unified density/variant system, globally configurable, with inline mode for table cells. Built for [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
 
 ## Introduction
 
@@ -121,11 +121,7 @@ const fileComms = {
 
 ## Documentation
 
-Detailed documentation is available as a VitePress site in the `/docs` folder. To view the documentation locally:
-
-```bash
-npm run docs:dev
-```
+Detailed documentation is available at [https://docs.velis.si/dynamicforms/vuetify-inputs](https://docs.velis.si/dynamicforms/vuetify-inputs).
 
 ## Available Components
 
