@@ -1,6 +1,6 @@
 # DynamicForms Vue Forms Documentation
 
-This directory contains the VitePress documentation for `@dynamicforms/vuetify-forms`.
+This directory contains the VitePress documentation for `@dynamicforms/vuetify-inputs`.
 
 ## Development
 
