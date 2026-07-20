@@ -31,28 +31,49 @@ class Action extends FormAction<ActionBreakpointOptions> {
     });
   }
 
+  /** @see ActionRenderOptions.name */
   get name() {
     return this.value.name;
   }
 
+  /** @see ActionRenderOptions.label */
   get label() {
     return this.value.showLabel ? this.value.label : undefined;
   }
 
+  /** @see ActionRenderOptions.showLabel */
   get showLabel() {
     return isString(this.value.label) && !isEmpty(this.value.label) ? this.value.showLabel : false;
   }
 
+  /** @see ActionRenderOptions.icon */
   get icon() {
     return this.value.showIcon ? this.value.icon : undefined;
   }
 
+  /** @see ActionRenderOptions.showIcon */
   get showIcon() {
     return isString(this.value.icon) && !isEmpty(this.value.icon) ? this.value.showIcon : false;
   }
 
+  /** @see ActionRenderOptions.renderAs */
   get renderAs() {
     return this.value.renderAs;
+  }
+
+  /** @see ActionRenderOptions.defaultConfirm */
+  get defaultConfirm() {
+    return this.value.defaultConfirm;
+  }
+
+  /** @see ActionRenderOptions.defaultReject */
+  get defaultReject() {
+    return this.value.defaultReject;
+  }
+
+  /** @see ActionRenderOptions.passthroughAttrs */
+  get passthroughAttrs() {
+    return this.value.passthroughAttrs;
   }
 
   static closeAction(data?: Partial<IField<ActionBreakpointOptions>>) {

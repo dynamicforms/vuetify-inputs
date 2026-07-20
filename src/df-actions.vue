@@ -11,8 +11,15 @@
       v-for="(action, idx) in actionsWithBreakpoint"
       :key="idx"
       :variant="action.renderAs === ActionDisplayStyle.BUTTON ? 'tonal' : 'text'"
+      :color="defaultActionColor(action.action)"
+      :disabled="!action.action.enabled"
       :elevation="0"
       :size="buttonSize"
+      :class="{
+        'd-none': action.action.visibility === DisplayMode.HIDDEN,
+        invisible: action.action.visibility === DisplayMode.INVISIBLE,
+      }"
+      v-bind="action.action.passthroughAttrs"
       @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >
       <cached-icon v-if="action.icon" :name="action.icon" />
@@ -23,11 +30,12 @@
 </template>
 
 <script setup lang="ts">
+import { DisplayMode } from '@dynamicforms/vue-forms';
 import { computed, unref } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfActionsProps } from './dynamicforms-component-props';
-import { ActionDisplayStyle, useBreakpoint } from './helpers';
+import { Action, ActionDisplayStyle, useBreakpoint } from './helpers';
 
 const props = withDefaults(defineProps<DfActionsProps>(), {
   buttonSize: 'default',
@@ -35,13 +43,19 @@ const props = withDefaults(defineProps<DfActionsProps>(), {
 });
 
 const breakpoint = useBreakpoint();
-const actionsRef = computed(() => unref(props.actions));
+const actionsRef = computed(() => unref(props.actions).filter((action) => action.visibility !== DisplayMode.SUPPRESS));
 const actionsWithBreakpoint = computed(() =>
   actionsRef.value.map((action) => ({
     action,
     ...unref(action.getBreakpointValue(breakpoint)),
   })),
 );
+
+function defaultActionColor(action: Action): string | undefined {
+  if (action.defaultConfirm) return 'primary';
+  if (action.defaultReject) return 'secondary';
+  return undefined;
+}
 </script>
 
 <style>

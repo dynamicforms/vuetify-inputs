@@ -16,6 +16,7 @@ Here's a simple example of the `df-actions` component in action:
 - Automatic icon and label handling
 - Grouping options for button layouts
 - Integration with DynamicForms action system
+- `defaultConfirm` / `defaultReject` actions are automatically colored `primary` / `secondary`
 
 ## Props
 
@@ -37,6 +38,9 @@ interface ActionBreakpointOptions {
   renderAs?: ActionDisplayStyle;    // BUTTON or TEXT
   showIcon?: boolean;               // Whether to show the icon
   showLabel?: boolean;              // Whether to show the label
+  defaultConfirm?: boolean;         // Marks the action as the "confirm" one - colored primary by default
+  defaultReject?: boolean;          // Marks the action as the "reject/dismiss" one - colored secondary by default
+  passthroughAttrs?: Record<string, any>; // Extra props forwarded straight to the rendered <v-btn>
   // Responsive breakpoints
   xs?: Partial<ActionRenderOptions>;
   sm?: Partial<ActionRenderOptions>;
@@ -81,6 +85,16 @@ The `value` object defines the visual appearance and behavior:
 | `renderAs` | `ActionDisplayStyle` | How to render: `BUTTON` or `TEXT` |
 | `showIcon` | `boolean` | Whether to display the icon |
 | `showLabel` | `boolean` | Whether to display the label |
+| `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the button `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
+| `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the button `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
+| `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `loading`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>`, overriding `<df-actions>`'s own computed props |
+
+`enabled` and `visibility` aren't part of `ActionRenderOptions` - they're standard `FormAction`/`Field` properties from `@dynamicforms/vue-forms` (settable at the top level of `Action.create()`, or via `action.enabled` / `action.visibility` directly) - but `<df-actions>` reacts to them too:
+
+- `enabled: false` disables the button (`<v-btn disabled>`).
+- `visibility: DisplayMode.HIDDEN` keeps the button in the DOM with a `d-none` class.
+- `visibility: DisplayMode.INVISIBLE` keeps the button in the layout with an `invisible` class (`visibility: hidden`).
+- `visibility: DisplayMode.SUPPRESS` removes the button from the rendered list entirely.
 
 ### ActionDisplayStyle
 
@@ -168,6 +182,50 @@ const customCloseAction = Action.closeAction({
     label: 'Cancel',
     renderAs: ActionDisplayStyle.TEXT
   }
+});
+```
+
+### Default Confirm / Reject Actions
+
+`defaultConfirm` and `defaultReject` mark which action in a set represents "confirm" (e.g. Save, Yes, OK) versus
+"reject/dismiss" (e.g. Cancel, No). `<df-actions>` uses these flags to pick a sensible default button color -
+`primary` for `defaultConfirm`, `secondary` for `defaultReject` - so the important action in a set stands out
+without you having to set `color` by hand on every action:
+
+```typescript
+const yes = Action.yesAction({ value: { defaultConfirm: true } });   // colored primary
+const no = Action.noAction({ value: { defaultReject: true } });      // colored secondary
+
+// A single close action can be both, e.g. when there's only one way to close
+const close = Action.closeAction({ value: { defaultConfirm: true, defaultReject: true } });
+```
+
+At most one action in a given set should set `defaultConfirm`, and at most one should set `defaultReject`.
+
+> **Side note:** if you're using [`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:), its
+> [`<df-modal>`](:vuetify-modal-form-kit:/api/df-modal#keyboard-shortcuts) component also reads these same flags
+> off the actions passed to its `actions` prop, to decide which action Enter / Escape should trigger. Since
+> `<df-modal>`'s `actions` slot is normally rendered via `<df-actions>` too, the two concerns - keyboard shortcut
+> and default button color - line up for free.
+
+### Passthrough Attributes
+
+`passthroughAttrs` forwards arbitrary props straight to the rendered `<v-btn>`, taking precedence over
+`<df-actions>`'s own computed props (`variant`, `color`, `disabled`). Use it for anything `<v-btn>` supports that
+isn't already modeled by `ActionRenderOptions`:
+
+```typescript
+const deleteAction = Action.create({
+  value: {
+    name: 'delete',
+    label: 'Delete',
+    icon: 'trash-outline',
+    renderAs: ActionDisplayStyle.BUTTON,
+    showIcon: true,
+    showLabel: true,
+    passthroughAttrs: { color: 'error', variant: 'flat' },
+  },
+  actions: [deleteFormAction],
 });
 ```
 

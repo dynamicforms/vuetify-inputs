@@ -10,6 +10,7 @@ export default defineConfig({
     config: crosslinksConfig({
       projects: {
         'vue-forms': 'https://docs.velis.si/dynamicforms/vue-forms',
+        'vuetify-modal-form-kit': 'https://docs.velis.si/dynamicforms/vuetify-modal-form-kit',
       },
     }),
   },

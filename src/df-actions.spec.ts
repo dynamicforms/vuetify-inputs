@@ -1,5 +1,5 @@
 // df-actions.spec.ts
-import { ExecuteAction } from '@dynamicforms/vue-forms';
+import { DisplayMode, ExecuteAction } from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { vi } from 'vitest';
 import { Ref, ref } from 'vue';
@@ -268,5 +268,170 @@ describe('DfActions', () => {
     expect(wrapper.findAll('.v-btn')).toHaveLength(2);
     expect(wrapper.findAll('.v-btn')[0].text()).toContain('Save');
     expect(wrapper.findAll('.v-btn')[1].text()).toContain('Cancel');
+  });
+
+  describe('defaultConfirm / defaultReject color', () => {
+    it('obarva gumb primary, ko je defaultConfirm nastavljen', () => {
+      const action = createMockAction('save', 'Save');
+      action.value.defaultConfirm = true;
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('color')).toBe('primary');
+    });
+
+    it('obarva gumb secondary, ko je defaultReject nastavljen', () => {
+      const action = createMockAction('cancel', 'Cancel');
+      action.value.defaultReject = true;
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('color')).toBe('secondary');
+    });
+
+    it('defaultConfirm ima prednost pred defaultReject, če sta oba nastavljena', () => {
+      const action = createMockAction('close', 'Close');
+      action.value.defaultConfirm = true;
+      action.value.defaultReject = true;
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('color')).toBe('primary');
+    });
+
+    it('gumb je brez barve, ko ne defaultConfirm ne defaultReject nista nastavljena', () => {
+      const action = createMockAction('neutral', 'Neutral');
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('color')).toBeUndefined();
+    });
+  });
+
+  describe('enabled / disabled', () => {
+    it('gumb je onemogočen, ko je action.enabled false', () => {
+      const action = createMockAction('save', 'Save');
+      action.enabled = false;
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('disabled')).toBe(true);
+    });
+
+    it('gumb je omogočen, ko je action.enabled true (privzeto)', () => {
+      const action = createMockAction('save', 'Save');
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('disabled')).toBe(false);
+    });
+  });
+
+  describe('visibility', () => {
+    it('doda razred d-none, ko je visibility HIDDEN', () => {
+      const action = createMockAction('save', 'Save');
+      action.visibility = DisplayMode.HIDDEN;
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      expect(wrapper.find('.v-btn').classes()).toContain('d-none');
+    });
+
+    it('doda razred invisible, ko je visibility INVISIBLE', () => {
+      const action = createMockAction('save', 'Save');
+      action.visibility = DisplayMode.INVISIBLE;
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      expect(wrapper.find('.v-btn').classes()).toContain('invisible');
+    });
+
+    it('ne prikaže gumba, ko je visibility SUPPRESS', () => {
+      const shownAction = createMockAction('save', 'Save');
+      const suppressedAction = createMockAction('secret', 'Secret');
+      suppressedAction.visibility = DisplayMode.SUPPRESS;
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [shownAction, suppressedAction] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttons = wrapper.findAll('.v-btn');
+      expect(buttons).toHaveLength(1);
+      expect(buttons[0].text()).toContain('Save');
+    });
+
+    it('gumb nima dodatnih razredov, ko je visibility FULL (privzeto)', () => {
+      const action = createMockAction('save', 'Save');
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const button = wrapper.find('.v-btn');
+      expect(button.classes()).not.toContain('d-none');
+      expect(button.classes()).not.toContain('invisible');
+    });
+  });
+
+  describe('passthroughAttrs', () => {
+    it('posreduje dodatne atribute na v-btn', () => {
+      const action = createMockAction('save', 'Save');
+      action.value.passthroughAttrs = { block: true, rounded: 'lg' };
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('block')).toBe(true);
+      expect(buttonComponent.props('rounded')).toBe('lg');
+    });
+
+    it('passthroughAttrs.color prevlada nad izračunano barvo iz defaultConfirm', () => {
+      const action = createMockAction('save', 'Save');
+      action.value.defaultConfirm = true;
+      action.value.passthroughAttrs = { color: 'error' };
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('color')).toBe('error');
+    });
   });
 });

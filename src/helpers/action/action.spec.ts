@@ -76,6 +76,36 @@ describe('Action', () => {
     });
   });
 
+  describe('defaultConfirm / defaultReject / passthroughAttrs', () => {
+    it('exposes defaultConfirm and defaultReject from the value', () => {
+      const confirmAction = Action.create({ value: { label: 'Save', defaultConfirm: true } });
+      expect(confirmAction.defaultConfirm).toBe(true);
+      expect(confirmAction.defaultReject).toBeUndefined();
+
+      const rejectAction = Action.create({ value: { label: 'Cancel', defaultReject: true } });
+      expect(rejectAction.defaultReject).toBe(true);
+      expect(rejectAction.defaultConfirm).toBeUndefined();
+    });
+
+    it('leaves defaultConfirm/defaultReject undefined when not set', () => {
+      const action = Action.create({ value: { label: 'Neutral' } });
+      expect(action.defaultConfirm).toBeUndefined();
+      expect(action.defaultReject).toBeUndefined();
+    });
+
+    it('exposes passthroughAttrs from the value', () => {
+      const action = Action.create({
+        value: { label: 'Delete', passthroughAttrs: { color: 'error', loading: true } },
+      });
+      expect(action.passthroughAttrs).toEqual({ color: 'error', loading: true });
+    });
+
+    it('leaves passthroughAttrs undefined when not set', () => {
+      const action = Action.create({ value: { label: 'Neutral' } });
+      expect(action.passthroughAttrs).toBeUndefined();
+    });
+  });
+
   describe('Action template functions', () => {
     it('closeAction() should return an Action object with correct values', () => {
       const action = Action.closeAction();

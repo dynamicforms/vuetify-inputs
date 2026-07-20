@@ -75,6 +75,7 @@ const saveAction = Action.create({
     renderAs: ActionDisplayStyle.BUTTON,
     showIcon: true,
     showLabel: false,
+    defaultConfirm: true,
     md: { showLabel: true, showIcon: false }, // Medium screen and bigger, show label, but not icon
     lg: { showIcon: true } // Large screen and bigger, show label (carried over from md), and icon
   },
@@ -103,6 +104,7 @@ const cancelAction = Action.create({
     renderAs: ActionDisplayStyle.BUTTON,
     showIcon: true,
     showLabel: false,
+    defaultReject: true,
     md: { showLabel: true, showIcon: false }, // On small screens, only show icon
     lg: { showIcon: true } // Large screen and bigger, show label (carried over from md), and icon
   },
