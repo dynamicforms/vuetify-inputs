@@ -64,8 +64,8 @@ import { DfSelect, DfTextArea } from '@dynamicforms/vuetify-inputs';
 
 // Create a form with fields
 const form = new Group({
-  country: Field.create({ value: null }),
-  description: Field.create({ value: '' })
+  country: new Field({ value: null }),
+  description: new Field({ value: '' })
 });
 
 // Define countries for select

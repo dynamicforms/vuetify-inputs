@@ -77,7 +77,7 @@ const localeInfos = [
   '中文区域设置: 周从周一开始，yyyy年M月d日格式'
 ];
 
-const dateTimeField = Field.create({
+const dateTimeField = new Field({
   value: new Date().toISOString(),
   validators: [new Validators.Required()],
 });

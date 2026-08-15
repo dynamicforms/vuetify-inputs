@@ -91,9 +91,9 @@ import { DfSelect, DfTextArea, DfFile } from '@dynamicforms/vuetify-inputs';
 
 // Create a form with fields
 const form = new Group({
-  country: Field.create({ value: null }),
-  description: Field.create({ value: '' }),
-  document: Field.create({ value: null })
+  country: new Field({ value: null }),
+  description: new Field({ value: '' }),
+  document: new Field({ value: null })
 });
 
 // Define options for the select field
@@ -132,6 +132,7 @@ Detailed documentation is available at [https://docs.velis.si/dynamicforms/vueti
 - **df-date-time**: A date and time selection component with configurable format and type.
 - **df-file**: A file upload component with progress indication
 - **df-input**: A general value input.
+- **df-input-hint**: Renders a field's or a group's errors, falling back to its hint text.
 - **df-rtf-editor**: A RTF editor input.
 - **df-select**: A selection component supporting static or dynamic options, multiple selection, and tagging
 - **df-text-area**: A textarea component with configurable rows and validation

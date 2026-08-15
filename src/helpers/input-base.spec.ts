@@ -48,7 +48,7 @@ describe('input-base', () => {
 
     describe('value computed property', () => {
       it('reads and writes from control.value when control is provided', async () => {
-        const control = Form.Field.create<string>({ value: 'initial' });
+        const control = new Form.Field<string>({ value: 'initial' });
         const props: BaseProps<string> = { control };
         const emit = vi.fn();
 
@@ -115,7 +115,7 @@ describe('input-base', () => {
       });
 
       it('does not throw error if control is a FieldBase instance', () => {
-        const validControl = Form.Field.create({ value: 'test' });
+        const validControl = new Form.Field({ value: 'test' });
         const props: BaseProps = { control: validControl };
         const emit = vi.fn();
 
@@ -125,7 +125,7 @@ describe('input-base', () => {
 
     describe('touched', () => {
       it('binds to control.touched when control is provided', async () => {
-        const control = Form.Field.create({ value: 'test' });
+        const control = new Form.Field({ value: 'test' });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -161,7 +161,7 @@ describe('input-base', () => {
 
     describe('valid', () => {
       it('returns control.valid when control is provided', () => {
-        const control = Form.Field.create({ value: 'test' });
+        const control = new Form.Field({ value: 'test' });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -182,7 +182,7 @@ describe('input-base', () => {
 
     describe('errors', () => {
       it('returns control.errors when control is provided', () => {
-        const control = Form.Field.create({ value: '' });
+        const control = new Form.Field({ value: '' });
         control.errors = [new ValidationErrorRenderContent('Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
@@ -214,7 +214,7 @@ describe('input-base', () => {
       });
 
       it('showErrors returns errors only when touched', async () => {
-        const control = Form.Field.create({ value: '' });
+        const control = new Form.Field({ value: '' });
         control.errors = [new ValidationErrorRenderContent('Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
@@ -230,7 +230,7 @@ describe('input-base', () => {
       });
 
       it('anyErrors returns space when touched and has errors', async () => {
-        const control = Form.Field.create({ value: '' });
+        const control = new Form.Field({ value: '' });
         control.errors = [new ValidationErrorRenderContent('Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
@@ -248,7 +248,7 @@ describe('input-base', () => {
 
     describe('enabled', () => {
       it('returns control.enabled when control is provided', () => {
-        const control = Form.Field.create({ value: 'test', enabled: false });
+        const control = new Form.Field({ value: 'test', enabled: false });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -271,7 +271,7 @@ describe('input-base', () => {
 
     describe('visibility', () => {
       it('returns control.visibility when control is provided', () => {
-        const control = Form.Field.create({ value: 'test', visibility: Form.DisplayMode.HIDDEN });
+        const control = new Form.Field({ value: 'test', visibility: Form.DisplayMode.HIDDEN });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -475,7 +475,9 @@ describe('input-base', () => {
 
     describe('vuetifyBindings', () => {
       it('maps all properties correctly', () => {
-        const control = Form.Field.create({ value: 'test', fieldName: 'testField' });
+        // fieldName is installed by the containing Group, so a standalone field receives it by assignment
+        const control = new Form.Field({ value: 'test' });
+        control.fieldName = 'testField';
         const props: BaseProps = {
           control,
           label: 'Test Label',

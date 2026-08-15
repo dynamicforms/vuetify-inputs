@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-08-15
+
+### Removed
+
+- `Action.create()`. Actions are constructed with `new Action(...)`, matching @dynamicforms/vue-forms 0.6.0, which
+  removed `Field.create()` and `Action.create()`. `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()`
+  are unaffected.
+
+### Changed
+
+- The `control` prop is typed `FieldBase<T>`. vue-forms removed the `IField` interface the prop was typed with; the
+  runtime guard has always been `instanceof FieldBase`.
+- The `@dynamicforms/vue-forms` peer dependency is `^0.6.0`.
+
+### Added
+
+- Documentation for group-level validation errors and conditional group visibility, which @dynamicforms/vue-forms 0.6.0
+  made observable by constructing `Group` and `List` as Vue reactive objects.
+- A migration guide at `/guide/migration`.
+
 ## [0.7.0] - 2026-01-28
 
 ### Added

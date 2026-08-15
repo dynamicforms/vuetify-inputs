@@ -75,7 +75,7 @@ const inputTypes = [
 const selectedType = ref<'text' | 'password' | 'email' | 'url' | 'number'>('text');
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-const inputField = Field.create<string>({ value: '' });
+const inputField = new Field<string>({ value: '' });
 inputField.registerAction(new Validators.LengthInRange(3, 50));
 
 watch(selectedType, (newType) => {

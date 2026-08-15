@@ -141,7 +141,7 @@ const fruits = [
 </template>
 
 <script setup>
-import { Group, Field } from '@dynamicforms/vue-forms';
+import { Group, Field, ValidationErrorText, Validator } from '@dynamicforms/vue-forms';
 import { DfSelect } from '@dynamicforms/vuetify-inputs';
 
 const categories = [
@@ -151,15 +151,13 @@ const categories = [
 ];
 
 const form = new Group({
-  categories: Field.create({
+  categories: new Field({
     value: [1],
     validators: [
-      {
-        validate: (value) => {
-          if (!value || value.length === 0) return 'Select at least one category';
-          return null;
-        }
-      }
+      new Validator((value) => {
+        if (!value || value.length === 0) return [new ValidationErrorText('Select at least one category')];
+        return null;
+      })
     ]
   })
 });

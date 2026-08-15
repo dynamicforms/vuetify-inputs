@@ -9,7 +9,7 @@ All input components inherit the following properties:
 
 | Property         | Type                  | Default             | Description                                                                                 |
 |------------------|-----------------------|---------------------|---------------------------------------------------------------------------------------------|
-| control          | `Field`               | `undefined`         | [vue-forms](:vue-forms:) field object for state management integration                      |
+| control          | `FieldBase`           | `undefined`         | [vue-forms](:vue-forms:) field object for state management integration                      |
 | modelValue       | `any`                 | component dependent | The field value (v-model) when used without control                                         |
 | label            | `string \| Label \| MdString` | `''`        | Input field label. supports icons by creating a Label class (see below)                     |
 | hint             | `string`              | `''`                | Hint text displayed below the input field                                                   |
@@ -102,7 +102,7 @@ import { Group, Field } from '@dynamicforms/vue-forms';
 import { DfInput } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
-  name: Field.create({ value: '' })
+  name: new Field({ value: '' })
 });
 </script>
 ```

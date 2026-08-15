@@ -84,7 +84,7 @@ import { Group, Field } from '@dynamicforms/vue-forms';
 import { DfCheckbox } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
-  isVerified: Field.create({ value: null })
+  isVerified: new Field({ value: null })
 });
 </script>
 ```

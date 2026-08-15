@@ -14,7 +14,7 @@ describe('Action', () => {
         showLabel: true,
         showIcon: true,
       };
-      const action: Action = Action.create({ value: actionData });
+      const action: Action = new Action({ value: actionData });
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('Test action');
       expect(action.icon).toBe('test-icon');
@@ -24,7 +24,7 @@ describe('Action', () => {
     });
 
     it('handles showLabel/showIcon logic correctly', () => {
-      const actionWithEmptyLabel = Action.create({
+      const actionWithEmptyLabel = new Action({
         value: {
           label: '',
           icon: 'test-icon',
@@ -35,7 +35,7 @@ describe('Action', () => {
       expect(actionWithEmptyLabel.showLabel).toBe(false); // empty label means showLabel is false
       expect(actionWithEmptyLabel.showIcon).toBe(true);
 
-      const actionWithEmptyIcon = Action.create({
+      const actionWithEmptyIcon = new Action({
         value: {
           label: 'Test',
           icon: '',
@@ -60,7 +60,7 @@ describe('Action', () => {
         md: { showLabel: true, showIcon: false },
         xl: { renderAs: ActionDisplayStyle.TEXT },
       };
-      const action = Action.create({ value: actionData });
+      const action = new Action({ value: actionData });
 
       const breakpointValue = action.getBreakpointValue(breakpoint);
 
@@ -78,30 +78,30 @@ describe('Action', () => {
 
   describe('defaultConfirm / defaultReject / passthroughAttrs', () => {
     it('exposes defaultConfirm and defaultReject from the value', () => {
-      const confirmAction = Action.create({ value: { label: 'Save', defaultConfirm: true } });
+      const confirmAction = new Action({ value: { label: 'Save', defaultConfirm: true } });
       expect(confirmAction.defaultConfirm).toBe(true);
       expect(confirmAction.defaultReject).toBeUndefined();
 
-      const rejectAction = Action.create({ value: { label: 'Cancel', defaultReject: true } });
+      const rejectAction = new Action({ value: { label: 'Cancel', defaultReject: true } });
       expect(rejectAction.defaultReject).toBe(true);
       expect(rejectAction.defaultConfirm).toBeUndefined();
     });
 
     it('leaves defaultConfirm/defaultReject undefined when not set', () => {
-      const action = Action.create({ value: { label: 'Neutral' } });
+      const action = new Action({ value: { label: 'Neutral' } });
       expect(action.defaultConfirm).toBeUndefined();
       expect(action.defaultReject).toBeUndefined();
     });
 
     it('exposes passthroughAttrs from the value', () => {
-      const action = Action.create({
+      const action = new Action({
         value: { label: 'Delete', passthroughAttrs: { color: 'error', loading: true } },
       });
       expect(action.passthroughAttrs).toEqual({ color: 'error', loading: true });
     });
 
     it('leaves passthroughAttrs undefined when not set', () => {
-      const action = Action.create({ value: { label: 'Neutral' } });
+      const action = new Action({ value: { label: 'Neutral' } });
       expect(action.passthroughAttrs).toBeUndefined();
     });
   });

@@ -97,8 +97,8 @@ import { DfInput } from '../../src';
 
 const allowNull = ref(false);
 
-const quantityField = Field.create({ value: 1 });
-const priceField = Field.create({ value: 10.99 });
+const quantityField = new Field({ value: 1 });
+const priceField = new Field({ value: 10.99 });
 
 function increaseQuantity() {
   if (quantityField.value === null) {

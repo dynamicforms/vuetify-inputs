@@ -74,16 +74,16 @@ import { Field, Validators } from '@dynamicforms/vue-forms';
 import { DfDateTime, Label } from '../../src';
 import DatetimeMultilingual from './datetime-multilingual.vue';
 
-const dateTimeField = Field.create({
+const dateTimeField = new Field({
   value: null,
   validators: [new Validators.Required()],
 });
 
-const dateField = Field.create({
+const dateField = new Field({
   value: new Date().toISOString().split('T')[0]
 });
 
-const timeField = Field.create({
+const timeField = new Field({
   value: new Date().toISOString().split('T')[1].split('.')[0]
 });
 

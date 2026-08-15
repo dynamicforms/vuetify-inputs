@@ -81,7 +81,7 @@
     <v-card>
       <v-card-title>Form Output</v-card-title>
       <v-card-text>
-        <pre class="output">{{ formOutput }}</pre>
+        <pre class="output">{{ personForm.value }}</pre>
       </v-card-text>
     </v-card>
   </div>
@@ -94,15 +94,13 @@ import { getAllCountries } from 'countries-and-timezones';
 
 // Create a form group with fields
 const personForm = new Group({
-  firstName: Field.create({ value: 'John' }),
-  lastName: Field.create({ value: 'Doe' }),
-  age: Field.create({ value: 30 }),
-  active: Field.create({ value: true }),
-  country: Field.create({ value: 'si', validators: [new Validators.Required()] }),
+  firstName: new Field({ value: 'John' }),
+  lastName: new Field({ value: 'Doe' }),
+  age: new Field({ value: 30 }),
+  active: new Field({ value: true }),
+  country: new Field({ value: 'si', validators: [new Validators.Required()] }),
 });
 
-// Create a reactive reference for form output
-const formOutput = personForm.reactiveValue;
 const countries = Object.values(getAllCountries()).map(
   (country) => ({ id: country.id.toLowerCase(), text: country.name }),
 );
@@ -114,7 +112,7 @@ const toggleField = (fieldName) => {
   }
 };
 
-// Register a value changed action to update form output display
+// A value changed action on the group fires for a change in any of its fields
 personForm.registerAction(new ValueChangedAction(async (field, supr, newValue, oldValue) => {
   return supr(field, newValue, oldValue);
 }));

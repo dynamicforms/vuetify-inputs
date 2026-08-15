@@ -152,7 +152,7 @@ import { Group, Field } from '@dynamicforms/vue-forms';
 import { DfFile } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
-  document: Field.create({ value: null })
+  document: new Field({ value: null })
 });
 
 // Implementation of FileComms (same as above)

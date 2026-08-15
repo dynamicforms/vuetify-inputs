@@ -1,4 +1,4 @@
-import { Action as FormAction, IField, IFieldConstructorParams } from '@dynamicforms/vue-forms';
+import { Action as FormAction, IFieldConstructorParams } from '@dynamicforms/vue-forms';
 import { isEmpty, isString } from 'lodash-es';
 import { computed, Ref } from 'vue';
 
@@ -8,14 +8,7 @@ import { ActionDisplayStyle } from './action-display-style';
 import { ActionBreakpointOptions, ActionRenderOptions, ResponsiveActionRenderOptions } from './action-render-options';
 import { BreakpointNames } from './responsive-render-options';
 
-// @ts-expect-error: prevent TS from complaining how create method is not ok because its declaration differs from Fld's
 class Action extends FormAction<ActionBreakpointOptions> {
-  static create<T extends ActionBreakpointOptions = ActionBreakpointOptions>(
-    params?: Partial<IFieldConstructorParams<T>>,
-  ): Action {
-    return super.create<T>(params) as any as Action;
-  }
-
   getBreakpointValue(breakpoint: Ref<BreakpointNames>) {
     return computed(() => {
       const responsiveValue = new ResponsiveActionRenderOptions(this.value);
@@ -76,8 +69,8 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return this.value.passthroughAttrs;
   }
 
-  static closeAction(data?: Partial<IField<ActionBreakpointOptions>>) {
-    const init: Partial<IField<ActionBreakpointOptions>> = {
+  static closeAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
+    const init: Partial<IFieldConstructorParams<ActionBreakpointOptions>> = {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'close',
@@ -89,11 +82,11 @@ class Action extends FormAction<ActionBreakpointOptions> {
       },
     };
     init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
-    return Action.create(init);
+    return new Action(init);
   }
 
-  static yesAction(data?: Partial<IField<ActionBreakpointOptions>>) {
-    const init: Partial<IField<ActionBreakpointOptions>> = {
+  static yesAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
+    const init: Partial<IFieldConstructorParams<ActionBreakpointOptions>> = {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'yes',
@@ -105,11 +98,11 @@ class Action extends FormAction<ActionBreakpointOptions> {
       },
     };
     init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
-    return Action.create(init);
+    return new Action(init);
   }
 
-  static noAction(data?: Partial<IField<ActionBreakpointOptions>>) {
-    const init: Partial<IField<ActionBreakpointOptions>> = {
+  static noAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
+    const init: Partial<IFieldConstructorParams<ActionBreakpointOptions>> = {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'no',
@@ -121,7 +114,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       },
     };
     init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
-    return Action.create(init);
+    return new Action(init);
   }
 }
 

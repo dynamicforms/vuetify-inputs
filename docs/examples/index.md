@@ -65,3 +65,7 @@ Examples of integrating Vuetify input fields with the `@dynamicforms/vue-forms` 
 ### [Validation](./validators)
 
 Various ways to validate input fields.
+
+### [Groups](./groups)
+
+Validation errors that belong to a whole section, and conditions that show or hide one.

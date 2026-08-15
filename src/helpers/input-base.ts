@@ -17,7 +17,7 @@ export type VuetifyDensity = 'default' | 'comfortable' | 'compact';
 export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
 
 export interface BaseProps<T = any> {
-  control?: Form.IField<T>;
+  control?: Form.FieldBase<T>;
   modelValue?: T;
   label?: string | Label | MdString;
   errors?: string[];

@@ -106,7 +106,7 @@ import { Group, Field } from '@dynamicforms/vue-forms';
 import { DfInput } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
-  quantity: Field.create({ value: 1 }),
+  quantity: new Field({ value: 1 }),
 });
 </script>
 ```
