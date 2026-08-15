@@ -82,7 +82,7 @@ The peer dependency range is now `^0.6.0`. Install it together with this release
 
 Your own use of the peer library migrates at the same time — `Field.create()`, `reactiveValue` and `IField` are all
 removed there. That migration is described in
-[the vue-forms migration guide](https://docs.velis.si/dynamicforms/vue-forms/guide/migration.html); follow it for
+[the vue-forms migration guide](:vue-forms:/guide/migration.html); follow it for
 everything that is not on this page.
 
 ### What newly works
@@ -114,7 +114,7 @@ only affects what you render off the group itself. This library adds no cascade 
    `Action.closeAction()`, `Action.yesAction()` or `Action.noAction()`.
 5. Rename `DFInputHint` → `DfInputHint` in imports.
 6. Work through the
-   [vue-forms migration guide](https://docs.velis.si/dynamicforms/vue-forms/guide/migration.html) for your own use of
+   [vue-forms migration guide](:vue-forms:/guide/migration.html) for your own use of
    that library — `Field.create()` and `reactiveValue` in particular.
 7. Remove reactivity workarounds around groups and lists: a manual `ref` bumped after every mutation, a forced
    `key`, an explicit `triggerRef`, a `computed` re-reading `JSON.stringify(group.value)`.

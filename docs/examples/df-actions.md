@@ -203,7 +203,7 @@ const close = Action.closeAction({ value: { defaultConfirm: true, defaultReject:
 At most one action in a given set should set `defaultConfirm`, and at most one should set `defaultReject`.
 
 > **Side note:** if you're using [`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:), its
-> [`<df-modal>`](:vuetify-modal-form-kit:/api/df-modal#keyboard-shortcuts) component also reads these same flags
+> [`<df-modal>`](:vuetify-modal-form-kit:/api/df-modal.html#keyboard-shortcuts) component also reads these same flags
 > off the actions passed to its `actions` prop, to decide which action Enter / Escape should trigger. Since
 > `<df-modal>`'s `actions` slot is normally rendered via `<df-actions>` too, the two concerns - keyboard shortcut
 > and default button color - line up for free.
