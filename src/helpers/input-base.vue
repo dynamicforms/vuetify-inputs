@@ -1,19 +1,13 @@
 <template>
   <v-input
-    v-if="visibility !== DisplayMode.SUPPRESS"
+    v-if="isRendered"
     :name="vuetifyBindings.name"
     :density="vuetifyBindings.density"
     :hint="vuetifyBindings.hint"
     :persistent-hint="vuetifyBindings.persistentHint"
     :hide-details="vuetifyBindings.hideDetails"
     :error-messages="vuetifyBindings.errorMessages"
-    :class="[
-      cssClass,
-      {
-        'd-none': visibility === DisplayMode.HIDDEN,
-        invisible: visibility === DisplayMode.INVISIBLE,
-      },
-    ]"
+    :class="[cssClass, visibilityClass]"
   >
     <v-field
       :variant="vuetifyBindings.variant"
@@ -45,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import { DisplayMode } from '@dynamicforms/vue-forms';
 import { computed, ref, unref } from 'vue';
 
 import DfInputHint from './df-input-hint.vue';
@@ -55,7 +48,7 @@ import { BaseEmits, BaseProps, useInputBase } from './input-base';
 const props = defineProps<BaseProps & { loading?: boolean }>();
 const emits = defineEmits<BaseEmits & { (e: 'blur'): void }>();
 
-const { label, showErrors, touched, value, visibility, vuetifyBindings } = useInputBase(props, emits);
+const { isRendered, label, showErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 
 const isClearable = computed(() => !!(unref(props.clearable) && unref(value)));
 const focused = ref<boolean>(false);

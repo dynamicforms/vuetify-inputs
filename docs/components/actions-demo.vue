@@ -67,7 +67,7 @@ const mockFormAction = new ExecuteAction((action, supr, params) => {
 });
 
 // Create actions
-const saveAction = Action.create({
+const saveAction = new Action({
   value: {
     name: 'save',
     label: 'Save',
@@ -82,7 +82,7 @@ const saveAction = Action.create({
   actions: [mockFormAction],
 });
 
-const deleteAction = Action.create({
+const deleteAction = new Action({
   value: {
     name: 'delete',
     label: 'Delete',
@@ -96,7 +96,7 @@ const deleteAction = Action.create({
   actions: [mockFormAction],
 });
 
-const cancelAction = Action.create({
+const cancelAction = new Action({
   value: {
     name: 'cancel',
     label: 'Cancel',

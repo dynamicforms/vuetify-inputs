@@ -80,7 +80,7 @@
         >
           Form is {{ formValid ? 'valid' : 'invalid' }}
         </v-alert>
-        <pre class="output">{{ JSON.stringify(formOutput, null, 2) }}</pre>
+        <pre class="output">{{ JSON.stringify(validatedForm.value, null, 2) }}</pre>
       </v-card-text>
     </v-card>
   </div>
@@ -94,13 +94,13 @@ import { DfInput, DfSelect, DfTextArea } from '../../src'
 // Create a form group with validated fields
 const validatedForm = new Group({
   // Required field - cannot be empty
-  username: Field.create({
+  username: new Field({
     value: '',
     validators: [new Validators.Required()]
   }),
 
   // Email field with pattern validation
-  email: Field.create({
+  email: new Field({
     value: '',
     validators: [
       new Validators.Pattern(
@@ -111,29 +111,26 @@ const validatedForm = new Group({
   }),
 
   // Number field with range validation
-  age: Field.create({
+  age: new Field({
     value: null,
     validators: [new Validators.ValueInRange(18, 100)]
   }),
 
   // Field with allowed values validation
-  role: Field.create({
+  role: new Field({
     value: '',
     validators: [new Validators.InAllowedValues(['admin', 'user', 'guest'])]
   }),
 
   // Text field with length validation
-  bio: Field.create({
+  bio: new Field({
     value: '',
     validators: [new Validators.LengthInRange(10, 200)]
   })
 });
 
-// Create a reactive reference for form output and validation status
-const formOutput = validatedForm.reactiveValue;
-const formValid = computed(() => {
-  return Object.values(validatedForm.fields).every(field => field.valid);
-});
+// group.valid covers the group's own errors and those of every field it holds
+const formValid = computed(() => validatedForm.valid);
 
 // Function to reset the form
 function resetForm() {
@@ -144,7 +141,7 @@ function resetForm() {
   validatedForm.fields.bio.value = '';
 }
 
-// Register a value changed action to update form output display
+// A value changed action on the group fires for a change in any of its fields
 validatedForm.registerAction(new ValueChangedAction(async (field, supr, newValue, oldValue) => {
   console.log('Form value has changed');
   return supr(field, newValue, oldValue);

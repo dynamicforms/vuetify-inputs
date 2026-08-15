@@ -1,7 +1,8 @@
 <template>
   <v-text-field
+    v-if="isRendered"
     v-model="value"
-    :class="densityClass"
+    :class="[densityClass, visibilityClass]"
     :clearable="allowNull"
     type="text"
     :rules="rules"
@@ -36,7 +37,10 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
-const { densityClass, label, showErrors, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, isRendered, label, showErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
+  props,
+  emits,
+);
 const dropdownShown = ref(false);
 
 const rules = computed<((val: string) => boolean | string)[]>(() => [

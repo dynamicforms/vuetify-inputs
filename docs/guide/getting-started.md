@@ -75,8 +75,8 @@ import { DfTextArea, DfSelect } from '@dynamicforms/vuetify-inputs';
 
 // Create a form group with fields
 const form = new Group({
-  description: Field.create({ value: '' }),
-  category: Field.create({ value: null }),
+  description: new Field({ value: '' }),
+  category: new Field({ value: null }),
 });
 
 // Define options for the select field
@@ -129,6 +129,7 @@ const categoryOptions = [
 - [**df-date-time**](/examples/df-datetime): A date and time selection component with configurable format and type.
 - [**df-file**](/examples/df-file): A file upload component with progress indication.
 - [**df-input**](/examples/df-input): A general value input.
+- **df-input-hint**: Renders a field's or a group's errors, falling back to its hint text.
 - [**df-rtf-editor**](/examples/df-rtf-editor): A RTF editor input.
 - [**df-select**](/examples/df-select): A selection component supporting static or dynamic options, multiple selection,
   and tagging.

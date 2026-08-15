@@ -18,7 +18,7 @@ describe('DfActions', () => {
 
   const createMockAction = (name: string, label: string, icon?: string): Action => {
     const executeAction = new ExecuteAction(vi.fn());
-    return Action.create({
+    return new Action({
       value: {
         name,
         label,

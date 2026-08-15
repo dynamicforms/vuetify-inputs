@@ -90,7 +90,7 @@ import { DfTextArea } from '@dynamicforms/vuetify-inputs';
 import { Validators } from '@dynamicforms/vue-forms';
 
 const form = new Group({
-  notes: Field.create({ 
+  notes: new Field({ 
     value: '',
     validators: [new Validators.LengthInRange(minLength, maxLength)]
   })

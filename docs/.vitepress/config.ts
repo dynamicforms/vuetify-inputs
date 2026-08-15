@@ -35,6 +35,12 @@ export default defineConfig({
             { text: 'Using without DynamicForms', link: '/guide/getting-started#using-without-dynamicforms' },
             { text: 'Available Components', link: '/guide/getting-started#available-components' },
           ]
+        },
+        {
+          text: 'Migration',
+          items: [
+            { text: 'Migration guide', link: '/guide/migration' },
+          ]
         }
       ],
       '/examples/': [
@@ -43,6 +49,7 @@ export default defineConfig({
           items: [
             { text: 'input base', link: '/examples/input-base' },
             { text: 'validation', link: '/examples/validators' },
+            { text: 'groups', link: '/examples/groups' },
             { text: 'density', link: '/examples/density' },
             { text: 'df-actions', link: '/examples/df-actions' },
             { text: 'df-checkbox', link: '/examples/df-checkbox' },

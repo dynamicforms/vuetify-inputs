@@ -31,7 +31,7 @@
 import { Field } from '@dynamicforms/vue-forms';
 import { DfRtfEditor } from '../../src';
 
-const contentField = Field.create({
+const contentField = new Field({
   value: '<h2>Welcome to RTF Editor</h2><p>This is a <strong>rich text editor</strong> component that uses ' +
     '<a href="https://ckeditor.com/">CKEditor</a> as its foundation.</p><p>You can:</p><ul><li>Format text with ' +
     '<strong>bold</strong>, <em>italic</em>, and other styles</li><li>Insert links, images, and media</li>' +

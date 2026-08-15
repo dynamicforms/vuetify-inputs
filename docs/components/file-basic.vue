@@ -42,7 +42,7 @@ import { CachedIcon } from 'vue-cached-icon';
 
 import { DfFile } from '../../src';
 
-const fileField = Field.create({
+const fileField = new Field({
   value: null
 });
 

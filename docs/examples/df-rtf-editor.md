@@ -126,20 +126,18 @@ const content = ref('<h2>Welcome</h2><p>This is a <strong>rich text editor</stro
 </template>
 
 <script setup>
-import { Group, Field } from '@dynamicforms/vue-forms';
+import { Group, Field, ValidationErrorText, Validator } from '@dynamicforms/vue-forms';
 import { DfRtfEditor } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
-  description: Field.create({
+  description: new Field({
     value: '<p>Enter a detailed product description here.</p>',
     validators: [
-      {
-        validate: (value) => {
-          if (!value || value === '<p></p>') return 'Description is required';
-          if (value.length < 20) return 'Description is too short';
-          return null;
-        }
-      }
+      new Validator((value) => {
+        if (!value || value === '<p></p>') return [new ValidationErrorText('Description is required')];
+        if (value.length < 20) return [new ValidationErrorText('Description is too short')];
+        return null;
+      })
     ]
   })
 });

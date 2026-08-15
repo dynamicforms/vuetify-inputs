@@ -48,7 +48,7 @@ describe('input-base', () => {
 
     describe('value computed property', () => {
       it('reads and writes from control.value when control is provided', async () => {
-        const control = Form.Field.create<string>({ value: 'initial' });
+        const control = new Form.Field<string>({ value: 'initial' });
         const props: BaseProps<string> = { control };
         const emit = vi.fn();
 
@@ -115,7 +115,7 @@ describe('input-base', () => {
       });
 
       it('does not throw error if control is a FieldBase instance', () => {
-        const validControl = Form.Field.create({ value: 'test' });
+        const validControl = new Form.Field({ value: 'test' });
         const props: BaseProps = { control: validControl };
         const emit = vi.fn();
 
@@ -125,7 +125,7 @@ describe('input-base', () => {
 
     describe('touched', () => {
       it('binds to control.touched when control is provided', async () => {
-        const control = Form.Field.create({ value: 'test' });
+        const control = new Form.Field({ value: 'test' });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -161,7 +161,7 @@ describe('input-base', () => {
 
     describe('valid', () => {
       it('returns control.valid when control is provided', () => {
-        const control = Form.Field.create({ value: 'test' });
+        const control = new Form.Field({ value: 'test' });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -182,7 +182,7 @@ describe('input-base', () => {
 
     describe('errors', () => {
       it('returns control.errors when control is provided', () => {
-        const control = Form.Field.create({ value: '' });
+        const control = new Form.Field({ value: '' });
         control.errors = [new ValidationErrorRenderContent('Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
@@ -214,7 +214,7 @@ describe('input-base', () => {
       });
 
       it('showErrors returns errors only when touched', async () => {
-        const control = Form.Field.create({ value: '' });
+        const control = new Form.Field({ value: '' });
         control.errors = [new ValidationErrorRenderContent('Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
@@ -230,7 +230,7 @@ describe('input-base', () => {
       });
 
       it('anyErrors returns space when touched and has errors', async () => {
-        const control = Form.Field.create({ value: '' });
+        const control = new Form.Field({ value: '' });
         control.errors = [new ValidationErrorRenderContent('Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
@@ -248,7 +248,7 @@ describe('input-base', () => {
 
     describe('enabled', () => {
       it('returns control.enabled when control is provided', () => {
-        const control = Form.Field.create({ value: 'test', enabled: false });
+        const control = new Form.Field({ value: 'test', enabled: false });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -270,8 +270,13 @@ describe('input-base', () => {
     });
 
     describe('visibility', () => {
+      const fromProp = (visibility: Form.DisplayMode): BaseProps => ({ visibility });
+      const fromControl = (visibility: Form.DisplayMode): BaseProps => ({
+        control: new Form.Field({ value: 'test', visibility }),
+      });
+
       it('returns control.visibility when control is provided', () => {
-        const control = Form.Field.create({ value: 'test', visibility: Form.DisplayMode.HIDDEN });
+        const control = new Form.Field({ value: 'test', visibility: Form.DisplayMode.HIDDEN });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -296,6 +301,126 @@ describe('input-base', () => {
         const { visibility } = useInputBase(props, emit);
 
         expect(visibility.value).toBe(Form.DisplayMode.FULL);
+      });
+
+      it('control.visibility takes precedence over the visibility prop', () => {
+        const control = new Form.Field({ value: 'test', visibility: Form.DisplayMode.SUPPRESS });
+        const props: BaseProps = { control, visibility: Form.DisplayMode.FULL };
+        const emit = vi.fn();
+
+        const result = useInputBase(props, emit);
+
+        expect(result.visibility.value).toBe(Form.DisplayMode.SUPPRESS);
+        expect(result.isRendered.value).toBe(false);
+      });
+
+      it('isRendered is false only for SUPPRESS when driven by control', () => {
+        const emit = vi.fn();
+
+        expect(useInputBase(fromControl(Form.DisplayMode.FULL), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromControl(Form.DisplayMode.HIDDEN), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromControl(Form.DisplayMode.INVISIBLE), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromControl(Form.DisplayMode.SUPPRESS), emit).isRendered.value).toBe(false);
+      });
+
+      it('isRendered is false only for SUPPRESS when driven by the visibility prop', () => {
+        const emit = vi.fn();
+
+        expect(useInputBase(fromProp(Form.DisplayMode.FULL), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromProp(Form.DisplayMode.HIDDEN), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromProp(Form.DisplayMode.INVISIBLE), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromProp(Form.DisplayMode.SUPPRESS), emit).isRendered.value).toBe(false);
+      });
+
+      it('isRendered is true when no control and no visibility prop', () => {
+        const props: BaseProps = {};
+        const emit = vi.fn();
+
+        const { isRendered } = useInputBase(props, emit);
+
+        expect(isRendered.value).toBe(true);
+      });
+
+      it('visibilityClass sets d-none for HIDDEN and invisible for INVISIBLE when driven by control', () => {
+        const emit = vi.fn();
+
+        expect(useInputBase(fromControl(Form.DisplayMode.FULL), emit).visibilityClass.value).toEqual({
+          'd-none': false,
+          invisible: false,
+        });
+        expect(useInputBase(fromControl(Form.DisplayMode.HIDDEN), emit).visibilityClass.value).toEqual({
+          'd-none': true,
+          invisible: false,
+        });
+        expect(useInputBase(fromControl(Form.DisplayMode.INVISIBLE), emit).visibilityClass.value).toEqual({
+          'd-none': false,
+          invisible: true,
+        });
+        expect(useInputBase(fromControl(Form.DisplayMode.SUPPRESS), emit).visibilityClass.value).toEqual({
+          'd-none': false,
+          invisible: false,
+        });
+      });
+
+      it('visibilityClass sets d-none for HIDDEN and invisible for INVISIBLE from the prop', () => {
+        const emit = vi.fn();
+
+        expect(useInputBase(fromProp(Form.DisplayMode.FULL), emit).visibilityClass.value).toEqual({
+          'd-none': false,
+          invisible: false,
+        });
+        expect(useInputBase(fromProp(Form.DisplayMode.HIDDEN), emit).visibilityClass.value).toEqual({
+          'd-none': true,
+          invisible: false,
+        });
+        expect(useInputBase(fromProp(Form.DisplayMode.INVISIBLE), emit).visibilityClass.value).toEqual({
+          'd-none': false,
+          invisible: true,
+        });
+        expect(useInputBase(fromProp(Form.DisplayMode.SUPPRESS), emit).visibilityClass.value).toEqual({
+          'd-none': false,
+          invisible: false,
+        });
+      });
+
+      it('visibilityClass follows the control rather than the visibility prop', () => {
+        const control = new Form.Field({ value: 'test', visibility: Form.DisplayMode.HIDDEN });
+        const props: BaseProps = { control, visibility: Form.DisplayMode.INVISIBLE };
+        const emit = vi.fn();
+
+        const { visibilityClass } = useInputBase(props, emit);
+
+        expect(visibilityClass.value).toEqual({ 'd-none': true, invisible: false });
+      });
+
+      it('visibilityClass sets no class when no control and no visibility prop', () => {
+        const props: BaseProps = {};
+        const emit = vi.fn();
+
+        const { visibilityClass } = useInputBase(props, emit);
+
+        expect(visibilityClass.value).toEqual({ 'd-none': false, invisible: false });
+      });
+
+      it('isRendered and visibilityClass follow control.visibility changes', async () => {
+        const control = new Form.Field({ value: 'test' });
+        const props: BaseProps = { control };
+        const emit = vi.fn();
+
+        const { isRendered, visibilityClass } = useInputBase(props, emit);
+
+        expect(isRendered.value).toBe(true);
+        expect(visibilityClass.value).toEqual({ 'd-none': false, invisible: false });
+
+        control.visibility = Form.DisplayMode.INVISIBLE;
+        await nextTick();
+
+        expect(visibilityClass.value).toEqual({ 'd-none': false, invisible: true });
+
+        control.visibility = Form.DisplayMode.SUPPRESS;
+        await nextTick();
+
+        expect(isRendered.value).toBe(false);
       });
     });
 
@@ -475,7 +600,9 @@ describe('input-base', () => {
 
     describe('vuetifyBindings', () => {
       it('maps all properties correctly', () => {
-        const control = Form.Field.create({ value: 'test', fieldName: 'testField' });
+        // fieldName is installed by the containing Group, so a standalone field receives it by assignment
+        const control = new Form.Field({ value: 'test' });
+        control.fieldName = 'testField';
         const props: BaseProps = {
           control,
           label: 'Test Label',

@@ -20,13 +20,13 @@ import { Group, Field, MdString, ValueChangedAction, Validators } from '@dynamic
 // Create a form group with validated fields
 const validatedForm = new Group({
   // Required field - cannot be empty
-  username: Field.create({ 
+  username: new Field({ 
     value: '', 
     validators: [new Validators.Required('Username is required')]
   }),
   
   // Email field with pattern validation
-  email: Field.create({ 
+  email: new Field({ 
     value: '', 
     validators: [
       new Validators.Pattern(
@@ -37,7 +37,7 @@ const validatedForm = new Group({
   }),
   
   // Number field with range validation
-  age: Field.create({ 
+  age: new Field({ 
     value: 18, 
     validators: [
       new Validators.ValueInRange(18, 100, 'Age must be between 18 and 100')
@@ -45,7 +45,7 @@ const validatedForm = new Group({
   }),
   
   // Field with allowed values validation
-  role: Field.create({ 
+  role: new Field({ 
     value: '', 
     validators: [
       new Validators.InAllowedValues(
@@ -56,7 +56,7 @@ const validatedForm = new Group({
   }),
   
   // Text field with length validation
-  bio: Field.create({
+  bio: new Field({
     value: '',
     validators: [
       new Validators.LengthInRange(10, 200, 'Bio must be between 10 and 200 characters')
@@ -64,13 +64,10 @@ const validatedForm = new Group({
   })
 });
 
-// Create a reactive reference for form output and validation status
-const formOutput = validatedForm.reactiveValue;
-const formValid = computed(() => {
-  return Object.values(validatedForm.fields).every(field => field.valid);
-});
+// group.valid covers the group's own errors and those of every field it holds
+const formValid = computed(() => validatedForm.valid);
 
-// Register a value changed action to update form output display
+// A value changed action on the group fires for a change in any of its fields
 validatedForm.registerAction(new ValueChangedAction(async (field, supr, newValue, oldValue) => {
   return supr(field, newValue, oldValue);
 }));
@@ -149,7 +146,7 @@ validatedForm.registerAction(new ValueChangedAction(async (field, supr, newValue
       <v-card-title>Form Validation Status</v-card-title>
       <v-card-text>
         <p>Form is {{ formValid ? 'valid' : 'invalid' }}</p>
-        <pre class="output">{{ JSON.stringify(formOutput, null, 2) }}</pre>
+        <pre class="output">{{ JSON.stringify(validatedForm.value, null, 2) }}</pre>
       </v-card-text>
     </v-card>
   </div>

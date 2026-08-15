@@ -52,7 +52,7 @@ import { ref } from 'vue';
 import { Field, MdString, Validators } from '@dynamicforms/vue-forms';
 import { DfColor } from '../../src';
 
-const colorField = Field.create({
+const colorField = new Field({
   value: '#42A5F5',
   validators: [
     new Validators.Pattern(

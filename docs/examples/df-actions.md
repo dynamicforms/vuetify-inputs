@@ -22,19 +22,19 @@ Here's a simple example of the `df-actions` component in action:
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `actions` | `Action[]` or `Ref<Action[]>` | `[]` | Array of Action objects to render |
+| `actions` | `Action[]` or `Ref<Action[]>` | required | Array of Action objects to render |
 | `buttonSize` | `string` or `number` | `'default'` | Size of buttons (see Vuetify's v-btn size prop) |
 | `showAsGroup` | `'no'` \| `'grouped'` \| `'grouped-no-borders'` | `'no'` | Controls how buttons are grouped |
 
 ## Action Object
 
-The component expects an array of `Action` objects created using `Action.create()` with the following structure:
+The component expects an array of `Action` objects created with `new Action()` with the following structure:
 
 ```typescript
 interface ActionBreakpointOptions {
   name?: string;                    // Unique identifier for the action
   label?: string;                   // Display text
-  icon?: string;                    // Icon name (Ionicons format)
+  icon?: string;                    // Icon name, resolved by vue-cached-icon (e.g. ion-save-outline, mdi-content-save)
   renderAs?: ActionDisplayStyle;    // BUTTON or TEXT
   showIcon?: boolean;               // Whether to show the icon
   showLabel?: boolean;              // Whether to show the label
@@ -54,13 +54,13 @@ The `Action` object is the core component that defines how actions behave in the
 
 ### Creating Actions
 
-Actions are created using the `Action.create()` method:
+Actions are created with the `Action` constructor:
 
 ```typescript
 import { Action, ActionDisplayStyle } from '@dynamicforms/vuetify-inputs';
 import { ExecuteAction } from '@dynamicforms/vue-forms';
 
-const saveAction = Action.create({
+const saveAction = new Action({
   value: {
     name: 'save',
     label: 'Save',
@@ -81,7 +81,7 @@ The `value` object defines the visual appearance and behavior:
 |----------|------|-------------|
 | `name` | `string` | Unique identifier for the action |
 | `label` | `string` | Display text |
-| `icon` | `string` | Icon name (Ionicons format) |
+| `icon` | `string` | Icon name, resolved by `vue-cached-icon`; both `ion-` and `mdi-` prefixed names work |
 | `renderAs` | `ActionDisplayStyle` | How to render: `BUTTON` or `TEXT` |
 | `showIcon` | `boolean` | Whether to display the icon |
 | `showLabel` | `boolean` | Whether to display the label |
@@ -89,7 +89,7 @@ The `value` object defines the visual appearance and behavior:
 | `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the button `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
 | `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `loading`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>`, overriding `<df-actions>`'s own computed props |
 
-`enabled` and `visibility` aren't part of `ActionRenderOptions` - they're standard `FormAction`/`Field` properties from `@dynamicforms/vue-forms` (settable at the top level of `Action.create()`, or via `action.enabled` / `action.visibility` directly) - but `<df-actions>` reacts to them too:
+`enabled` and `visibility` aren't part of `ActionRenderOptions` - they're standard `FormAction`/`Field` properties from `@dynamicforms/vue-forms` (settable at the top level of the `new Action()` parameters, or via `action.enabled` / `action.visibility` directly) - but `<df-actions>` reacts to them too:
 
 - `enabled: false` disables the button (`<v-btn disabled>`).
 - `visibility: DisplayMode.HIDDEN` keeps the button in the DOM with a `d-none` class.
@@ -106,7 +106,7 @@ The `value` object defines the visual appearance and behavior:
 Actions support responsive behavior through breakpoint-specific configurations:
 
 ```typescript
-const responsiveAction = Action.create({
+const responsiveAction = new Action({
   value: {
     name: 'save',
     label: 'Save Document',
@@ -158,7 +158,7 @@ const saveFormAction = new ExecuteAction(async (action, supr, params) => {
 });
 
 // Attach to Action
-const saveAction = Action.create({
+const saveAction = new Action({
   value: { /* visual config */ },
   actions: [saveFormAction]
 });
@@ -203,7 +203,7 @@ const close = Action.closeAction({ value: { defaultConfirm: true, defaultReject:
 At most one action in a given set should set `defaultConfirm`, and at most one should set `defaultReject`.
 
 > **Side note:** if you're using [`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:), its
-> [`<df-modal>`](:vuetify-modal-form-kit:/api/df-modal#keyboard-shortcuts) component also reads these same flags
+> [`<df-modal>`](:vuetify-modal-form-kit:/api/df-modal.html#keyboard-shortcuts) component also reads these same flags
 > off the actions passed to its `actions` prop, to decide which action Enter / Escape should trigger. Since
 > `<df-modal>`'s `actions` slot is normally rendered via `<df-actions>` too, the two concerns - keyboard shortcut
 > and default button color - line up for free.
@@ -215,7 +215,7 @@ At most one action in a given set should set `defaultConfirm`, and at most one s
 isn't already modeled by `ActionRenderOptions`:
 
 ```typescript
-const deleteAction = Action.create({
+const deleteAction = new Action({
   value: {
     name: 'delete',
     label: 'Delete',
@@ -244,7 +244,7 @@ const submitFormAction = new ExecuteAction(async (action, supr, params) => {
 });
 
 // Responsive action configuration
-const submitAction = Action.create({
+const submitAction = new Action({
   value: {
     name: 'submit',
     label: 'Submit Form',
@@ -274,7 +274,7 @@ responsive capabilities for different screen sizes.
 The component automatically adapts to different screen sizes based on the breakpoint configuration:
 
 ```javascript
-const saveAction = Action.create({
+const saveAction = new Action({
   value: {
     name: 'save',
     label: 'Save',
@@ -322,7 +322,7 @@ The `showAsGroup` property allows you to control the visual grouping of buttons:
 
   // Create actions for the component
   const actions = ref([
-    Action.create({
+    new Action({
       value: {
         name: 'save',
         label: 'Save',
@@ -334,7 +334,7 @@ The `showAsGroup` property allows you to control the visual grouping of buttons:
       actions: [saveFormAction]
     }),
 
-    Action.create({
+    new Action({
       value: {
         name: 'cancel',
         label: 'Cancel',

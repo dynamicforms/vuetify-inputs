@@ -33,7 +33,7 @@
 import { Field } from '@dynamicforms/vue-forms';
 import { DfTextArea } from '../../src';
 
-const descriptionField = Field.create({
+const descriptionField = new Field({
   value: 'This is a sample description text that demonstrates the text area component with DynamicForms integration.',
 });
 

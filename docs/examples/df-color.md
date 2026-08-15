@@ -50,18 +50,16 @@ The component includes built-in validation for proper hex color format. By defau
 You can extend this validation by adding custom validators to the DynamicForms Field:
 
 ```javascript
-const colorField = Field.create({
+const colorField = new Field({
   value: '#FF0000',
   validators: [
-    {
-      validate: (value) => {
-        // Your custom validation logic
-        if (value && !value.startsWith('#')) {
-          return 'Color must start with #';
-        }
-        return null; // Return null for valid values
+    new Validator((value) => {
+      // Your custom validation logic
+      if (value && !value.startsWith('#')) {
+        return [new ValidationErrorText('Color must start with #')];
       }
-    }
+      return null; // Return null for valid values
+    })
   ]
 });
 ```
@@ -83,24 +81,22 @@ This component emits all [common events from InputBase](./input-base):
 </template>
 
 <script setup>
-import { Field } from '@dynamicforms/vue-forms';
+import { Field, ValidationErrorText, Validator } from '@dynamicforms/vue-forms';
 import { DfColor } from '@dynamicforms/vuetify-inputs';
 
 // Valid brand colors
 const brandColors = ['#C41E3A', '#1B4D3E', '#0F52BA', '#FFA500'];
 
-const colorField = Field.create({
+const colorField = new Field({
   value: '#C41E3A',
   validators: [
-    {
-      validate: (value) => {
-        if (!value) return null;
-        if (!brandColors.includes(value)) {
-          return 'Please select a color from the brand palette';
-        }
-        return null;
+    new Validator((value) => {
+      if (!value) return null;
+      if (!brandColors.includes(value)) {
+        return [new ValidationErrorText('Please select a color from the brand palette')];
       }
-    }
+      return null;
+    })
   ]
 });
 </script>

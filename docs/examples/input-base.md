@@ -9,7 +9,7 @@ All input components inherit the following properties:
 
 | Property         | Type                  | Default             | Description                                                                                 |
 |------------------|-----------------------|---------------------|---------------------------------------------------------------------------------------------|
-| control          | `Field`               | `undefined`         | [vue-forms](:vue-forms:) field object for state management integration                      |
+| control          | `FieldBase`           | `undefined`         | [vue-forms](:vue-forms:) field object for state management integration                      |
 | modelValue       | `any`                 | component dependent | The field value (v-model) when used without control                                         |
 | label            | `string \| Label \| MdString` | `''`        | Input field label. supports icons by creating a Label class (see below)                     |
 | hint             | `string`              | `''`                | Hint text displayed below the input field                                                   |
@@ -17,7 +17,7 @@ All input components inherit the following properties:
 | placeholder      | `string`              | `''`                | Placeholder text displayed when the input is empty                                          |
 | errors           | `string[]`            | `[]`                | List of errors (used only without control)                                                  |
 | enabled          | `boolean`             | `true`              | Whether the input field is enabled                                                          |
-| visibility       | `DisplayMode`         | `FULL`              | Component visibility mode (FULL, HIDDEN, INVISIBLE, SUPPRESS)                               |
+| visibility       | `DisplayMode`         | `FULL`              | Component visibility mode (FULL, HIDDEN, INVISIBLE, SUPPRESS), see [Display Modes](#display-modes) |
 | cssClass         | `string`              | `''`                | Additional CSS classes                                                                      |
 | clearable        | `boolean`             | `true`              | Whether the value can be cleared                                                            |
 | passthroughAttrs | `Record<string, any>` | `undefined`         | Additional attributes to pass through to the underlying Vuetify component                   |
@@ -59,10 +59,18 @@ See [demo](./density.md) to see how densities render for individual variants.
 
 ## Display Modes
 
-- `FULL`: Component is fully visible and enabled for interaction
-- `HIDDEN`: Component is hidden but still takes up space in the layout
-- `INVISIBLE`: Component is invisible but still takes up space
-- `SUPPRESS`: Component is not rendered in the DOM at all
+Every input component applies the display mode to its own root element:
+
+- `FULL`: the component renders normally and is available for interaction
+- `HIDDEN`: the root element gets the `d-none` class, so the component is not displayed and takes up no space
+- `INVISIBLE`: the root element gets the `invisible` class, so the component is not painted but still takes up its space
+  in the layout
+- `SUPPRESS`: the root element is not rendered in the DOM at all
+
+The mode comes from the `control` when one is bound: `control.visibility` takes precedence over the `visibility` prop,
+which serves as the value when the component is used without a control. When neither is given, the mode is `FULL`. A
+`ConditionalVisibilityAction` registered on the control therefore shows and hides the input on its own, with no `v-if`
+in the template.
 
 ## Label
 
@@ -102,7 +110,7 @@ import { Group, Field } from '@dynamicforms/vue-forms';
 import { DfInput } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
-  name: Field.create({ value: '' })
+  name: new Field({ value: '' })
 });
 </script>
 ```

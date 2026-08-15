@@ -107,9 +107,9 @@ import { Group, Field, MdString } from '@dynamicforms/vue-forms';
 import { DfCheckbox, Label } from '../../src';
 
 const form = new Group({
-  binaryField: Field.create({ value: false }),
-  ternaryField: Field.create({ value: null }),
-  autoToggleField: Field.create({ value: false }),
+  binaryField: new Field({ value: false }),
+  ternaryField: new Field({ value: null }),
+  autoToggleField: new Field({ value: false }),
 });
 
 const autoSwitchActive = ref(false);

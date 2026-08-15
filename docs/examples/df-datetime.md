@@ -180,7 +180,7 @@ import { Group, Field } from '@dynamicforms/vue-forms';
 import { DfDateTime } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
-  meetingTime: Field.create({ 
+  meetingTime: new Field({ 
     value: new Date().toISOString()
   })
 });
