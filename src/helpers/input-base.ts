@@ -80,8 +80,8 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const visibility = computed(() =>
     props.control ? props.control.visibility : props.visibility || Form.DisplayMode.FULL,
   );
-  const label = computed(
-    (): Label => (isString(props.label || '') ? new Label(<string>props.label || '') : <Label>props.label),
+  const label = computed((): Label =>
+    isString(props.label || '') ? new Label(<string>props.label || '') : <Label>props.label,
   );
   const placeholder = computed(() => props.placeholder || '');
   const helpText = computed(() => props.helpText || '');
