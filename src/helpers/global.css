@@ -5,6 +5,12 @@
   height: 1.5em;
 }
 
+/* DisplayMode.INVISIBLE. Vuetify ships .d-none for DisplayMode.HIDDEN but no counterpart that keeps
+   the element's box, which is what separates the two modes. */
+.invisible {
+  visibility: hidden;
+}
+
 .df-input-container {
   width: 100%;
 }

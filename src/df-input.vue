@@ -1,5 +1,5 @@
 <template>
-  <div class="df-input-container" :class="densityClass">
+  <div v-if="isRendered" class="df-input-container" :class="[densityClass, visibilityClass]">
     <v-text-field
       v-if="!isNumber"
       v-model="value"
@@ -42,7 +42,10 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
-const { densityClass, label, showErrors, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, isRendered, label, showErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
+  props,
+  emits,
+);
 const { inputType, max, min, precision, step } = toRefs(props);
 
 const isNumber = computed(() => inputType.value === 'number');

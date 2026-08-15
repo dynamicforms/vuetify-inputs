@@ -183,7 +183,8 @@ The action watches every field the statement mentions and sets the group's `visi
 `DisplayMode.FULL` or `DisplayMode.SUPPRESS` as the statement's result changes. `visibility` is a
 property of the group alone, so the template consumes it once: render the section under
 `v-if="group.visibility !== DisplayMode.SUPPRESS"` and the whole section, its fields included, leaves
-the DOM.
+the DOM. A field whose own control carries the action needs no `v-if`: the input component bound to
+that field reads its control's visibility itself.
 
 `ConditionalEnabledAction` takes the same statement and sets `enabled` instead.
 `ConditionalValueAction` takes a statement and the value to assign,

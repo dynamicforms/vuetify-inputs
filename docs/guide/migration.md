@@ -62,6 +62,20 @@ as a parameter, or a variable annotated before it is handed to a component.
 What the components accept at runtime is exactly what they always accepted: they guard with `instanceof FieldBase`,
 so the value passed in has to derive from that class, as it always did.
 
+### `DFInputHint` is spelled `DfInputHint`
+
+The component was exported under two names. Only `DfInputHint` remains, which is also the name it
+registers under when the plugin is installed with `registerComponents: true`, so the tag
+`<df-input-hint>` resolves. Rename the import if you used the other spelling.
+
+```typescript
+// before
+import { DFInputHint } from '@dynamicforms/vuetify-inputs';
+
+// after
+import { DfInputHint } from '@dynamicforms/vuetify-inputs';
+```
+
 ### @dynamicforms/vue-forms 0.6.0 is required
 
 The peer dependency range is now `^0.6.0`. Install it together with this release; 0.5.x is not compatible.
@@ -98,10 +112,11 @@ only affects what you render off the group itself. This library adds no cascade 
    and drop `IField` from your imports.
 4. Retype any variable declared as `Partial<IField<ActionBreakpointOptions>>` before it is passed to
    `Action.closeAction()`, `Action.yesAction()` or `Action.noAction()`.
-5. Work through the
+5. Rename `DFInputHint` → `DfInputHint` in imports.
+6. Work through the
    [vue-forms migration guide](https://docs.velis.si/dynamicforms/vue-forms/guide/migration.html) for your own use of
    that library — `Field.create()` and `reactiveValue` in particular.
-6. Remove reactivity workarounds around groups and lists: a manual `ref` bumped after every mutation, a forced
+7. Remove reactivity workarounds around groups and lists: a manual `ref` bumped after every mutation, a forced
    `key`, an explicit `triggerRef`, a `computed` re-reading `JSON.stringify(group.value)`.
 
 ---

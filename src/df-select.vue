@@ -1,18 +1,10 @@
 <template>
   <component
     :is="taggable ? 'v-combobox' : 'v-autocomplete'"
-    v-if="visibility !== DisplayMode.SUPPRESS"
+    v-if="isRendered"
     ref="dfSelectRef"
     v-model="selected"
-    :class="[
-      cssClass,
-      densityClass,
-      {
-        'd-none': visibility === DisplayMode.HIDDEN,
-        invisible: visibility === DisplayMode.INVISIBLE,
-        'df-select-multirow': isMultiline,
-      },
-    ]"
+    :class="[cssClass, densityClass, visibilityClass, { 'df-select-multirow': isMultiline }]"
     :items="options"
     :return-object="false"
     chips
@@ -74,7 +66,6 @@
 </template>
 
 <script setup lang="ts">
-import { DisplayMode } from '@dynamicforms/vue-forms';
 import { unionBy } from 'lodash-es';
 import { computed, nextTick, ref, toRefs, unref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
@@ -98,7 +89,7 @@ const propsWithDefaults = withDefaults(defineProps<DfSelectProps>(), {
   fetchChoices: undefined,
 });
 
-const { choices, multiple, allowTags: taggable, allowNull, cssClass, visibility } = toRefs(propsWithDefaults);
+const { choices, multiple, allowTags: taggable, allowNull, cssClass } = toRefs(propsWithDefaults);
 
 interface Emits extends BaseEmits {
   (e: 'update:modelValueDisplay', value: SelectChoice[]): any;
@@ -114,10 +105,12 @@ const dfSelectRef = ref<InstanceType<typeof VAutocomplete> | InstanceType<typeof
 
 const {
   densityClass,
+  isRendered,
   label,
   showErrors,
   touched,
   value: resultingValue,
+  visibilityClass,
   vuetifyBindings,
 } = useInputBase(propsWithDefaults, emits);
 

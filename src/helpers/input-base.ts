@@ -80,6 +80,11 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const visibility = computed(() =>
     props.control ? props.control.visibility : props.visibility || Form.DisplayMode.FULL,
   );
+  const isRendered = computed(() => visibility.value !== Form.DisplayMode.SUPPRESS);
+  const visibilityClass = computed(() => ({
+    'd-none': visibility.value === Form.DisplayMode.HIDDEN,
+    invisible: visibility.value === Form.DisplayMode.INVISIBLE,
+  }));
   const label = computed((): Label =>
     isString(props.label || '') ? new Label(<string>props.label || '') : <Label>props.label,
   );
@@ -103,6 +108,8 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     errors,
     showErrors,
     visibility,
+    isRendered,
+    visibilityClass,
     label,
     touched,
     density: density.value,

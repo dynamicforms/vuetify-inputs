@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Action.create()`. Actions are constructed with `new Action(...)`, matching @dynamicforms/vue-forms 0.6.0, which
   removed `Field.create()` and `Action.create()`. `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()`
   are unaffected.
+- The `DFInputHint` export. The component was reachable under two names; `DfInputHint` remains, and is the name the
+  plugin registers it under, so the `<df-input-hint>` tag resolves under `registerComponents: true`.
 
 ### Changed
 
@@ -24,6 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation for group-level validation errors and conditional group visibility, which @dynamicforms/vue-forms 0.6.0
   made observable by constructing `Group` and `List` as Vue reactive objects.
 - A migration guide at `/guide/migration`.
+
+### Fixed
+
+- Every input component honours the visibility of its `control`; `df-checkbox`, `df-color` and `df-input` ignored it
+  altogether, while `df-select` and `df-text-area` read the `visibility` prop instead of the control.
+- `DisplayMode` is resolved in one place, `useInputBase`, which the components consume for both the render decision
+  (`SUPPRESS`) and the `d-none` / `invisible` classes (`HIDDEN` / `INVISIBLE`).
+- `DisplayMode.INVISIBLE` hides the element. The `invisible` class the components apply for it is defined by the
+  package stylesheet; Vuetify ships no such rule, so the mode had no effect.
 
 ## [0.7.0] - 2026-01-28
 

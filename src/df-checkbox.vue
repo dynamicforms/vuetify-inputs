@@ -1,8 +1,9 @@
 <template>
   <v-checkbox
+    v-if="isRendered"
     v-model="boolValue"
     density="compact"
-    :class="densityClass"
+    :class="[densityClass, visibilityClass]"
     :indeterminate="indeterminate"
     :false-value="false"
     :true-value="true"
@@ -27,7 +28,10 @@ const props = withDefaults(defineProps<DfCheckboxProps>(), { ...defaultBaseProps
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { densityClass, label, showErrors, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, isRendered, label, showErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
+  props,
+  emits,
+);
 
 const indeterminate = computed(() => props.allowNull && value.value == null);
 

@@ -1,15 +1,8 @@
 <template>
-  <div class="df-textarea-container" :class="densityClass">
+  <div v-if="isRendered" class="df-textarea-container" :class="[densityClass, visibilityClass]">
     <v-textarea
-      v-if="visibility !== DisplayMode.SUPPRESS"
       v-model="value"
-      :class="[
-        cssClass,
-        {
-          'd-none': visibility === DisplayMode.HIDDEN,
-          invisible: visibility === DisplayMode.INVISIBLE,
-        },
-      ]"
+      :class="cssClass"
       :rows="rows"
       :auto-grow="(maxRows || 0) > 0"
       :max-rows="maxRows"
@@ -23,7 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { DisplayMode } from '@dynamicforms/vue-forms';
 import { toRefs } from 'vue';
 
 import { DfTextAreaProps } from './dynamicforms-component-props';
@@ -38,6 +30,9 @@ const props = withDefaults(defineProps<DfTextAreaProps>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { densityClass, label, showErrors, touched, value, vuetifyBindings } = useInputBase(props, emits);
-const { cssClass, visibility } = toRefs(props);
+const { densityClass, isRendered, label, showErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
+  props,
+  emits,
+);
+const { cssClass } = toRefs(props);
 </script>
