@@ -139,6 +139,11 @@ const responsiveAction = new Action({
 inherits the value from `md` (or the closest smaller breakpoint that defines it). Note that the "original values" 
 (without breakpoint) represent the smallest breakpoint size.
 
+The same cascade applies to the other two kinds of value a subclass of `ResponsiveRenderOptions` can carry, which
+matters when you build one of your own: an object-valued option is merged key by key, so a breakpoint restates only
+the keys it changes, and a list-valued one is inherited whole unless the breakpoint declares a list of its own -
+an empty list at a breakpoint states nothing rather than emptying what it inherited.
+
 ### Action Execution
 
 Actions are executed through the `actions` array, which contains `FormAction` objects from `@dynamicforms/vue-forms`:

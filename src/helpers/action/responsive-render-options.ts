@@ -1,3 +1,4 @@
+import { isArray, isObjectLike } from 'lodash-es';
 import { computed } from 'vue';
 import { useDisplay } from 'vuetify';
 
@@ -24,7 +25,17 @@ export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
     for (const bp of responsiveBreakpoints) {
       const bpData = this._value[bp];
       for (const field of fields) {
-        if (bpData?.[field] != null) (<any>result)[field] = bpData[field];
+        const value = bpData?.[field];
+        if (value == null) continue;
+        if (isArray(value)) {
+          // a breakpoint states what it changes. An empty list is what a breakpoint that changes something else
+          // is left holding, so it cascades on rather than blanking the list it inherited.
+          if (value.length) (<any>result)[field] = value;
+        } else if (isObjectLike(value)) {
+          (<any>result)[field] = { ...(<any>result)[field], ...value };
+        } else {
+          (<any>result)[field] = value;
+        }
       }
       if (bp === breakpoint) break;
     }

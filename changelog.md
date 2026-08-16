@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2026-08-16
+
+### Fixed
+
+- `ResponsiveRenderOptions.getOptionsForBreakpoint()` cascades list- and object-valued options the way it always
+  cascaded scalars. A breakpoint holding an empty list left the subclass with no items at that breakpoint instead of
+  the ones it inherited, and an object-valued option was replaced wholesale, so a breakpoint that restated one key
+  dropped every other key it inherited. Both are what a subclass carrying a collection sees; the options this
+  package ships are scalars throughout, so `Action` and `<df-actions>` render exactly as before.
+
 ## [0.8.0] - 2026-08-15
 
 ### Removed
