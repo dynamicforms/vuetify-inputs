@@ -51,6 +51,7 @@ export default defineConfig({
             { text: 'validation', link: '/examples/validators' },
             { text: 'groups', link: '/examples/groups' },
             { text: 'density', link: '/examples/density' },
+            { text: 'responsive options', link: '/examples/responsive-render-options' },
             { text: 'df-actions', link: '/examples/df-actions' },
             { text: 'df-checkbox', link: '/examples/df-checkbox' },
             { text: 'df-color', link: '/examples/df-color' },

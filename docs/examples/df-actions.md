@@ -139,6 +139,10 @@ const responsiveAction = new Action({
 inherits the value from `md` (or the closest smaller breakpoint that defines it). Note that the "original values" 
 (without breakpoint) represent the smallest breakpoint size.
 
+An action's options are all single values, so the cascade above is the whole story here. The class behind it,
+`ResponsiveRenderOptions`, also carries options that are objects or lists for the subclasses that need them -
+see [responsive options](/examples/responsive-render-options) if you are writing one.
+
 ### Action Execution
 
 Actions are executed through the `actions` array, which contains `FormAction` objects from `@dynamicforms/vue-forms`:

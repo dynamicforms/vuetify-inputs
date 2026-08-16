@@ -1,3 +1,4 @@
+import { isPlainObject } from 'lodash-es';
 import { computed } from 'vue';
 import { useDisplay } from 'vuetify';
 
@@ -24,13 +25,30 @@ export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
     for (const bp of responsiveBreakpoints) {
       const bpData = this._value[bp];
       for (const field of fields) {
-        if (bpData?.[field] != null) (<any>result)[field] = bpData[field];
+        const value = bpData?.[field];
+        // a breakpoint states what it changes; a field it says nothing about keeps cascading
+        if (value == null) continue;
+        if (isPlainObject(value)) {
+          // shallow, so a breakpoint restates single keys of an options object rather than the whole of it. A
+          // nested object is a value like any other and is replaced whole. Only plain objects merge: a Date, a
+          // Map or a class instance would come out of a spread as its own properties without its prototype.
+          (<any>result)[field] = { ...(<any>result)[field], ...value };
+        } else {
+          (<any>result)[field] = value;
+        }
       }
       if (bp === breakpoint) break;
     }
     return result;
   }
 
+  /**
+   * Normalizes one breakpoint's options. The merge reads `null` and `undefined` as "this breakpoint says
+   * nothing about that field", so a field the breakpoint does not state has to come back as `undefined` rather
+   * than as an empty value - an empty array or string returned here reads as a breakpoint deliberately emptying
+   * what it inherited. The value returned for `defaultIfEmpty` carries every field the class merges, since the
+   * field set is taken from it.
+   */
   protected abstract cleanBreakpoint(bp?: T, defaultIfEmpty?: boolean): T | null;
 }
 

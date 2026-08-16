@@ -15,6 +15,11 @@ alignment of component parts so that your forms look perfectly aligned in all re
 The base component for all input elements. Contains documentation about common props, events, and behavior shared by 
 all input components.
 
+### [Responsive options](./responsive-render-options)
+
+How an action's breakpoints are resolved, and the rules to follow when building a responsive object of your own on
+`ResponsiveRenderOptions`.
+
 ## Input Fields
 
 ### [df-actions](./df-actions)

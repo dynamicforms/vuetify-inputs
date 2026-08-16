@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2026-08-16
+
+### Fixed
+
+- `ResponsiveRenderOptions.getOptionsForBreakpoint()` merges an object-valued option key by key. It replaced the
+  object wholesale, so a breakpoint restating one key dropped every other key it inherited. Single values are
+  replaced as before, and so is anything that is not a plain object - a `Date`, a `Map` or a class instance would
+  come out of a merge as a bare copy of its own properties. The options this package ships are single values
+  throughout, so `Action` and `<df-actions>` resolve exactly as before.
+
+### Added
+
+- Documentation of the cascade for anyone subclassing `ResponsiveRenderOptions`, at `/examples/responsive-render-options`:
+  what each kind of value does at a breakpoint, that the object merge is shallow, and the contract `cleanBreakpoint()`
+  has to keep - a field the breakpoint does not state comes back `undefined`, since an empty value is a value and
+  replaces what was inherited.
+
 ## [0.8.0] - 2026-08-15
 
 ### Removed
