@@ -140,11 +140,12 @@ function setResultingValue(newValue: any) {
   try {
     resultingValue.value = newValue;
   } finally {
-    // The guard suppresses the watch that pushes the model's value back into `selected`. A write the model
-    // refuses - a validator that throws unwinds it, a disabled field drops it - never reaches that watch, so
-    // the chips would go on showing a selection the control never took. Comparing what the control holds
-    // against what was written is what restores it, and it needs a deep comparison: for multiple selection the
-    // value reads back as a different array holding the same items.
+    // The guard suppresses the watch that pushes the model's value back into `selected`. A write the control does
+    // not take verbatim - a ValueChangedAction that writes another value back, a disabled field that drops it, a
+    // handler that throws and unwinds it - never reaches that watch, so the chips would go on showing a selection
+    // the control never took. Comparing what the control holds against what was written is what restores it, and
+    // it needs a deep comparison: for multiple selection the value reads back as a different array holding the
+    // same items.
     if (!isEqual(multipleCompliantValue(resultingValue.value, multiple.value), newValue)) {
       updateSelectedFromValue(
         multipleCompliantValue(resultingValue.value, multiple.value),
