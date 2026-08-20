@@ -22,7 +22,7 @@ Here's a simple example of the `df-actions` component in action:
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `actions` | `Action[]` or `Ref<Action[]>` | required | Array of Action objects to render |
+| `actions` | `Action[]` or `Ref<Action[]>` | required | Array of Action objects to render - this library's `Action`, or a bare `@dynamicforms/vue-forms` one |
 | `buttonSize` | `string` or `number` | `'default'` | Size of buttons (see Vuetify's v-btn size prop) |
 | `showAsGroup` | `'no'` \| `'grouped'` \| `'grouped-no-borders'` | `'no'` | Controls how buttons are grouped |
 
@@ -57,6 +57,27 @@ the base options whatever a breakpoint states about them.
 
 The `Action` object is the core component that defines how actions behave in the `df-actions` component. It extends the
 `Action` class of `@dynamicforms/vue-forms` to provide responsive behavior and visual configuration.
+
+### Actions declared in `@dynamicforms/vue-forms`
+
+The component reads what it draws off the action's value rather than through this subclass's accessors, so an action
+declared as the `Action` of `@dynamicforms/vue-forms` - which states a `label` and an `icon` and nothing else - is
+rendered as well: as a button showing whichever of the two it carries. What the value does not state comes out as the
+default, and a `label` or `icon` that is not a string is not drawn, since this library renders both as text.
+
+```typescript
+import { Action } from '@dynamicforms/vue-forms';
+
+const cancel = new Action({ value: { label: 'Cancel' }, actions: [cancelHandler] });
+```
+
+The subclass earns its keep where an action is to render responsively, as a text link, or in a color the confirm /
+reject flags pick: those members live in `ActionRenderOptions`, which only it declares. An action that renders as a
+plain button needs none of them.
+
+The read itself is exported: `getRenderOptionsForBreakpoint(value, breakpoint)` answers the `ActionRenderOptions` a
+value renders as at one breakpoint, defaults filled in and `label` / `icon` filtered by their flags.
+`Action.getBreakpointValue(breakpointRef)` is a `computed()` over the same call.
 
 ### Creating Actions
 
@@ -93,7 +114,7 @@ The `value` object defines the visual appearance and behavior:
 | `showLabel` | `boolean` | Whether to display the label |
 | `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the button `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
 | `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the button `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
-| `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `loading`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>`, overriding `<df-actions>`'s own computed props |
+| `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>`, overriding `<df-actions>`'s own computed props |
 
 `label` and `icon` are `@dynamicforms/vue-forms`' own accessors: each reads the member of the same name off the
 value and each takes a write, which is an ordinary value change. `renderedLabel` and `renderedIcon` are this
@@ -102,11 +123,14 @@ subclass's, and answer what the action draws — the text where `showLabel` stat
 missing or empty, whatever the value holds. The breakpoint-resolved options `<df-actions>` renders from are
 filtered the same way, which is why the component reads none of these accessors.
 
-`enabled` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` properties from
-`@dynamicforms/vue-forms` (settable at the top level of the `new Action()` parameters, or via `action.enabled` /
-`action.visibility` directly) - but `<df-actions>` reacts to them too:
+`enabled`, `busy` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` members
+of `@dynamicforms/vue-forms` (`enabled` and `visibility` settable at the top level of the `new Action()` parameters,
+or via `action.enabled` / `action.visibility` directly; `busy` is a read) - but `<df-actions>` reacts to them too:
 
-- `enabled: false` disables the button (`<v-btn disabled>`).
+- `enabled: false` disables the button (`<v-btn disabled>`), and so does a disabled container above the action: what
+  the button binds is `effectiveEnabled`, which is `false` where the action or any `Group` or `List` holding it is
+  disabled.
+- `busy` disables the button and draws it `loading` for as long as a run of the action has yet to settle.
 - `visibility: DisplayMode.HIDDEN` keeps the button in the DOM with a `d-none` class.
 - `visibility: DisplayMode.INVISIBLE` keeps the button in the layout with an `invisible` class (`visibility: hidden`).
 - `visibility: DisplayMode.SUPPRESS` removes the button from the rendered list entirely.
@@ -206,18 +230,13 @@ See [handling a failed run](:vue-forms:/api/actions.html#handling-a-failed-run) 
 #### Reporting a run in flight
 
 `action.busy` is `true` from the call to `execute()` until the run it started settles, whether it resolves or
-rejects; overlapping runs are counted, so it stands until the last of them is done. `<df-actions>` doesn't read it -
-the button stays clickable through a run - so an action that must not be entered twice writes its own `enabled`,
-which the component does bind:
+rejects; overlapping runs are counted, so it stands until the last of them is done. `<df-actions>` binds it: the
+button is disabled and drawn `loading` while it stands, so a second click cannot start a second run of a handler
+that has yet to settle, and the wait is visible where the handler is slow.
 
-```typescript
-import { watchEffect } from 'vue';
-
-watchEffect(() => { saveAction.enabled = !saveAction.busy; });
-```
-
-`execute()` itself doesn't consult `enabled`, so this stops the click rather than the call; a programmatic
-`execute()` runs whatever `enabled` says.
+`execute()` itself consults neither `enabled` nor `busy`, so this stops the click rather than the call: a
+programmatic `execute()` runs whatever either says, and an action that is to refuse an overlapping run refuses it in
+its own handler.
 
 ### Predefined Actions
 
@@ -266,7 +285,7 @@ At most one action in a given set should set `defaultConfirm`, and at most one s
 ### Passthrough Attributes
 
 `passthroughAttrs` forwards arbitrary props straight to the rendered `<v-btn>`, taking precedence over
-`<df-actions>`'s own computed props (`variant`, `color`, `disabled`). Use it for anything `<v-btn>` supports that
+`<df-actions>`'s own computed props (`variant`, `color`, `disabled`, `loading`). Use it for anything `<v-btn>` supports that
 isn't already modeled by `ActionRenderOptions`:
 
 ```typescript

@@ -1,7 +1,7 @@
 {
   "name": "@dynamicforms/vuetify-inputs",
   "private": false,
-  "version": "0.9.0",
+  "version": "0.9.1",
   "type": "module",
   "description": "Vuetify input components with guaranteed visual consistency across all form fields — unified density/variant system, globally configurable, with inline mode for table cells. Built for @dynamicforms/vue-forms.",
   "author": "Jure Erznožnik",
@@ -12,6 +12,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "require": "./dist/dynamicforms-vuetify-inputs.umd.cjs",
       "import": "./dist/dynamicforms-vuetify-inputs.js"
     },

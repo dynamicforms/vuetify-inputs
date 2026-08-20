@@ -1,8 +1,8 @@
 import { ActionValue } from '@dynamicforms/vue-forms';
-import { isBoolean, isObjectLike, isString } from 'lodash-es';
+import { isBoolean, isEmpty, isObjectLike, isString } from 'lodash-es';
 
 import { ActionDisplayStyle } from './action-display-style';
-import { BreakpointsJSON, ResponsiveRenderOptions } from './responsive-render-options';
+import { BreakpointNames, BreakpointsJSON, ResponsiveRenderOptions } from './responsive-render-options';
 
 export interface ActionRenderOptions extends ActionValue {
   /** The text of the action, rendered when {@link showLabel} is set and the text is not empty. `ActionValue`
@@ -66,4 +66,26 @@ export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<Actio
 
     return Object.keys(result).length ? result : null;
   }
+}
+
+/**
+ * What one action renders as at `breakpoint`, read off the value of any `Action`. The members
+ * `ActionRenderOptions` adds over `ActionValue` are taken where the value carries them and defaulted where it does
+ * not, so an action holding nothing but a label - which is all a `@dynamicforms/vue-forms` `Action` declares -
+ * renders as a button showing that label.
+ *
+ * `label` and `icon` come back only where the matching flag says they are shown, and the flags come back false
+ * where there is no text or name to show, so a caller renders each member on its own flag and never on emptiness.
+ */
+export function getRenderOptionsForBreakpoint(value: ActionValue, breakpoint: BreakpointNames): ActionRenderOptions {
+  const options = new ResponsiveActionRenderOptions(value as ActionBreakpointOptions);
+  const partial = options.getOptionsForBreakpoint(breakpoint);
+  return {
+    name: partial.name,
+    label: partial.showLabel ? partial.label : undefined,
+    icon: partial.showIcon ? partial.icon : undefined,
+    renderAs: partial.renderAs,
+    showLabel: isString(partial.label) && !isEmpty(partial.label) ? partial.showLabel : false,
+    showIcon: isString(partial.icon) && !isEmpty(partial.icon) ? partial.showIcon : false,
+  };
 }

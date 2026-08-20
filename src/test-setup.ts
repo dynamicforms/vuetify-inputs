@@ -6,3 +6,11 @@ vi.mock('vue-cached-icon', () => ({
     props: ['name'],
   },
 }));
+
+// jsdom implements no ResizeObserver, and Vuetify's progress circular - what a `loading` button draws - observes
+// its own size. A stub that never reports is enough for a component test: nothing here measures.
+global.ResizeObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};

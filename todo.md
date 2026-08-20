@@ -24,9 +24,6 @@
 
 ## Adopt what vue-forms newly offers
 
-- `<df-actions>` does not read `Action.busy`, so a button stays clickable through an in-flight run and a second
-  click starts a second one. `:disabled="!action.action.enabled || action.action.busy"`, and `:loading` for the
-  visual.
 - No input shows anything while an asynchronous validator is in flight. `control.validating` answers for the whole
   subtree since 0.13 and `control.busy` for executions at or below the element; a `loading` binding in
   `vuetifyBindings` would cover every component at once.
@@ -46,9 +43,11 @@
   into one writable computed.
 - The `value` setter writes `internalValue` even while a control is bound, where the getter never reads it. Mirror
   the getter's precedence.
-- `Action.getBreakpointValue()` allocates a fresh `computed()` per call, and `<df-actions>` calls it inside another
-  computed's map and immediately unrefs it, so the memoisation is never used. Cache it on the instance, and hoist
-  `new ResponsiveActionRenderOptions(this.value)` out of the per-call path.
+- `getRenderOptionsForBreakpoint()` builds a `ResponsiveActionRenderOptions` per call, and `<df-actions>` calls it
+  once per action inside a computed, so every breakpoint change and every value change rebuilds the whole cascade
+  for every button. Cache the object per action value.
+- `Action.getBreakpointValue()` allocates a fresh `computed()` per call, so a caller that does not hold on to the
+  answer never reaches the memoisation.
 
 ## Components
 

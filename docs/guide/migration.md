@@ -8,6 +8,59 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.9.1 (from v0.9.0)
+
+Nothing this library exports is renamed or removed. What changes is that your compiler finally sees the package's
+declarations, and that `<df-actions>` draws two states it did not draw before. There is a
+[checklist](#checklist-for-0-9-1) at the end of this section.
+
+### The declarations reach your compiler
+
+`exports["."]` states a `types` condition. TypeScript resolves a package carrying an `exports` map through that map
+alone - the top-level `types` field is not consulted - so on `moduleResolution: "bundler"` or `"node16"` every import
+from this package was `any`.
+
+Expect the first build after the upgrade to report errors your project always had: a misspelled member of an
+`Action` value, a prop passed to a component that does not declare it, a `label` read as something other than a
+string. They are the checks that were never run, not new rules.
+
+### An action inside a disabled container is drawn disabled
+
+A button `<df-actions>` draws binds `effectiveEnabled`, which is `false` where the action or any `Group` or `List`
+holding it is disabled. It bound the action's own `enabled`, so the buttons of a disabled section stayed clickable,
+while `<df-modal>`'s Enter and Escape shortcuts - which read `effectiveEnabled` - refused the same actions.
+
+`enabled` on the action is unchanged and still answers what was written to it. Drop the per-action `enabled = false`
+writes that were there to follow a disabled container.
+
+### A run in flight disables its own button
+
+`<df-actions>` binds `Action.busy`: while a run of the action has yet to settle the button is disabled and drawn
+`loading`, so a second click cannot start a second run of a handler that is still working.
+
+An action that reached this by writing its own `enabled` no longer needs to:
+
+```typescript
+// before
+watchEffect(() => { saveAction.enabled = !saveAction.busy; });
+
+// after: <df-actions> binds busy itself
+```
+
+The write is not refused - it is `enabled` like any other - but it states the same thing the component already
+draws, and anything else that reads the action's `enabled` reads a run in flight rather than what the form declared.
+
+### Checklist for 0.9.1
+
+1. Build once and work through the type errors that surface: they are your project's, and this release is the first
+   in which they are reported.
+2. Load the forms that disable a whole section: the action buttons inside one now render disabled. Drop the
+   per-action `enabled = false` writes that were there to achieve it.
+3. Drop the `watchEffect` (or equivalent) that mirrored `busy` into `enabled` on an action.
+4. Check the tests that click a button of an action whose handler is asynchronous: a click that lands while the
+   previous run is in flight no longer reaches the handler.
+
+
 ## Upgrading to v0.9.0 (from v0.8.x)
 
 This release follows `@dynamicforms/vue-forms` 0.17.0. Nothing this library exports is renamed or removed, so most

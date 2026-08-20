@@ -73,7 +73,7 @@ looks like.
 - **Visibility through `DisplayMode`** — `FULL`, `HIDDEN`, `INVISIBLE` or `SUPPRESS`, taken from the bound element
   or from the `visibility` prop. [Display modes](/examples/input-base#display-modes)
 - **Enablement that follows the section.** A field reads `effectiveEnabled`, so the fields of a disabled group are
-  drawn disabled without being disabled one by one.
+  drawn disabled without being disabled one by one. An action button reads the same, and its `busy` besides.
 - **`passthroughAttrs`** — a record merged last over the computed Vuetify bindings, so any prop of the underlying
   Vuetify component is reachable without this library declaring it.
   [The escape hatch](/examples/input-base#passthroughattrs)
@@ -84,6 +84,9 @@ looks like.
 
 - **The `Action` class** extends vue-forms' with render options: a name, a display style, whether the label and the
   icon are shown, and `passthroughAttrs`. [df-actions](/examples/df-actions)
+- **A bare vue-forms `Action` is drawn too.** `<df-actions>` reads what it renders off the action's value, so the
+  subclass is what an action needs to render responsively, as a text link or in a confirm / reject colour - not what
+  it needs to be drawn at all.
 - **`defaultConfirm` / `defaultReject`** mark the Enter and Escape actions of a set, and colour their buttons.
 - **`closeAction()`, `yesAction()`, `noAction()`** are the three usual ones, ready made and translatable.
 - **Per-breakpoint render options.** Any render-options object states overrides from `xs` to `xl`; a breakpoint
