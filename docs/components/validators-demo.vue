@@ -88,12 +88,12 @@
 
 <script setup>
 import { computed } from 'vue';
-import { Group, Field, MdString, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
+import { Group, Field, MdString, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
 import { DfInput, DfSelect, DfTextArea } from '../../src'
 
 // Create a form group with validated fields
 const validatedForm = new Group({
-  // Required field - cannot be empty
+  // Required field - cannot be empty, and a value of spaces alone is empty too
   username: new Field({
     value: '',
     validators: [new Validators.Required()]
@@ -132,17 +132,21 @@ const validatedForm = new Group({
 // group.valid covers the group's own errors and those of every field it holds
 const formValid = computed(() => validatedForm.valid);
 
-// Function to reset the form
+// Function to reset the form. The five writes are one transaction, so the group announces one change rather than
+// five, and a handler that throws leaves the form as it was.
 function resetForm() {
-  validatedForm.fields.username.value = '';
-  validatedForm.fields.email.value = '';
-  validatedForm.fields.age.value = null;
-  validatedForm.fields.role.value = '';
-  validatedForm.fields.bio.value = '';
+  transaction(() => {
+    validatedForm.fields.username.value = '';
+    validatedForm.fields.email.value = '';
+    validatedForm.fields.age.value = null;
+    validatedForm.fields.role.value = '';
+    validatedForm.fields.bio.value = '';
+  });
 }
 
-// A value changed action on the group fires for a change in any of its fields
-validatedForm.registerAction(new ValueChangedAction(async (field, supr, newValue, oldValue) => {
+// A value changed action on the group fires for a change in any of its fields. The handler stays synchronous:
+// the write that triggers it returns once the chain has run, so nothing awaits a promise it hands back.
+validatedForm.registerAction(new ValueChangedAction((field, supr, newValue, oldValue) => {
   console.log('Form value has changed');
   return supr(field, newValue, oldValue);
 }));

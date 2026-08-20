@@ -29,8 +29,11 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return this.value.name;
   }
 
-  /** @see ActionRenderOptions.label */
-  get label() {
+  /**
+   * The label as this action renders it: the text where {@link ActionRenderOptions.showLabel} states it is shown,
+   * and `undefined` where it is not. `label` is the base class's, and answers the text whatever the flag says.
+   */
+  get renderedLabel() {
     return this.value.showLabel ? this.value.label : undefined;
   }
 
@@ -39,8 +42,11 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return isString(this.value.label) && !isEmpty(this.value.label) ? this.value.showLabel : false;
   }
 
-  /** @see ActionRenderOptions.icon */
-  get icon() {
+  /**
+   * The icon as this action renders it: the name where {@link ActionRenderOptions.showIcon} states it is shown,
+   * and `undefined` where it is not. `icon` is the base class's, and answers the name whatever the flag says.
+   */
+  get renderedIcon() {
     return this.value.showIcon ? this.value.icon : undefined;
   }
 

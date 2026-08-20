@@ -40,7 +40,7 @@ import {
   Operator,
   Statement,
   ValidationErrorRenderContent,
-  Validator,
+  Validators,
 } from '@dynamicforms/vue-forms';
 import { DfCheckbox, DfInput, DfInputHint } from '@dynamicforms/vuetify-inputs';
 
@@ -76,7 +76,7 @@ function tripTotal() {
 }
 
 // A validator on the group itself: the rule spans several fields, so the error belongs to the group
-form.registerAction(new Validator(() => {
+form.registerAction(new Validators.Validator(() => {
   const total = tripTotal();
   if (total <= budgetLimit) return null;
   return [
@@ -148,13 +148,13 @@ for markdown, or a component definition.
 
 ## Writing a group-level validator
 
-A `Validator` takes a function that returns either `null` (the rule holds) or an array of
+A `Validators.Validator` takes a function that returns either `null` (the rule holds) or an array of
 `ValidationError` objects. On a group, it runs whenever the value of any field in the group changes,
 including fields of nested groups, and it runs once at registration so the form opens in a correct
 state. The function reads the fields it needs through `group.fields`:
 
 ```js
-form.registerAction(new Validator((newValue, oldValue, group) => {
+form.registerAction(new Validators.Validator((newValue, oldValue, group) => {
   const { password, confirmation } = group.fields;
   if (!confirmation.value || password.value === confirmation.value) return null;
   return [new ValidationErrorRenderContent('The two passwords do not match')];

@@ -130,11 +130,14 @@ import {
 } from 'date-fns/locale';
 ```
 
-The locale affects:
+The date-fns locale affects:
 - Display formatting (how dates/times appear)
 - Parsing (how manual input is interpreted)
 - First day of week in date picker
-- Month and weekday names
+
+The month and weekday names inside the picker are not among them: the component passes no locale to
+`<v-date-picker>`, so those come from Vuetify's own locale configuration. See
+[Localisation](/examples/localisation) for the full split.
 
 ## Events
 

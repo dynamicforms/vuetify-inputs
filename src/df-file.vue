@@ -52,7 +52,7 @@ const props = withDefaults(defineProps<DfFileProps>(), defaultBaseProps);
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const touchInterval = ref<number | null>(null);
 
 // State

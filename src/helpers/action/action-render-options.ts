@@ -5,6 +5,12 @@ import { ActionDisplayStyle } from './action-display-style';
 import { BreakpointsJSON, ResponsiveRenderOptions } from './responsive-render-options';
 
 export interface ActionRenderOptions extends ActionValue {
+  /** The text of the action, rendered when {@link showLabel} is set and the text is not empty. `ActionValue`
+   * types this `unknown`, leaving what a label is to the rendering library; here it is a string. */
+  label?: string;
+  /** The icon of the action, a name `vue-cached-icon` resolves, rendered when {@link showIcon} is set and the
+   * name is not empty. Typed here for the same reason `label` is. */
+  icon?: string;
   /** Unique identifier for the action. Purely informational to `<df-actions>` itself - it is not used for
    * rendering - but by convention should match the key under which the action is registered in a
    * `FormActions` (`Record<string, Action>`) map passed to `@dynamicforms/vuetify-modal-form-kit`'s

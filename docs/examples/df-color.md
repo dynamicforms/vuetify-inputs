@@ -15,7 +15,7 @@ Below is an example of the df-color component used with DynamicForms:
 - Visual color picker interface based on Vuetify's color picker
 - Support for hex color input
 - Visual color indicator preview
-- Validation for proper hex color format
+- Built-in hex format check for the uncontrolled (v-model) case
 - Support for clearing the color value
 
 ## Props
@@ -42,18 +42,20 @@ alpha channel (e.g., `#FF0000FF`).
 
 ## Validation
 
-The component includes built-in validation for proper hex color format. By default, it validates that the value is:
+The component carries one built-in rule, and it applies only when no `control` is bound: with a bound field the rule
+passes unconditionally, and the field's own validators decide whether the value is acceptable.
 
-1. A valid hex color string
-2. Has the correct format (#RRGGBB or #RRGGBBAA)
+Uncontrolled, the rule accepts a string of 3, 4, 6 or 8 hexadecimal digits with an optional leading `#` - `#f00`,
+`f00`, `#ff0000`, `#ff0000ff` and `ff0000ff` all pass. An empty value passes only when `allowNull` is set. Anything
+else reports `Not a valid hex string.`
 
-You can extend this validation by adding custom validators to the DynamicForms Field:
+A bound field validates through the DynamicForms Field:
 
 ```javascript
 const colorField = new Field({
   value: '#FF0000',
   validators: [
-    new Validator((value) => {
+    new Validators.Validator((value) => {
       // Your custom validation logic
       if (value && !value.startsWith('#')) {
         return [new ValidationErrorText('Color must start with #')];
@@ -81,7 +83,7 @@ This component emits all [common events from InputBase](./input-base):
 </template>
 
 <script setup>
-import { Field, ValidationErrorText, Validator } from '@dynamicforms/vue-forms';
+import { Field, ValidationErrorText, Validators } from '@dynamicforms/vue-forms';
 import { DfColor } from '@dynamicforms/vuetify-inputs';
 
 // Valid brand colors
@@ -90,7 +92,7 @@ const brandColors = ['#C41E3A', '#1B4D3E', '#0F52BA', '#FFA500'];
 const colorField = new Field({
   value: '#C41E3A',
   validators: [
-    new Validator((value) => {
+    new Validators.Validator((value) => {
       if (!value) return null;
       if (!brandColors.includes(value)) {
         return [new ValidationErrorText('Please select a color from the brand palette')];

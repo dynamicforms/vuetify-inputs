@@ -5,6 +5,72 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-08-20
+
+### Changed
+
+- The `@dynamicforms/vue-forms` peer dependency is `^0.17.0`, the `vue` peer is `^3.5.2` and `engines.node` is `>=22`.
+  The last two are the peer library's own floors. Eleven of its releases sit between 0.6.0 and 0.17.0; an
+  application's own use of it migrates in the same step, which [the migration guide](/guide/migration) points at.
+- `useInputBase()` returns `density` as the `ComputedRef` it computes, where it returned that computed's value as a
+  plain string read once during setup. A consumer outside a template needs `.value`, and the density now follows a
+  later change of the `density` prop. An injected `field-density` and the plugin's `defaultDensity` are read once,
+  as configuration. `densityClass` is unchanged.
+- The `visibility` prop is resolved through `DisplayMode.fromAny()`, so it accepts a constant's name
+  case-insensitively - `visibility="hidden"` states what it looks like it states - and a value naming no
+  `DisplayMode` constant throws where the field renders. Both used to render the field fully and say nothing. The
+  prop is typed `Form.DisplayMode | string` accordingly.
+- An input bound to a `control` emits `update:modelValue` with the value the control ended up holding rather than
+  the value that was written to it. The two differ where the field does not take a write verbatim: a
+  `ValueChangedAction` that normalises it, a disabled field that drops it, a handler that throws and so unwinds the
+  operation. An input with no `control` emits what was written, as before.
+
+- An input bound to a control is drawn disabled while any container above that control is disabled. It read the
+  element's own `enabled`, so the fields of a disabled section stayed editable. `enabled` on each element is
+  unchanged and still answers what was written to it; what an input draws from is `effectiveEnabled`.
+- `ActionRenderOptions` states `label` and `icon` as strings. `ActionValue` types both `unknown` from vue-forms
+  0.17.0, leaving what a label is to the rendering library, and this is that library saying so.
+
+### Fixed
+
+- An input treats an accepted write of an array or an object as accepted. An element holds its state behind
+  `reactive()`, so such a value reads back as a proxy of what was written; the composable compared identities and
+  concluded that every one of those writes had been refused, holding the written value for a tick and scheduling a
+  second render of the input per change. The comparison is made over the raw objects.
+
+- `Action.label` and `Action.icon` are the peer library's accessors and answer what the action carries. This class
+  declared both as getters that filter the read by `showLabel` and `showIcon`; a getter declared alone defines the
+  whole property, so the assignment the peer documents threw a `TypeError`, and the filter tested the flags for
+  truthiness rather than for `false`, so an action stating neither answered `undefined` from both while
+  `<df-actions>` drew the text and the icon. The filtered reads are `renderedLabel` and `renderedIcon`, which is
+  what the action draws; `label` and `icon` answer the text and the name, and take writes.
+- `df-file` and `df-datetime` apply their density-dependent wrapper class whatever the density is resolved from. The
+  template read the `density` prop, so the class was missing whenever the density came from an injected
+  `field-density` or from the plugin settings; both components now read the resolved density from `useInputBase()`.
+- `df-select` no longer shows a selection the control refused. A write the model unwinds - a validator that throws,
+  a disabled field - never reached the watch that pushes the model's value back into the chips, so they went on
+  displaying a choice the control never took. What the control holds is compared against what was written, deeply,
+  since a multiple selection reads back as a different array holding the same items.
+- `df-select` warns about `choices` and `fetchChoices` only when both are set. The check tested the computed list of
+  items, which is an array and so always truthy, and the warning therefore fired for every select given nothing but
+  `fetchChoices`.
+
+### Added
+
+- An element carries the presentation the components render it with. `label`, `placeholder`, `helpText`, `hint`,
+  `cssClass`, `density` and `variant` are declared on vue-forms' `Extras` augmentation point, so they are typed on
+  every element in an application that installs this library - the fields written inline in a `Group` declaration
+  included - and are stated in the parameters an element is built with or written later with `setExtendedValues()`.
+  A form declared in code therefore describes itself, and `<df-input :control="form.fields.name" />` needs no
+  attribute of its own. A prop wins where both state something, and what an element carries wins over an injected
+  `field-density` / `field-variant` and over the plugin defaults.
+- Documentation of the configuration cascade at `/examples/configuration`: the plugin's options, what `provide` of
+  `field-density` and `field-variant` reaches, and the order the two are resolved in.
+- Documentation of `DfInputHint` at `/examples/df-input-hint`: the props of the message row every input renders, and
+  what it takes when it is used on its own for a group's errors.
+- Documentation of localisation at `/examples/localisation`: every translatable string with its default and where it
+  surfaces, CKEditor's interface language, and the date-fns locale `<df-date-time>` formats and parses with.
+
 ## [0.8.1] - 2026-08-16
 
 ### Fixed

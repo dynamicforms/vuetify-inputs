@@ -15,19 +15,20 @@ Here's the source code for the demo above:
 ### JavaScript/TypeScript
 
 ```js
-import { Group, Field, MdString, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
+import { computed } from 'vue';
+import { Group, Field, MdString, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
 
 // Create a form group with validated fields
 const validatedForm = new Group({
-  // Required field - cannot be empty
-  username: new Field({ 
-    value: '', 
-    validators: [new Validators.Required('Username is required')]
+  // Required field - cannot be empty, and a value of spaces alone is empty too
+  username: new Field({
+    value: '',
+    validators: [new Validators.Required()]
   }),
-  
+
   // Email field with pattern validation
-  email: new Field({ 
-    value: '', 
+  email: new Field({
+    value: '',
     validators: [
       new Validators.Pattern(
         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
@@ -35,43 +36,53 @@ const validatedForm = new Group({
       ),
     ]
   }),
-  
+
   // Number field with range validation
-  age: new Field({ 
-    value: 18, 
-    validators: [
-      new Validators.ValueInRange(18, 100, 'Age must be between 18 and 100')
-    ]
+  age: new Field({
+    value: null,
+    validators: [new Validators.ValueInRange(18, 100)]
   }),
-  
+
   // Field with allowed values validation
-  role: new Field({ 
-    value: '', 
-    validators: [
-      new Validators.InAllowedValues(
-        ['admin', 'user', 'guest'], 
-        'Role must be one of: admin, user, or guest'
-      )
-    ]
+  role: new Field({
+    value: '',
+    validators: [new Validators.InAllowedValues(['admin', 'user', 'guest'])]
   }),
-  
+
   // Text field with length validation
   bio: new Field({
     value: '',
-    validators: [
-      new Validators.LengthInRange(10, 200, 'Bio must be between 10 and 200 characters')
-    ]
+    validators: [new Validators.LengthInRange(10, 200)]
   })
 });
 
 // group.valid covers the group's own errors and those of every field it holds
 const formValid = computed(() => validatedForm.valid);
 
-// A value changed action on the group fires for a change in any of its fields
-validatedForm.registerAction(new ValueChangedAction(async (field, supr, newValue, oldValue) => {
+// Function to reset the form. The five writes are one transaction, so the group announces one change rather than
+// five, and a handler that throws leaves the form as it was.
+function resetForm() {
+  transaction(() => {
+    validatedForm.fields.username.value = '';
+    validatedForm.fields.email.value = '';
+    validatedForm.fields.age.value = null;
+    validatedForm.fields.role.value = '';
+    validatedForm.fields.bio.value = '';
+  });
+}
+
+// A value changed action on the group fires for a change in any of its fields. The handler stays synchronous:
+// the write that triggers it returns once the chain has run, so nothing awaits a promise it hands back.
+validatedForm.registerAction(new ValueChangedAction((field, supr, newValue, oldValue) => {
+  console.log('Form value has changed');
   return supr(field, newValue, oldValue);
 }));
 ```
+
+Each validator is built without a message here, so the field shows the built-in one - `'Please enter a value'`,
+`'Value must be between **18** and **100**'` and so on. Pass a message as the last constructor argument (the first,
+for `Required`) to replace it; a plain string renders as text and an `MdString` as markdown, as the email field
+shows.
 
 ### Vue Template
 
@@ -139,13 +150,25 @@ validatedForm.registerAction(new ValueChangedAction(async (field, supr, newValue
         >
           Submit
         </v-btn>
+        <v-btn
+          color="secondary"
+          @click="resetForm"
+          class="ml-2"
+        >
+          Reset
+        </v-btn>
       </v-card-actions>
     </v-card>
 
     <v-card>
       <v-card-title>Form Validation Status</v-card-title>
       <v-card-text>
-        <p>Form is {{ formValid ? 'valid' : 'invalid' }}</p>
+        <v-alert
+          :type="formValid ? 'success' : 'error'"
+          class="mb-3"
+        >
+          Form is {{ formValid ? 'valid' : 'invalid' }}
+        </v-alert>
         <pre class="output">{{ JSON.stringify(validatedForm.value, null, 2) }}</pre>
       </v-card-text>
     </v-card>
@@ -155,33 +178,31 @@ validatedForm.registerAction(new ValueChangedAction(async (field, supr, newValue
 
 ## Key Features Demonstrated
 
-- **Required Validator**: Ensures a field is not empty
-- **Pattern Validator**: Validates content against a regular expression (email format)  
-- **ValueInRange Validator**: Ensures a numeric value is within specified bounds
-- **InAllowedValues Validator**: Restricts input to a predefined set of values
-- **LengthInRange Validator**: Validates that the input length is within specified bounds
-- **Form-level Validation**: Tracking overall form validity based on individual field states
+- **Required Validator**: Fails on an empty value - a zero-length string, an empty array, an empty plain object,
+  `null` or `undefined`. A string is measured after it is trimmed, so a field holding nothing but spaces is empty
+  and invalid; `new Validators.Required({ trim: false })` measures the string as it stands. Only strings are
+  trimmed - an array, an object or any other value is measured as it is
+- **Pattern Validator**: Tests `String(value)` against a regular expression (email format here), so `undefined` is
+  tested as the string `"undefined"`
+- **ValueInRange Validator**: Fails when the value is below the minimum, above the maximum, or `undefined`. The
+  bounds are compared with `<` and `>`, which coerce `null` to `0`, so the `null` the age field starts out with fails
+  a range that begins at 18
+- **InAllowedValues Validator**: Restricts input to a predefined set of values, read at each validation rather than
+  at construction
+- **LengthInRange Validator**: Validates that the length of the value is within the given bounds; strings, arrays
+  and plain objects are measured by their own length, anything else by the length of `String(value)`
+- **Form-level Validation**: `group.valid` covers the group's own errors and those of every field it holds
 - **Error Display**: Showing validation errors to the user
 
 ## Try It Yourself
 
 Experiment with the validators by:
-1. Leaving fields empty
+1. Leaving the username empty, or typing nothing but spaces into it
 2. Entering an invalid email address
 3. Setting age outside the valid range
 4. Selecting different role values
 5. Entering text that's too short or too long in the bio field
 
 <script setup>
-import { computed } from 'vue';
 import ValidatorsFormDemo from '../components/validators-demo.vue';
-
-function getErrorMessages(field) {
-  if (!field.errors || field.errors.length === 0) return [];
-  return field.errors.map(error => {
-    if (error.componentBody) return error.componentBody;
-    if (error.text) return error.text;
-    return 'Validation error';
-  });
-}
 </script>

@@ -1,4 +1,4 @@
-# DynamicForms Vue Forms Documentation
+# DynamicForms Vuetify Inputs Documentation
 
 This directory contains the VitePress documentation for `@dynamicforms/vuetify-inputs`.
 
@@ -19,12 +19,11 @@ The site will be available at http://localhost:5173/
 ## Structure
 
 - `.vitepress/` - VitePress configuration
-  - `theme/` - Custom theme configuration
-  - `config.ts` - VitePress configuration
-- `guide/` - User guide documentation
-- `api/` - API reference documentation
-- `examples/` - Interactive examples
-- `components/` - Vue components used in the documentation
+  - `config.ts` - Site configuration: title, navigation, sidebar, Vuetify and CKEditor build setup
+  - `theme/` - Custom theme that installs Vuetify and the `DynamicFormsInputs` plugin
+- `guide/` - User guide: getting started and the migration guide
+- `examples/` - API reference pages, each with interactive examples
+- `components/` - Vue components the example pages embed as live demos
 
 ## Building
 
@@ -39,6 +38,8 @@ The built site will be in the `docs/.vitepress/dist` directory.
 
 ## Adding New Examples
 
-1. Create a new Vue component in `.vitepress/components/`
+1. Create a new Vue component in `components/`
 2. Create a new markdown page in `examples/`
-3. Import and use the component in your markdown page
+3. In that page, add a `<script setup>` block importing the component from `../components/`, and place the component's
+   tag where the demo belongs
+4. Add the page to the `/examples/` sidebar in `.vitepress/config.ts`

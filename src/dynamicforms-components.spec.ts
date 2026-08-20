@@ -41,6 +41,8 @@ describe('dynamicforms-components', () => {
     expect(resolveFromTag(tag, registrationNames), `<${tag}> does not resolve`).not.toBe(tag);
   });
 
+  // the [Vue warn] this emits is the assertion: the registration name is deliberately mis-cased, so the tag
+  // resolves to nothing
   it('reports a tag as unresolved when no registration name reaches it', () => {
     expect(resolveFromTag('df-input-hint', ['DFInputHint'])).toBe('df-input-hint');
   });

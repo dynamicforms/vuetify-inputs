@@ -24,7 +24,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| minHeight | `string` | `undefined` | Minimum height of the editor |
+| minHeight | `string` | `'7em'` | Minimum height of the editing area |
 
 ### Inherited Props
 
@@ -126,14 +126,14 @@ const content = ref('<h2>Welcome</h2><p>This is a <strong>rich text editor</stro
 </template>
 
 <script setup>
-import { Group, Field, ValidationErrorText, Validator } from '@dynamicforms/vue-forms';
+import { Group, Field, ValidationErrorText, Validators } from '@dynamicforms/vue-forms';
 import { DfRtfEditor } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
   description: new Field({
     value: '<p>Enter a detailed product description here.</p>',
     validators: [
-      new Validator((value) => {
+      new Validators.Validator((value) => {
         if (!value || value === '<p></p>') return [new ValidationErrorText('Description is required')];
         if (value.length < 20) return [new ValidationErrorText('Description is too short')];
         return null;
