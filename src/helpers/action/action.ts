@@ -29,9 +29,19 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return this.value.name;
   }
 
-  /** @see ActionRenderOptions.label */
+  /**
+   * @see ActionRenderOptions.label
+   *
+   * The read is filtered by `showLabel`, so an action rendering icon-only answers `undefined` while carrying a
+   * label. The write is the base class's and reaches `value.label` whatever `showLabel` says, so a write followed
+   * by a read of an icon-only action does not answer with what was written.
+   */
   get label() {
     return this.value.showLabel ? this.value.label : undefined;
+  }
+
+  set label(newValue: string | undefined) {
+    super.label = newValue;
   }
 
   /** @see ActionRenderOptions.showLabel */
@@ -39,9 +49,17 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return isString(this.value.label) && !isEmpty(this.value.label) ? this.value.showLabel : false;
   }
 
-  /** @see ActionRenderOptions.icon */
+  /**
+   * @see ActionRenderOptions.icon
+   *
+   * Filtered by `showIcon` on the read, unfiltered on the write - as `label` is.
+   */
   get icon() {
     return this.value.showIcon ? this.value.icon : undefined;
+  }
+
+  set icon(newValue: string | undefined) {
+    super.icon = newValue;
   }
 
   /** @see ActionRenderOptions.showIcon */

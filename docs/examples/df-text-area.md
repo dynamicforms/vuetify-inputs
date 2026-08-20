@@ -13,7 +13,7 @@ Below is an example of the df-text-area component used with DynamicForms:
 - Integration with `@dynamicforms/vue-forms` for state management and validation
 - Configurable number of rows
 - Auto-growing height with configurable maximum rows
-- Length validation with maxLength property
+- Length validation through vue-forms validators on the bound field
 - Customizable labels, hints, and error messages
 
 ## Props
@@ -92,7 +92,7 @@ import { Validators } from '@dynamicforms/vue-forms';
 const form = new Group({
   notes: new Field({ 
     value: '',
-    validators: [new Validators.LengthInRange(minLength, maxLength)]
+    validators: [new Validators.LengthInRange(10, 500)]
   })
 });
 </script>

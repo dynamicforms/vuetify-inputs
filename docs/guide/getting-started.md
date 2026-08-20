@@ -123,60 +123,28 @@ const categoryOptions = [
 
 ## Available Components
 
+- [**InputBase**](/examples/input-base): The base component for all input elements
 - [**df-actions**](/examples/df-actions): An actions group.
 - [**df-checkbox**](/examples/df-checkbox): A checkbox component.
 - [**df-color**](/examples/df-color): A color input.
 - [**df-date-time**](/examples/df-datetime): A date and time selection component with configurable format and type.
 - [**df-file**](/examples/df-file): A file upload component with progress indication.
 - [**df-input**](/examples/df-input): A general value input.
-- **df-input-hint**: Renders a field's or a group's errors, falling back to its hint text.
+- [**df-input-hint**](/examples/df-input-hint): Renders a field's or a group's errors, falling back to its hint text.
 - [**df-rtf-editor**](/examples/df-rtf-editor): A RTF editor input.
 - [**df-select**](/examples/df-select): A selection component supporting static or dynamic options, multiple selection,
   and tagging.
-- [**df-textarea**](/examples/df-text-area): A textarea component with configurable rows and validation.
+- [**df-text-area**](/examples/df-text-area): A textarea component with configurable rows and validation.
 
 ## Localisation
 
-- You can translate strings that are used in this library by calling ```translateStrings``` function. This function
-  takes a callback function which is called with string code as a parameter. Function should return a translated string.
-  If you can't provide translation for string code, return null and default (English) string will be used.
-- All translatable strings are available in ```translatableStrings``` variable. Those strings are used on info and
-  yes/no dialog and on rtf editor.
-- Example of usage:
+The library renders a few English strings of its own — the labels of the predefined actions and the entries of the two
+dropdowns the RTF editor adds to CKEditor's toolbar. `translateStrings()` replaces them, `setCkEditorLanguage()` sets
+CKEditor's interface language, and `DateTimeLocaleConfig` sets the date-fns locale `<df-date-time>` formats and parses
+with.
 
-```
-import { translateStrings } from '@dynamicforms/vuetify-inputs';
-
-function translateDFText() {
-  return (textCode: string) => {
-    const translationsTextCode = `df_modal.${textCode}`;
-    const translation = t(translationsTextCode);
-    if (translation !== translationsTextCode) return translation;
-    return null;
-  };
-}
-
-watch(locale, () => {
-  translateStrings(translateDFText());
-});
-```
-- If you want to use ckEditor in your language you have to set it using ```setCkEditorLanguage``` function. This function takes locale code and ckEditor translations as parameter.  
-- Example of usage:
-```
-import { setCkEditorLanguage } from '@dynamicforms/vuetify-inputs';
-
-import coreTranslationsDe from 'ckeditor5/translations/de';
-
-const ckEditorTranslations = {
-  de: coreTranslationsDe,
-  en: undefined,
-}
-
-onMounted(() => {
-  const localeCode = locale.value;
-  setCkEditorLanguage(localeCode, ckEditorTranslations[localeCode])
-});
-```
+[Localisation](/examples/localisation) lists every translatable key with its default and where it appears, and carries
+a worked example that keeps all three on the application's current locale.
 
 ## Next Steps
 

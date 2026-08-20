@@ -1,6 +1,6 @@
 import Form, { MdString, ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
 import { isEmpty, isString } from 'lodash-es';
-import { computed, inject, ref } from 'vue';
+import { computed, inject, nextTick, ref, shallowRef } from 'vue';
 
 import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
@@ -25,7 +25,7 @@ export interface BaseProps<T = any> {
   helpText?: string;
   hint?: string;
   enabled?: boolean;
-  visibility?: Form.DisplayMode;
+  visibility?: Form.DisplayMode | string;
   cssClass?: string;
   clearable?: boolean;
   passthroughAttrs?: Record<string, any>;
@@ -42,18 +42,38 @@ export interface BaseEmits<T = any> {
 
 export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+  const injectedDensity = inject<FieldDensity | null>('field-density', null);
+  const injectedVariant = inject<FieldVariant | null>('field-variant', null);
   const internalValue = ref<T | null>(null);
+
+  // A control may refuse the write or take a different value than the one written: a ValueChangedAction that
+  // normalises it, a disabled field that drops it, or a handler that throws and so unwinds the whole operation.
+  // The rendered control has the written value in its DOM by then, and the computed alone cannot repaint it -
+  // it reads back what the field held all along, and Vue schedules no render for a value that did not move.
+  // Holding the written value for one tick makes the read change twice, so the repaint that restores the
+  // field's own value happens.
+  const pendingWrite = shallowRef<{ value: T } | null>(null);
 
   const value = computed({
     get(): T {
+      if (pendingWrite.value) return pendingWrite.value.value;
       if (props.control) return props.control.value as T;
       if (props.modelValue === undefined) return internalValue.value as T;
       return props.modelValue as T;
     },
     set(newValue: T) {
-      if (props.control) props.control.value = newValue;
+      try {
+        if (props.control) props.control.value = newValue;
+      } finally {
+        if (props.control && props.control.value !== newValue) {
+          pendingWrite.value = { value: newValue };
+          nextTick(() => {
+            pendingWrite.value = null;
+          });
+        }
+      }
       if (props.modelValue === undefined) internalValue.value = newValue;
-      emit('update:modelValue', newValue);
+      emit('update:modelValue', props.control ? (props.control.value as T) : newValue);
     },
   });
 
@@ -77,9 +97,14 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const anyErrors = computed(() => (touched.value && errors.value.length > 0 ? ' ' : undefined));
   const showErrors = computed(() => (touched.value ? errors.value : undefined));
   const enabled = computed(() => (props.control ? props.control.enabled : props.enabled !== false));
-  const visibility = computed(() =>
-    props.control ? props.control.visibility : props.visibility || Form.DisplayMode.FULL,
-  );
+  // A control resolves its own mode - vue-forms refuses anything that is not a DisplayMode constant and reads a
+  // name case-insensitively. The prop is resolved the same way, so `visibility="hidden"` states what it looks
+  // like it states and an unrecognised mode is refused here as loudly as it is there.
+  const visibility = computed(() => {
+    if (props.control) return props.control.visibility;
+    if (props.visibility == null) return Form.DisplayMode.FULL;
+    return Form.DisplayMode.fromAny(props.visibility);
+  });
   const isRendered = computed(() => visibility.value !== Form.DisplayMode.SUPPRESS);
   const visibilityClass = computed(() => ({
     'd-none': visibility.value === Form.DisplayMode.HIDDEN,
@@ -94,11 +119,11 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const cssClass = computed(() => props.cssClass || '');
 
   const density = computed(
-    (): FieldDensity => props.density ?? inject('field-density', null) ?? settings.defaultDensity ?? 'default',
+    (): FieldDensity => props.density ?? injectedDensity ?? settings.defaultDensity ?? 'default',
   );
   const boundDensity = computed((): VuetifyDensity => (density.value === 'inline' ? 'default' : density.value));
   const variant = computed(
-    (): FieldVariant => props.variant ?? inject('field-variant', null) ?? settings.defaultVariant ?? 'underlined',
+    (): FieldVariant => props.variant ?? injectedVariant ?? settings.defaultVariant ?? 'underlined',
   );
 
   return {
@@ -112,7 +137,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     visibilityClass,
     label,
     touched,
-    density: density.value,
+    density,
     densityClass: computed(() => `df-density-${density.value}`),
 
     vuetifyBindings: computed(() => ({

@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { unionBy } from 'lodash-es';
+import { isEqual, unionBy } from 'lodash-es';
 import { computed, nextTick, ref, toRefs, unref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import { VAutocomplete, VCombobox } from 'vuetify/components';
@@ -125,8 +125,8 @@ const searchText = ref<string | null>(null);
 const fetchCounterGlobal = ref(0);
 const isMultiline = ref(false);
 
-if (options.value && propsWithDefaults.fetchChoices !== undefined) {
-  console.warn('Both options and fetchChoices are set. Only one of them should be set.');
+if (choices.value?.length && propsWithDefaults.fetchChoices !== undefined) {
+  console.warn('Both choices and fetchChoices are set. Only one of them should be set.');
 }
 
 function emitModelValueDisplay(mcVal: any) {
@@ -137,10 +137,27 @@ const setResultingValueGuard = ref(false);
 
 function setResultingValue(newValue: any) {
   setResultingValueGuard.value = true;
-  resultingValue.value = newValue;
-  nextTick(() => {
-    setResultingValueGuard.value = false;
-  });
+  try {
+    resultingValue.value = newValue;
+  } finally {
+    // The guard suppresses the watch that pushes the model's value back into `selected`. A write the model
+    // refuses - a validator that throws unwinds it, a disabled field drops it - never reaches that watch, so
+    // the chips would go on showing a selection the control never took. Comparing what the control holds
+    // against what was written is what restores it, and it needs a deep comparison: for multiple selection the
+    // value reads back as a different array holding the same items.
+    if (!isEqual(multipleCompliantValue(resultingValue.value, multiple.value), newValue)) {
+      updateSelectedFromValue(
+        multipleCompliantValue(resultingValue.value, multiple.value),
+        selected,
+        multiple.value,
+        taggable.value,
+        loadedChoices.value,
+      );
+    }
+    nextTick(() => {
+      setResultingValueGuard.value = false;
+    });
+  }
 }
 
 function getFullWidth(item: HTMLElement | null) {

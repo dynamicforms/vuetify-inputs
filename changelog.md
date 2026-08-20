@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-08-20
+
+### Changed
+
+- The `@dynamicforms/vue-forms` peer dependency is `^0.16.0`, the `vue` peer is `^3.5.2` and `engines.node` is `>=22`.
+  The last two are the peer library's own floors. Ten of its releases sit between 0.6.0 and 0.16.0; an application's
+  own use of it migrates in the same step, which [the migration guide](/guide/migration) points at.
+- `useInputBase()` returns `density` as the `ComputedRef` it computes, where it returned that computed's value as a
+  plain string read once during setup. A consumer outside a template needs `.value`, and the density now follows a
+  later change of the `density` prop. An injected `field-density` and the plugin's `defaultDensity` are read once,
+  as configuration. `densityClass` is unchanged.
+- The `visibility` prop is resolved through `DisplayMode.fromAny()`, so it accepts a constant's name
+  case-insensitively - `visibility="hidden"` states what it looks like it states - and a value naming no
+  `DisplayMode` constant throws where the field renders. Both used to render the field fully and say nothing. The
+  prop is typed `Form.DisplayMode | string` accordingly.
+- An input bound to a `control` emits `update:modelValue` with the value the control ended up holding rather than
+  the value that was written to it. The two differ where the field does not take a write verbatim: a
+  `ValueChangedAction` that normalises it, a disabled field that drops it, a handler that throws and so unwinds the
+  operation. An input with no `control` emits what was written, as before.
+
+### Fixed
+
+- `Action.label` and `Action.icon` take writes. This class overrides both accessors to filter the read by `showLabel`
+  and `showIcon`, and a getter declared alone hides the base class's setter, so the assignment reached nothing. Both
+  setters delegate to the peer library's, which writes through the value: a write fires `ValueChangedAction` and
+  moves `isChanged`. The reads stay filtered.
+- `df-file` and `df-datetime` apply their density-dependent wrapper class whatever the density is resolved from. The
+  template read the `density` prop, so the class was missing whenever the density came from an injected
+  `field-density` or from the plugin settings; both components now read the resolved density from `useInputBase()`.
+- `df-select` no longer shows a selection the control refused. A write the model unwinds - a validator that throws,
+  a disabled field - never reached the watch that pushes the model's value back into the chips, so they went on
+  displaying a choice the control never took. What the control holds is compared against what was written, deeply,
+  since a multiple selection reads back as a different array holding the same items.
+- `df-select` warns about `choices` and `fetchChoices` only when both are set. The check tested the computed list of
+  items, which is an array and so always truthy, and the warning therefore fired for every select given nothing but
+  `fetchChoices`.
+
+### Added
+
+- Documentation of the configuration cascade at `/examples/configuration`: the plugin's options, what `provide` of
+  `field-density` and `field-variant` reaches, and the order the two are resolved in.
+- Documentation of `DfInputHint` at `/examples/df-input-hint`: the props of the message row every input renders, and
+  what it takes when it is used on its own for a group's errors.
+- Documentation of localisation at `/examples/localisation`: every translatable string with its default and where it
+  surfaces, CKEditor's interface language, and the date-fns locale `<df-date-time>` formats and parses with.
+
 ## [0.8.1] - 2026-08-16
 
 ### Fixed

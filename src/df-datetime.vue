@@ -108,7 +108,7 @@ const emits = defineEmits<Emits>();
 
 const currentLocale = computed(() => props.locale ?? unref(DateTimeLocaleConfig.dateTimeLocale));
 const firstDayOfWeek = computed(() => currentLocale.value.options?.weekStartsOn ?? 1);
-const { densityClass, touched, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
+const { density, densityClass, touched, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 const dropdown = ref('');

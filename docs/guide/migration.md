@@ -8,6 +8,186 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.9.0 (from v0.8.x)
+
+This release follows `@dynamicforms/vue-forms` 0.16.0. Nothing this library exports is renamed or removed, so most
+projects compile untouched; the work is in your own use of the peer library, plus five points on this library's own
+surface. There is a [checklist](#checklist-for-0-9-0) at the end of this section.
+
+### The peer ranges and the node floor
+
+- `@dynamicforms/vue-forms` is `^0.16.0`. Install it with this release; 0.6.x through 0.15.x are not compatible.
+- `vue` is `^3.5.2`, raised from `^3.4`.
+- `engines.node` is `>=22`.
+
+The last two are the peer library's own floors, which this package now states as well: vue-forms declares
+`vue: ^3.5.2` and `engines.node: >=22` from its 0.12.0 release.
+
+```json
+{
+  "dependencies": {
+    "@dynamicforms/vue-forms": "^0.16.0",
+    "@dynamicforms/vuetify-inputs": "^0.9.0",
+    "vue": "^3.5.2"
+  }
+}
+```
+
+### Your own use of vue-forms migrates at the same time
+
+Ten releases of the peer library sit between 0.6.0 and 0.16.0, and this library re-exports none of the API they
+changed — every `Field`, `Group`, `List`, `Action` and validator your application builds is that library's, and it
+crosses all ten in one step here. Work through
+[the vue-forms migration guide](:vue-forms:/guide/migration.html), which is written for exactly this jump; the
+sections below cover only what that guide cannot know about, which is this package's own surface.
+
+Four breaks are worth searching for before you upgrade rather than after. The first three announce nothing at all —
+no log, no throw — so the code keeps compiling and stops working:
+
+- **`watch(element, cb)` no longer fires.** An element is no longer a Vue proxy of itself, so the deep traversal a
+  reactive watch source starts stops immediately. Watch a getter over what you read: `watch(() => field.value, cb)`.
+- **`readonly(element)` protects nothing.** It hands the element straight back, and a write through the result
+  reaches the element. Hand out `element.value`, or a `computed` over it.
+- **`isEqual` over two elements no longer compares their data.** It answered `true` for any two elements of the same
+  class, and answers `false` now unless they are the same instance. Compare `a.value` with `b.value`.
+- **`clone()` is `bind(data, overrides)`.** The data comes first: `f.clone({ value: x, label: 'Name' })` is
+  `f.bind(x, { label: 'Name' })`. The type checker finds every call site.
+
+### The `visibility` prop is resolved through `DisplayMode.fromAny`
+
+The prop is typed `Form.DisplayMode | string` and is resolved the way a control resolves its own mode, which means a
+name is read case-insensitively and a value naming no `DisplayMode` constant is refused.
+
+```vue
+<!-- resolves to DisplayMode.HIDDEN, as it reads -->
+<df-input visibility="hidden" />
+
+<!-- throws: 'hiden' is not a DisplayMode constant -->
+<df-input visibility="hiden" />
+```
+
+Both lines used to render the field fully: the prop was passed through untouched, and only an exact
+`DisplayMode` constant matched the comparisons the render decision and the `d-none` / `invisible` classes are made
+of. A misspelled name, and a mode a backend knows that this version does not, therefore did nothing and said
+nothing; they now throw where the field renders.
+
+A prop that names nothing still resolves to `DisplayMode.FULL`, and a `control` prop still decides on its own
+`visibility`, which the peer library resolves the same way. Where a mode arrives from a payload and an unknown one
+has to be survivable, resolve it yourself before it reaches the prop:
+
+```typescript
+const mode = Form.DisplayMode.isDefined(payload.visibility)
+  ? Form.DisplayMode.fromAny(payload.visibility)
+  : Form.DisplayMode.FULL;
+```
+
+### `useInputBase()` answers `density` as a `ComputedRef`
+
+`density` was a plain string, resolved once while the component set up. It is the `computed` itself now, so a
+consumer reading it needs `.value`, and the value follows a change of the `density` prop. An injected
+`field-density` and the plugin's `defaultDensity` are read once, while the component sets up, so a later change of
+either does not reach a field that already exists.
+
+```typescript
+// before
+const { density } = useInputBase(props, emits);
+const isInline = density === 'inline';
+
+// after
+const { density } = useInputBase(props, emits);
+const isInline = computed(() => density.value === 'inline');
+```
+
+In a template inside `<script setup>` the read is unchanged — `density` unwraps on its own — and `densityClass` is
+what it always was, a `ComputedRef<string>` holding `df-density-${density}`. Everything else `useInputBase()`
+returns keeps its type.
+
+### `update:modelValue` carries what the control took
+
+An input bound to a `control` emits the value the control ended up holding, where it emitted the value that was
+written to it. The two differ whenever the field does not take a write verbatim: a `ValueChangedAction` that
+normalises the value, a disabled field that drops it, a handler that throws and so unwinds the whole operation.
+
+```typescript
+const control = new Form.Field<string>({ value: '' });
+control.registerAction(
+  new Form.ValueChangedAction<string>((field, supr, newValue, oldValue) => {
+    if (newValue !== newValue?.toUpperCase()) field.value = newValue!.toUpperCase();
+    return supr(field, newValue, oldValue);
+  }),
+);
+// typing "abc" emits 'ABC'; it emitted 'abc'
+```
+
+The rendered control follows the same rule. Where the write does not stand, the input reads back the written value
+for one tick and the field's own value after it, so the repaint that restores what the field holds happens; the
+Vuetify component no longer shows a value the model refused. An input with no `control` — plain `v-model`, or no
+binding at all — emits what was written, as before.
+
+If a handler of yours re-read the control after the event to find out what was actually stored, that read now
+answers what the event already carried.
+
+### `Action` takes writes to `label` and `icon` again
+
+This library's `Action` overrides both accessors to filter the read by `showLabel` / `showIcon`. A getter declared
+alone hides the base class's setter, so `action.label = 'Saving'` reached nothing. Both setters are declared again
+and delegate to the peer library's, which from its 0.9.0 assigns a new value object through the value setter:
+
+```typescript
+const save = new Action({ value: { label: 'Save', icon: 'save-icon', renderAs: ActionDisplayStyle.BUTTON } });
+
+save.label = 'Saving…';   // fires ValueChangedAction, moves isChanged, refused by a disabled action
+save.value.label;         // 'Saving…'
+```
+
+The write is a value change, so an action whose label your code drives now reports `isChanged`, and a
+`ValueChangedAction` registered on it receives an event. The reads stay filtered: an action rendering icon-only
+answers `undefined` from `label` however it was written, and `value.label` is where the written text is.
+
+### `Action.execute()` is a promise
+
+`execute(params?)` comes from the peer library and is `async` there. It answers what the `ExecuteAction` chain
+returned, and `params` is optional.
+
+```typescript
+// before: the throw arrived here
+try { save.execute(); } catch (e) { report(e); }
+
+// after: await it, or attach a catch
+try { await save.execute(); } catch (e) { report(e); }
+save.execute().catch(report);
+```
+
+The chain is entered synchronously, so a handler has already run by the time the call returns and code that ignores
+the answer keeps working. What moves is where a failure surfaces: a handler that throws rejects the promise, and a
+call that neither awaits nor catches leaves an unhandled rejection. A `@click="save.execute()"` in a template needs
+no change — Vue attaches its own catch and routes the error to `app.config.errorHandler`.
+
+`Action.busy` comes with it: `true` from the call to `execute()` until the run settles, however it settles. It is
+what a button asks while its own handler runs.
+
+```vue
+<v-btn :disabled="!save.enabled || save.busy" @click="save.execute()">{{ save.label }}</v-btn>
+```
+
+### Checklist for 0.9.0
+
+1. Update `@dynamicforms/vue-forms` to `^0.16.0` and `vue` to `^3.5.2`, and run on node 22 or newer.
+2. Search for `watch(` with an element as the source, for `readonly(` over an element, and for `isEqual` over two
+   elements; rewrite each to read the element's value.
+3. Rename `clone(` to `bind(`, moving the data out of the overrides object and into the first argument.
+4. Work through the [vue-forms migration guide](:vue-forms:/guide/migration.html) for the rest of your own use of
+   that library.
+5. Add `.value` to every read of `density` from `useInputBase()` outside a template.
+6. Check each `visibility` prop that is given a string or a value from a payload: a name that matches no
+   `DisplayMode` constant now throws where the field renders.
+7. Re-read handlers of `update:modelValue` on inputs bound to a `control`: the payload is what the control holds,
+   and a re-read of the control after the event is redundant.
+8. `await` or `.catch()` every `Action.execute()` outside a template, and drop the `try`/`catch` that wrapped the
+   synchronous call.
+9. Where your code writes `action.label` or `action.icon`, expect the write to land now — and to fire
+   `ValueChangedAction` and move `isChanged`.
+
 ## Upgrading to v0.8.0 (from v0.7.x)
 
 This release follows `@dynamicforms/vue-forms` 0.6.0. Two mechanical edits cover most projects — `Action.create(` →

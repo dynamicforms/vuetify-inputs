@@ -8,6 +8,11 @@ This section contains a collection of practical examples demonstrating the usage
 This [demo](./density) showcases support for various component variants and densities. It also demonstrates vertical 
 alignment of component parts so that your forms look perfectly aligned in all respects. 
 
+## Configuration
+
+How an application [configures the library](./configuration): the plugin options, what they register, the stylesheet,
+and where a field's density and variant come from.
+
 ## Common Base Component
 
 ### [InputBase](./input-base)
@@ -46,6 +51,11 @@ A component for file uploads.
 
 A component for general data entry.
 
+### [df-input-hint](./df-input-hint)
+
+The message row every input renders: errors when there are any, the hint otherwise. Usable on its own for a group's
+errors.
+
 ### [**df-rtf-editor**](./df-rtf-editor)
 
 A RTF editor input.
@@ -70,6 +80,11 @@ Examples of integrating Vuetify input fields with the `@dynamicforms/vue-forms` 
 ### [Validation](./validators)
 
 Various ways to validate input fields.
+
+### [Localisation](./localisation)
+
+The library's own English strings and how to translate them, CKEditor's interface language, and the date-fns locale
+`<df-date-time>` formats and parses with.
 
 ### [Groups](./groups)
 

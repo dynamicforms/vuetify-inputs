@@ -23,6 +23,39 @@ describe('Action', () => {
       expect(action.showIcon).toBe(true);
     });
 
+    it('writes label and icon through the value', () => {
+      const action = new Action({
+        value: {
+          label: 'Save',
+          icon: 'save-icon',
+          renderAs: ActionDisplayStyle.BUTTON,
+          showLabel: true,
+          showIcon: true,
+        },
+      });
+
+      action.label = 'Saving';
+      action.icon = 'spinner';
+
+      expect(action.value.label).toBe('Saving');
+      expect(action.value.icon).toBe('spinner');
+      expect(action.label).toBe('Saving');
+      expect(action.icon).toBe('spinner');
+      expect(action.isChanged).toBe(true);
+    });
+
+    it('keeps the render options when label is written', () => {
+      const action = new Action({
+        value: { name: 'save', label: 'Save', icon: 'save-icon', renderAs: ActionDisplayStyle.TEXT, showLabel: true },
+      });
+
+      action.label = 'Saving';
+
+      expect(action.name).toBe('save');
+      expect(action.renderAs).toBe(ActionDisplayStyle.TEXT);
+      expect(action.value.icon).toBe('save-icon');
+    });
+
     it('handles showLabel/showIcon logic correctly', () => {
       const actionWithEmptyLabel = new Action({
         value: {

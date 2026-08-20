@@ -27,8 +27,9 @@ To achieve this, the library introduces a **density/variant system** that applie
 Global defaults can be set once at application startup via `VuetifyInputsSettings` and propagated down through Vue's
 provide/inject, so the entire application can switch density or variant with a single change.
 
-The [density example](/docs/examples/density.md) in the documentation demonstrates all components rendered side-by-side across every density
-and variant combination to verify alignment and consistent appearance.
+The [density example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/density.html) in the documentation
+demonstrates all components rendered side-by-side across every density and variant combination to verify alignment and
+consistent appearance.
 
 ## Features
 
@@ -36,7 +37,9 @@ and variant combination to verify alignment and consistent appearance.
 - **Vuetify Based**: Built on top of Vuetify components for beautiful Material Design styling
 - **Reactive**: Full Vue reactivity support with both v-model and DynamicForms Field controls
 - **TypeScript Support**: Comprehensive type definitions for excellent developer experience
-- **Highly opinionated**: Opinionated to ensure uniform look throughout the application. 
+- **Highly opinionated**: Opinionated to ensure uniform look throughout the application.
+- **Localisable**: `translateStrings()` replaces the library's own strings, `setCkEditorLanguage()` sets the RTF
+  editor's interface language, and `DateTimeLocaleConfig` sets the date-fns locale dates are formatted and parsed with
 
 ## Installation
 
@@ -126,6 +129,7 @@ Detailed documentation is available at [https://docs.velis.si/dynamicforms/vueti
 ## Available Components
 
 - **InputBase**: The base component for all input elements
+- **DfLabel**: Renders a label - plain text, markdown or an icon - the way every input renders its own
 - **df-actions**: An actions group.
 - **df-checkbox**: A checkbox component.
 - **df-color**: A color input.

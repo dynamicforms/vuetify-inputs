@@ -32,7 +32,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | min | `number` | `undefined` | Minimum value (for number inputs) |
 | max | `number` | `undefined` | Maximum value (for number inputs) |
 | step | `number` | `undefined` | Step value (for number inputs) |
-| precision | `number` | `null` | Decimal precision (for number inputs) |
+| precision | `number` \| `null` | `null` | Decimal precision (for number inputs) |
 
 ### Inherited Props
 
@@ -65,25 +65,38 @@ This component emits all [common events from InputBase](./input-base):
 
 ### Text Input
 
+Length and format constraints are validators on the bound field, not props of the component: df-input accepts only
+the props listed above, and anything else lands on the wrapper element as a plain attribute.
+
 ```vue
 <template>
   <df-input
-    v-model="username"
+    :control="form.fields.username"
     label="Username"
-    hint="Enter your username"
-    :min-length="3"
-    :max-length="20"
-    pattern="^[a-zA-Z0-9_]+$"
+    hint="3 to 20 characters, letters, digits and underscores"
+    :passthrough-attrs="{ autocomplete: 'username' }"
   />
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { Field, Group, Validators } from '@dynamicforms/vue-forms';
 import { DfInput } from '@dynamicforms/vuetify-inputs';
 
-const username = ref('');
+const form = new Group({
+  username: new Field({
+    value: '',
+    validators: [
+      new Validators.MinLength(3),
+      new Validators.MaxLength(20),
+      new Validators.Pattern(/^[a-zA-Z0-9_]+$/, 'Letters, digits and underscores only'),
+    ],
+  }),
+});
 </script>
 ```
+
+Native DOM attributes that the input element itself should carry - `autocomplete`, `inputmode`, `maxlength` - go
+through `passthroughAttrs`, which is forwarded to the Vuetify component.
 
 ### Number Input with DynamicForms
 

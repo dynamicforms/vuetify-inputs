@@ -108,7 +108,7 @@ import {
   Operator,
   Statement,
   ValidationErrorRenderContent,
-  Validator,
+  Validators,
 } from '@dynamicforms/vue-forms';
 import { DfCheckbox, DfInput, DfInputHint } from '../../src'
 
@@ -144,7 +144,7 @@ function tripTotal() {
 }
 
 // A validator on the group itself: the rule spans several fields, so the error belongs to the group
-form.registerAction(new Validator(() => {
+form.registerAction(new Validators.Validator(() => {
   const total = tripTotal();
   if (total <= budgetLimit) return null;
   return [

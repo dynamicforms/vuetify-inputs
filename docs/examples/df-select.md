@@ -80,7 +80,7 @@ The component handles values based on the `multiple` setting:
 
 When using the `fetchChoices` prop instead of static `choices`, the component:
 
-1. Calls the function when the component mounts
+1. Calls the function while the component is being set up, before it is mounted
 2. Calls the function when the user types in the search field
 3. Uses the search text as the query parameter
 4. Uses the current value(s) as the idValue parameter (for initial loading)
@@ -99,8 +99,19 @@ const fetchChoices = async (query?: string, idValue?: any): Promise<SelectChoice
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
+In addition to the [common events from InputBase](./input-base):
+
 - `update:modelValue` - When the selected value(s) change
+- `update:modelValueDisplay` - Carries a `SelectChoice[]` holding the choices that match the current value. It is
+  emitted whenever the value settles: once while the component is being set up, again when the initial `fetchChoices`
+  call resolves, and on every later change of the selection
+
+## Slots
+
+Two slots are forwarded to the underlying `v-autocomplete` / `v-combobox`, with the slot props Vuetify passes:
+
+- `append-inner`
+- `prepend-inner`
 
 ## Examples
 
@@ -141,7 +152,7 @@ const fruits = [
 </template>
 
 <script setup>
-import { Group, Field, ValidationErrorText, Validator } from '@dynamicforms/vue-forms';
+import { Group, Field, ValidationErrorText, Validators } from '@dynamicforms/vue-forms';
 import { DfSelect } from '@dynamicforms/vuetify-inputs';
 
 const categories = [
@@ -154,7 +165,7 @@ const form = new Group({
   categories: new Field({
     value: [1],
     validators: [
-      new Validator((value) => {
+      new Validators.Validator((value) => {
         if (!value || value.length === 0) return [new ValidationErrorText('Select at least one category')];
         return null;
       })

@@ -50,7 +50,13 @@ interface ActionBreakpointOptions {
 }
 ```
 
-The `Action` object is the core component that defines how actions behave in the `df-actions` component. It extends the `FormAction` from `@dynamicforms/vue-forms` to provide responsive behavior and visual configuration.
+A breakpoint accepts the whole `ActionRenderOptions` type, but only five of its members take part in the cascade:
+`ResponsiveActionRenderOptions.cleanBreakpoint()` copies `renderAs`, `label`, `icon`, `showLabel` and `showIcon` out of
+a breakpoint and drops everything else. `name`, `defaultConfirm`, `defaultReject` and `passthroughAttrs` are read from
+the base options whatever a breakpoint states about them.
+
+The `Action` object is the core component that defines how actions behave in the `df-actions` component. It extends the
+`Action` class of `@dynamicforms/vue-forms` to provide responsive behavior and visual configuration.
 
 ### Creating Actions
 
@@ -69,7 +75,7 @@ const saveAction = new Action({
     showIcon: true,
     showLabel: true
   },
-  actions: [saveFormAction] // FormAction objects that handle execution
+  actions: [saveFormAction] // ExecuteAction handlers that run when the action is executed
 });
 ```
 
@@ -89,7 +95,16 @@ The `value` object defines the visual appearance and behavior:
 | `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the button `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
 | `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `loading`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>`, overriding `<df-actions>`'s own computed props |
 
-`enabled` and `visibility` aren't part of `ActionRenderOptions` - they're standard `FormAction`/`Field` properties from `@dynamicforms/vue-forms` (settable at the top level of the `new Action()` parameters, or via `action.enabled` / `action.visibility` directly) - but `<df-actions>` reacts to them too:
+The `label` and `icon` accessors of this subclass read through `showLabel` and `showIcon`: an icon-only action
+answers `undefined` for `label` while its value still carries one, and a label-only action answers `undefined` for
+`icon`. The writes are the base class's and reach `value.label` / `value.icon` whatever the two flags say, so a
+write followed by a read of an icon-only action does not answer with what was written. `showLabel` and `showIcon`
+answer `false` where the text they govern is missing or empty, whatever the value holds. The breakpoint-resolved
+options `<df-actions>` renders from are filtered the same way.
+
+`enabled` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` properties from
+`@dynamicforms/vue-forms` (settable at the top level of the `new Action()` parameters, or via `action.enabled` /
+`action.visibility` directly) - but `<df-actions>` reacts to them too:
 
 - `enabled: false` disables the button (`<v-btn disabled>`).
 - `visibility: DisplayMode.HIDDEN` keeps the button in the DOM with a `d-none` class.
@@ -145,19 +160,15 @@ see [responsive options](/examples/responsive-render-options) if you are writing
 
 ### Action Execution
 
-Actions are executed through the `actions` array, which contains `FormAction` objects from `@dynamicforms/vue-forms`:
+Actions are executed through the `actions` array, which holds `FieldActionBase` handlers from
+`@dynamicforms/vue-forms`; the one that runs on execution is `ExecuteAction`:
 
 ```typescript
 import { ExecuteAction } from '@dynamicforms/vue-forms';
 
 // Create the execution logic
 const saveFormAction = new ExecuteAction(async (action, supr, params) => {
-  try {
-    await saveDocument();
-    showSuccessMessage('Document saved successfully');
-  } catch (error) {
-    showErrorMessage('Failed to save document');
-  }
+  await saveDocument();
   return supr(action, params); // Call the super method
 });
 
@@ -167,6 +178,46 @@ const saveAction = new Action({
   actions: [saveFormAction]
 });
 ```
+
+#### Awaiting a run
+
+`action.execute(params?)` runs the `ExecuteAction` chain and answers a promise carrying what the chain returned. The
+chain is entered synchronously - a handler has already run by the time `execute()` returns - but a handler that
+throws rejects that promise rather than throwing out of the call, so the failure is reported to whoever awaits the
+answer:
+
+```typescript
+try {
+  await saveAction.execute();
+  showSuccessMessage('Document saved successfully');
+} catch (error) {
+  showErrorMessage('Failed to save document');
+}
+```
+
+A call that neither awaits the answer nor attaches a `.catch()` leaves the rejection unhandled: it surfaces through
+the runtime rather than through the form, and the action carries no trace of it. A handler rendered through
+`<df-actions>` needs no change on that count - the component calls `execute(event)` from a template event handler,
+and Vue attaches its own catch to the promise such a handler answers with, so the rejection goes to Vue's error
+handling instead of nowhere. Where the user has to be told what failed, catch it in the `ExecuteAction` handler.
+
+See [handling a failed run](:vue-forms:/api/actions.html#handling-a-failed-run) for the whole contract.
+
+#### Reporting a run in flight
+
+`action.busy` is `true` from the call to `execute()` until the run it started settles, whether it resolves or
+rejects; overlapping runs are counted, so it stands until the last of them is done. `<df-actions>` doesn't read it -
+the button stays clickable through a run - so an action that must not be entered twice writes its own `enabled`,
+which the component does bind:
+
+```typescript
+import { watchEffect } from 'vue';
+
+watchEffect(() => { saveAction.enabled = !saveAction.busy; });
+```
+
+`execute()` itself doesn't consult `enabled`, so this stops the click rather than the call; a programmatic
+`execute()` runs whatever `enabled` says.
 
 ### Predefined Actions
 
@@ -241,8 +292,7 @@ import { ExecuteAction } from '@dynamicforms/vue-forms';
 
 // Business logic
 const submitFormAction = new ExecuteAction(async (action, supr, params) => {
-  const formData = await form.getValues();
-  await api.submitForm(formData);
+  await api.submitForm(form.value);
   router.push('/success');
   return supr(action, params);
 });
@@ -270,8 +320,11 @@ const submitAction = new Action({
 });
 ```
 
-This approach separates visual presentation (Action) from business logic (FormAction), while providing powerful 
-responsive capabilities for different screen sizes.
+`form` here is a `Group`: it hands out what it holds through the `value` property, or through `fullValue` where
+disabled members have to be in the payload.
+
+This approach separates visual presentation (the `Action` and its render options) from business logic (the
+`ExecuteAction` handlers), and lets each screen size get the presentation that fits it.
 
 ## Responsive Behavior
 

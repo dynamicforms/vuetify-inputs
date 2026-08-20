@@ -1,6 +1,6 @@
 import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
 import { describe, expect, it, vi } from 'vitest';
-import { nextTick } from 'vue';
+import { nextTick, reactive } from 'vue';
 
 import { Label, useInputBase, type BaseProps } from './input-base';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings';
@@ -90,6 +90,48 @@ describe('input-base', () => {
 
         expect(value.value).toBe('internal');
         expect(emit).toHaveBeenCalledWith('update:modelValue', 'internal');
+      });
+
+      it('emits what the control took, not what was written', async () => {
+        const control = new Form.Field<string>({ value: 'initial' });
+        control.registerAction(
+          new Form.ValueChangedAction<string>((field, supr, newValue, oldValue) => {
+            const normalised = (newValue ?? '').toUpperCase();
+            if (normalised !== newValue) field.value = normalised;
+            return supr(field, newValue, oldValue);
+          }),
+        );
+        const emit = vi.fn();
+
+        const { value } = useInputBase<string>({ control }, emit);
+
+        value.value = 'typed';
+        await nextTick();
+
+        expect(control.value).toBe('TYPED');
+        expect(emit).toHaveBeenCalledWith('update:modelValue', 'TYPED');
+      });
+
+      it('reads back the written value for one tick when the control refuses the write', async () => {
+        const control = new Form.Field<string>({ value: 'initial' });
+        control.registerAction(
+          new Form.ValueChangedAction<string>(() => {
+            throw new Error('refused');
+          }),
+        );
+        const emit = vi.fn();
+
+        const { value } = useInputBase<string>({ control }, emit);
+
+        expect(() => {
+          value.value = 'refused';
+        }).toThrow('refused');
+        expect(value.value).toBe('refused');
+
+        await nextTick();
+
+        expect(control.value).toBe('initial');
+        expect(value.value).toBe('initial');
       });
 
       it('emits update:modelValue on value change', async () => {
@@ -458,6 +500,33 @@ describe('input-base', () => {
       });
     });
 
+    describe('visibility prop', () => {
+      it('resolves a mode named as a string', () => {
+        const emit = vi.fn();
+
+        const { visibility, isRendered } = useInputBase({ visibility: 'hidden' }, emit);
+
+        expect(visibility.value).toBe(Form.DisplayMode.HIDDEN);
+        expect(isRendered.value).toBe(true);
+      });
+
+      it('refuses a mode that names no DisplayMode constant', () => {
+        const emit = vi.fn();
+
+        const { visibility } = useInputBase({ visibility: 'hiden' }, emit);
+
+        expect(() => visibility.value).toThrow();
+      });
+
+      it('is FULL when the prop names nothing', () => {
+        const emit = vi.fn();
+
+        const { visibility } = useInputBase({}, emit);
+
+        expect(visibility.value).toBe(Form.DisplayMode.FULL);
+      });
+    });
+
     describe('placeholder, helpText, hint, cssClass', () => {
       it('returns provided values', () => {
         const props: BaseProps = {
@@ -496,7 +565,7 @@ describe('input-base', () => {
 
         const { density } = useInputBase(props, emit);
 
-        expect(density).toBe('compact');
+        expect(density.value).toBe('compact');
       });
 
       it('uses injected field-density when props.density is not provided', () => {
@@ -506,7 +575,7 @@ describe('input-base', () => {
 
         const { density } = useInputBase(props, emit);
 
-        expect(density).toBe('comfortable');
+        expect(density.value).toBe('comfortable');
       });
 
       it('uses settings.defaultDensity when no props or inject', () => {
@@ -517,7 +586,7 @@ describe('input-base', () => {
 
         const { density } = useInputBase(props, emit);
 
-        expect(density).toBe('compact');
+        expect(density.value).toBe('compact');
       });
 
       it('defaults to "default" when nothing is provided', () => {
@@ -526,7 +595,22 @@ describe('input-base', () => {
 
         const { density } = useInputBase(props, emit);
 
-        expect(density).toBe('default');
+        expect(density.value).toBe('default');
+      });
+
+      it('follows a change of the density prop', async () => {
+        const props: BaseProps = reactive({ density: 'compact' });
+        const emit = vi.fn();
+
+        const { density, densityClass } = useInputBase(props, emit);
+
+        expect(density.value).toBe('compact');
+
+        props.density = 'comfortable';
+        await nextTick();
+
+        expect(density.value).toBe('comfortable');
+        expect(densityClass.value).toBe('df-density-comfortable');
       });
 
       it('boundDensity converts inline to default', () => {
@@ -600,9 +684,8 @@ describe('input-base', () => {
 
     describe('vuetifyBindings', () => {
       it('maps all properties correctly', () => {
-        // fieldName is installed by the containing Group, so a standalone field receives it by assignment
-        const control = new Form.Field({ value: 'test' });
-        control.fieldName = 'testField';
+        // fieldName is a read-only accessor the containing Group writes, so the field is declared inside one
+        const control = new Form.Group({ testField: new Form.Field({ value: 'test' }) }).fields.testField;
         const props: BaseProps = {
           control,
           label: 'Test Label',
@@ -701,7 +784,7 @@ describe('input-base', () => {
 
         const result = useInputBase(props, emit);
 
-        expect(result.density).toBe('comfortable');
+        expect(result.density.value).toBe('comfortable');
         expect(result.vuetifyBindings.value.variant).toBe('solo-filled');
       });
 
@@ -713,7 +796,7 @@ describe('input-base', () => {
 
         const { density } = useInputBase(props, emit);
 
-        expect(density).toBe('default');
+        expect(density.value).toBe('default');
       });
     });
   });
