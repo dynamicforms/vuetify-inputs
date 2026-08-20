@@ -29,11 +29,17 @@ features:
     link: /examples/density
     linkText: Variant demo
   - title: Defaults that cascade
-    details: Density and variant are read from the prop, then from an ancestor's provide('field-density') /
-      provide('field-variant'), then from the plugin's defaultDensity / defaultVariant, and finally from the baked-in
-      'default' and 'underlined'.
+    details: Density and variant are read from the prop, then from the field itself, then from an ancestor's
+      provide('field-density') / provide('field-variant'), then from the plugin's defaultDensity / defaultVariant,
+      and finally from the baked-in 'default' and 'underlined' — most specific statement first.
     link: /examples/configuration
     linkText: Configuration
+  - title: A field that describes itself
+    details: A field carries its own label, hint, placeholder, help text, css class, density and variant, typed on
+      every element through vue-forms' Extras augmentation point. A form declared in code needs no presentation
+      attributes at the tags that draw it, and a prop still wins wherever one is written.
+    link: /examples/input-base
+    linkText: Presentation on the element
   - title: A control, a v-model, or neither
     details: Bind a vue-forms control and the field owns the value, validity, enabled state and visibility. Bind
       v-model and the component reports every change to the parent. Bind neither and it keeps the value itself.

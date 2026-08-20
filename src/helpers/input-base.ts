@@ -16,6 +16,29 @@ export type FieldVariant = 'outlined' | 'plain' | 'underlined' | 'filled' | 'sol
 export type VuetifyDensity = 'default' | 'comfortable' | 'compact';
 export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
 
+/**
+ * The presentation an element carries for the components in this library.
+ *
+ * Every one of these is also a prop, and the prop wins where both state something: a call site is more specific
+ * than the element it renders. What the element carries is what a form declared in code says about itself, so a
+ * field that names its own label needs no attribute at the tag that draws it.
+ *
+ * `Extras` is @dynamicforms/vue-forms' augmentation point for exactly this, so these properties are typed on every
+ * element in an application that installs this library, the fields written inline in a `Group` declaration
+ * included.
+ */
+declare module '@dynamicforms/vue-forms' {
+  interface Extras {
+    label?: string | Label | MdString;
+    placeholder?: string;
+    helpText?: string;
+    hint?: string;
+    cssClass?: string;
+    density?: FieldDensity;
+    variant?: FieldVariant;
+  }
+}
+
 export interface BaseProps<T = any> {
   control?: Form.FieldBase<T>;
   modelValue?: T;
@@ -96,7 +119,9 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   );
   const anyErrors = computed(() => (touched.value && errors.value.length > 0 ? ' ' : undefined));
   const showErrors = computed(() => (touched.value ? errors.value : undefined));
-  const enabled = computed(() => (props.control ? props.control.enabled : props.enabled !== false));
+  // a field inside a disabled section is drawn disabled: effectiveEnabled is false where the element or any
+  // container above it is disabled, which is the question a rendered input asks
+  const enabled = computed(() => (props.control ? props.control.effectiveEnabled : props.enabled !== false));
   // A control resolves its own mode - vue-forms refuses anything that is not a DisplayMode constant and reads a
   // name case-insensitively. The prop is resolved the same way, so `visibility="hidden"` states what it looks
   // like it states and an unrecognised mode is refused here as loudly as it is there.
@@ -110,20 +135,25 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     'd-none': visibility.value === Form.DisplayMode.HIDDEN,
     invisible: visibility.value === Form.DisplayMode.INVISIBLE,
   }));
-  const label = computed((): Label =>
-    isString(props.label || '') ? new Label(<string>props.label || '') : <Label>props.label,
-  );
-  const placeholder = computed(() => props.placeholder || '');
-  const helpText = computed(() => props.helpText || '');
-  const hint = computed(() => props.hint || '');
-  const cssClass = computed(() => props.cssClass || '');
+  // the presentation the bound element carries: what a prop does not state is taken from here before any default
+  const extra = computed(() => props.control?.extra ?? {});
+
+  const label = computed((): Label => {
+    const stated = props.label ?? extra.value.label;
+    return isString(stated || '') ? new Label(<string>stated || '') : <Label>stated;
+  });
+  const placeholder = computed(() => props.placeholder ?? extra.value.placeholder ?? '');
+  const helpText = computed(() => props.helpText ?? extra.value.helpText ?? '');
+  const hint = computed(() => props.hint ?? extra.value.hint ?? '');
+  const cssClass = computed(() => props.cssClass ?? extra.value.cssClass ?? '');
 
   const density = computed(
-    (): FieldDensity => props.density ?? injectedDensity ?? settings.defaultDensity ?? 'default',
+    (): FieldDensity => props.density ?? extra.value.density ?? injectedDensity ?? settings.defaultDensity ?? 'default',
   );
   const boundDensity = computed((): VuetifyDensity => (density.value === 'inline' ? 'default' : density.value));
   const variant = computed(
-    (): FieldVariant => props.variant ?? injectedVariant ?? settings.defaultVariant ?? 'underlined',
+    (): FieldVariant =>
+      props.variant ?? extra.value.variant ?? injectedVariant ?? settings.defaultVariant ?? 'underlined',
   );
 
   return {

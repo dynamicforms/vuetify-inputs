@@ -30,9 +30,6 @@
 - No input shows anything while an asynchronous validator is in flight. `control.validating` answers for the whole
   subtree since 0.13 and `control.busy` for executions at or below the element; a `loading` binding in
   `vuetifyBindings` would cover every component at once.
-- Extended properties (`element.extra`, `setExtendedValues()`) are what vue-forms intends a UI layer to read its
-  presentation hints from — label, hint, css class. The components demand all of these as template attributes, so
-  a form declared entirely in code still has to restate them at every call site.
 - `InAllowedValues` reads its list at each validation and accepts a `Ref` or a getter, so a validator can measure
   against the choices df-select loaded over ajax. The loaded list is component-private; exposing it would connect
   the two.

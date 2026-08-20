@@ -120,14 +120,21 @@ Both values are resolved the same way, in one place, when the field is created:
 ```typescript
 const injectedDensity = inject<FieldDensity | null>('field-density', null);
 const injectedVariant = inject<FieldVariant | null>('field-variant', null);
+const extra = computed(() => props.control?.extra ?? {});
 
-const density = computed(() => props.density ?? injectedDensity ?? settings.defaultDensity ?? 'default');
-const variant = computed(() => props.variant ?? injectedVariant ?? settings.defaultVariant ?? 'underlined');
+const density = computed(
+  () => props.density ?? extra.value.density ?? injectedDensity ?? settings.defaultDensity ?? 'default',
+);
+const variant = computed(
+  () => props.variant ?? extra.value.variant ?? injectedVariant ?? settings.defaultVariant ?? 'underlined',
+);
 ```
 
-So a `density` prop on the component wins over everything; failing that, a `field-density` provided by any ancestor
-applies; failing that, `defaultDensity` from the plugin options; and failing that, `'default'`. The chain for variant is
-identical and ends in `'underlined'`.
+So a `density` prop on the component wins over everything; failing that, the `density` the bound element carries
+among its [extended properties](/examples/input-base#presentation-carried-by-the-element); failing that, a
+`field-density` provided by any ancestor; failing that, `defaultDensity` from the plugin options; and failing that,
+`'default'`. The chain for variant is identical and ends in `'underlined'`. The order runs from the most specific
+statement to the least: the tag, then the field, then the section, then the application.
 
 A section that wants its own look provides the values, which is what a dialog does for its form and a table does for its
 rows:

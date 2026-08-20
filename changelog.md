@@ -9,12 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The `@dynamicforms/vue-forms` peer dependency is `^0.16.1`, the `vue` peer is `^3.5.2` and `engines.node` is `>=22`.
-  The last two are the peer library's own floors. Ten of its releases sit between 0.6.0 and 0.16.1; an application's
-  own use of it migrates in the same step, which [the migration guide](/guide/migration) points at. 0.16.1 is the
-  floor rather than 0.16.0 because an `Action` whose value states its icon or its label per breakpoint and states
-  neither at the top level - which [df-actions](/examples/df-actions) documents - is settled correctly only from
-  that release.
+- The `@dynamicforms/vue-forms` peer dependency is `^0.17.0`, the `vue` peer is `^3.5.2` and `engines.node` is `>=22`.
+  The last two are the peer library's own floors. Eleven of its releases sit between 0.6.0 and 0.17.0; an
+  application's own use of it migrates in the same step, which [the migration guide](/guide/migration) points at.
 - `useInputBase()` returns `density` as the `ComputedRef` it computes, where it returned that computed's value as a
   plain string read once during setup. A consumer outside a template needs `.value`, and the density now follows a
   later change of the `density` prop. An injected `field-density` and the plugin's `defaultDensity` are read once,
@@ -27,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the value that was written to it. The two differ where the field does not take a write verbatim: a
   `ValueChangedAction` that normalises it, a disabled field that drops it, a handler that throws and so unwinds the
   operation. An input with no `control` emits what was written, as before.
+
+- An input bound to a control is drawn disabled while any container above that control is disabled. It read the
+  element's own `enabled`, so the fields of a disabled section stayed editable. `enabled` on each element is
+  unchanged and still answers what was written to it; what an input draws from is `effectiveEnabled`.
+- `ActionRenderOptions` states `label` and `icon` as strings. `ActionValue` types both `unknown` from vue-forms
+  0.17.0, leaving what a label is to the rendering library, and this is that library saying so.
 
 ### Fixed
 
@@ -47,6 +50,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- An element carries the presentation the components render it with. `label`, `placeholder`, `helpText`, `hint`,
+  `cssClass`, `density` and `variant` are declared on vue-forms' `Extras` augmentation point, so they are typed on
+  every element in an application that installs this library - the fields written inline in a `Group` declaration
+  included - and are stated in the parameters an element is built with or written later with `setExtendedValues()`.
+  A form declared in code therefore describes itself, and `<df-input :control="form.fields.name" />` needs no
+  attribute of its own. A prop wins where both state something, and what an element carries wins over an injected
+  `field-density` / `field-variant` and over the plugin defaults.
 - Documentation of the configuration cascade at `/examples/configuration`: the plugin's options, what `provide` of
   `field-density` and `field-variant` reaches, and the order the two are resolved in.
 - Documentation of `DfInputHint` at `/examples/df-input-hint`: the props of the message row every input renders, and

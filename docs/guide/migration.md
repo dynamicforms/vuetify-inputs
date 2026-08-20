@@ -10,15 +10,13 @@ exists.
 
 ## Upgrading to v0.9.0 (from v0.8.x)
 
-This release follows `@dynamicforms/vue-forms` 0.16.1. Nothing this library exports is renamed or removed, so most
+This release follows `@dynamicforms/vue-forms` 0.17.0. Nothing this library exports is renamed or removed, so most
 projects compile untouched; the work is in your own use of the peer library, plus five points on this library's own
 surface. There is a [checklist](#checklist-for-0-9-0) at the end of this section.
 
 ### The peer ranges and the node floor
 
-- `@dynamicforms/vue-forms` is `^0.16.1`. Install it with this release; 0.6.x through 0.15.x are not compatible.
-  The floor is 0.16.1 rather than 0.16.0: an `Action` whose value states its label or its icon per breakpoint and
-  states neither at the top level is settled correctly only from that release.
+- `@dynamicforms/vue-forms` is `^0.17.0`. Install it with this release; 0.16.x and below are not compatible.
 - `vue` is `^3.5.2`, raised from `^3.4`.
 - `engines.node` is `>=22`.
 
@@ -28,7 +26,7 @@ The last two are the peer library's own floors, which this package now states as
 ```json
 {
   "dependencies": {
-    "@dynamicforms/vue-forms": "^0.16.1",
+    "@dynamicforms/vue-forms": "^0.17.0",
     "@dynamicforms/vuetify-inputs": "^0.9.0",
     "vue": "^3.5.2"
   }
@@ -37,7 +35,7 @@ The last two are the peer library's own floors, which this package now states as
 
 ### Your own use of vue-forms migrates at the same time
 
-Ten releases of the peer library sit between 0.6.0 and 0.16.1, and this library re-exports none of the API they
+Eleven releases of the peer library sit between 0.6.0 and 0.17.0, and this library re-exports none of the API they
 changed — every `Field`, `Group`, `List`, `Action` and validator your application builds is that library's, and it
 crosses all ten in one step here. Work through
 [the vue-forms migration guide](:vue-forms:/guide/migration.html), which is written for exactly this jump; the
@@ -129,6 +127,58 @@ binding at all — emits what was written, as before.
 If a handler of yours re-read the control after the event to find out what was actually stored, that read now
 answers what the event already carried.
 
+### A field inside a disabled section is drawn disabled
+
+An input bound to a `control` reads `effectiveEnabled`, which is `false` where the element or any container above
+it is disabled. It read the element's own `enabled`, so `section.enabled = false` left every input inside the
+section editable and an application had to disable each field of a section itself.
+
+```typescript
+const section = new Group({ amount: new Field({ value: 0 }) });
+section.enabled = false;
+
+section.fields.amount.enabled;            // true - what was written to the field, unchanged
+section.fields.amount.effectiveEnabled;   // false - and what <df-input> draws from
+```
+
+Nothing about `enabled` moves: it still answers what was written to each element, a write to a member of a disabled
+container is still accepted, and what a container serializes is still decided by its members' own `enabled`. What
+changes is that the fields of a section your code disables now render disabled and read-only. Where an application
+disabled those fields one by one to get that, the per-field writes can go.
+
+### An element carries its own presentation
+
+`label`, `placeholder`, `helpText`, `hint`, `cssClass`, `density` and `variant` are declared on vue-forms' `Extras`
+augmentation point, so every element in an application that installs this library carries them, typed, and the
+components read them where the corresponding prop states nothing.
+
+```vue
+<script setup>
+const form = new Group({
+  name: new Field({ value: '', label: 'Full name', hint: 'As it appears on the document' }),
+});
+</script>
+
+<template>
+  <df-input :control="form.fields.name" />
+</template>
+```
+
+Nothing is required of an existing form: a prop wins over what the element carries, so every attribute you have
+written goes on saying what it said. What an element carries wins over an injected `field-density` /
+`field-variant` and over the plugin defaults, which puts it second in the cascade, behind the prop alone.
+
+One thing to check: an application that already attached extended properties of these names to its elements — a
+`label` written with `setExtendedValues()` and rendered by the application's own template — now feeds the
+components as well, and the component draws it where its tag states no `label`.
+
+### `ActionRenderOptions` states `label` and `icon` as strings
+
+vue-forms 0.17.0 types both `unknown` on `ActionValue`, so a rendering library says what a label is; this one says
+`string`. An action of this library's own class is unaffected. Where your code declares a value type of its own
+over `ActionRenderOptions` it inherits the two as strings, and where it extends vue-forms' `ActionValue` directly it
+states them itself.
+
 ### `Action` takes writes to `label` and `icon` again
 
 This library's `Action` overrides both accessors to filter the read by `showLabel` / `showIcon`. A getter declared
@@ -174,7 +224,7 @@ what a button asks while its own handler runs.
 
 ### Checklist for 0.9.0
 
-1. Update `@dynamicforms/vue-forms` to `^0.16.1` and `vue` to `^3.5.2`, and run on node 22 or newer.
+1. Update `@dynamicforms/vue-forms` to `^0.17.0` and `vue` to `^3.5.2`, and run on node 22 or newer.
 2. Search for `watch(` with an element as the source, for `readonly(` over an element, and for `isEqual` over two
    elements; rewrite each to read the element's value.
 3. Rename `clone(` to `bind(`, moving the data out of the overrides object and into the first argument.
@@ -189,6 +239,10 @@ what a button asks while its own handler runs.
    synchronous call.
 9. Where your code writes `action.label` or `action.icon`, expect the write to land now — and to fire
    `ValueChangedAction` and move `isChanged`.
+10. Load the forms that disable a whole section: the fields inside one now render disabled. Drop the per-field
+    `enabled = false` writes that were there to achieve it.
+11. Search for `setExtendedValues` and for extended properties named `label`, `placeholder`, `helpText`, `hint`,
+    `cssClass`, `density` or `variant`: the components read those now, where the tag states no prop of that name.
 
 ## Upgrading to v0.8.0 (from v0.7.x)
 

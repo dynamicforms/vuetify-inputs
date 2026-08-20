@@ -500,6 +500,84 @@ describe('input-base', () => {
       });
     });
 
+    describe('presentation carried by the element', () => {
+      it('takes the label, hint, placeholder and css class the element carries', () => {
+        const control = new Form.Field({ value: '' });
+        control.setExtendedValues({
+          label: 'From the field',
+          hint: 'A hint',
+          placeholder: 'Type here',
+          helpText: 'Help',
+          cssClass: 'from-field',
+        });
+        const emit = vi.fn();
+
+        const { label, vuetifyBindings } = useInputBase({ control }, emit);
+
+        expect(label.value.text).toBe('From the field');
+        expect(vuetifyBindings.value.hint).toBe('A hint');
+        expect(vuetifyBindings.value.placeholder).toBe('Type here');
+        expect(vuetifyBindings.value.helpText).toBe('Help');
+        expect(vuetifyBindings.value.class).toBe('from-field');
+      });
+
+      it('lets the prop win over what the element carries', () => {
+        const control = new Form.Field({ value: '' });
+        control.setExtendedValues({ label: 'From the field', density: 'compact' });
+        const emit = vi.fn();
+
+        const { label, density } = useInputBase({ control, label: 'From the tag', density: 'comfortable' }, emit);
+
+        expect(label.value.text).toBe('From the tag');
+        expect(density.value).toBe('comfortable');
+      });
+
+      it('takes the density and variant the element carries over the injected ones', () => {
+        mockInjectValues.set('field-density', 'default');
+        mockInjectValues.set('field-variant', 'underlined');
+        const control = new Form.Field({ value: '' });
+        control.setExtendedValues({ density: 'inline', variant: 'outlined' });
+        const emit = vi.fn();
+
+        const { density, vuetifyBindings } = useInputBase({ control }, emit);
+
+        expect(density.value).toBe('inline');
+        expect(vuetifyBindings.value.variant).toBe('outlined');
+      });
+
+      it('follows a later write of the presentation', async () => {
+        const control = new Form.Field({ value: '' });
+        const emit = vi.fn();
+
+        const { label } = useInputBase({ control }, emit);
+
+        expect(label.value.text).toBe('');
+
+        control.setExtendedValues({ label: 'Named later' });
+        await nextTick();
+
+        expect(label.value.text).toBe('Named later');
+      });
+    });
+
+    describe('enabled', () => {
+      it('is false while a container above the element is disabled', () => {
+        const section = new Form.Group({ amount: new Form.Field({ value: 1 }) });
+        const emit = vi.fn();
+
+        const { enabled, vuetifyBindings } = useInputBase({ control: section.fields.amount }, emit);
+
+        expect(enabled.value).toBe(true);
+
+        section.enabled = false;
+
+        expect(section.fields.amount.enabled).toBe(true);
+        expect(enabled.value).toBe(false);
+        expect(vuetifyBindings.value.disabled).toBe(true);
+        expect(vuetifyBindings.value.readonly).toBe(true);
+      });
+    });
+
     describe('visibility prop', () => {
       it('resolves a mode named as a string', () => {
         const emit = vi.fn();

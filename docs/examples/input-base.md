@@ -41,6 +41,49 @@ state and the visibility. The `modelValue`, `errors`, `enabled` and `visibility`
 `allowNull` prop. `df-rtf-editor` binds its whole prop set to `InputBase`, so `clearable` reaches it and the button is
 drawn, but the component handles no `click:clear`, so pressing it leaves the text standing.
 
+### Presentation carried by the element
+
+A bound `control` carries the presentation the component renders it with. `label`, `placeholder`, `helpText`,
+`hint`, `cssClass`, `density` and `variant` are declared on
+[`Extras`](:vue-forms:/api/field.html#extended-properties), which is the augmentation point
+`@dynamicforms/vue-forms` provides for exactly this, so they are typed on every element in an application that
+installs this library — including the fields written inline in a `Group` declaration, which no type argument on the
+group can annotate.
+
+State them where the field is declared:
+
+```vue
+<template>
+  <df-input :control="form.fields.name" />
+  <df-select :control="form.fields.country" :choices="countries" />
+</template>
+
+<script setup>
+import { Field, Group } from '@dynamicforms/vue-forms';
+import { DfInput, DfSelect } from '@dynamicforms/vuetify-inputs';
+
+const form = new Group({
+  name: new Field({ value: '', label: 'Full name', hint: 'As it appears on the document' }),
+  country: new Field({ value: null, label: 'Country', density: 'compact' }),
+});
+</script>
+```
+
+They are ordinary extended properties, so `setExtendedValues()` writes them later and the read is tracked — a
+label written after the component rendered reaches the screen:
+
+```typescript
+form.fields.name.setExtendedValues({ label: 'Name as printed', cssClass: 'text-primary' });
+```
+
+**A prop wins.** A call site is more specific than the element it draws, so `<df-input :control="field"
+label="At the tag" />` renders the tag's label whatever the field carries. For `density` and `variant` the element
+sits second in the cascade, ahead of an injected `field-density` / `field-variant` and ahead of the plugin
+defaults — the element is more specific than the section it appears in.
+
+What an element carries is not the same as what it answers for. `enabled`, `visibility`, `errors` and the value are
+members of the element itself and are read from there; these seven are what a UI layer attached to it.
+
 ### Density
 
 ```typescript
@@ -57,8 +100,10 @@ All input components in this suite will take props for setting variant and densi
 well. Here's a list in descending priority:
 
 - props: any component that has variant and/or density set via props will have exactly those values
+- the bound element: a `control` carries `density` and `variant` among its
+  [extended properties](#presentation-carried-by-the-element), and they apply where the props state nothing
 - provide: any parent component may `provide` `'field-variant'` and/or `'field-density'`. If they are set and not
-  overridden by specifying props, they will be used.
+  overridden by specifying props or by the element, they will be used.
 - specify global defaults when installing the library:
   `app.use(DynamicFormsInputs, { defaultVariant: 'your variant', defaultDensity: 'your density' })`
 - baked-in defaults (when nothing is specified):
@@ -293,7 +338,7 @@ then, so a control of the wrong kind fails at mount rather than misbehaving late
 | visibilityClass | `ComputedRef<{ 'd-none': boolean, invisible: boolean }>` | The class object for `HIDDEN` and `INVISIBLE`, to bind on the root element |
 | label | `ComputedRef<Label>` | The label as a `Label` instance: a `string` or `MdString` is wrapped, a `Label` is passed through |
 | touched | `WritableComputedRef<boolean> \| Ref<boolean>` | Bound to `control.touched` when there is a control, a standalone ref otherwise. Components write `true` to it on blur |
-| density | `ComputedRef<FieldDensity>` | The `density` prop, then the injected `field-density`, then the plugin's `defaultDensity`, then `'default'` |
+| density | `ComputedRef<FieldDensity>` | The `density` prop, then the control's `extra.density`, then the injected `field-density`, then the plugin's `defaultDensity`, then `'default'` |
 | densityClass | `ComputedRef<string>` | `` `df-density-${density}` ``, to bind on the root element |
 | vuetifyBindings | `ComputedRef<Record<string, any>>` | Everything to `v-bind` on the Vuetify input, see below |
 

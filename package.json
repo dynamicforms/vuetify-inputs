@@ -55,15 +55,15 @@
   },
   "peerDependencies": {
     "@ckeditor/ckeditor5-vue": "^7.0.0",
-    "@dynamicforms/vue-forms": "^0.16.1",
+    "@dynamicforms/vue-forms": "^0.17.0",
     "@mdi/font": "^7.4.47",
     "ckeditor5": "^43.0.0",
     "date-fns": "^4.1.0",
     "lodash-es": "^4.17.12",
+    "vitepress-plugin-crosslinks": "^1.0.0",
     "vue": "^3.5.2",
     "vue-cached-icon": "^3.0.3",
     "vue-markdown-render": "^2.2.1",
-    "vitepress-plugin-crosslinks": "^1.0.0",
     "vuetify": "^3.9"
   },
   "devDependencies": {
@@ -76,13 +76,13 @@
     "@vue/tsconfig": "^0.7.0",
     "eslint-config-velis": "^2.0.12",
     "jsdom": "^26.0.0",
+    "markdown-it-attrs": "^4.3.1",
     "rollup-plugin-visualizer": "^5.14.0",
     "typescript": "^5",
     "vite": "^7",
     "vite-plugin-dts": "^4",
     "vite-plugin-eslint": "^1.8.1",
     "vitest": "^3",
-    "vue-tsc": "^2",
-    "markdown-it-attrs": "^4.3.1"
+    "vue-tsc": "^2"
   }
 }
