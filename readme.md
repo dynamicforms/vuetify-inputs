@@ -4,9 +4,15 @@ Vuetify input components with guaranteed visual consistency across all form fiel
 
 ## Introduction
 
-`@dynamicforms/vuetify-inputs` provides input components for data entry that will be stored in form data. It is the 
-visual implementation of logical concepts from
-[@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
+`@dynamicforms/vuetify-inputs` provides input components for data entry, built so that every one of them matches
+every other.
+
+Hand a component an element of [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms) and that element
+owns the value, the validation, the enabled state and the visibility, and the component draws what it holds. That is
+what the library was built for, and it is not what it requires: every component works just as well with a plain
+`v-model`, or with no binding at all. The visual consistency, the density and variant system and the inline mode for
+table cells are the same either way, so the components are worth reaching for whether or not you want a form model
+behind them.
 
 ## Design Goals
 

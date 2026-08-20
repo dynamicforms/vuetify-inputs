@@ -43,18 +43,22 @@ features:
 
 # @dynamicforms/vuetify-inputs
 
-Input components for data entry that ends up in form data. This library is the visual implementation of the logical
-concepts in [@dynamicforms/vue-forms](:vue-forms:); that library holds the value, the validation and the state, and
-this one draws it.
+Input components for data entry, built so that every one of them matches every other.
 
 ## What it is
 
-Input components for data entry that ends up in form data. [@dynamicforms/vue-forms](:vue-forms:) holds the value,
-the validation and the state; this library draws it, and makes every field it draws match every other.
+A set of Vuetify fields that share one base, so a row mixing a text field, a select, a checkbox and a date picker
+comes out aligned. Two axes carry that: **density** — how vertically compact a field is, `default`, `comfortable`,
+`compact` or the `inline` that fits a table cell — and **variant**, the seven Vuetify visual styles. Both are
+resolved by the same code for every component, so a change to either moves every field at once.
 
-Two axes carry that: **density** — how vertically compact a field is, `default`, `comfortable`, `compact` or the
-`inline` that fits a table cell — and **variant**, the seven Vuetify visual styles. Both are resolved by the same
-code for every component, so a change to either moves every field at once.
+Bind a field to a [@dynamicforms/vue-forms](:vue-forms:) element and that element owns the value, the validation,
+the enabled state and the visibility, and the component draws what it holds. That is what this library was built
+for, and it is not what it requires: **every component works just as well with a plain `v-model`, or with no
+binding at all.** Reach for them because your form fields should look alike, whether or not you want a form model
+behind them — the consistency, the density and variant system, the inline mode and the escape hatches are the same
+either way. [Using them without vue-forms](/guide/getting-started#using-without-dynamicforms) is a section of its
+own.
 
 [Rationale](/guide/rationale) states the premise in full and lists everything the library does.
 

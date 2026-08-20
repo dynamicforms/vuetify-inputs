@@ -13,8 +13,16 @@ mixing them on a single form row produces an aligned result with no per-componen
 library is opinionated: it decides how a field is put together, and a component that wants to look different says so
 through the two axes below rather than through markup of its own.
 
-The logic is not here. [@dynamicforms/vue-forms](:vue-forms:) holds the value, the validation, the enabled and
-visibility state and the event pipeline; this library draws it.
+The logic need not be here. [@dynamicforms/vue-forms](:vue-forms:) holds the value, the validation, the enabled and
+visibility state and the event pipeline, and a component handed one of its elements draws what that element holds —
+which is what this library was built for.
+
+It is not a condition of using it. A component handed a plain `v-model` keeps the value in the parent, and one
+handed nothing at all keeps it internally; the errors, the enabled state and the visibility are then props like any
+other. Everything on this page other than that binding applies unchanged, so a project that wants aligned fields, a
+density that fits a table cell, or one call that restyles the application has a reason to be here whether or not it
+ever builds a form model. The package is a peer dependency either way — the components render their messages and
+their display modes through it — but nothing asks you to construct a `Field`.
 
 ## The two axes
 
