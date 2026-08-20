@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2026-08-20
+
+### Added
+
+- `<df-actions>` draws an action declared as the `Action` of `@dynamicforms/vue-forms`. It read the breakpoint
+  options through an accessor only this library's subclass declares and threw a `TypeError` over anything else; it
+  reads them off the action's value instead, so an action stating a label alone is drawn as a button showing it. The
+  subclass is what an action needs to render responsively, as a text link or in a confirm / reject colour - not what
+  it needs to be drawn at all.
+- `getRenderOptionsForBreakpoint(value, breakpoint)` is exported: the `ActionRenderOptions` an action's value renders
+  as at one breakpoint, defaults filled in and `label` / `icon` filtered by their flags. `Action.getBreakpointValue()`
+  is a `computed()` over it.
+
+### Changed
+
+- A button `<df-actions>` draws is disabled where any container above the action is disabled, and while a run of the
+  action has yet to settle - the latter draws it `loading` besides. The button bound the action's own `enabled` and
+  read no `busy`, so an action in a disabled `Group` was clickable where the keyboard would not reach it, and a
+  second click started a second run of a handler still in flight. What disables the button is
+  `!action.effectiveEnabled || action.busy`; `enabled` on the action is unchanged and still answers what was written
+  to it.
+- `passthroughAttrs` now takes precedence over `loading` as well, which is one more prop the component computes on
+  its own.
+
+### Fixed
+
+- `exports["."]` states a `types` condition. TypeScript resolves a package carrying an `exports` map through that map
+  alone and ignores the top-level `types` field, so a consumer on `moduleResolution: "bundler"` or `"node16"` found
+  no declarations: every import from the package was `any`, and nothing this library exports - `Action`,
+  `BreakpointNames`, the components, the props - was checked at all.
+
 ## [0.9.0] - 2026-08-20
 
 ### Changed

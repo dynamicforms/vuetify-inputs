@@ -1,7 +1,16 @@
 <template>
   <div class="actions-demo pa-4">
     <div class="d-flex align-center justify-space-between mb-4">
-      <div class="mb-0"><strong>Current breakpoint:</strong> {{ currentBreakpoint }}</div>
+      <div class="mb-0">
+        <div><strong>Current breakpoint:</strong> {{ currentBreakpoint }}</div>
+        <v-switch
+          v-model="sectionEnabled"
+          label="Section enabled"
+          density="compact"
+          hide-details
+          color="primary"
+        ></v-switch>
+      </div>
       <div class="d-flex align-center">
         <span class="me-2">Button size:</span>
         <v-select
@@ -30,8 +39,8 @@
 </template>
 
 <script setup lang="ts">
-import { ExecuteAction } from '@dynamicforms/vue-forms';
-import { ref, computed, Ref } from 'vue';
+import { ExecuteAction, Group } from '@dynamicforms/vue-forms';
+import { ref, computed, Ref, watchEffect } from 'vue';
 import { useDisplay } from 'vuetify';
 import { Action, ActionDisplayStyle, DfActions } from '../../src';
 
@@ -66,6 +75,14 @@ const mockFormAction = new ExecuteAction((action, supr, params) => {
   supr(action, params);
 });
 
+// A handler that takes its time: the button it belongs to is disabled and spins until this settles, so a second
+// click cannot start a second run.
+const slowFormAction = new ExecuteAction(async (action, supr, params) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  alert(`Action "${(<Action> action).name}" done`);
+  return supr(action, params);
+});
+
 // Create actions
 const saveAction = new Action({
   value: {
@@ -79,7 +96,7 @@ const saveAction = new Action({
     md: { showLabel: true, showIcon: false }, // Medium screen and bigger, show label, but not icon
     lg: { showIcon: true } // Large screen and bigger, show label (carried over from md), and icon
   },
-  actions: [mockFormAction],
+  actions: [slowFormAction],
 });
 
 const deleteAction = new Action({
@@ -112,6 +129,14 @@ const cancelAction = new Action({
 });
 
 const actions: Ref<Action[]> = ref([saveAction, deleteAction, cancelAction]);
+
+// The buttons follow the enablement of the group holding them: each reads effectiveEnabled, which is false where
+// the action or any container above it is disabled.
+const section = new Group({ save: saveAction, delete: deleteAction, cancel: cancelAction });
+const sectionEnabled = ref(true);
+watchEffect(() => {
+  section.enabled = sectionEnabled.value;
+});
 
 // Get current breakpoint
 const display = useDisplay();

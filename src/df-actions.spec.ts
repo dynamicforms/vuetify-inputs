@@ -1,8 +1,8 @@
 // df-actions.spec.ts
-import { DisplayMode, ExecuteAction } from '@dynamicforms/vue-forms';
+import { Action as FormAction, DisplayMode, ExecuteAction, Group } from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { vi } from 'vitest';
-import { Ref, ref } from 'vue';
+import { nextTick, Ref, ref } from 'vue';
 import { createVuetify } from 'vuetify';
 import { VBtn } from 'vuetify/components';
 
@@ -348,6 +348,107 @@ describe('DfActions', () => {
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('disabled')).toBe(false);
+    });
+
+    it('gumb je onemogočen, ko je onemogočena skupina, ki akcijo drži', () => {
+      const action = createMockAction('save', 'Save');
+      const form = new Group({ save: action });
+      form.enabled = false;
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      expect(action.enabled).toBe(true);
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('disabled')).toBe(true);
+    });
+  });
+
+  describe('busy', () => {
+    const pendingAction = (): [Action, () => void] => {
+      let release: () => void = () => {};
+      const pending = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const action = new Action({
+        value: { name: 'save', label: 'Save', showLabel: true },
+        actions: [new ExecuteAction(() => pending)],
+      });
+      return [action, release];
+    };
+
+    it('gumb je onemogočen in se vrti, dokler zagon ne obstane', async () => {
+      const [action, release] = pendingAction();
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('disabled')).toBe(false);
+      expect(buttonComponent.props('loading')).toBe(false);
+
+      const run = action.execute();
+      await nextTick();
+      expect(buttonComponent.props('disabled')).toBe(true);
+      expect(buttonComponent.props('loading')).toBe(true);
+
+      release();
+      await run;
+      await nextTick();
+      expect(buttonComponent.props('disabled')).toBe(false);
+      expect(buttonComponent.props('loading')).toBe(false);
+    });
+
+    it('klik na akcijo, ki teče, ne požene drugega zagona', async () => {
+      const [action, release] = pendingAction();
+      const executeSpy = vi.spyOn(action, 'execute');
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      await wrapper.find('.v-btn').trigger('click');
+      await nextTick();
+      expect(wrapper.find('button').attributes('disabled')).toBeDefined();
+
+      await wrapper.find('.v-btn').trigger('click');
+      release();
+      await executeSpy.mock.results[0].value;
+      expect(executeSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('bare vue-forms Action', () => {
+    it('nariše akcijo, ki nosi le oznako', () => {
+      const action = new FormAction({ value: { label: 'Save' } });
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(buttonComponent.text()).toContain('Save');
+      expect(buttonComponent.props('variant')).toBe('tonal');
+      expect(buttonComponent.props('disabled')).toBe(false);
+    });
+
+    it('izvede akcijo, ki nosi le oznako, ob kliku', async () => {
+      const executed = vi.fn();
+      const action = new FormAction({ value: { label: 'Save' }, actions: [new ExecuteAction(executed)] });
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      await wrapper.find('.v-btn').trigger('click');
+      expect(executed).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -5,23 +5,13 @@ import { computed, Ref } from 'vue';
 import { translatableStrings } from '../translations';
 
 import { ActionDisplayStyle } from './action-display-style';
-import { ActionBreakpointOptions, ActionRenderOptions, ResponsiveActionRenderOptions } from './action-render-options';
+import { ActionBreakpointOptions, getRenderOptionsForBreakpoint } from './action-render-options';
 import { BreakpointNames } from './responsive-render-options';
 
 class Action extends FormAction<ActionBreakpointOptions> {
+  /** @see getRenderOptionsForBreakpoint, which answers the same for the value of any `Action` */
   getBreakpointValue(breakpoint: Ref<BreakpointNames>) {
-    return computed(() => {
-      const responsiveValue = new ResponsiveActionRenderOptions(this.value);
-      const partial = responsiveValue.getOptionsForBreakpoint(breakpoint.value);
-      return {
-        name: partial.name,
-        label: partial.showLabel ? partial.label : undefined,
-        icon: partial.showIcon ? partial.icon : undefined,
-        renderAs: partial.renderAs,
-        showLabel: isString(partial.label) && !isEmpty(partial.label) ? partial.showLabel : false,
-        showIcon: isString(partial.icon) && !isEmpty(partial.icon) ? partial.showIcon : false,
-      } as ActionRenderOptions;
-    });
+    return computed(() => getRenderOptionsForBreakpoint(this.value, breakpoint.value));
   }
 
   /** @see ActionRenderOptions.name */

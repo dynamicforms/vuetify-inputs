@@ -11,15 +11,16 @@
       v-for="(action, idx) in actionsWithBreakpoint"
       :key="idx"
       :variant="action.renderAs === ActionDisplayStyle.BUTTON ? 'tonal' : 'text'"
-      :color="defaultActionColor(action.action)"
-      :disabled="!action.action.enabled"
+      :color="defaultActionColor(action.value)"
+      :disabled="!action.action.effectiveEnabled || action.action.busy"
+      :loading="action.action.busy"
       :elevation="0"
       :size="buttonSize"
       :class="{
         'd-none': action.action.visibility === DisplayMode.HIDDEN,
         invisible: action.action.visibility === DisplayMode.INVISIBLE,
       }"
-      v-bind="action.action.passthroughAttrs"
+      v-bind="action.value.passthroughAttrs"
       @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >
       <cached-icon v-if="action.icon" :name="action.icon" />
@@ -35,7 +36,7 @@ import { computed, unref } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfActionsProps } from './dynamicforms-component-props';
-import { Action, ActionDisplayStyle, useBreakpoint } from './helpers';
+import { ActionDisplayStyle, ActionRenderOptions, getRenderOptionsForBreakpoint, useBreakpoint } from './helpers';
 
 const props = withDefaults(defineProps<DfActionsProps>(), {
   buttonSize: 'default',
@@ -44,16 +45,21 @@ const props = withDefaults(defineProps<DfActionsProps>(), {
 
 const breakpoint = useBreakpoint();
 const actionsRef = computed(() => unref(props.actions).filter((action) => action.visibility !== DisplayMode.SUPPRESS));
+// What each button draws is read off the action's value rather than through the accessors this library's `Action`
+// adds over it, so an action declared as a `@dynamicforms/vue-forms` one - which declares none of them - is drawn
+// as well. `value` is the value as it stands, which is where the members no breakpoint resolves are read from;
+// the spread is that same value resolved at the current breakpoint.
 const actionsWithBreakpoint = computed(() =>
   actionsRef.value.map((action) => ({
     action,
-    ...unref(action.getBreakpointValue(breakpoint)),
+    value: action.value as ActionRenderOptions,
+    ...getRenderOptionsForBreakpoint(action.value, breakpoint.value),
   })),
 );
 
-function defaultActionColor(action: Action): string | undefined {
-  if (action.defaultConfirm) return 'primary';
-  if (action.defaultReject) return 'secondary';
+function defaultActionColor(value: ActionRenderOptions): string | undefined {
+  if (value.defaultConfirm) return 'primary';
+  if (value.defaultReject) return 'secondary';
   return undefined;
 }
 </script>
