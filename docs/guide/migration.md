@@ -10,13 +10,15 @@ exists.
 
 ## Upgrading to v0.9.0 (from v0.8.x)
 
-This release follows `@dynamicforms/vue-forms` 0.16.0. Nothing this library exports is renamed or removed, so most
+This release follows `@dynamicforms/vue-forms` 0.16.1. Nothing this library exports is renamed or removed, so most
 projects compile untouched; the work is in your own use of the peer library, plus five points on this library's own
 surface. There is a [checklist](#checklist-for-0-9-0) at the end of this section.
 
 ### The peer ranges and the node floor
 
-- `@dynamicforms/vue-forms` is `^0.16.0`. Install it with this release; 0.6.x through 0.15.x are not compatible.
+- `@dynamicforms/vue-forms` is `^0.16.1`. Install it with this release; 0.6.x through 0.15.x are not compatible.
+  The floor is 0.16.1 rather than 0.16.0: an `Action` whose value states its label or its icon per breakpoint and
+  states neither at the top level is settled correctly only from that release.
 - `vue` is `^3.5.2`, raised from `^3.4`.
 - `engines.node` is `>=22`.
 
@@ -26,7 +28,7 @@ The last two are the peer library's own floors, which this package now states as
 ```json
 {
   "dependencies": {
-    "@dynamicforms/vue-forms": "^0.16.0",
+    "@dynamicforms/vue-forms": "^0.16.1",
     "@dynamicforms/vuetify-inputs": "^0.9.0",
     "vue": "^3.5.2"
   }
@@ -35,7 +37,7 @@ The last two are the peer library's own floors, which this package now states as
 
 ### Your own use of vue-forms migrates at the same time
 
-Ten releases of the peer library sit between 0.6.0 and 0.16.0, and this library re-exports none of the API they
+Ten releases of the peer library sit between 0.6.0 and 0.16.1, and this library re-exports none of the API they
 changed — every `Field`, `Group`, `List`, `Action` and validator your application builds is that library's, and it
 crosses all ten in one step here. Work through
 [the vue-forms migration guide](:vue-forms:/guide/migration.html), which is written for exactly this jump; the
@@ -172,7 +174,7 @@ what a button asks while its own handler runs.
 
 ### Checklist for 0.9.0
 
-1. Update `@dynamicforms/vue-forms` to `^0.16.0` and `vue` to `^3.5.2`, and run on node 22 or newer.
+1. Update `@dynamicforms/vue-forms` to `^0.16.1` and `vue` to `^3.5.2`, and run on node 22 or newer.
 2. Search for `watch(` with an element as the source, for `readonly(` over an element, and for `isEqual` over two
    elements; rewrite each to read the element's value.
 3. Rename `clone(` to `bind(`, moving the data out of the overrides object and into the first argument.

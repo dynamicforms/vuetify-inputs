@@ -22,24 +22,6 @@
   - icon position
   - icon size
 
-## Defects in @dynamicforms/vue-forms that this library runs into
-
-Both are in `Action.init`, and both follow from `isValEmpty()` testing for the absence of `label` and `icon` — a
-heuristic that is total for the base `ActionValue` and not for a subclass value, which the library's own
-documentation invites (`docs/api/actions.md`: "a UI library is expected to extend it"). This library's `Action`
-widens the value to `BreakpointsJSON<ActionRenderOptions>`.
-
-- An action value naming neither `label` nor `icon` at the top level is discarded whole.
-  `new Action({ value: { name: 'save', renderAs: BUTTON, xs: { icon: 'x', showIcon: true } } })` ends up holding
-  `{}` — the name, the render style and every breakpoint block are gone, and `<df-actions>` renders a blank button
-  with nothing logged. Every icon-only or label-only action that states its icon per breakpoint hits this.
-- `originalValue` is truncated to `{ label, icon }`, so an action declared with a baseline matching its value
-  reports `isChanged` from construction, and so does every `Group` holding it.
-
-A subclass cannot work around either: `init` runs its body inside `transactional()`, which is not part of the
-public surface. The fix belongs in vue-forms — `isValEmpty` asking whether the object carries any meaningful key,
-and the baseline being built from the whole value rather than from two of its members.
-
 ## Adopt what vue-forms 0.16 newly offers
 
 - `<df-actions>` does not read `Action.busy`, so a button stays clickable through an in-flight run and a second

@@ -9,9 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The `@dynamicforms/vue-forms` peer dependency is `^0.16.0`, the `vue` peer is `^3.5.2` and `engines.node` is `>=22`.
-  The last two are the peer library's own floors. Ten of its releases sit between 0.6.0 and 0.16.0; an application's
-  own use of it migrates in the same step, which [the migration guide](/guide/migration) points at.
+- The `@dynamicforms/vue-forms` peer dependency is `^0.16.1`, the `vue` peer is `^3.5.2` and `engines.node` is `>=22`.
+  The last two are the peer library's own floors. Ten of its releases sit between 0.6.0 and 0.16.1; an application's
+  own use of it migrates in the same step, which [the migration guide](/guide/migration) points at. 0.16.1 is the
+  floor rather than 0.16.0 because an `Action` whose value states its icon or its label per breakpoint and states
+  neither at the top level - which [df-actions](/examples/df-actions) documents - is settled correctly only from
+  that release.
 - `useInputBase()` returns `density` as the `ComputedRef` it computes, where it returned that computed's value as a
   plain string read once during setup. A consumer outside a template needs `.value`, and the density now follows a
   later change of the `density` prop. An injected `field-density` and the plugin's `defaultDensity` are read once,

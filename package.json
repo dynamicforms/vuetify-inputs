@@ -55,7 +55,7 @@
   },
   "peerDependencies": {
     "@ckeditor/ckeditor5-vue": "^7.0.0",
-    "@dynamicforms/vue-forms": "^0.16.0",
+    "@dynamicforms/vue-forms": "^0.16.1",
     "@mdi/font": "^7.4.47",
     "ckeditor5": "^43.0.0",
     "date-fns": "^4.1.0",
