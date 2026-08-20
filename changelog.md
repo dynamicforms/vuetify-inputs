@@ -33,10 +33,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `Action.label` and `Action.icon` take writes. This class overrides both accessors to filter the read by `showLabel`
-  and `showIcon`, and a getter declared alone hides the base class's setter, so the assignment reached nothing. Both
-  setters delegate to the peer library's, which writes through the value: a write fires `ValueChangedAction` and
-  moves `isChanged`. The reads stay filtered.
+- An input treats an accepted write of an array or an object as accepted. An element holds its state behind
+  `reactive()`, so such a value reads back as a proxy of what was written; the composable compared identities and
+  concluded that every one of those writes had been refused, holding the written value for a tick and scheduling a
+  second render of the input per change. The comparison is made over the raw objects.
+
+- `Action.label` and `Action.icon` are the peer library's accessors and answer what the action carries. This class
+  declared both as getters that filter the read by `showLabel` and `showIcon`; a getter declared alone defines the
+  whole property, so the assignment the peer documents threw a `TypeError`, and the filter tested the flags for
+  truthiness rather than for `false`, so an action stating neither answered `undefined` from both while
+  `<df-actions>` drew the text and the icon. The filtered reads are `renderedLabel` and `renderedIcon`, which is
+  what the action draws; `label` and `icon` answer the text and the name, and take writes.
 - `df-file` and `df-datetime` apply their density-dependent wrapper class whatever the density is resolved from. The
   template read the `density` prop, so the class was missing whenever the density came from an injected
   `field-density` or from the plugin settings; both components now read the resolved density from `useInputBase()`.

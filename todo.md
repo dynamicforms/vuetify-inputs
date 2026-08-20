@@ -22,7 +22,7 @@
   - icon position
   - icon size
 
-## Adopt what vue-forms 0.16 newly offers
+## Adopt what vue-forms newly offers
 
 - `<df-actions>` does not read `Action.busy`, so a button stays clickable through an in-flight run and a second
   click starts a second one. `:disabled="!action.action.enabled || action.action.busy"`, and `:loading` for the

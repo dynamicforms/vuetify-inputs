@@ -332,7 +332,7 @@ then, so a control of the wrong kind fails at mount rather than misbehaving late
 | valid | `ComputedRef<boolean>` | `control.valid`, or `true` when there is no control |
 | errors | `ComputedRef<ValidationError[]>` | `control.errors`, or the `errors` prop with each string wrapped in a `ValidationErrorRenderContent` |
 | showErrors | `ComputedRef<ValidationError[] \| undefined>` | The same errors once the field is touched, `undefined` before that. This is what gets bound to `DfInputHint` |
-| enabled | `ComputedRef<boolean>` | `control.enabled`, or `props.enabled !== false` when there is no control |
+| enabled | `ComputedRef<boolean>` | `control.effectiveEnabled` — `false` where the element or any container above it is disabled — or `props.enabled !== false` when there is no control |
 | visibility | `ComputedRef<DisplayMode>` | The resolved display mode, see [Display Modes](#display-modes) |
 | isRendered | `ComputedRef<boolean>` | `false` only for `SUPPRESS`; it is the `v-if` on the component's root element |
 | visibilityClass | `ComputedRef<{ 'd-none': boolean, invisible: boolean }>` | The class object for `HIDDEN` and `INVISIBLE`, to bind on the root element |

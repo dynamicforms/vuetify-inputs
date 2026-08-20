@@ -30,18 +30,11 @@ class Action extends FormAction<ActionBreakpointOptions> {
   }
 
   /**
-   * @see ActionRenderOptions.label
-   *
-   * The read is filtered by `showLabel`, so an action rendering icon-only answers `undefined` while carrying a
-   * label. The write is the base class's and reaches `value.label` whatever `showLabel` says, so a write followed
-   * by a read of an icon-only action does not answer with what was written.
+   * The label as this action renders it: the text where {@link ActionRenderOptions.showLabel} states it is shown,
+   * and `undefined` where it is not. `label` is the base class's, and answers the text whatever the flag says.
    */
-  get label() {
+  get renderedLabel() {
     return this.value.showLabel ? this.value.label : undefined;
-  }
-
-  set label(newValue: string | undefined) {
-    super.label = newValue;
   }
 
   /** @see ActionRenderOptions.showLabel */
@@ -50,16 +43,11 @@ class Action extends FormAction<ActionBreakpointOptions> {
   }
 
   /**
-   * @see ActionRenderOptions.icon
-   *
-   * Filtered by `showIcon` on the read, unfiltered on the write - as `label` is.
+   * The icon as this action renders it: the name where {@link ActionRenderOptions.showIcon} states it is shown,
+   * and `undefined` where it is not. `icon` is the base class's, and answers the name whatever the flag says.
    */
-  get icon() {
+  get renderedIcon() {
     return this.value.showIcon ? this.value.icon : undefined;
-  }
-
-  set icon(newValue: string | undefined) {
-    super.icon = newValue;
   }
 
   /** @see ActionRenderOptions.showIcon */

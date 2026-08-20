@@ -95,12 +95,12 @@ The `value` object defines the visual appearance and behavior:
 | `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the button `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
 | `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `loading`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>`, overriding `<df-actions>`'s own computed props |
 
-The `label` and `icon` accessors of this subclass read through `showLabel` and `showIcon`: an icon-only action
-answers `undefined` for `label` while its value still carries one, and a label-only action answers `undefined` for
-`icon`. The writes are the base class's and reach `value.label` / `value.icon` whatever the two flags say, so a
-write followed by a read of an icon-only action does not answer with what was written. `showLabel` and `showIcon`
-answer `false` where the text they govern is missing or empty, whatever the value holds. The breakpoint-resolved
-options `<df-actions>` renders from are filtered the same way.
+`label` and `icon` are `@dynamicforms/vue-forms`' own accessors: each reads the member of the same name off the
+value and each takes a write, which is an ordinary value change. `renderedLabel` and `renderedIcon` are this
+subclass's, and answer what the action draws — the text where `showLabel` states it is shown, the icon name where
+`showIcon` does, and `undefined` otherwise. `showLabel` and `showIcon` answer `false` where the text they govern is
+missing or empty, whatever the value holds. The breakpoint-resolved options `<df-actions>` renders from are
+filtered the same way, which is why the component reads none of these accessors.
 
 `enabled` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` properties from
 `@dynamicforms/vue-forms` (settable at the top level of the `new Action()` parameters, or via `action.enabled` /

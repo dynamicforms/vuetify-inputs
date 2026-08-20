@@ -1,6 +1,6 @@
 import Form, { MdString, ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
 import { isEmpty, isString } from 'lodash-es';
-import { computed, inject, nextTick, ref, shallowRef } from 'vue';
+import { computed, inject, nextTick, ref, shallowRef, toRaw } from 'vue';
 
 import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
@@ -88,7 +88,10 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
       try {
         if (props.control) props.control.value = newValue;
       } finally {
-        if (props.control && props.control.value !== newValue) {
+        // compared as the write was made: an element holds its state behind reactive(), so an array or an object
+        // reads back as a proxy of what was written and an identity comparison would answer that every such write
+        // was refused. Object.is over the raw objects answers for NaN as well
+        if (props.control && !Object.is(toRaw(props.control.value as any), toRaw(newValue as any))) {
           pendingWrite.value = { value: newValue };
           nextTick(() => {
             pendingWrite.value = null;

@@ -179,22 +179,32 @@ vue-forms 0.17.0 types both `unknown` on `ActionValue`, so a rendering library s
 over `ActionRenderOptions` it inherits the two as strings, and where it extends vue-forms' `ActionValue` directly it
 states them itself.
 
-### `Action` takes writes to `label` and `icon` again
+### `label` and `icon` are the base class's; the filtered reads are `renderedLabel` and `renderedIcon`
 
-This library's `Action` overrides both accessors to filter the read by `showLabel` / `showIcon`. A getter declared
-alone hides the base class's setter, so `action.label = 'Saving'` reached nothing. Both setters are declared again
-and delegate to the peer library's, which from its 0.9.0 assigns a new value object through the value setter:
+This library's `Action` declared `label` and `icon` as getters that filter the read by `showLabel` / `showIcon`.
+Both are gone: `label` and `icon` are `@dynamicforms/vue-forms`' own, so they answer the text and the icon name
+whatever the two flags say, and they take writes.
 
 ```typescript
 const save = new Action({ value: { label: 'Save', icon: 'save-icon', renderAs: ActionDisplayStyle.BUTTON } });
 
+save.label;               // 'Save'
 save.label = 'Saving…';   // fires ValueChangedAction, moves isChanged, refused by a disabled action
-save.value.label;         // 'Saving…'
 ```
 
-The write is a value change, so an action whose label your code drives now reports `isChanged`, and a
-`ValueChangedAction` registered on it receives an event. The reads stay filtered: an action rendering icon-only
-answers `undefined` from `label` however it was written, and `value.label` is where the written text is.
+The filtered read has its own name:
+
+```typescript
+const iconOnly = new Action({ value: { label: 'Save', icon: 'save-icon', showLabel: false, showIcon: true } });
+
+iconOnly.label;           // 'Save' — what the action carries
+iconOnly.renderedLabel;   // undefined — what it draws
+```
+
+Rename every read that wanted the filtered value: `action.label` → `action.renderedLabel`, `action.icon` →
+`action.renderedIcon`. A read that wanted the text needs no change and is now correct for an action that states
+neither flag, which answered `undefined` before. `<df-actions>` is unaffected — it renders from the
+breakpoint-resolved options, which filter on their own.
 
 ### `Action.execute()` is a promise
 
@@ -219,7 +229,7 @@ no change — Vue attaches its own catch and routes the error to `app.config.err
 what a button asks while its own handler runs.
 
 ```vue
-<v-btn :disabled="!save.enabled || save.busy" @click="save.execute()">{{ save.label }}</v-btn>
+<v-btn :disabled="!save.enabled || save.busy" @click="save.execute()">{{ save.renderedLabel }}</v-btn>
 ```
 
 ### Checklist for 0.9.0
@@ -237,8 +247,9 @@ what a button asks while its own handler runs.
    and a re-read of the control after the event is redundant.
 8. `await` or `.catch()` every `Action.execute()` outside a template, and drop the `try`/`catch` that wrapped the
    synchronous call.
-9. Where your code writes `action.label` or `action.icon`, expect the write to land now — and to fire
-   `ValueChangedAction` and move `isChanged`.
+9. Rename every read of `action.label` / `action.icon` that wanted the value filtered by `showLabel` / `showIcon`
+   to `action.renderedLabel` / `action.renderedIcon`. A read that wanted the text stays as it is, takes writes,
+   and now answers for an action that states neither flag.
 10. Load the forms that disable a whole section: the fields inside one now render disabled. Drop the per-field
     `enabled = false` writes that were there to achieve it.
 11. Search for `setExtendedValues` and for extended properties named `label`, `placeholder`, `helpText`, `hint`,

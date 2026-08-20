@@ -134,6 +134,28 @@ describe('input-base', () => {
         expect(value.value).toBe('initial');
       });
 
+      it('takes an array write the control accepted as accepted', async () => {
+        const control = new Form.Field<number[]>({ value: [] });
+        const emit = vi.fn();
+
+        const { value } = useInputBase<number[]>({ control }, emit);
+
+        const written = [1, 2, 3];
+        value.value = written;
+
+        // the element holds its state behind reactive(), so an array reads back as a proxy of what was written.
+        // The write stands, so the read answers with what the control holds from the moment it returns - a read
+        // answering with the array that was written is the composable treating an accepted write as refused
+        expect(control.value).toEqual(written);
+        expect(value.value).toBe(control.value);
+        expect(value.value).not.toBe(written);
+        expect(emit).toHaveBeenCalledWith('update:modelValue', control.value);
+
+        await nextTick();
+
+        expect(value.value).toBe(control.value);
+      });
+
       it('emits update:modelValue on value change', async () => {
         const props: BaseProps<number> = { modelValue: 42 };
         const emit = vi.fn();

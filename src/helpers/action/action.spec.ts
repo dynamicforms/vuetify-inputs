@@ -56,6 +56,23 @@ describe('Action', () => {
       expect(action.value.icon).toBe('save-icon');
     });
 
+    it('reads the label and the icon whatever the flags say', () => {
+      const action = new Action({ value: { name: 'save', label: 'Save', icon: 'save-icon' } });
+
+      expect(action.label).toBe('Save');
+      expect(action.icon).toBe('save-icon');
+    });
+
+    it('renders the label and the icon only where the flags state they are shown', () => {
+      const action = new Action({
+        value: { name: 'save', label: 'Save', icon: 'save-icon', showLabel: false, showIcon: true },
+      });
+
+      expect(action.renderedLabel).toBeUndefined();
+      expect(action.renderedIcon).toBe('save-icon');
+      expect(action.label).toBe('Save');
+    });
+
     it('handles showLabel/showIcon logic correctly', () => {
       const actionWithEmptyLabel = new Action({
         value: {
