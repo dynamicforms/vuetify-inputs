@@ -27,6 +27,12 @@ export default defineConfig({
     sidebar: {
       '/guide/': [
         {
+          text: 'Rationale',
+          items: [
+            { text: 'Why the library exists', link: '/guide/rationale' },
+          ]
+        },
+        {
           text: 'Getting Started',
           items: [
             { text: 'Installation', link: '/guide/getting-started#installation' },

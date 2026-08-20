@@ -31,15 +31,40 @@ The [density example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples
 demonstrates all components rendered side-by-side across every density and variant combination to verify alignment and
 consistent appearance.
 
-## Features
+## What matters most
 
-- **DynamicForms Integration**: Seamlessly works with `@dynamicforms/vue-forms` for state management and validation
-- **Vuetify Based**: Built on top of Vuetify components for beautiful Material Design styling
-- **Reactive**: Full Vue reactivity support with both v-model and DynamicForms Field controls
-- **TypeScript Support**: Comprehensive type definitions for excellent developer experience
-- **Highly opinionated**: Opinionated to ensure uniform look throughout the application.
+- **Every field matches every other**: one shared base, so a row mixing a text field, a select, a checkbox and a
+  date picker comes out aligned with no per-component tweaking
+- **A density that fits a table cell**: `default`, `comfortable` and `compact` are Vuetify's; `inline` is this
+  library's own, and strips a field of its decoration until it fits inside a cell
+- **Set the look once, override anywhere**: density and variant are read from the prop, then the field, then a
+  `provide` from any ancestor, then the plugin defaults — most specific first
+- **The field carries its own presentation**: a `@dynamicforms/vue-forms` field holds the label, hint, placeholder,
+  css class, density and variant it is drawn with, so a form declared in code needs no presentation attributes on
+  the tags that draw it
+
+## Everything else it does
+
+- **Ten components**: `df-input`, `df-text-area`, `df-select`, `df-checkbox`, `df-color`, `df-date-time`, `df-file`,
+  `df-rtf-editor`, `df-actions` and `df-input-hint`
+- **A control, a v-model, or neither**: a bound element owns the value, validity, touched, enabled and visibility;
+  `v-model` reports changes to the parent; neither keeps the value internally
+- **Errors, hints and help text** in one row, rendered through vue-forms' `MessagesWidget`, so an error may be
+  plain text, markdown or a component of its own
+- **Labels with icons and markdown**, through the `Label` class and `MdString`
+- **Visibility through `DisplayMode`** — `FULL`, `HIDDEN`, `INVISIBLE`, `SUPPRESS` — and enablement that follows the
+  containing section
+- **`passthroughAttrs`**: any prop of the underlying Vuetify component, without this library declaring it
+- **Actions**: the `Action` class with render options, `defaultConfirm` / `defaultReject`, the ready-made
+  close/yes/no factories, and per-breakpoint render options from `xs` to `xl`
+- **Selection**: static choices or an async `fetchChoices`, single or multiple, chips with icons, free values with
+  `allowTags`
+- **Uploads**: a `FileComms` object with upload progress, delete and a periodic touch
+- **Rich text**: a configured CKEditor 5 inside the same field frame as every other input
 - **Localisable**: `translateStrings()` replaces the library's own strings, `setCkEditorLanguage()` sets the RTF
-  editor's interface language, and `DateTimeLocaleConfig` sets the date-fns locale dates are formatted and parsed with
+  editor's interface language, and `DateTimeLocaleConfig` sets the date-fns locale dates are formatted and parsed
+  with
+- **TypeScript**: every component's props are an exported interface, and the definitions ship with the build
 
 ## Installation
 
