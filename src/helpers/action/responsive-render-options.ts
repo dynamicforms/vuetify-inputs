@@ -4,7 +4,13 @@ import { useDisplay } from 'vuetify';
 
 export const responsiveBreakpoints = ['xs', 'sm', 'md', 'lg', 'xl'] as const;
 export type BreakpointNames = (typeof responsiveBreakpoints)[number];
-export type BreakpointsJSON<T extends Record<string, any>> = T & Partial<Record<BreakpointNames, T>>;
+/**
+ * A set of options and the per-breakpoint sets that restate parts of it. `B` is what a breakpoint may state,
+ * and defaults to the whole of `T`; a subclass narrows it where a member belongs to the object as a whole rather
+ * than to one screen width.
+ */
+export type BreakpointsJSON<T extends Record<string, any>, B extends Record<string, any> = T> = T &
+  Partial<Record<BreakpointNames, B>>;
 
 export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
   protected readonly _value: BreakpointsJSON<T>;
@@ -20,12 +26,14 @@ export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
   }
 
   getOptionsForBreakpoint(breakpoint: BreakpointNames): T {
-    const result = this.cleanBreakpoint(this._value as T) as BreakpointsJSON<T>;
-    const fields = Object.keys(result);
+    // a base that states nothing cleans to null, and the breakpoints above it still have options to resolve
+    const result = (this.cleanBreakpoint(this._value as T) ?? ({} as T)) as BreakpointsJSON<T>;
     for (const bp of responsiveBreakpoints) {
-      const bpData = this._value[bp];
-      for (const field of fields) {
-        const value = bpData?.[field];
+      // the fields that cascade are the ones each breakpoint states, so a field named at a breakpoint and
+      // nowhere else still reaches the result
+      const bpData = this._value[bp] ?? {};
+      for (const field of Object.keys(bpData)) {
+        const value = (<any>bpData)[field];
         // a breakpoint states what it changes; a field it says nothing about keeps cascading
         if (value == null) continue;
         if (isPlainObject(value)) {
@@ -46,8 +54,7 @@ export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
    * Normalizes one breakpoint's options. The merge reads `null` and `undefined` as "this breakpoint says
    * nothing about that field", so a field the breakpoint does not state has to come back as `undefined` rather
    * than as an empty value - an empty array or string returned here reads as a breakpoint deliberately emptying
-   * what it inherited. The value returned for `defaultIfEmpty` carries every field the class merges, since the
-   * field set is taken from it.
+   * what it inherited.
    */
   protected abstract cleanBreakpoint(bp?: T, defaultIfEmpty?: boolean): T | null;
 }

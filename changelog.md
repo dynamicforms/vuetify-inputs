@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `dfInputComponentsByTag`, every component this library draws with, keyed by the tag that names it, and
+  `DfInputComponentTag`, the union of those tags. A rendering layer that resolves a component out of a map rather
+  than through Vue's resolver kept a list of its own, which had to be extended by hand whenever this package gained
+  a component and drew nothing at all until it was.
+- `DfInputHintProps` and `DfLabelProps` are declared alongside the other components' props and exported through
+  `DfInputComponentProps`. The two components declared their props inline, so a caller building `<df-input-hint>` or
+  `<df-label>` from a layout had nothing to type the props object against.
+- `BreakpointsJSON` takes a second type argument for what a breakpoint may state, defaulting to the whole of the
+  options type. `ActionBreakpointRenderOptions` is what it is given for an action: `ActionRenderOptions` without
+  `name`, `defaultConfirm` and `defaultReject`, which belong to the action rather than to a screen width and are
+  now a type error at a breakpoint.
+
+### Fixed
+
+- A field that only a breakpoint states is resolved. The fields taking part in the cascade were read off the base
+  options, so an option named at `md` and nowhere else was dropped: `{ label: 'Save', md: { icon: 'save-outline',
+  showIcon: true } }` drew no icon at any width, and an action whose value stated nothing at the base drew nothing
+  anywhere. The cascade covers the fields each breakpoint states.
+- `getRenderOptionsForBreakpoint()` answers `name`, `defaultConfirm`, `defaultReject` and `passthroughAttrs`. It
+  declared `name` and returned `undefined` for it whatever the value held, and did not carry the other three at all,
+  so `<df-actions>` read the colour flags and the attrs straight off the raw value to draw a button. Resolved
+  options carry every member `ActionRenderOptions` declares.
+- `passthroughAttrs` resolves per breakpoint, merged key by key like any plain object, so a breakpoint restating
+  `color` leaves the `density` below it standing.
+
 ## [0.9.1] - 2026-08-20
 
 ### Added

@@ -31,6 +31,21 @@ Object.entries(VuetifyComponents).map(([name, component]) => app.component(name,
 ```
 :::
 
+### Resolving a component by its tag
+
+A rendering layer that reads a component out of a map rather than through Vue's resolver - one that draws a
+serialized layout naming `df-select`, say - is handed `dfInputComponentsByTag`, which holds every component of
+this library under the tag that names it. `DfInputComponentTag` is the union of those tags.
+
+```typescript
+import { dfInputComponentsByTag } from '@dynamicforms/vuetify-inputs';
+
+const components = { ...dfInputComponentsByTag, ...myOwnComponents };
+```
+
+This is the map [`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:) hands its layout renderer, and
+using it instead of a list of your own is what keeps a component this library gains from going unresolved.
+
 ## Basic Usage
 
 `@dynamicforms/vuetify-inputs` provides Vuetify-based input components that work with `@dynamicforms/vue-forms` for form 

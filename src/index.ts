@@ -8,6 +8,7 @@ import * as VuetifyComponents from './vuetify-components';
 export * from './helpers';
 export * as VuetifyComponents from './vuetify-components';
 export * from './dynamicforms-components';
+export * from './dynamicforms-components-by-tag';
 export * as DfInputComponents from './dynamicforms-components';
 export * as DfInputComponentProps from './dynamicforms-component-props';
 

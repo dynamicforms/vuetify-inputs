@@ -21,15 +21,10 @@ import { MdString } from '@dynamicforms/vue-forms';
 import { computed } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import VueMarkdown from 'vue-markdown-render';
-import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
 
-import { Label } from './input-base';
+import type { DfLabelProps } from '../dynamicforms-component-props';
 
-const props = defineProps<{
-  data?: DefaultInputSlot & { label?: string | MdString };
-  label: Label;
-  allowWrap?: boolean;
-}>();
+const props = defineProps<DfLabelProps>();
 
 const lbl = computed(() => (props.data ? props.data.label : props.label.text));
 </script>

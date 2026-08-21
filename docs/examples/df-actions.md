@@ -42,18 +42,21 @@ interface ActionBreakpointOptions {
   defaultReject?: boolean;          // Marks the action as the "reject/dismiss" one - colored secondary by default
   passthroughAttrs?: Record<string, any>; // Extra props forwarded straight to the rendered <v-btn>
   // Responsive breakpoints
-  xs?: Partial<ActionRenderOptions>;
-  sm?: Partial<ActionRenderOptions>;
-  md?: Partial<ActionRenderOptions>;
-  lg?: Partial<ActionRenderOptions>;
-  xl?: Partial<ActionRenderOptions>;
+  xs?: ActionBreakpointRenderOptions;
+  sm?: ActionBreakpointRenderOptions;
+  md?: ActionBreakpointRenderOptions;
+  lg?: ActionBreakpointRenderOptions;
+  xl?: ActionBreakpointRenderOptions;
 }
 ```
 
-A breakpoint accepts the whole `ActionRenderOptions` type, but only five of its members take part in the cascade:
-`ResponsiveActionRenderOptions.cleanBreakpoint()` copies `renderAs`, `label`, `icon`, `showLabel` and `showIcon` out of
-a breakpoint and drops everything else. `name`, `defaultConfirm`, `defaultReject` and `passthroughAttrs` are read from
-the base options whatever a breakpoint states about them.
+A breakpoint states how the action is drawn at that width: `renderAs`, `label`, `icon`, `showLabel`, `showIcon` and
+`passthroughAttrs`. `name`, `defaultConfirm` and `defaultReject` are not among them - which key a modal resolves with,
+and which key fires the action, are properties of the action itself and do not depend on the width of the screen. They
+are stated once, in the base options, and `ActionBreakpointRenderOptions` is `ActionRenderOptions` without them.
+
+`passthroughAttrs` cascades key by key, like any plain object: a breakpoint restating `color` leaves the `density`
+below it standing.
 
 The `Action` object is the core component that defines how actions behave in the `df-actions` component. It extends the
 `Action` class of `@dynamicforms/vue-forms` to provide responsive behavior and visual configuration.
@@ -115,6 +118,8 @@ The `value` object defines the visual appearance and behavior:
 | `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the button `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
 | `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the button `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
 | `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>`, overriding `<df-actions>`'s own computed props |
+
+Every one of these but `name`, `defaultConfirm` and `defaultReject` can also be stated per breakpoint.
 
 `label` and `icon` are `@dynamicforms/vue-forms`' own accessors: each reads the member of the same name off the
 value and each takes a write, which is an ordinary value change. `renderedLabel` and `renderedIcon` are this
@@ -178,9 +183,11 @@ const responsiveAction = new Action({
 inherits the value from `md` (or the closest smaller breakpoint that defines it). Note that the "original values" 
 (without breakpoint) represent the smallest breakpoint size.
 
-An action's options are all single values, so the cascade above is the whole story here. The class behind it,
-`ResponsiveRenderOptions`, also carries options that are objects or lists for the subclasses that need them -
-see [responsive options](/examples/responsive-render-options) if you are writing one.
+All of an action's options but one are single values, and a breakpoint restating one replaces it.
+`passthroughAttrs` is an object and merges key by key instead, so a breakpoint states the attrs it changes and
+inherits the rest. The class behind the cascade, `ResponsiveRenderOptions`, also carries options that are lists,
+for the subclasses that need them - see [responsive options](/examples/responsive-render-options) if you are
+writing one.
 
 ### Action Execution
 

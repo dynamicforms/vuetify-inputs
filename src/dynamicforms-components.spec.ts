@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { type Component, createApp, resolveComponent } from 'vue';
 
 import * as Inputs from './dynamicforms-components';
+import { type DfInputComponentTag, dfInputComponentsByTag } from './dynamicforms-components-by-tag';
 
 /**
  * Every export of this module is a registration name: the plugin installs each one with
@@ -45,5 +46,17 @@ describe('dynamicforms-components', () => {
   // resolves to nothing
   it('reports a tag as unresolved when no registration name reaches it', () => {
     expect(resolveFromTag('df-input-hint', ['DFInputHint'])).toBe('df-input-hint');
+  });
+
+  // the map is what a layout resolves a tag through, and the registration names are what Vue's own resolver
+  // reaches: a tag that is in one and not the other renders in one application and not in the next
+  describe('dfInputComponentsByTag', () => {
+    it('holds every exported component, under its kebab-case tag', () => {
+      expect(Object.keys(dfInputComponentsByTag).sort()).toEqual(registrationNames.map(kebab).sort());
+    });
+
+    it.each(registrationNames)('answers %s for the tag that names it', (name) => {
+      expect(dfInputComponentsByTag[kebab(name) as DfInputComponentTag]).toBe(Inputs[name as keyof typeof Inputs]);
+    });
   });
 });

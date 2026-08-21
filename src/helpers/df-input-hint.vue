@@ -3,17 +3,12 @@
 </template>
 
 <script setup lang="ts">
-import { ClassTypes, MessagesWidget, ValidationError } from '@dynamicforms/vue-forms';
+import { MessagesWidget } from '@dynamicforms/vue-forms';
 import { computed } from 'vue';
 
-interface Props {
-  errors?: string | ValidationError[];
-  message?: string | ValidationError[];
-  errorClasses?: ClassTypes;
-  messageClasses?: ClassTypes;
-}
+import type { DfInputHintProps } from '../dynamicforms-component-props';
 
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<DfInputHintProps>(), {
   errors: '',
   message: '',
   errorClasses: 'text-error',

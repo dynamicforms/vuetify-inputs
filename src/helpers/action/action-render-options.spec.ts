@@ -100,4 +100,35 @@ describe('getRenderOptionsForBreakpoint', () => {
     expect(getRenderOptionsForBreakpoint(value, 'lg').label).toBeUndefined();
     expect(getRenderOptionsForBreakpoint(value, 'lg').icon).toBe('save-outline');
   });
+
+  it('resolves an icon a breakpoint names and the base does not', () => {
+    const value = { label: 'Save', md: { icon: 'save-outline', showIcon: true } };
+
+    expect(getRenderOptionsForBreakpoint(value, 'sm').icon).toBeUndefined();
+    expect(getRenderOptionsForBreakpoint(value, 'md').icon).toBe('save-outline');
+    expect(getRenderOptionsForBreakpoint(value, 'md').showIcon).toBe(true);
+  });
+
+  it('carries the members that are stated once for the action', () => {
+    const value = { label: 'Save', name: 'save', defaultConfirm: true, defaultReject: false, md: { label: 'Save it' } };
+    const options = getRenderOptionsForBreakpoint(value, 'md');
+
+    expect(options.name).toBe('save');
+    expect(options.defaultConfirm).toBe(true);
+    expect(options.defaultReject).toBe(false);
+    expect(options.label).toBe('Save it');
+  });
+
+  it('resolves passthroughAttrs key by key', () => {
+    const value = {
+      label: 'Save',
+      passthroughAttrs: { color: 'red', density: 'compact' },
+      md: { passthroughAttrs: { color: 'blue' } },
+    };
+
+    expect(getRenderOptionsForBreakpoint(value, 'sm').passthroughAttrs).toEqual({ color: 'red', density: 'compact' });
+    expect(getRenderOptionsForBreakpoint(value, 'md').passthroughAttrs).toEqual({ color: 'blue', density: 'compact' });
+    // the action's own object is left as it was declared
+    expect(value.passthroughAttrs).toEqual({ color: 'red', density: 'compact' });
+  });
 });

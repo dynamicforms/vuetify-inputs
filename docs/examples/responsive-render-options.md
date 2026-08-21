@@ -66,11 +66,9 @@ class ResponsivePanelOptions extends ResponsiveRenderOptions<PanelOptions> {
 }
 ```
 
-Two rules make the cascade behave:
-
-**Return `undefined` for a field the breakpoint does not state.** An empty array or an empty string is a value,
-and the merge treats it as one - it will replace what the breakpoint inherited. That is what lets a breakpoint
-clear a list on purpose:
+One rule makes the cascade behave: **return `undefined` for a field the breakpoint does not state.** An empty
+array or an empty string is a value, and the merge treats it as one - it will replace what the breakpoint
+inherited. That is what lets a breakpoint clear a list on purpose:
 
 ```typescript
 // base: { items: ['a', 'b'] }, md: { items: [] }
@@ -82,8 +80,34 @@ Watch for a class field that initializes a collection: `items: string[] = []` ma
 state an empty list from the moment it is constructed, and every one of them will then clear the list instead
 of inheriting it. Leave such a field optional and fill it in when something is actually added.
 
-**Carry every merged field in the `defaultIfEmpty` result.** The fields that take part in the cascade are read
-off the value returned for `defaultIfEmpty`, so a field missing there is never merged from any breakpoint.
+A field takes part in the cascade because a breakpoint states it, not because the base does: a field named at
+`md` and nowhere else resolves from `md` upwards, and comes back `undefined` below it.
+
+```typescript
+// base: {}, md: { title: 'only at md' }
+options.getOptionsForBreakpoint('sm'); // { }
+options.getOptionsForBreakpoint('md'); // { title: 'only at md' }
+```
+
+## Options a breakpoint may not state
+
+Some options belong to the object as a whole rather than to one screen width - an identifier, a flag another
+component keys on. `BreakpointsJSON` takes a second type argument for what a breakpoint may state, so such an
+option is a type error at a breakpoint instead of a value that quietly does nothing:
+
+```typescript
+interface PanelOptions {
+  name?: string;
+  title?: string;
+}
+
+type PanelBreakpointOptions = BreakpointsJSON<PanelOptions, Omit<PanelOptions, 'name'>>;
+
+const panel: PanelBreakpointOptions = { name: 'main', md: { name: 'wide' } };  // error: `name` is not per-breakpoint
+```
+
+This is how an action's options are declared: `ActionBreakpointOptions` is `ActionRenderOptions` with `name`,
+`defaultConfirm` and `defaultReject` left out of every breakpoint.
 
 ---
 

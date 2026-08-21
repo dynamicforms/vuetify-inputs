@@ -1,8 +1,9 @@
-import { Action } from '@dynamicforms/vue-forms';
+import { Action, ClassTypes, MdString, ValidationError } from '@dynamicforms/vue-forms';
 import { type Locale } from 'date-fns';
 import { MaybeRef } from 'vue';
+import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
 
-import { BaseProps, FileComms, SelectChoice, SelectFetchChoices } from './helpers';
+import { BaseProps, FileComms, Label, SelectChoice, SelectFetchChoices } from './helpers';
 
 type ShowAsGroup = 'no' | 'grouped' | 'grouped-no-borders';
 
@@ -39,6 +40,26 @@ export interface DfInputProps extends BaseProps {
   step?: number;
   min?: number;
   max?: number;
+}
+
+export interface DfInputHintProps {
+  /** The errors to render. Rendered in place of {@link message} whenever there is one. */
+  errors?: string | ValidationError[];
+  /** The message to render, shown while there is no error. */
+  message?: string | ValidationError[];
+  /** Classes for the rendered errors. Defaults to `text-error`. */
+  errorClasses?: ClassTypes;
+  /** Classes for the rendered message. Defaults to no class. */
+  messageClasses?: ClassTypes;
+}
+
+export interface DfLabelProps {
+  /** The slot data Vuetify hands a `#label` slot. Where it is given, its `label` is what is rendered. */
+  data?: DefaultInputSlot & { label?: string | MdString };
+  /** The label to render where no {@link data} is given: its text, and the icon it carries. */
+  label: Label;
+  /** Whether the label wraps over several lines. It is rendered on one line by default. */
+  allowWrap?: boolean;
 }
 
 export interface DfRtfEditorProps extends BaseProps {

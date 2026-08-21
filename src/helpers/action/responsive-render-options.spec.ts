@@ -30,7 +30,40 @@ class TestRenderOptions extends ResponsiveRenderOptions<TestOptions> {
   }
 }
 
+// A subclass that returns only the fields it was given, so the base carries no key at all for a field that only
+// a breakpoint states. This is the shape ResponsiveActionRenderOptions has.
+class SparseRenderOptions extends ResponsiveRenderOptions<TestOptions> {
+  protected cleanBreakpoint(bp?: TestOptions, defaultIfEmpty: boolean = false): TestOptions | null {
+    if (!bp && !defaultIfEmpty) return null;
+
+    const result: TestOptions = {};
+    if (bp?.items) result.items = [...bp.items];
+    if (bp?.props) result.props = { ...bp.props };
+    if (bp?.label != null) result.label = bp.label;
+    if (bp?.marker) result.marker = bp.marker;
+
+    return Object.keys(result).length || defaultIfEmpty ? result : null;
+  }
+}
+
 describe('ResponsiveRenderOptions', () => {
+  describe('fields the base does not state', () => {
+    it('resolves a scalar a breakpoint names and the base does not', () => {
+      const options = new SparseRenderOptions({ md: { label: 'only at md' } });
+
+      expect(options.getOptionsForBreakpoint('sm').label).toBeUndefined();
+      expect(options.getOptionsForBreakpoint('md').label).toBe('only at md');
+      expect(options.getOptionsForBreakpoint('lg').label).toBe('only at md');
+    });
+
+    it('resolves an object a breakpoint names and the base does not', () => {
+      const options = new SparseRenderOptions({ label: 'base', sm: { props: { dense: true } } });
+
+      expect(options.getOptionsForBreakpoint('xs').props).toBeUndefined();
+      expect(options.getOptionsForBreakpoint('sm').props).toEqual({ dense: true });
+    });
+  });
+
   describe('lists', () => {
     it('keeps the list it inherited when a breakpoint states nothing about it', () => {
       const options = new TestRenderOptions({
