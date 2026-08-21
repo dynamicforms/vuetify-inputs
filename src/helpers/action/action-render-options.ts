@@ -1,5 +1,5 @@
 import { ActionValue } from '@dynamicforms/vue-forms';
-import { isBoolean, isEmpty, isObjectLike, isString } from 'lodash-es';
+import { isBoolean, isEmpty, isObjectLike, isPlainObject, isString } from 'lodash-es';
 
 import { ActionDisplayStyle } from './action-display-style';
 import { BreakpointNames, BreakpointsJSON, ResponsiveRenderOptions } from './responsive-render-options';
@@ -43,7 +43,13 @@ export interface ActionRenderOptions extends ActionValue {
    * whole array of buttons, not just one. */
   passthroughAttrs?: Record<string, any>;
 }
-export type ActionBreakpointOptions = BreakpointsJSON<ActionRenderOptions>;
+/**
+ * What one breakpoint of an action's value may state: the members that describe how the action is drawn.
+ * `name`, `defaultConfirm` and `defaultReject` are not among them - which key a modal resolves with, and which
+ * key fires the action, are properties of the action itself and do not depend on the width of the screen.
+ */
+export type ActionBreakpointRenderOptions = Omit<ActionRenderOptions, 'name' | 'defaultConfirm' | 'defaultReject'>;
+export type ActionBreakpointOptions = BreakpointsJSON<ActionRenderOptions, ActionBreakpointRenderOptions>;
 
 export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<ActionRenderOptions> {
   protected cleanBreakpoint(bp?: ActionRenderOptions, defaultIfEmpty: boolean = false): ActionRenderOptions | null {
@@ -62,6 +68,12 @@ export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<Actio
       if (isString(bp.icon)) result.icon = bp.icon;
       if (isBoolean(bp.showLabel)) result.showLabel = bp.showLabel;
       if (isBoolean(bp.showIcon)) result.showIcon = bp.showIcon;
+      if (isString(bp.name)) result.name = bp.name;
+      if (isBoolean(bp.defaultConfirm)) result.defaultConfirm = bp.defaultConfirm;
+      if (isBoolean(bp.defaultReject)) result.defaultReject = bp.defaultReject;
+      // copied rather than kept by identity, so the cascade's shallow merge of a later breakpoint's attrs does
+      // not write into the object the action holds
+      if (isPlainObject(bp.passthroughAttrs)) result.passthroughAttrs = { ...bp.passthroughAttrs };
     }
 
     return Object.keys(result).length ? result : null;
@@ -87,5 +99,8 @@ export function getRenderOptionsForBreakpoint(value: ActionValue, breakpoint: Br
     renderAs: partial.renderAs,
     showLabel: isString(partial.label) && !isEmpty(partial.label) ? partial.showLabel : false,
     showIcon: isString(partial.icon) && !isEmpty(partial.icon) ? partial.showIcon : false,
+    defaultConfirm: partial.defaultConfirm,
+    defaultReject: partial.defaultReject,
+    passthroughAttrs: partial.passthroughAttrs,
   };
 }
