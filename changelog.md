@@ -20,6 +20,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   options type. `ActionBreakpointRenderOptions` is what it is given for an action: `ActionRenderOptions` without
   `name`, `defaultConfirm` and `defaultReject`, which belong to the action rather than to a screen width and are
   now a type error at a breakpoint.
+- `<df-rtf-editor>`'s toolbar gained a "Style" dropdown applying named, class-based looks (article category, title,
+  subtitle, info box, side quote, marker, spoiler, and dark/bright code) to the current block or selection, and a
+  media-embed tool that turns a pasted YouTube or Vimeo URL into a responsive player (any other URL is inserted as
+  a plain link instead).
+
+### Changed
+
+- **Breaking:** `<df-rtf-editor>` is built on [TipTap](https://tiptap.dev/) instead of CKEditor 5. CKEditor 5's core
+  is dual-licensed GPL/commercial, which put every application built on this library under the same terms unless it
+  paid for a commercial CKEditor licence; TipTap's core and the extensions this component uses are MIT. The toolbar
+  is now assembled from this library's own Vuetify components and icons rather than a vendor UI, so its buttons
+  follow the application's theme and every one of its labels is a `translatableStrings` key like the rest of the
+  library's own text (see [Localisation](/examples/localisation)). Saved HTML content, and the content classes
+  (`h3.category`, `p.info-box`, `span.marker`, and the rest) a document may already carry, are unaffected.
+  `@ckeditor/ckeditor5-vue` and `ckeditor5` are dropped from `peerDependencies`, replaced by `@tiptap/core`,
+  `@tiptap/vue-3`, `@tiptap/pm`, `@tiptap/starter-kit`, `@tiptap/extension-image`, `@tiptap/extension-link`,
+  `@tiptap/extension-placeholder`, `@tiptap/extension-table` and its `-row`/`-cell`/`-header` companions, and
+  `@tiptap/extension-text-align`.
+- Images: insertion by URL, upload, or clipboard paste all embed the picture as a base64 `data:` URI, matching the
+  previous `Base64UploadAdapter` behaviour, and a placed image resizes by dragging its corner and edge handles.
+- Pasting a Word or Google Docs selection strips the source application's clutter — `mso-*` inline styles, `Mso*`
+  classes, `o:p` and other namespaced tags, conditional comments — while formatted text, embedded images and tables
+  come through as structured content.
+
+### Removed
+
+- **Breaking:** `setCkEditorLanguage()` and the `ckEditorLanguage` object. CKEditor 5 shipped its own translated UI
+  bundles, which these configured; TipTap is headless, so the RTF editor's entire toolbar is text this library
+  itself owns, translated the same way as everything else, through `translateStrings()`.
 
 ### Fixed
 

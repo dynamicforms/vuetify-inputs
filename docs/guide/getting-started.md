@@ -153,13 +153,12 @@ const categoryOptions = [
 
 ## Localisation
 
-The library renders a few English strings of its own — the labels of the predefined actions and the entries of the two
-dropdowns the RTF editor adds to CKEditor's toolbar. `translateStrings()` replaces them, `setCkEditorLanguage()` sets
-CKEditor's interface language, and `DateTimeLocaleConfig` sets the date-fns locale `<df-date-time>` formats and parses
-with.
+The library renders a few English strings of its own — the labels of the predefined actions and every label the RTF
+editor's toolbar draws. `translateStrings()` replaces them, and `DateTimeLocaleConfig` sets the date-fns locale
+`<df-date-time>` formats and parses with.
 
 [Localisation](/examples/localisation) lists every translatable key with its default and where it appears, and carries
-a worked example that keeps all three on the application's current locale.
+a worked example that keeps both on the application's current locale.
 
 ## Next Steps
 

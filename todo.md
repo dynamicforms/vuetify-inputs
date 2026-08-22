@@ -55,10 +55,15 @@
   selected values settles it. `updateSelectedFromValue` re-normalises a value its callers already normalised.
 - Both df-select watchers are `deep: true`, while every write allocates a new array identity anyway — the traversal
   buys nothing.
-- `ck-editor-custom.vue` re-allocates the toolbar config, the 40-entry plugin array, the headings and the ~50-key
-  editor config per instance; none of it depends on props.
+- `rtf-toolbar.vue`'s `headingOptions` array and `<df-rtf-editor>`'s `useEditor` extension list are re-built per
+  instance; neither depends on props.
 - `df-file.fileInputKey` is created and re-randomised twice and read nowhere — the `:key` it was meant to bust does
-  not exist. `ck-editor-custom.onEditorReady` has an empty body and is published through `defineExpose`.
+  not exist.
+- `<df-rtf-editor>`'s toolbar has no accessibility-help button: a keyboard-shortcut reference for the editor's
+  commands. A `v-dialog` listing the toolbar's own shortcuts would cover it.
+- `stripWordArtifacts` strips namespaced *tags* (`o:p`, `w:sdt`...) and `Mso*` classes/`mso-*` style properties, but
+  not namespaced *attributes* Word leaves on ordinary elements (`v:shapes="Picture_x0020_1"` on a pasted `<img>`,
+  for one) — harmless (browsers ignore unknown attributes) but not removed either.
 - `df-checkbox` runs lodash `clone` over a `boolean | null`.
 - `density="compact"` on df-checkbox and on df-input's number branch is overridden by the `v-bind` that follows it.
 - `df-select` binds `aria-describedby` to `${name}-help`, and nothing renders an element with that id, so `helpText`
@@ -82,18 +87,17 @@
 
 - `vitepress-plugin-crosslinks` sits in `peerDependencies`, so every consuming application is asked to install a
   VitePress plugin. It belongs to the docs workspace, as do `markdown-it-attrs` and `@types/markdown-it-attrs`.
-- `ck-editor-custom.vue` imports `ckeditor5/ckeditor5.css` and two Google Fonts URLs into its `<style>` block, and
-  Vite inlines all three into the single library stylesheet — 261 KB, with two runtime requests to
-  fonts.googleapis.com, paid by every consumer whether or not it renders an RTF editor. A separate style export
-  would confine it to the ones that do.
+- `editor-core.vue` imports two Google Fonts URLs into its `<style>` block, and Vite inlines both into the
+  single library stylesheet — two runtime requests to fonts.googleapis.com, paid by every consumer whether or not
+  it renders an RTF editor. A separate style export would confine it to the ones that do.
 - A UMD build is still published while the peer library is ESM-only. A consumer that loads the UMD artifact and the
   ESM peer holds two copies of the class hierarchy, and `control instanceof FieldBase` answers `false`.
 
 ## Tests
 
-- `DynamicFormsInputs.install` has no spec: neither registration flag, the settings provide, nor the CKEditor
-  plugin install. `coverage.exclude: ['**/index.ts']` also swallows `src/index.ts`, which is not a barrel — narrow
-  the glob to the barrels.
+- `DynamicFormsInputs.install` has no spec: neither the registration flag nor the settings provide.
+  `coverage.exclude: ['**/index.ts']` also swallows `src/index.ts`, which is not a barrel — narrow the glob to the
+  barrels.
 - `df-select` (305 lines) is covered only by the generic visibility matrix: 5/17 functions. Untested — single vs
   multiple value shape, `allowTags` swapping the underlying component, out-of-order `fetchChoices` responses being
   discarded, the `update:modelValueDisplay` payload, `allowNull: false` selecting the first option, chip close.
@@ -106,4 +110,9 @@
 - The density and variant resolution is tested at the composable with a mocked `inject`, never through a mounted
   component: that a real `provide('field-density', …)` in a parent reaches a child, and that `inline` produces the
   wrapper class `global.css` keys its compensation on.
-- `translateStrings`, `setCkEditorLanguage` and `setDateTimeLocale` are documented public API with 0 % coverage.
+- `translateStrings` and `setDateTimeLocale` are documented public API with 0 % coverage.
+- `rtf-toolbar.vue`'s link, image, table and media-embed menus, the heading and Style dropdowns, and the bubble
+  menu in `editor-core.vue` have no component-level spec: applying/removing a link and its `download` toggle,
+  inserting an image by URL, the table row/column commands, and `setHeading`/`isHeadingActive` are all unasserted
+  through a mounted toolbar. `applyStyle`/`isStyleActive` and `toEmbedSrc`/`MediaEmbed` are covered directly in
+  `block-styles.spec.ts`/`media-embed.spec.ts`, but the menu wiring that calls them is not.

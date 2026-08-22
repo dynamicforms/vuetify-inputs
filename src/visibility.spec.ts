@@ -14,7 +14,7 @@ import DfSelect from '@/df-select.vue';
 import DfTextArea from '@/df-text-area.vue';
 import { FileComms } from '@/helpers';
 
-vi.mock('@/helpers/ck-editor-custom.vue', () => ({
+vi.mock('@/helpers/rtf-editor/editor-core.vue', () => ({
   default: {
     template: '<div class="ck-editor-stub" />',
     props: ['modelValue', 'minHeight', 'disabled'],

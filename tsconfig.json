@@ -5,6 +5,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./node_modules/*"],
+      "@tiptap/vue-3/menus": ["./node_modules/@tiptap/vue-3/dist/menus/index.d.ts"],
     },
     "types": ["vitest/globals"],
     "skipLibCheck": true

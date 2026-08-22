@@ -19,7 +19,7 @@ The site will be available at http://localhost:5173/
 ## Structure
 
 - `.vitepress/` - VitePress configuration
-  - `config.ts` - Site configuration: title, navigation, sidebar, Vuetify and CKEditor build setup
+  - `config.ts` - Site configuration: title, navigation, sidebar, Vuetify build setup
   - `theme/` - Custom theme that installs Vuetify and the `DynamicFormsInputs` plugin
 - `guide/` - User guide: getting started and the migration guide
 - `examples/` - API reference pages, each with interactive examples

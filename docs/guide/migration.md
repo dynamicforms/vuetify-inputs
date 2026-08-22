@@ -8,6 +8,97 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.10.0 (from v0.9.2)
+
+`<df-rtf-editor>` is built on [TipTap](https://tiptap.dev/) instead of CKEditor 5. CKEditor 5's core is
+dual-licensed GPL/commercial, which put every application built on this library under the same terms unless it
+paid for a commercial CKEditor licence; TipTap's core and the extensions this component uses are MIT. Three
+things follow from that swap: a peer dependency change, a removed API, and a change to the HTML the editor
+produces that reaches further than this library - the third is the one worth reading carefully even if you never
+touch this component's config. There is a [checklist](#checklist-for-0-10-0) at the end of this section.
+
+### The peer dependencies change
+
+`@ckeditor/ckeditor5-vue` and `ckeditor5` are gone from `peerDependencies`, replaced by TipTap's packages:
+
+```json
+{
+  "dependencies": {
+    "@tiptap/core": "^3.30.2",
+    "@tiptap/vue-3": "^3.30.2",
+    "@tiptap/pm": "^3.30.2",
+    "@tiptap/starter-kit": "^3.30.2",
+    "@tiptap/extension-image": "^3.30.2",
+    "@tiptap/extension-link": "^3.30.2",
+    "@tiptap/extension-placeholder": "^3.30.2",
+    "@tiptap/extension-table": "^3.30.2",
+    "@tiptap/extension-table-cell": "^3.30.2",
+    "@tiptap/extension-table-header": "^3.30.2",
+    "@tiptap/extension-table-row": "^3.30.2",
+    "@tiptap/extension-text-align": "^3.30.2"
+  }
+}
+```
+
+Drop the two CKEditor packages from your own `package.json` and install this set instead. Nothing else in your
+project's use of `@dynamicforms/vuetify-inputs` needs to change on account of this swap by itself.
+
+### `setCkEditorLanguage()` and `ckEditorLanguage` are removed
+
+CKEditor 5 shipped its own translated UI (button tooltips, dialog captions), which these two configured via a
+separate per-language bundle:
+
+```typescript
+// before
+import { setCkEditorLanguage } from '@dynamicforms/vuetify-inputs';
+import deTranslations from 'ckeditor5/translations/de.js';
+
+setCkEditorLanguage('de', deTranslations);
+```
+
+TipTap is headless: `<df-rtf-editor>`'s entire toolbar is built from this library's own Vuetify components, so
+every one of its labels is already a `translatableStrings` key, translated the same way as the rest of this
+library's text, through `translateStrings()` - see [Localisation](/examples/localisation). Drop the
+`setCkEditorLanguage` call and the translation-bundle import; nothing replaces them, because there is no longer a
+separate vendor UI language to configure.
+
+### List items and table cells wrap their text in a `<p>` now
+
+This is the one that reaches outside this library. CKEditor 5 saved a bulleted item as `<li>Text</li>` and a table
+cell as `<td>Text</td>`. TipTap's list and table schemas wrap block content in a paragraph even inside a list item
+or a cell, so the same content now saves as `<li><p>Text</p></li>` and `<td><p>Text</p></td>`.
+
+Inside `<df-rtf-editor>` itself this is invisible - its own stylesheet zeroes the paragraph margin in that
+context, so a list reads as tightly spaced lines, not double-spaced ones. But `<df-rtf-editor>` only styles its
+own editing surface. **Anywhere else this saved HTML is rendered** - a public page built from the stored value, a
+PDF export, a templated email - inherits the browser's or renderer's default `<p>` margin on every list item and
+table cell, unless that renderer's own stylesheet accounts for it. A `<li>` that used to be one line becomes a
+`<li>` with a paragraph's worth of empty space above and below it; a table built for compact rows gets visibly taller
+ones. Add the same rule this library's own editor uses wherever else this HTML is displayed:
+
+```css
+li p, td p, th p {
+  margin: 0;
+}
+```
+
+This is safe to apply everywhere you render content saved by this library, past or future: it only matches a
+`<p>` actually nested inside a list item or cell, so content saved before this upgrade - which has no such nested
+`<p>` - is simply not touched by it.
+
+### Checklist for 0.10.0
+
+1. Swap `@ckeditor/ckeditor5-vue` and `ckeditor5` for the `@tiptap/*` set above in your own `package.json`.
+2. Search your project for `setCkEditorLanguage` and drop the call and its translation-bundle import; if you
+   supplied per-locale editor language before, that concern no longer exists to configure.
+3. Find every place outside `<df-rtf-editor>` that renders HTML this component saved - marketing pages, PDF
+   generation, **templated emails** - and add `li p, td p, th p { margin: 0; }` (or that renderer's equivalent) to
+   its stylesheet. Check a rendered list and a rendered table specifically; this is easy to miss until content
+   with a list or a table happens to go out through that particular renderer.
+4. If your own styling targeted CKEditor-specific classes or DOM structure (rather than the semantic HTML this
+   library always documented as its saved format), re-check it against the new output.
+
+
 ## Upgrading to v0.9.1 (from v0.9.0)
 
 Nothing this library exports is renamed or removed. What changes is that your compiler finally sees the package's

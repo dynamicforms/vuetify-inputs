@@ -1,5 +1,5 @@
 import { Locale } from 'date-fns';
-import { sl } from 'date-fns/locale/sl'; // eslint-disable-line import/extensions
+import { sl } from 'date-fns/locale/sl';
 import { isRef, ref, Ref } from 'vue';
 
 export const DateTimeLocaleConfig = {

@@ -83,8 +83,8 @@ Various ways to validate input fields.
 
 ### [Localisation](./localisation)
 
-The library's own English strings and how to translate them, CKEditor's interface language, and the date-fns locale
-`<df-date-time>` formats and parses with.
+The library's own English strings and how to translate them, and the date-fns locale `<df-date-time>` formats and
+parses with.
 
 ### [Groups](./groups)
 

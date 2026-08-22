@@ -83,7 +83,7 @@ function setFocused(isFocused: boolean) {
   min-height: revert;
 }
 
-.ck-editor-custom .df-sub-field {
+.rtf-editor .df-sub-field {
   max-height: revert;
 }
 </style>

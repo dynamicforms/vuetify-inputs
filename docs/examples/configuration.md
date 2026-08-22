@@ -1,8 +1,8 @@
 # Configuration
 
 An application states the look of its fields once, when it installs the plugin. `app.use(DynamicFormsInputs, options)`
-provides the library's settings to the whole application, registers the components you ask it to register, and installs
-the CKEditor Vue plugin. Everything else is per-field, and comes out of the defaults cascade described below.
+provides the library's settings to the whole application, and registers the components you ask it to register.
+Everything else is per-field, and comes out of the defaults cascade described below.
 
 This page is about configuration. For what the density and variant values look like on screen, and for a live demo of
 every combination, see [density](/examples/density).
@@ -83,12 +83,6 @@ import { VuetifyComponents } from '@dynamicforms/vuetify-inputs';
 Object.entries(VuetifyComponents).map(([name, component]) => app.component(name, component));
 ```
 
-### CKEditor
-
-The plugin installs `CkeditorPlugin` from `@ckeditor/ckeditor5-vue`, which registers the `<ckeditor>` component.
-[df-rtf-editor](/examples/df-rtf-editor) builds its editor on that component, so installing `DynamicFormsInputs` is all
-the registration the RTF editor needs. This happens on every install, independently of both registration flags.
-
 ## The stylesheet
 
 ```typescript
@@ -105,9 +99,7 @@ The stylesheet is a single file and carries everything the components need beyon
 - the `invisible` class for `DisplayMode.INVISIBLE`. Vuetify ships `d-none` for `HIDDEN`, but nothing that hides an
   element while keeping its box, and that distinction is the point of the two modes.
 - the components' own styles: the `df-actions` button group, the multi-row select, label layout, the cached-icon
-  wrapper.
-- CKEditor 5's stylesheet, with the editor's colour variables bound to the Vuetify theme so the RTF editor follows the
-  application's palette.
+  wrapper, and the RTF editor's toolbar and content area, styled to follow the application's Vuetify theme.
 
 Each component puts its resolved density on its root element as `df-density-default`, `df-density-comfortable`,
 `df-density-compact` or `df-density-inline`, and the rules above key off those classes. Without the import, fields still
