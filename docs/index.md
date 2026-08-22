@@ -15,6 +15,9 @@ hero:
     - theme: alt
       text: View on GitHub
       link: https://github.com/dynamicforms/vuetify-inputs
+    - theme: alt
+      text: Changelog
+      link: /guide/changelog
 features:
   - title: Every field matches every other
     details: A text field, a select, a checkbox and a date picker built from stock Vuetify each carry their own
