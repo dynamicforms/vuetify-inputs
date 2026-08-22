@@ -1,7 +1,6 @@
 import vuetify from 'vite-plugin-vuetify';
 import { defineConfig } from 'vitepress';
 import { crosslinksConfig } from 'vitepress-plugin-crosslinks';
-import ssrCkeditorStub from './ssr-ckeditor-stub';
 
 export default defineConfig({
   title: 'DynamicForms Vuetify Inputs',
@@ -84,7 +83,7 @@ export default defineConfig({
     }
   },
   vite: {
-    plugins: [vuetify(), ssrCkeditorStub],
+    plugins: [vuetify()],
     optimizeDeps: {
       include: ['vuetify'],
     },

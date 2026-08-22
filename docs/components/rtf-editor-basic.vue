@@ -32,10 +32,10 @@ import { Field } from '@dynamicforms/vue-forms';
 import { DfRtfEditor } from '../../src';
 
 const contentField = new Field({
-  value: '<h2>Welcome to RTF Editor</h2><p>This is a <strong>rich text editor</strong> component that uses ' +
-    '<a href="https://ckeditor.com/">CKEditor</a> as its foundation.</p><p>You can:</p><ul><li>Format text with ' +
-    '<strong>bold</strong>, <em>italic</em>, and other styles</li><li>Insert links, images, and media</li>' +
-    '<li>Create lists and tables</li><li>And much more...</li></ul>'
+  value: '<h2>Welcome to RTF Editor</h2><p>This is a <strong>rich text editor</strong> component built on ' +
+    '<a href="https://tiptap.dev/">TipTap</a>.</p><p>You can:</p><ul><li>Format text with ' +
+    '<strong>bold</strong>, <em>italic</em>, and headings</li><li>Insert links, images, and tables</li>' +
+    '<li>Create bulleted and numbered lists</li><li>And much more...</li></ul>'
 });
 
 function toggleEnabled() {

@@ -19,6 +19,43 @@ export const translatableStrings = {
   Spoiler: 'Spoiler',
   CodeDark: 'Code (dark)',
   CodeBright: 'Code (bright)',
+  Undo: 'Undo',
+  Redo: 'Redo',
+  SelectAll: 'Select all',
+  Bold: 'Bold',
+  Italic: 'Italic',
+  HorizontalLine: 'Horizontal line',
+  Blockquote: 'Block quote',
+  BulletedList: 'Bulleted list',
+  NumberedList: 'Numbered list',
+  Outdent: 'Decrease indent',
+  Indent: 'Increase indent',
+  AlignLeft: 'Align left',
+  AlignCenter: 'Align center',
+  AlignRight: 'Align right',
+  AlignJustify: 'Justify',
+  Link: 'Link',
+  LinkUrl: 'URL',
+  LinkApply: 'Apply',
+  LinkRemove: 'Remove link',
+  Image: 'Image',
+  ImageUrl: 'Image URL',
+  ImageUpload: 'Upload image',
+  ImageInsert: 'Insert',
+  Table: 'Table',
+  TableInsert: 'Insert table',
+  TableAddRowAbove: 'Add row above',
+  TableAddRowBelow: 'Add row below',
+  TableDeleteRow: 'Delete row',
+  TableAddColumnBefore: 'Add column before',
+  TableAddColumnAfter: 'Add column after',
+  TableDeleteColumn: 'Delete column',
+  TableToggleHeaderRow: 'Toggle header row',
+  TableDeleteTable: 'Delete table',
+  Style: 'Style',
+  MediaEmbed: 'Insert media',
+  MediaEmbedUrl: 'Video URL',
+  MediaEmbedInsert: 'Insert',
 };
 
 export function translateStrings(translationCallback: (s: string) => string) {
@@ -29,13 +66,3 @@ export function translateStrings(translationCallback: (s: string) => string) {
     }
   });
 }
-
-export function setCkEditorLanguage(language: string, translations: any) {
-  ckEditorLanguage.language = language;
-  ckEditorLanguage.translations = translations;
-}
-
-export const ckEditorLanguage = {
-  language: 'en',
-  translations: undefined,
-};

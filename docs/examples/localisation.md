@@ -1,12 +1,11 @@
 # Localisation
 
-The library renders a small number of English strings of its own: the labels of the three predefined actions, the
-entries of the two dropdowns the RTF editor adds to CKEditor's toolbar, and the label of the link decorator that
-marks a link as downloadable. All of them are translatable. Dates and times are a separate concern, driven by a
-date-fns locale rather than by a string table, and CKEditor's own interface is a third, translated by CKEditor's
-translation bundles.
+The library renders a small number of English strings of its own: the labels of the three predefined actions, and
+every tooltip, dropdown entry and dialog label the RTF editor's toolbar draws — the toolbar is built from this
+library's own Vuetify components, so its entire text lives in the same table as everything else. All of it is
+translatable. Dates and times are a separate concern, driven by a date-fns locale rather than by a string table.
 
-The three mechanisms are independent. An application that needs all of it calls all three, and the
+The two mechanisms are independent. An application that needs both calls both, and the
 [worked example](#wiring-it-to-vue-i18n) below does exactly that.
 
 ## The strings the library owns
@@ -19,26 +18,39 @@ in force right now — not the English originals, which are its initial contents
 | `Yes` | `Yes` | Label of the action returned by `Action.yesAction()` |
 | `No` | `No` | Label of the action returned by `Action.noAction()` |
 | `Close` | `Close` | Label of the action returned by `Action.closeAction()` |
-| `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, `paragraph` entry |
-| `Heading1` | `Heading 1` | `<df-rtf-editor>` heading dropdown, `heading1` entry |
-| `Heading2` | `Heading 2` | `<df-rtf-editor>` heading dropdown, `heading2` entry |
-| `Heading3` | `Heading 3` | `<df-rtf-editor>` heading dropdown, `heading3` entry |
-| `Heading4` | `Heading 4` | `<df-rtf-editor>` heading dropdown, `heading4` entry |
-| `Heading5` | `Heading 5` | `<df-rtf-editor>` heading dropdown, `heading5` entry |
-| `Heading6` | `Heading 6` | `<df-rtf-editor>` heading dropdown, `heading6` entry |
-| `Downloadable` | `Downloadable` | `<df-rtf-editor>` link balloon, the manual decorator that adds `download="file"` |
-| `ArticleCategory` | `Article category` | `<df-rtf-editor>` style dropdown, `h3.category` |
-| `Title` | `Title` | `<df-rtf-editor>` style dropdown, `h2.document-title` |
-| `Subtitle` | `Subtitle` | `<df-rtf-editor>` style dropdown, `h3.document-subtitle` |
-| `InfoBox` | `Info box` | `<df-rtf-editor>` style dropdown, `p.info-box` |
-| `SideQuote` | `Side quote` | `<df-rtf-editor>` style dropdown, `blockquote.side-quote` |
-| `Marker` | `Marker` | `<df-rtf-editor>` style dropdown, `span.marker` |
-| `Spoiler` | `Spoiler` | `<df-rtf-editor>` style dropdown, `span.spoiler` |
-| `CodeDark` | `Code (dark)` | `<df-rtf-editor>` style dropdown, `pre.fancy-code.fancy-code-dark` |
-| `CodeBright` | `Code (bright)` | `<df-rtf-editor>` style dropdown, `pre.fancy-code.fancy-code-bright` |
+| `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, "no heading" entry |
+| `Heading1`–`Heading6` | `Heading 1`–`Heading 6` | `<df-rtf-editor>` heading dropdown entries |
+| `Undo` / `Redo` | `Undo` / `Redo` | `<df-rtf-editor>` toolbar button tooltips |
+| `SelectAll` | `Select all` | `<df-rtf-editor>` toolbar button tooltip |
+| `Bold` / `Italic` | `Bold` / `Italic` | `<df-rtf-editor>` toolbar button tooltips |
+| `HorizontalLine` | `Horizontal line` | `<df-rtf-editor>` toolbar button tooltip |
+| `Blockquote` | `Block quote` | `<df-rtf-editor>` toolbar button tooltip |
+| `BulletedList` / `NumberedList` | `Bulleted list` / `Numbered list` | `<df-rtf-editor>` toolbar button tooltips |
+| `Outdent` / `Indent` | `Decrease indent` / `Increase indent` | `<df-rtf-editor>` toolbar button tooltips |
+| `AlignLeft`, `AlignCenter`, `AlignRight`, `AlignJustify` | `Align left`, `Align center`, `Align right`, `Justify` | `<df-rtf-editor>` toolbar button tooltips |
+| `Link` | `Link` | `<df-rtf-editor>` toolbar button tooltip |
+| `LinkUrl` | `URL` | `<df-rtf-editor>` link menu, the URL field's label |
+| `LinkApply` | `Apply` | `<df-rtf-editor>` link menu, the apply button |
+| `LinkRemove` | `Remove link` | `<df-rtf-editor>` link menu, the remove button |
+| `Downloadable` | `Downloadable` | `<df-rtf-editor>` link menu, the checkbox that adds `download="file"` |
+| `Image` | `Image` | `<df-rtf-editor>` toolbar button tooltip |
+| `ImageUrl` | `Image URL` | `<df-rtf-editor>` image menu, the URL field's label |
+| `ImageUpload` | `Upload image` | `<df-rtf-editor>` image menu, the upload button |
+| `ImageInsert` | `Insert` | `<df-rtf-editor>` image menu, the insert-from-URL button |
+| `Table` | `Table` | `<df-rtf-editor>` toolbar button tooltip |
+| `TableInsert` | `Insert table` | `<df-rtf-editor>` table menu |
+| `TableAddRowAbove`, `TableAddRowBelow`, `TableDeleteRow` | `Add row above`, `Add row below`, `Delete row` | `<df-rtf-editor>` table menu |
+| `TableAddColumnBefore`, `TableAddColumnAfter`, `TableDeleteColumn` | `Add column before`, `Add column after`, `Delete column` | `<df-rtf-editor>` table menu |
+| `TableToggleHeaderRow` | `Toggle header row` | `<df-rtf-editor>` table menu |
+| `TableDeleteTable` | `Delete table` | `<df-rtf-editor>` table menu |
+| `Style` | `Style` | `<df-rtf-editor>` toolbar button, the Style dropdown's own label |
+| `ArticleCategory`, `Title`, `Subtitle`, `InfoBox`, `SideQuote`, `Marker`, `Spoiler`, `CodeDark`, `CodeBright` | see [df-rtf-editor](/examples/df-rtf-editor#custom-styles) | Style dropdown entries, one per `class` preset (`h3.category`, `p.info-box`...) the editor's stylesheet renders |
+| `MediaEmbed` | `Insert media` | `<df-rtf-editor>` toolbar button tooltip |
+| `MediaEmbedUrl` | `Video URL` | `<df-rtf-editor>` media-embed menu, the URL field's label |
+| `MediaEmbedInsert` | `Insert` | `<df-rtf-editor>` media-embed menu, the insert button |
 
-The style entries name what the dropdown shows; the CSS classes each one applies are fixed and are not affected by a
-translation, so the HTML the editor produces is the same whatever language the toolbar speaks.
+The style-preset entries name CSS classes that are fixed and not affected by a translation, so the saved HTML is the
+same whatever language the toolbar speaks.
 
 ## translateStrings
 
@@ -71,9 +83,10 @@ translateStrings((key: string): string => {
 - **Actions.** `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()` copy the string into the action's
   `label` when the factory runs. An action that already exists keeps the label it was built with — assign
   `action.label` to change it, or build the action again.
-- **The RTF editor.** `<df-rtf-editor>` assembles its CKEditor configuration when the editor component is set up. An
-  editor that is already mounted keeps its dropdown entries and its link decorator label; remount it to pick up new
-  ones, for instance by binding `:key` to the current locale code.
+- **The RTF editor.** `<df-rtf-editor>`'s toolbar reads the strings straight off the (non-reactive) `translatableStrings`
+  object, so a component that is already mounted shows the values it read at its last render, not necessarily the
+  latest ones — remount it to guarantee the new strings appear, for instance by binding `:key` to the current locale
+  code.
 
 Call `translateStrings` before the application mounts, and again on every locale change if the locale can change at
 runtime.
@@ -84,35 +97,6 @@ second call, a key the callback declines keeps the *previous translation* — it
 switcher therefore needs a complete catalogue for every locale it offers, English included; declining a key is a
 safety net against a missing message, not a way to select English.
 :::
-
-## CKEditor's interface language
-
-The strings above are the ones this library adds to the editor. Everything else in CKEditor's user interface — button
-tooltips, dialog captions, the accessibility help — is translated by CKEditor's own bundles.
-
-```typescript
-setCkEditorLanguage(language: string, translations: any): void
-```
-
-It writes both members of the exported `ckEditorLanguage` object, which starts out as `{ language: 'en', translations:
-undefined }`. `<df-rtf-editor>` passes `language` to the editor's `config.language` and `translations` to
-`config.translations`.
-
-Translation bundles are shipped by the `ckeditor5` package, one module per language, each with the bundle as its
-default export:
-
-```typescript
-import { setCkEditorLanguage } from '@dynamicforms/vuetify-inputs';
-import deTranslations from 'ckeditor5/translations/de.js';
-
-setCkEditorLanguage('de', deTranslations);
-```
-
-English needs no bundle: pass `undefined` as the second argument and CKEditor uses its built-in English.
-
-The same timing rule applies as for `translateStrings` — the configuration is read when an editor is set up, so call
-`setCkEditorLanguage` before the first `<df-rtf-editor>` mounts, and remount the editor if the language changes while
-it is on screen.
 
 ## Dates and times
 
@@ -176,24 +160,18 @@ See [df-date-time](/examples/df-datetime) for the display format patterns and th
 
 ## Wiring it to vue-i18n
 
-A single composable can carry all three mechanisms and keep them on the application's current locale. Call it once,
-high in the component tree.
+A single composable can carry both mechanisms and keep them on the application's current locale. Call it once, high in
+the component tree.
 
 ```typescript
 // use-df-locale.ts
 import type { Locale } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
-import {
-  DateTimeLocaleConfig,
-  setCkEditorLanguage,
-  translateStrings,
-} from '@dynamicforms/vuetify-inputs';
-import deTranslations from 'ckeditor5/translations/de.js';
+import { DateTimeLocaleConfig, translateStrings } from '@dynamicforms/vuetify-inputs';
 import { watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const dateFnsLocales: Record<string, Locale> = { en: enUS, de };
-const ckEditorTranslations: Record<string, any> = { en: undefined, de: deTranslations };
 
 export function useDfLocale() {
   const { locale, t } = useI18n();
@@ -206,7 +184,6 @@ export function useDfLocale() {
       return translated === path ? (null as unknown as string) : translated;
     });
     DateTimeLocaleConfig.setDateTimeLocale(dateFnsLocales[code] ?? enUS);
-    setCkEditorLanguage(code, ckEditorTranslations[code]);
   };
 
   apply(locale.value);
@@ -214,9 +191,9 @@ export function useDfLocale() {
 }
 ```
 
-The message catalogue carries every key of `translatableStrings` under `df_inputs`, in every locale the switcher
-offers — the English catalogue included, because a declined key keeps the previous translation rather than the English
-default:
+The message catalogue needs every key of `translatableStrings` under `df_inputs`, in every locale the switcher offers
+— the English catalogue included, because a declined key keeps the previous translation rather than the English
+default. The full key list is the table above; a few entries are enough to show the shape:
 
 ```typescript
 const messages = {
@@ -224,26 +201,22 @@ const messages = {
     df_inputs: {
       Yes: 'Yes', No: 'No', Close: 'Close',
       Paragraph: 'Paragraph',
-      Heading1: 'Heading 1', Heading2: 'Heading 2', Heading3: 'Heading 3',
-      Heading4: 'Heading 4', Heading5: 'Heading 5', Heading6: 'Heading 6',
+      Heading1: 'Heading 1', Heading2: 'Heading 2', /* ...Heading3-6 */
+      Bold: 'Bold', Italic: 'Italic',
+      Link: 'Link', LinkUrl: 'URL', LinkApply: 'Apply', LinkRemove: 'Remove link',
       Downloadable: 'Downloadable',
-      ArticleCategory: 'Article category', Title: 'Title', Subtitle: 'Subtitle',
-      InfoBox: 'Info box', SideQuote: 'Side quote',
-      Marker: 'Marker', Spoiler: 'Spoiler',
-      CodeDark: 'Code (dark)', CodeBright: 'Code (bright)',
+      // ...the rest of the table above
     },
   },
   de: {
     df_inputs: {
       Yes: 'Ja', No: 'Nein', Close: 'Schließen',
       Paragraph: 'Absatz',
-      Heading1: 'Überschrift 1', Heading2: 'Überschrift 2', Heading3: 'Überschrift 3',
-      Heading4: 'Überschrift 4', Heading5: 'Überschrift 5', Heading6: 'Überschrift 6',
+      Heading1: 'Überschrift 1', Heading2: 'Überschrift 2', /* ...Heading3-6 */
+      Bold: 'Fett', Italic: 'Kursiv',
+      Link: 'Link', LinkUrl: 'URL', LinkApply: 'Übernehmen', LinkRemove: 'Link entfernen',
       Downloadable: 'Herunterladbar',
-      ArticleCategory: 'Artikelkategorie', Title: 'Titel', Subtitle: 'Untertitel',
-      InfoBox: 'Infobox', SideQuote: 'Randzitat',
-      Marker: 'Markierung', Spoiler: 'Spoiler',
-      CodeDark: 'Code (dunkel)', CodeBright: 'Code (hell)',
+      // ...the rest of the table above
     },
   },
 };

@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 import eslint from 'vite-plugin-eslint';
 import dts from 'vite-plugin-dts';
 import { visualizer } from 'rollup-plugin-visualizer';
+import { configDefaults } from 'vitest/config';
 
 /** @type {import('vite').UserConfig} */
 export default defineConfig({
@@ -51,9 +52,21 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
-        '@ckeditor/ckeditor5-core',
         '@dynamicforms/vue-forms',
-        'ckeditor5',
+        '@tiptap/core',
+        '@tiptap/extension-image',
+        '@tiptap/extension-link',
+        '@tiptap/extension-placeholder',
+        '@tiptap/extension-table',
+        '@tiptap/extension-table-cell',
+        '@tiptap/extension-table-header',
+        '@tiptap/extension-table-row',
+        '@tiptap/extension-text-align',
+        '@tiptap/pm',
+        /^@tiptap\/pm\/.*/,
+        '@tiptap/starter-kit',
+        '@tiptap/vue-3',
+        /^@tiptap\/vue-3\/.*/,
         'date-fns',
         'lodash-es',
         'vue',
@@ -68,6 +81,9 @@ export default defineConfig({
     }
   },
   test: {
+    // The e2e/ suite runs under Playwright (`npm run test:e2e`), not vitest - its own test()/expect() aren't
+    // vitest's, so it must stay out of vitest's default file discovery.
+    exclude: [...configDefaults.exclude, 'e2e/**'],
     coverage: {
       provider: 'v8',
       include: [
