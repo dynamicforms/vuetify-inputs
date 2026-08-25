@@ -47,6 +47,10 @@ A component for date and time selection.
 
 A component for file uploads.
 
+### [df-image](./df-image)
+
+A component for image uploads, with a preview, drag & drop, and a browse dialog.
+
 ### [df-input](./df-input)
 
 A component for general data entry.

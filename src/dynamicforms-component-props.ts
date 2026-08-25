@@ -34,6 +34,15 @@ export interface DfFileProps extends BaseProps {
   comms: FileComms;
 }
 
+/**
+ * `comms.upload` must resolve to a value directly usable as an `<img>` src (typically the URL your backend
+ * serves the image from): the component has no separate lookup for turning an identifier into a display URL,
+ * so it renders `modelValue` itself as the preview once a file has been uploaded.
+ */
+export interface DfImageProps extends BaseProps {
+  comms: FileComms;
+}
+
 export interface DfInputProps extends BaseProps {
   inputType?: 'text' | 'password' | 'email' | 'url' | 'number';
   precision?: number | null;

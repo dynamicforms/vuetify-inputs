@@ -65,6 +65,7 @@ export default defineConfig({
             { text: 'df-color', link: '/examples/df-color' },
             { text: 'df-date-time', link: '/examples/df-datetime' },
             { text: 'df-file', link: '/examples/df-file' },
+            { text: 'df-image', link: '/examples/df-image' },
             { text: 'df-input', link: '/examples/df-input' },
             { text: 'df-input-hint', link: '/examples/df-input-hint' },
             { text: 'df-rtf-editor', link: '/examples/df-rtf-editor' },

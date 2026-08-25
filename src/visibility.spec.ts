@@ -8,6 +8,7 @@ import DfCheckbox from '@/df-checkbox.vue';
 import DfColor from '@/df-color.vue';
 import DfDateTime from '@/df-datetime.vue';
 import DfFile from '@/df-file.vue';
+import DfImage from '@/df-image.vue';
 import DfInput from '@/df-input.vue';
 import DfRtfEditor from '@/df-rtf-editor.vue';
 import DfSelect from '@/df-select.vue';
@@ -32,6 +33,7 @@ const inputComponents: [string, any, Record<string, any>][] = [
   ['DfColor', DfColor, {}],
   ['DfDateTime', DfDateTime, {}],
   ['DfFile', DfFile, { comms }],
+  ['DfImage', DfImage, { comms }],
   ['DfInput', DfInput, {}],
   ['DfRtfEditor', DfRtfEditor, {}],
   ['DfSelect', DfSelect, {}],

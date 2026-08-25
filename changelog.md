@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `<df-image>`, an image upload field: a preview of the current image, a drag & drop zone, and a button opening
+  the browser's file dialog. It shares the `FileComms` contract with `<df-file>`, with the difference that
+  `upload` must resolve to a URL the component can render directly as the image's `src`.
 - `dfInputComponentsByTag`, every component this library draws with, keyed by the tag that names it, and
   `DfInputComponentTag`, the union of those tags. A rendering layer that resolves a component out of a map rather
   than through Vue's resolver kept a list of its own, which had to be extended by hand whenever this package gained

@@ -3,6 +3,7 @@ export { default as DfCheckbox } from './df-checkbox.vue';
 export { default as DfColor } from './df-color.vue';
 export { default as DfDateTime } from './df-datetime.vue';
 export { default as DfFile } from './df-file.vue';
+export { default as DfImage } from './df-image.vue';
 export { default as DfInput } from './df-input.vue';
 export { default as DfInputHint } from './helpers/df-input-hint.vue';
 export { default as DfLabel } from './helpers/df-label.vue';
