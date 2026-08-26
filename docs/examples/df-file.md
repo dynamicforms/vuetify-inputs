@@ -25,6 +25,7 @@ In addition to [common props from InputBase](./input-base), this component requi
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | comms | `FileComms` | **Required** | Object with methods for file operations |
+| touchInterval | `number` | `60000` | Milliseconds between keep-alive touches. See [Configuration](/examples/configuration) for setting this application-wide instead |
 
 ### Inherited Props
 
@@ -58,13 +59,16 @@ interface FileComms {
   upload: (file: File, progressCallback?: FileProgressCallback) => Promise<string>;
 
   /**
-   * Called when the file is removed
+   * Called when the file is removed. Throw FileGoneError if the backend already reports the identifier as
+   * gone; any other thrown error is treated as transient.
    * @param fileIdentifier The identifier that was returned by upload
    */
   delete: (fileIdentifier: string) => Promise<void>;
 
   /**
-   * Called periodically to keep the file active
+   * Called periodically to keep the file active. Throw FileGoneError if the backend reports the identifier
+   * no longer exists — the component then clears the field and, where a `control` is bound, shows the
+   * error's `errorText`. Any other thrown error is treated as transient and left to the consumer.
    * @param fileIdentifier The identifier that was returned by upload
    */
   touch: (fileIdentifier: string) => Promise<void>;
@@ -72,6 +76,13 @@ interface FileComms {
 
 // Progress callback type
 type FileProgressCallback = (loaded: number, total: number) => void;
+
+// Thrown by touch/delete to report that the backend has already discarded the file
+class FileGoneError extends Error {
+  constructor(public errorText: string) {
+    super(errorText);
+  }
+}
 ```
 
 ## Upload Progress
@@ -79,8 +90,10 @@ type FileProgressCallback = (loaded: number, total: number) => void;
 The component displays a progress bar during file upload, using the values provided by the `progressCallback` in the
 `upload` method.
 
-After a file has been uploaded to the backend, it will be touched every 60 seconds to let the backend know that it's still 
-relevant.
+After a file has been uploaded to the backend, it is touched every `touchInterval` milliseconds (60 seconds by
+default) to let the backend know that it's still relevant. If a touch rejects with a `FileGoneError`, the field is
+cleared and, where a `control` is bound, the error's `errorText` is shown as a validation error. Any other rejection
+is treated as a transient failure and left to the consumer.
 
 ## Events
 
@@ -105,6 +118,7 @@ This component emits all [common events from InputBase](./input-base):
 import { ref } from 'vue';
 import axios from 'axios';
 import { DfFile } from '@dynamicforms/vuetify-inputs';
+import { FileGoneError } from '@dynamicforms/vuetify-inputs';
 
 const fileId = ref(null);
 
@@ -130,7 +144,14 @@ const fileComms = {
   },
   
   touch: async (fileId) => {
-    await axios.post(`/api/files/${fileId}/touch`);
+    try {
+      await axios.post(`/api/files/${fileId}/touch`);
+    } catch (err) {
+      if (err.response?.status === 404) {
+        throw new FileGoneError('This file is no longer available. Please upload it again.');
+      }
+      throw err;
+    }
   }
 };
 </script>

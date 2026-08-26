@@ -1,10 +1,11 @@
+import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 
 import DfImage from '@/df-image.vue';
-import { FileComms } from '@/helpers';
+import { FileComms, FileGoneError } from '@/helpers';
 
 const pngFile = (name = 'photo.png') => new File([new Uint8Array([137, 80, 78, 71])], name, { type: 'image/png' });
 const textFile = (name = 'notes.txt') => new File(['hello'], name, { type: 'text/plain' });
@@ -28,6 +29,11 @@ describe('DfImage', () => {
     };
     global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
     global.URL.revokeObjectURL = vi.fn();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   const mountImage = (props: Record<string, any> = {}) =>
@@ -35,6 +41,14 @@ describe('DfImage', () => {
       props: { comms, label: 'Photo', ...props },
       global: { plugins: [vuetify] },
     });
+
+  const pickImage = async (wrapper: ReturnType<typeof mountImage>, file: File) => {
+    const input = wrapper.find('input[type="file"]');
+    Object.defineProperty(input.element, 'files', { value: fileList([file]), configurable: true });
+    await input.trigger('change');
+    await wrapper.vm.$nextTick();
+    await vi.advanceTimersByTimeAsync(0);
+  };
 
   it('shows the drop placeholder when no image is set', () => {
     const wrapper = mountImage();
@@ -54,11 +68,7 @@ describe('DfImage', () => {
   it('uploads a picked image and reflects the returned identifier as modelValue', async () => {
     const wrapper = mountImage();
 
-    const input = wrapper.find('input[type="file"]');
-    Object.defineProperty(input.element, 'files', { value: fileList([pngFile()]), configurable: true });
-    await input.trigger('change');
-    await wrapper.vm.$nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await pickImage(wrapper, pngFile());
 
     expect(comms.upload).toHaveBeenCalledTimes(1);
     expect(wrapper.emitted('update:modelValue')).toBeTruthy();
@@ -70,7 +80,7 @@ describe('DfImage', () => {
     const wrapper = mountImage();
 
     await wrapper.find('.df-image-wrapper').trigger('drop', { dataTransfer: { files: fileList([pngFile()]) } });
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await vi.advanceTimersByTimeAsync(0);
 
     expect(comms.upload).toHaveBeenCalledTimes(1);
   });
@@ -94,5 +104,61 @@ describe('DfImage', () => {
     expect(comms.delete).toHaveBeenCalledWith('https://example.com/existing.png');
     const emitted = wrapper.emitted('update:modelValue') as any[];
     expect(emitted[emitted.length - 1]).toEqual([null]);
+  });
+
+  it('touches the uploaded image at a regular interval', async () => {
+    const wrapper = mountImage({ touchInterval: 1_000 });
+    await pickImage(wrapper, pngFile());
+
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    expect(comms.touch).toHaveBeenCalledWith('https://example.com/uploaded.png');
+  });
+
+  it('clears the field and preview and reports the error on control when touch reports the image is gone', async () => {
+    comms.touch = vi.fn(async () => {
+      throw new FileGoneError('The uploaded image is no longer available on the server.');
+    });
+    const control = new Form.Field<string>({ value: '' });
+    const wrapper = mountImage({ control, touchInterval: 1_000 });
+    await pickImage(wrapper, pngFile());
+
+    await vi.advanceTimersByTimeAsync(1_000);
+    await wrapper.vm.$nextTick();
+
+    expect(control.value).toBeFalsy();
+    expect(control.errors).toHaveLength(1);
+    expect((control.errors[0] as ValidationErrorRenderContent).resolvedText).toBe(
+      'The uploaded image is no longer available on the server.',
+    );
+    expect(wrapper.findComponent({ name: 'VImg' }).exists()).toBe(false);
+  });
+
+  it('clears the field without throwing when touch reports the image is gone and no control is bound', async () => {
+    comms.touch = vi.fn(async () => {
+      throw new FileGoneError('The uploaded image is no longer available on the server.');
+    });
+    const wrapper = mountImage({ touchInterval: 1_000 });
+    await pickImage(wrapper, pngFile());
+
+    await vi.advanceTimersByTimeAsync(1_000);
+    await wrapper.vm.$nextTick();
+
+    const emitted = wrapper.emitted('update:modelValue') as any[];
+    expect(emitted[emitted.length - 1]).toEqual([null]);
+  });
+
+  it('leaves the field untouched when touch rejects with a transient error', async () => {
+    comms.touch = vi.fn(async () => {
+      throw new Error('network hiccup');
+    });
+    const wrapper = mountImage({ touchInterval: 1_000 });
+    await pickImage(wrapper, pngFile());
+
+    await vi.advanceTimersByTimeAsync(1_000);
+    await wrapper.vm.$nextTick();
+
+    const emitted = wrapper.emitted('update:modelValue') as any[];
+    expect(emitted[emitted.length - 1]).toEqual(['https://example.com/uploaded.png']);
   });
 });

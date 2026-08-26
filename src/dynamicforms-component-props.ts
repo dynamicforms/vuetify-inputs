@@ -32,6 +32,9 @@ export interface DfDateTimeProps extends BaseProps {
 
 export interface DfFileProps extends BaseProps {
   comms: FileComms;
+  /** Milliseconds between keep-alive touches. Overrides `defaultTouchInterval` from the plugin's
+   *  `VuetifyInputsSettings`, which in turn overrides the baked-in default of 60000. */
+  touchInterval?: number;
 }
 
 /**
@@ -41,6 +44,9 @@ export interface DfFileProps extends BaseProps {
  */
 export interface DfImageProps extends BaseProps {
   comms: FileComms;
+  /** Milliseconds between keep-alive touches. Overrides `defaultTouchInterval` from the plugin's
+   *  `VuetifyInputsSettings`, which in turn overrides the baked-in default of 60000. */
+  touchInterval?: number;
 }
 
 export interface DfInputProps extends BaseProps {

@@ -41,11 +41,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeUnmount, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfFileProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, InputBase, useInputBase } from './helpers';
+import {
+  BaseEmits,
+  defaultBaseProps,
+  InputBase,
+  setFileGoneError,
+  useFileTouchKeepAlive,
+  useInputBase,
+} from './helpers';
 
 const props = withDefaults(defineProps<DfFileProps>(), defaultBaseProps);
 
@@ -53,7 +60,6 @@ interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
-const touchInterval = ref<number | null>(null);
 
 // State
 const currentFile = ref<File | null>(null);
@@ -69,33 +75,33 @@ const fileLabel = computed(() => {
   return '';
 });
 
-function clearTouchInterval() {
-  if (touchInterval.value) window.clearInterval(touchInterval.value);
-}
-function setupTouchInterval() {
-  clearTouchInterval();
-  touchInterval.value = window.setInterval(() => {
-    if (value.value) props.comms.touch(value.value);
-  }, 60 * 1000);
-}
-
-onBeforeUnmount(() => clearTouchInterval());
-watch(value, (newValue) => {
-  if (newValue) setupTouchInterval();
-  else clearTouchInterval();
-});
-
-async function removeFile() {
-  if (value.value) {
-    await props.comms.delete(value.value);
-  }
-
+function resetFileState() {
   value.value = null;
   progress.value = 0;
   fileInputKey.value = Math.round(Math.random() * 1000);
   currentFile.value = null;
   selectedFile.value = null;
   clearTouchInterval();
+}
+
+function handleFileGone(errorText: string) {
+  resetFileState();
+  setFileGoneError(props.control, errorText);
+}
+
+const { setupTouchInterval, clearTouchInterval } = useFileTouchKeepAlive(
+  value,
+  () => props.comms,
+  () => props.touchInterval,
+  handleFileGone,
+);
+
+async function removeFile() {
+  if (value.value) {
+    await props.comms.delete(value.value);
+  }
+
+  resetFileState();
 }
 
 async function upload(file: File) {

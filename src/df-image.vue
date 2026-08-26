@@ -60,11 +60,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, useId, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, useId } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfImageProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, InputBase, translatableStrings, useInputBase } from './helpers';
+import {
+  BaseEmits,
+  defaultBaseProps,
+  InputBase,
+  setFileGoneError,
+  translatableStrings,
+  useFileTouchKeepAlive,
+  useInputBase,
+} from './helpers';
 
 const props = withDefaults(defineProps<DfImageProps>(), defaultBaseProps);
 
@@ -73,7 +81,6 @@ const emits = defineEmits<Emits>();
 
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const t = translatableStrings;
-const touchInterval = ref<number | null>(null);
 const fileInputId = useId();
 
 // State
@@ -88,16 +95,6 @@ const isDisabled = computed(() => !!(vuetifyBindings.value.disabled || vuetifyBi
 const isDragging = computed(() => dragCounter.value > 0);
 const previewUrl = computed<string | null>(() => objectUrl.value ?? (value.value ? (value.value as string) : null));
 
-function clearTouchInterval() {
-  if (touchInterval.value) window.clearInterval(touchInterval.value);
-}
-function setupTouchInterval() {
-  clearTouchInterval();
-  touchInterval.value = window.setInterval(() => {
-    if (value.value) props.comms.touch(value.value);
-  }, 60 * 1000);
-}
-
 function revokeObjectUrl() {
   if (objectUrl.value) {
     URL.revokeObjectURL(objectUrl.value);
@@ -105,25 +102,34 @@ function revokeObjectUrl() {
   }
 }
 
-onBeforeUnmount(() => {
-  clearTouchInterval();
+function resetFileState() {
+  value.value = null;
+  progress.value = 0;
+  currentFile.value = null;
   revokeObjectUrl();
-});
-watch(value, (newValue) => {
-  if (newValue) setupTouchInterval();
-  else clearTouchInterval();
-});
+  clearTouchInterval();
+}
+
+function handleFileGone(errorText: string) {
+  resetFileState();
+  setFileGoneError(props.control, errorText);
+}
+
+const { setupTouchInterval, clearTouchInterval } = useFileTouchKeepAlive(
+  value,
+  () => props.comms,
+  () => props.touchInterval,
+  handleFileGone,
+);
+
+onBeforeUnmount(() => revokeObjectUrl());
 
 async function removeFile() {
   if (value.value) {
     await props.comms.delete(value.value);
   }
 
-  value.value = null;
-  progress.value = 0;
-  currentFile.value = null;
-  revokeObjectUrl();
-  clearTouchInterval();
+  resetFileState();
 }
 
 async function upload(file: File) {

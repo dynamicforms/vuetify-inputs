@@ -20,11 +20,12 @@ app.use(DynamicFormsInputs, {
   registerVuetifyComponents: false,
   defaultDensity: 'compact',
   defaultVariant: 'outlined',
+  defaultTouchInterval: 90_000,
 });
 ```
 
 The options argument is optional, and so is every option in it: `app.use(DynamicFormsInputs)` is valid and leaves the
-baked-in defaults in place. The type is `DynamicFormsInputsOptions`, which is `VuetifyInputsSettings` (the two default
+baked-in defaults in place. The type is `DynamicFormsInputsOptions`, which is `VuetifyInputsSettings` (the default
 settings) plus the two registration flags.
 
 | Option | Type | Default | Description |
@@ -33,6 +34,7 @@ settings) plus the two registration flags.
 | `registerVuetifyComponents` | `boolean` | `false` | Registers the Vuetify components the library's templates use |
 | `defaultDensity` | `FieldDensity` | unset, so `'default'` applies | Application-wide density for all fields |
 | `defaultVariant` | `FieldVariant` | unset, so `'underlined'` applies | Application-wide variant for all fields |
+| `defaultTouchInterval` | `number` | unset, so `60000` applies | Milliseconds between `<df-file>`/`<df-image>` keep-alive touches, application-wide |
 
 `FieldDensity` is `'default' | 'comfortable' | 'compact' | 'inline'`, `FieldVariant` is
 `'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled'`.
