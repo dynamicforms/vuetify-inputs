@@ -27,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   subtitle, info box, side quote, marker, spoiler, and dark/bright code) to the current block or selection, and a
   media-embed tool that turns a pasted YouTube or Vimeo URL into a responsive player (any other URL is inserted as
   a plain link instead).
+- `<df-file>`/`<df-image>`'s keep-alive `touch` interval is configurable: a `touchInterval` prop per field, falling
+  back to a new `defaultTouchInterval` plugin setting, falling back to the existing 60 second default. A
+  `touch`/`delete` implementation can now throw `FileGoneError` to report that the backend has already discarded
+  the file — the component clears the field and, where a `control` is bound, shows the error's `errorText` as a
+  validation error. Any other thrown error is left to the consumer, as before.
 
 ### Changed
 
