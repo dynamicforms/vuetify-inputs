@@ -19,7 +19,7 @@
         class="d-flex w-100 position-relative df-input-wrapper"
         :class="[density, { 'df-file-dragging': isDragging }]"
         @dragenter.prevent="onDragEnter"
-        @dragover.prevent="onDragEnter"
+        @dragover.prevent
         @dragleave.prevent="onDragLeave"
         @drop.prevent="onDrop"
       >

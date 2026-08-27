@@ -65,6 +65,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `<df-image>`'s drag-over highlight no longer gets stuck on after a drag ends. `dragover` fires
+  continuously while a file hovers over the drop zone, and was incrementing the same counter as
+  `dragenter`; a single `dragleave` couldn't bring it back down, so the dashed outline stayed until
+  the page reloaded, surviving even the field's own clear button.
 - `<df-file>` shows an existing value's name. Its label read the raw `modelValue` prop, which
   stays unset when the field is bound through `control` rather than `v-model` - every consumer
   using the `control` binding saw a blank input for a field that already held a file.
