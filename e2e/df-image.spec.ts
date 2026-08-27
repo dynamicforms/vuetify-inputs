@@ -10,9 +10,9 @@ test.beforeEach(async ({ page }) => {
   await page.waitForSelector('.df-image-wrapper');
 });
 
-test('clicking the placeholder opens the native file chooser', async ({ page }) => {
+test('clicking the field opens the native file chooser', async ({ page }) => {
   const chooserPromise = page.waitForEvent('filechooser');
-  await page.click('.df-image-placeholder');
+  await page.click('.df-image-preview-label');
   const chooser = await chooserPromise;
 
   expect(chooser.isMultiple()).toBe(false);
@@ -25,7 +25,7 @@ test('a large image is scaled to the field instead of cropped, and the field doe
   const boxBefore = await wrapper.boundingBox();
 
   const chooserPromise = page.waitForEvent('filechooser');
-  await page.click('.df-image-placeholder');
+  await page.click('.df-image-preview-label');
   const chooser = await chooserPromise;
   await chooser.setFiles(path.join(dirname, 'fixtures', 'large-portrait.png'));
 
@@ -65,11 +65,6 @@ test('dropping an image uploads it and clears the drag highlight', async ({ page
 });
 
 test('replacing an existing image opens the file chooser from the overlay button', async ({ page }) => {
-  const chooserPromise = page.waitForEvent('filechooser');
-  await page.click('.df-image-placeholder');
-  const chooser = await chooserPromise;
-  await chooser.setFiles(path.join(dirname, 'fixtures', 'large-portrait.png'));
-
   await expect(page.locator('.df-image-preview img')).toBeVisible();
 
   const replaceChooserPromise = page.waitForEvent('filechooser');
