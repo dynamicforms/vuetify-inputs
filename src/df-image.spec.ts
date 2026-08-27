@@ -27,8 +27,8 @@ describe('DfImage', () => {
       delete: vi.fn(async () => {}),
       touch: vi.fn(async () => {}),
     };
-    global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
-    global.URL.revokeObjectURL = vi.fn();
+    globalThis.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+    globalThis.URL.revokeObjectURL = vi.fn();
     vi.useFakeTimers();
   });
 
