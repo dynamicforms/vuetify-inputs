@@ -4,18 +4,20 @@ import { defineConfig } from '@playwright/test';
 // real browser against the docs site to check things vitest's jsdom environment cannot (actual CSS layout/paint,
 // hover-revealed resize handles, a genuine `paste` DOM event, real bubbling drag events). Run locally by hand
 // with `npm run test:e2e`.
+//
+// Served from the built site rather than `docs:dev`: a dev server pre-bundles its whole dependency graph
+// (Vuetify, TipTap, date-fns, ...) on first navigation, which a CI runner can take well past a reasonable test
+// timeout to finish; the built site has no such warm-up cost.
 export default defineConfig({
   testDir: './e2e',
-  // The first navigation against a cold dev server triggers Vite's dependency pre-bundling for the whole
-  // dependency graph (Vuetify, TipTap, date-fns, ...), which a CI runner can take well past 30s to finish.
-  timeout: process.env.CI ? 60000 : 30000,
+  timeout: 30000,
   webServer: {
-    command: 'npm run docs:dev',
-    url: 'http://localhost:5173',
+    command: 'npm run docs:build && npm run docs:preview',
+    url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
-    timeout: 60000,
+    timeout: 120000,
   },
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:4173',
   },
 });
