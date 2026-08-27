@@ -6,7 +6,9 @@ import { defineConfig } from '@playwright/test';
 // with `npm run test:e2e`.
 export default defineConfig({
   testDir: './e2e',
-  timeout: 30000,
+  // The first navigation against a cold dev server triggers Vite's dependency pre-bundling for the whole
+  // dependency graph (Vuetify, TipTap, date-fns, ...), which a CI runner can take well past 30s to finish.
+  timeout: process.env.CI ? 60000 : 30000,
   webServer: {
     command: 'npm run docs:dev',
     url: 'http://localhost:5173',
