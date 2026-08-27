@@ -58,6 +58,14 @@ describe('DfFile', () => {
     expect(emitted[emitted.length - 1]).toEqual(['file-id-1']);
   });
 
+  it('shows drag feedback while dragging over the field', async () => {
+    const wrapper = mountFile();
+
+    await wrapper.find('input[type="file"]').trigger('dragover');
+
+    expect(wrapper.find('.v-file-input').classes()).toContain('v-file-input--dragging');
+  });
+
   it('deletes the uploaded file and clears modelValue on click:clear', async () => {
     const wrapper = mountFile({ modelValue: 'file-id-1' });
 

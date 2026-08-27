@@ -171,4 +171,10 @@ function handleFileChange(file: File | File[]): any {
 .df-file-download-btn:hover {
   opacity: 1;
 }
+
+.df-input-wrapper .v-file-input--dragging {
+  outline: 2px dashed rgb(var(--v-theme-primary));
+  outline-offset: -2px;
+  background-color: rgba(var(--v-theme-primary), 0.08);
+}
 </style>

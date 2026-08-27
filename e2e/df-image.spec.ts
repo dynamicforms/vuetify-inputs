@@ -10,9 +10,9 @@ test.beforeEach(async ({ page }) => {
   await page.waitForSelector('.df-image-wrapper');
 });
 
-test('clicking the placeholder opens the native file chooser', async ({ page }) => {
+test('clicking the field opens the native file chooser', async ({ page }) => {
   const chooserPromise = page.waitForEvent('filechooser');
-  await page.click('.df-image-placeholder');
+  await page.click('.df-image-preview-label');
   const chooser = await chooserPromise;
 
   expect(chooser.isMultiple()).toBe(false);
@@ -25,7 +25,7 @@ test('a large image is scaled to the field instead of cropped, and the field doe
   const boxBefore = await wrapper.boundingBox();
 
   const chooserPromise = page.waitForEvent('filechooser');
-  await page.click('.df-image-placeholder');
+  await page.click('.df-image-preview-label');
   const chooser = await chooserPromise;
   await chooser.setFiles(path.join(dirname, 'fixtures', 'large-portrait.png'));
 
@@ -45,12 +45,26 @@ test('a large image is scaled to the field instead of cropped, and the field doe
   expect(disableBox!.y).toBeGreaterThanOrEqual(boxAfter!.y + boxAfter!.height);
 });
 
-test('replacing an existing image opens the file chooser from the overlay button', async ({ page }) => {
-  const chooserPromise = page.waitForEvent('filechooser');
-  await page.click('.df-image-placeholder');
-  const chooser = await chooserPromise;
-  await chooser.setFiles(path.join(dirname, 'fixtures', 'large-portrait.png'));
+test('dropping an image uploads it and clears the drag highlight', async ({ page }) => {
+  const wrapper = page.locator('.df-image-wrapper');
+  await wrapper.dispatchEvent('dragenter');
+  await expect(wrapper).toHaveClass(/df-image-dragging/);
 
+  const dataTransfer = await page.evaluateHandle(() => {
+    // a valid, decodable 1x1 transparent PNG - v-img never fires its load event for arbitrary bytes
+    const base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
+    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const dt = new DataTransfer();
+    dt.items.add(new File([bytes], 'sample.png', { type: 'image/png' }));
+    return dt;
+  });
+  await wrapper.dispatchEvent('drop', { dataTransfer });
+
+  await expect(wrapper).not.toHaveClass(/df-image-dragging/);
+  await expect(page.locator('.df-image-preview img')).toBeVisible({ timeout: 10000 });
+});
+
+test('replacing an existing image opens the file chooser from the overlay button', async ({ page }) => {
   await expect(page.locator('.df-image-preview img')).toBeVisible();
 
   const replaceChooserPromise = page.waitForEvent('filechooser');
