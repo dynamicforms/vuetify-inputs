@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `<df-file>` shows a download button next to an existing value's name when `FileComms` implements the new,
   optional `getDownloadUrl`; a backend that offers no such lookup draws no button. `<df-image>` shows one next to
   its replace button whenever a value is set, since its existing value is already a URL the browser can fetch.
+- `<df-file>` accepts a dropped file the same way `<df-image>` does: the field highlights while a file is dragged
+  over it, and dropping uploads the file exactly as picking it from the browser's file dialog would.
 
 ### Changed
 
