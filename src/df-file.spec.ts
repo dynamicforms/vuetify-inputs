@@ -68,6 +68,28 @@ describe('DfFile', () => {
     expect(emitted[emitted.length - 1]).toEqual([null]);
   });
 
+  it('shows an existing control-bound value as the file label', () => {
+    const control = new Form.Field<string>({ value: 'fonti/existing.ttf' });
+    const wrapper = mountFile({ control });
+
+    expect(wrapper.findComponent({ name: 'VFileInput' }).props('label')).toBe('fonti/existing.ttf');
+  });
+
+  it('does not render a download control when comms has no getDownloadUrl', () => {
+    const wrapper = mountFile({ modelValue: 'doc.pdf' });
+
+    expect(wrapper.find('.df-file-download-btn').exists()).toBe(false);
+  });
+
+  it('downloads the existing file through comms.getDownloadUrl', async () => {
+    comms.getDownloadUrl = vi.fn(async () => 'blob:mock-url');
+    const wrapper = mountFile({ modelValue: 'doc.pdf' });
+
+    await wrapper.find('.df-file-download-btn').trigger('click');
+
+    expect(comms.getDownloadUrl).toHaveBeenCalledWith('doc.pdf');
+  });
+
   it('touches the uploaded file at a regular interval', async () => {
     const wrapper = mountFile({ touchInterval: 1_000 });
     await pickFile(wrapper, pdfFile());

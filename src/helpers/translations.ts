@@ -44,6 +44,8 @@ export const translatableStrings = {
   ImageInsert: 'Insert',
   ImageDropHint: 'Drop image here or click to browse',
   ImageReplace: 'Replace image',
+  ImageDownload: 'Download image',
+  FileDownload: 'Download file',
   Table: 'Table',
   TableInsert: 'Insert table',
   TableAddRowAbove: 'Add row above',

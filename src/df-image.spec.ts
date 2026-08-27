@@ -65,6 +65,20 @@ describe('DfImage', () => {
     expect(img.props('src')).toBe('https://example.com/existing.png');
   });
 
+  it('does not render a download link when no image is set', () => {
+    const wrapper = mountImage();
+
+    expect(wrapper.find('.df-image-download-btn').exists()).toBe(false);
+  });
+
+  it('renders a download link pointing at the existing image', () => {
+    const wrapper = mountImage({ modelValue: 'https://example.com/existing.png' });
+
+    const link = wrapper.find('.df-image-download-btn');
+    expect(link.exists()).toBe(true);
+    expect(link.attributes('href')).toBe('https://example.com/existing.png');
+  });
+
   it('uploads a picked image and reflects the returned identifier as modelValue', async () => {
     const wrapper = mountImage();
 

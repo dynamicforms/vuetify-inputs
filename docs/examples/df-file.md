@@ -14,6 +14,7 @@ Below is an example of the df-file component used with DynamicForms:
 - Integration with `@dynamicforms/vue-forms` for state management
 - File upload with progress indication
 - File deletion support
+- Downloading the file currently held by the field, where `comms` implements `getDownloadUrl`
 - Automatic periodic "touches" to keep uploaded files active
 - Customizable labels, hints, and error messages
 - Backend communication abstraction through the FileComms interface
@@ -72,6 +73,14 @@ interface FileComms {
    * @param fileIdentifier The identifier that was returned by upload
    */
   touch: (fileIdentifier: string) => Promise<void>;
+
+  /**
+   * Called when the user asks to download the file currently held by the field. Optional - omit it if the
+   * backend offers no way to retrieve an already-uploaded file, and the component draws no download button.
+   * @param fileIdentifier The identifier that was returned by upload
+   * @return A URL the browser can fetch the file from directly (e.g. a signed URL or a same-origin path)
+   */
+  getDownloadUrl?: (fileIdentifier: string) => string | Promise<string>;
 }
 
 // Progress callback type
@@ -152,7 +161,9 @@ const fileComms = {
       }
       throw err;
     }
-  }
+  },
+
+  getDownloadUrl: async (fileId) => `/api/files/${fileId}/download`
 };
 </script>
 ```

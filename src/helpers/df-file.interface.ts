@@ -47,4 +47,14 @@ export interface FileComms {
    * @param fileIdentifier the identifier that was returned by upload
    */
   touch: (fileIdentifier: string) => Promise<void>;
+
+  /**
+   * getDownloadUrl is called when the user asks to download the file currently held by the field. Omit it if
+   * the backend offers no way to retrieve an already-uploaded file: the component shows no download control
+   * in that case.
+   *
+   * @param fileIdentifier the identifier that was returned by upload
+   * @return a URL the browser can fetch the file from directly (e.g. a signed URL or a same-origin path)
+   */
+  getDownloadUrl?: (fileIdentifier: string) => string | Promise<string>;
 }

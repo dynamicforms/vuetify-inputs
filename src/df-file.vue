@@ -34,7 +34,19 @@
           @update:model-value="handleFileChange"
           @focus="slotProps.focus()"
           @blur="slotProps.blur()"
-        />
+        >
+          <template v-if="canDownload" #append-inner>
+            <button
+              type="button"
+              class="df-file-download-btn"
+              :title="t.FileDownload"
+              :aria-label="t.FileDownload"
+              @click.stop.prevent="downloadFile"
+            >
+              <cached-icon name="mdi-download" />
+            </button>
+          </template>
+        </v-file-input>
       </div>
     </template>
   </input-base>
@@ -50,6 +62,7 @@ import {
   defaultBaseProps,
   InputBase,
   setFileGoneError,
+  translatableStrings,
   useFileTouchKeepAlive,
   useInputBase,
 } from './helpers';
@@ -60,6 +73,7 @@ interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
+const t = translatableStrings;
 
 // State
 const currentFile = ref<File | null>(null);
@@ -70,10 +84,23 @@ const loading = computed(() => currentFile.value && progress.value < 100);
 
 const fileLabel = computed(() => {
   if (!selectedFile.value && value.value) {
-    return props.modelValue;
+    return value.value;
   }
   return '';
 });
+
+const canDownload = computed(() => !selectedFile.value && !!value.value && !!props.comms.getDownloadUrl);
+
+async function downloadFile() {
+  if (!value.value || !props.comms.getDownloadUrl) return;
+
+  const url = await props.comms.getDownloadUrl(value.value);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = '';
+  link.rel = 'noopener';
+  link.click();
+}
 
 function resetFileState() {
   value.value = null;
@@ -133,3 +160,15 @@ function handleFileChange(file: File | File[]): any {
   }
 }
 </script>
+
+<style>
+.df-file-download-btn {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.df-file-download-btn:hover {
+  opacity: 1;
+}
+</style>
