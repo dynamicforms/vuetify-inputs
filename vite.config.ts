@@ -2,7 +2,6 @@
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-import eslint from 'vite-plugin-eslint';
 import dts from 'vite-plugin-dts';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { configDefaults } from 'vitest/config';
@@ -11,14 +10,6 @@ import { configDefaults } from 'vitest/config';
 export default defineConfig({
   plugins: [
     vue(),
-    {
-      ...eslint({
-        failOnWarning: false,
-        failOnError: false,
-      }),
-      apply: 'serve',
-      enforce: 'post',
-    },
     dts({
       tsconfigPath: './tsconfig.build.json',
       rollupTypes: true

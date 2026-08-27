@@ -94,7 +94,6 @@
     "typescript": "^5",
     "vite": "^7",
     "vite-plugin-dts": "^4",
-    "vite-plugin-eslint": "^1.8.1",
     "vitest": "^3",
     "vue-tsc": "^2"
   },
