@@ -15,6 +15,8 @@ Below is an example of the df-image component used with DynamicForms:
 - Drag & drop, and a click-to-browse dialog
 - Upload progress indication
 - Image deletion support
+- Downloading the currently set image - its value is already a URL the browser can fetch, so no `comms` method is
+  needed for this, unlike `df-file`'s `getDownloadUrl`
 - Automatic periodic "touches" to keep uploaded images active
 - Customizable labels, hints, and error messages
 - Backend communication abstraction through the same `FileComms` interface as `df-file`
@@ -86,6 +88,9 @@ class FileGoneError extends Error {
   }
 }
 ```
+
+`FileComms` also declares an optional `getDownloadUrl`, for `df-file`'s use — `df-image` ignores it, since its value
+already is the URL a download link needs.
 
 ## Upload Progress
 

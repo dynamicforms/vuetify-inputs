@@ -54,6 +54,18 @@
         <label v-if="previewUrl && !isDisabled" :for="fileInputId" class="df-image-replace-btn" :title="t.ImageReplace">
           <cached-icon name="mdi-pencil" />
         </label>
+        <a
+          v-if="canDownload"
+          :href="value as string"
+          download
+          target="_blank"
+          rel="noopener"
+          class="df-image-download-btn"
+          :title="t.ImageDownload"
+          :aria-label="t.ImageDownload"
+        >
+          <cached-icon name="mdi-download" />
+        </a>
       </div>
     </template>
   </input-base>
@@ -94,6 +106,7 @@ const loading = computed(() => currentFile.value && progress.value < 100);
 const isDisabled = computed(() => !!(vuetifyBindings.value.disabled || vuetifyBindings.value.readonly));
 const isDragging = computed(() => dragCounter.value > 0);
 const previewUrl = computed<string | null>(() => objectUrl.value ?? (value.value ? (value.value as string) : null));
+const canDownload = computed(() => !!value.value);
 
 function revokeObjectUrl() {
   if (objectUrl.value) {
@@ -245,10 +258,10 @@ function onDrop(event: DragEvent) {
   opacity: 0.7;
 }
 
-.df-image-replace-btn {
+.df-image-replace-btn,
+.df-image-download-btn {
   position: absolute;
   top: 4px;
-  right: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -258,5 +271,12 @@ function onDrop(event: DragEvent) {
   cursor: pointer;
   background-color: rgba(var(--v-theme-surface), 0.9);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.df-image-replace-btn {
+  right: 4px;
+}
+.df-image-download-btn {
+  left: 4px;
+  color: inherit;
 }
 </style>

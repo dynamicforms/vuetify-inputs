@@ -43,7 +43,7 @@ import { CachedIcon } from 'vue-cached-icon';
 import { DfFile } from '../../src';
 
 const fileField = new Field({
-  value: null
+  value: 'contracts/existing-agreement.pdf'
 });
 
 const uploadedFiles = ref([]);
@@ -86,6 +86,14 @@ const fileComms = {
     // In a real implementation, this would call an API to "touch" the file
     console.log('Touching file:', fileIdentifier);
     return Promise.resolve();
+  },
+
+  getDownloadUrl: async (fileIdentifier) => {
+    // In a real implementation, this would resolve to a signed URL or a same-origin download path
+    const blob = new Blob([`Hello world!\n\nThis is a mock download standing in for: ${fileIdentifier}`], {
+      type: 'text/plain'
+    });
+    return URL.createObjectURL(blob);
   }
 };
 

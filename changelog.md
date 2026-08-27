@@ -32,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `touch`/`delete` implementation can now throw `FileGoneError` to report that the backend has already discarded
   the file — the component clears the field and, where a `control` is bound, shows the error's `errorText` as a
   validation error. Any other thrown error is left to the consumer, as before.
+- `<df-file>` shows a download button next to an existing value's name when `FileComms` implements the new,
+  optional `getDownloadUrl`; a backend that offers no such lookup draws no button. `<df-image>` shows one next to
+  its replace button whenever a value is set, since its existing value is already a URL the browser can fetch.
 
 ### Changed
 
@@ -60,6 +63,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `<df-file>` shows an existing value's name. Its label read the raw `modelValue` prop, which
+  stays unset when the field is bound through `control` rather than `v-model` - every consumer
+  using the `control` binding saw a blank input for a field that already held a file.
 - A field that only a breakpoint states is resolved. The fields taking part in the cascade were read off the base
   options, so an option named at `md` and nowhere else was dropped: `{ label: 'Save', md: { icon: 'save-outline',
   showIcon: true } }` drew no icon at any width, and an action whose value stated nothing at the base drew nothing
