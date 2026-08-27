@@ -62,8 +62,9 @@ jobs:
         with:
           coverage-files: coverage/coverage-final.json
           # docs/ holds the VitePress site and its demo components - not library code, and not covered by
-          # vitest, whose coverage is scoped to src/
-          extra-ignore-patterns: docs/**
+          # vitest, whose coverage is scoped to src/. test-setup.ts is a vitest setupFile, which runs
+          # outside instrumented test files and so never appears in the coverage report either.
+          extra-ignore-patterns: docs/**,src/test-setup.ts
           log-level: INFO
           base-ref: ${{ github.base_ref }}
           head-ref: HEAD
