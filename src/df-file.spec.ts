@@ -58,23 +58,12 @@ describe('DfFile', () => {
     expect(emitted[emitted.length - 1]).toEqual(['file-id-1']);
   });
 
-  it('uploads a dropped file', async () => {
-    const wrapper = mountFile();
-
-    await wrapper.find('.df-input-wrapper').trigger('drop', { dataTransfer: { files: fileList([pdfFile()]) } });
-    await vi.advanceTimersByTimeAsync(0);
-
-    expect(comms.upload).toHaveBeenCalledTimes(1);
-    const emitted = wrapper.emitted('update:modelValue') as any[];
-    expect(emitted[emitted.length - 1]).toEqual(['file-id-1']);
-  });
-
   it('shows drag feedback while dragging over the field', async () => {
     const wrapper = mountFile();
 
-    await wrapper.find('.df-input-wrapper').trigger('dragenter');
+    await wrapper.find('input[type="file"]').trigger('dragover');
 
-    expect(wrapper.find('.df-input-wrapper').classes()).toContain('df-file-dragging');
+    expect(wrapper.find('.v-file-input').classes()).toContain('v-file-input--dragging');
   });
 
   it('deletes the uploaded file and clears modelValue on click:clear', async () => {

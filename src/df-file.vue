@@ -15,14 +15,7 @@
       />
     </template>
     <template #default="slotProps">
-      <div
-        class="d-flex w-100 position-relative df-input-wrapper"
-        :class="[density, { 'df-file-dragging': isDragging }]"
-        @dragenter.prevent="onDragEnter"
-        @dragover.prevent
-        @dragleave.prevent="onDragLeave"
-        @drop.prevent="onDrop"
-      >
+      <div class="d-flex w-100 position-relative df-input-wrapper" :class="density">
         <v-file-input
           v-model="selectedFile"
           :label="fileLabel"
@@ -87,10 +80,7 @@ const currentFile = ref<File | null>(null);
 const progress = ref(0);
 const fileInputKey = ref(Math.round(Math.random() * 1000));
 const selectedFile = ref<File | null>();
-const dragCounter = ref(0);
 const loading = computed(() => currentFile.value && progress.value < 100);
-const isDisabled = computed(() => !!(vuetifyBindings.value.disabled || vuetifyBindings.value.readonly));
-const isDragging = computed(() => dragCounter.value > 0);
 
 const fileLabel = computed(() => {
   if (!selectedFile.value && value.value) {
@@ -169,23 +159,6 @@ function handleFileChange(file: File | File[]): any {
     }
   }
 }
-
-function onDragEnter() {
-  if (isDisabled.value) return;
-  dragCounter.value += 1;
-}
-function onDragLeave() {
-  dragCounter.value = Math.max(0, dragCounter.value - 1);
-}
-function onDrop(event: DragEvent) {
-  dragCounter.value = 0;
-  if (isDisabled.value) return;
-  const file = event.dataTransfer?.files?.[0];
-  if (file) {
-    selectedFile.value = file;
-    upload(file);
-  }
-}
 </script>
 
 <style>
@@ -199,7 +172,7 @@ function onDrop(event: DragEvent) {
   opacity: 1;
 }
 
-.df-file-dragging {
+.df-input-wrapper .v-file-input--dragging {
   outline: 2px dashed rgb(var(--v-theme-primary));
   outline-offset: -2px;
   background-color: rgba(var(--v-theme-primary), 0.08);
