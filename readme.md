@@ -69,7 +69,9 @@ consistent appearance.
 - **Rich text**: TipTap with a Vuetify toolbar, inside the same field frame as every other input
 - **Localisable**: `translateStrings()` replaces the library's own strings, including every RTF editor toolbar
   label and `<df-image>`/`<df-file>`'s upload and download prompts, and `DateTimeLocaleConfig` sets the date-fns
-  locale dates are formatted and parsed with
+  locale dates are formatted and parsed with — see the
+  [localisation example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/localisation.html) for every
+  key and a worked example
 - **TypeScript**: every component's props are an exported interface, and the definitions ship with the build
 
 ## Installation
