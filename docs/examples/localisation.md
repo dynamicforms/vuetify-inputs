@@ -1,17 +1,20 @@
 # Localisation
 
-The library renders a small number of English strings of its own: the labels of the three predefined actions, and
+The library renders a small number of English strings of its own: the labels of the three predefined actions,
 every tooltip, dropdown entry and dialog label the RTF editor's toolbar draws — the toolbar is built from this
-library's own Vuetify components, so its entire text lives in the same table as everything else. All of it is
-translatable. Dates and times are a separate concern, driven by a date-fns locale rather than by a string table.
+library's own Vuetify components, so its entire text lives in the same table as everything else — and the upload
+and download prompts on `<df-image>` and `<df-file>`. All of it is translatable. Dates and times are a separate
+concern, driven by a date-fns locale rather than by a string table.
 
 The two mechanisms are independent. An application that needs both calls both, and the
 [worked example](#wiring-it-to-vue-i18n) below does exactly that.
 
 ## The strings the library owns
 
-`translatableStrings` is the table. It is a plain object exported from the package, and it holds the strings that are
-in force right now — not the English originals, which are its initial contents and nothing more.
+`translatableStrings` is the table. It is a reactive object exported from the package, and it holds the strings that
+are in force right now — not the English originals, which are its initial contents and nothing more. Reading a key
+inside a template, a `computed` or a `watchEffect` subscribes to it, so a component already on screen picks up a
+later `translateStrings` call on its own.
 
 | Key | English default | Where it surfaces |
 |-----|-----------------|-------------------|
@@ -29,7 +32,7 @@ in force right now — not the English originals, which are its initial contents
 | `Outdent` / `Indent` | `Decrease indent` / `Increase indent` | `<df-rtf-editor>` toolbar button tooltips |
 | `AlignLeft`, `AlignCenter`, `AlignRight`, `AlignJustify` | `Align left`, `Align center`, `Align right`, `Justify` | `<df-rtf-editor>` toolbar button tooltips |
 | `Link` | `Link` | `<df-rtf-editor>` toolbar button tooltip |
-| `LinkUrl` | `URL` | `<df-rtf-editor>` link menu, the URL field's label |
+| `LinkUrl` | `URL` | `<df-rtf-editor>` link menu's URL field label, and the bubble menu's `window.prompt()` for a link over selected text |
 | `LinkApply` | `Apply` | `<df-rtf-editor>` link menu, the apply button |
 | `LinkRemove` | `Remove link` | `<df-rtf-editor>` link menu, the remove button |
 | `Downloadable` | `Downloadable` | `<df-rtf-editor>` link menu, the checkbox that adds `download="file"` |
@@ -37,6 +40,10 @@ in force right now — not the English originals, which are its initial contents
 | `ImageUrl` | `Image URL` | `<df-rtf-editor>` image menu, the URL field's label |
 | `ImageUpload` | `Upload image` | `<df-rtf-editor>` image menu, the upload button |
 | `ImageInsert` | `Insert` | `<df-rtf-editor>` image menu, the insert-from-URL button |
+| `ImageDropHint` | `Drop image here or click to browse` | `<df-image>`'s empty-state drop zone |
+| `ImageReplace` | `Replace image` | `<df-image>`'s replace-image button tooltip |
+| `ImageDownload` | `Download image` | `<df-image>`'s download button tooltip and aria-label |
+| `FileDownload` | `Download file` | `<df-file>`'s download button tooltip and aria-label |
 | `Table` | `Table` | `<df-rtf-editor>` toolbar button tooltip |
 | `TableInsert` | `Insert table` | `<df-rtf-editor>` table menu |
 | `TableAddRowAbove`, `TableAddRowBelow`, `TableDeleteRow` | `Add row above`, `Add row below`, `Delete row` | `<df-rtf-editor>` table menu |
@@ -48,6 +55,7 @@ in force right now — not the English originals, which are its initial contents
 | `MediaEmbed` | `Insert media` | `<df-rtf-editor>` toolbar button tooltip |
 | `MediaEmbedUrl` | `Video URL` | `<df-rtf-editor>` media-embed menu, the URL field's label |
 | `MediaEmbedInsert` | `Insert` | `<df-rtf-editor>` media-embed menu, the insert button |
+| `InvalidHexColor` | `Not a valid hex string.` | `<df-color>`'s built-in validation rule, shown when the typed value isn't a hex color and no `control` validator is set |
 
 The style-preset entries name CSS classes that are fixed and not affected by a translation, so the saved HTML is the
 same whatever language the toolbar speaks.
@@ -55,48 +63,32 @@ same whatever language the toolbar speaks.
 ## translateStrings
 
 ```typescript
-translateStrings(translationCallback: (s: string) => string): void
+translateStrings(translationCallback: (key: string, defaultValue: string) => string | null | undefined): void
 ```
 
-`translateStrings` walks every key of `translatableStrings` in declaration order and calls the callback once per key.
-The callback receives the **key** — `'Heading1'`, `'CodeDark'` — never the English default and never a namespaced
-path. Whatever it returns that is not `null` or `undefined` is written into the table in place of the current value; a
-`null` or `undefined` return leaves the current value standing. The function itself returns nothing.
-
-The declared parameter type is `(s: string) => string`, so a TypeScript callback that declines a key has to widen its
-return: `return null as unknown as string`.
+`translateStrings` walks every key of `translatableStrings` in declaration order and calls the callback once per key,
+with the **key** — `'Heading1'`, `'CodeDark'` — and its English default. Whatever it returns that is not `null` or
+`undefined` is written into the table in place of the current value; a `null` or `undefined` return resets that entry
+to its English default. The function itself returns nothing.
 
 ```typescript
 import { translateStrings } from '@dynamicforms/vuetify-inputs';
 
-translateStrings((key: string): string => {
-  const translated = myCatalogue[key];
-  return translated ?? (null as unknown as string);
-});
+translateStrings((key, defaultValue) => myCatalogue[key] ?? defaultValue);
 ```
 
 ### When it takes effect
 
-`translatableStrings` is read at the moment a string is needed, not at the moment it is rendered, so a call to
-`translateStrings` reaches only what is built after it:
-
 - **Actions.** `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()` copy the string into the action's
   `label` when the factory runs. An action that already exists keeps the label it was built with — assign
   `action.label` to change it, or build the action again.
-- **The RTF editor.** `<df-rtf-editor>`'s toolbar reads the strings straight off the (non-reactive) `translatableStrings`
-  object, so a component that is already mounted shows the values it read at its last render, not necessarily the
-  latest ones — remount it to guarantee the new strings appear, for instance by binding `:key` to the current locale
-  code.
+- **The RTF editor.** `<df-rtf-editor>`'s toolbar reads `translatableStrings` reactively, including the heading
+  dropdown, so a call to `translateStrings` reaches a toolbar that is already mounted - no remount needed.
 
 Call `translateStrings` before the application mounts, and again on every locale change if the locale can change at
-runtime.
-
-::: warning Translations accumulate
-The table is overwritten in place, so the English defaults are gone after the first call that replaces them. On a
-second call, a key the callback declines keeps the *previous translation* — it does not fall back to English. A locale
-switcher therefore needs a complete catalogue for every locale it offers, English included; declining a key is a
-safety net against a missing message, not a way to select English.
-:::
+runtime - a key the callback declines on a later call reverts to its English default rather than keeping what an
+earlier call set it to, so each call is a complete statement of the current locale, not a patch on top of the last
+one.
 
 ## Dates and times
 
@@ -177,12 +169,7 @@ export function useDfLocale() {
   const { locale, t } = useI18n();
 
   const apply = (code: string) => {
-    // t() answers the path itself when a message is missing; null then keeps what the table already holds
-    translateStrings((key: string): string => {
-      const path = `df_inputs.${key}`;
-      const translated = t(path);
-      return translated === path ? (null as unknown as string) : translated;
-    });
+    translateStrings((key, defaultValue) => t(`df_inputs.${key}`, defaultValue));
     DateTimeLocaleConfig.setDateTimeLocale(dateFnsLocales[code] ?? enUS);
   };
 
@@ -191,9 +178,10 @@ export function useDfLocale() {
 }
 ```
 
-The message catalogue needs every key of `translatableStrings` under `df_inputs`, in every locale the switcher offers
-— the English catalogue included, because a declined key keeps the previous translation rather than the English
-default. The full key list is the table above; a few entries are enough to show the shape:
+A locale the switcher offers only needs the keys it actually translates — vue-i18n's `t(path, defaultValue)` falls
+back to `defaultValue` for a message a locale doesn't carry, and `translateStrings` falls back to the English default
+in turn for a key the callback declines. The full key list is the table above; a few entries are enough to show the
+shape:
 
 ```typescript
 const messages = {
@@ -222,12 +210,13 @@ const messages = {
 };
 ```
 
-Because neither the actions nor a mounted editor re-read the table, the components that show these strings are rebuilt
-on a locale change. Building the actions inside a `computed` on the locale, and keying the editor by it, is enough:
+The RTF editor's toolbar re-reads `translatableStrings` on its own, but an action does not re-read the table once
+built, so it still needs rebuilding on a locale change. Building the actions inside a `computed` on the locale is
+enough:
 
 ```vue
 <template>
-  <df-rtf-editor :key="locale" :control="form.fields.body" label="Body" />
+  <df-rtf-editor :control="form.fields.body" label="Body" />
   <df-actions :actions="dialogActions" />
 </template>
 
@@ -257,6 +246,8 @@ const dialogActions = computed(() => {
   [validator messages](:vue-forms:/api/validators.html) in vue-forms.
 - **Vuetify's own strings**, including the month and weekday names in the date picker. Configure them through
   Vuetify's `locale` option when you create the Vuetify instance.
+- **The RTF editor's resize-handle hint** ("Hold Shift to keep the aspect ratio"), which is plain CSS `content`, not
+  a string the table can reach.
 
 ---
 

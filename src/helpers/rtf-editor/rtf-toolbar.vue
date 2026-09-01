@@ -388,15 +388,18 @@ const state = computed(() => {
   };
 });
 
-const headingOptions = [
-  { level: 0, label: t.Paragraph },
-  { level: 1, label: t.Heading1 },
-  { level: 2, label: t.Heading2 },
-  { level: 3, label: t.Heading3 },
-  { level: 4, label: t.Heading4 },
-  { level: 5, label: t.Heading5 },
-  { level: 6, label: t.Heading6 },
-] as const;
+const headingOptions = computed(
+  () =>
+    [
+      { level: 0, label: t.Paragraph },
+      { level: 1, label: t.Heading1 },
+      { level: 2, label: t.Heading2 },
+      { level: 3, label: t.Heading3 },
+      { level: 4, label: t.Heading4 },
+      { level: 5, label: t.Heading5 },
+      { level: 6, label: t.Heading6 },
+    ] as const,
+);
 
 function isHeadingActive(level: number) {
   void tick.value;
@@ -404,7 +407,7 @@ function isHeadingActive(level: number) {
   return !!editor.value?.isActive('heading', { level });
 }
 const headingLabel = computed(
-  () => headingOptions.find((option) => isHeadingActive(option.level))?.label ?? t.Paragraph,
+  () => headingOptions.value.find((option) => isHeadingActive(option.level))?.label ?? t.Paragraph,
 );
 
 function setHeading(level: number) {

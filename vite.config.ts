@@ -43,6 +43,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
+        '@dynamicforms/translatable',
         '@dynamicforms/vue-forms',
         '@tiptap/core',
         '@tiptap/extension-image',

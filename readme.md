@@ -68,7 +68,8 @@ consistent appearance.
 - **Uploads**: a `FileComms` object with upload progress, delete and a periodic touch
 - **Rich text**: TipTap with a Vuetify toolbar, inside the same field frame as every other input
 - **Localisable**: `translateStrings()` replaces the library's own strings, including every RTF editor toolbar
-  label, and `DateTimeLocaleConfig` sets the date-fns locale dates are formatted and parsed with
+  label and `<df-image>`/`<df-file>`'s upload and download prompts, and `DateTimeLocaleConfig` sets the date-fns
+  locale dates are formatted and parsed with
 - **TypeScript**: every component's props are an exported interface, and the definitions ship with the build
 
 ## Installation

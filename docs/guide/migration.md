@@ -8,6 +8,57 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.11.0 (from v0.10.5)
+
+`translatableStrings` is now backed by [`@dynamicforms/translatable`](https://github.com/dynamicforms/translatable)
+and is reactive; `translateStrings`'s callback signature and its behaviour on a declined key both change with it.
+There is a [checklist](#checklist-for-0-11-0) at the end of this section.
+
+### `translateStrings`'s callback takes a second argument, and a declined key resets to English
+
+```typescript
+// before
+translateStrings((key: string): string => {
+  const translated = myCatalogue[key];
+  return translated ?? (null as unknown as string);
+});
+
+// after
+translateStrings((key, defaultValue) => myCatalogue[key] ?? defaultValue);
+```
+
+The callback now receives the English default as a second argument, so there is no longer a need to fall back to
+it by hand or to widen a declined return past `string` with a cast. The behaviour on a declined key changes along
+with the signature: previously, a key the callback declined kept *whatever a previous `translateStrings` call had
+set it to* - so a locale switcher had to supply a complete catalogue, English included, or an entry could be left
+showing a stale translation from a locale the application had moved away from. Now, a declined key resets to its
+English default on that call, so every call to `translateStrings` is a complete statement of the current locale
+rather than a patch on top of the last one - a locale that only overrides a handful of keys behaves the same as
+one that overrides all of them.
+
+If your own callback relied on the old accumulating behaviour - for instance, calling `translateStrings` once with
+a partial catalogue early and topping it up later without repeating the earlier keys - it now needs to supply
+every key it wants translated on every call.
+
+### `<df-rtf-editor>`'s toolbar no longer needs remounting
+
+`translatableStrings` reads used to be frozen at the moment a component last rendered, so an application working
+around that would remount `<df-rtf-editor>` on a locale change, typically by binding `:key` to the locale code. The
+toolbar (heading dropdown included) now reads the table reactively and updates on its own; a `:key` binding kept
+for this reason is no longer necessary, though it is harmless to leave in place. `Action.closeAction()`,
+`.yesAction()` and `.noAction()` are unaffected by this - they still copy the label into the action when the
+factory runs, so an application already rebuilding its actions on a locale change (as
+[Localisation](/examples/localisation) recommends) needs no change there.
+
+### Checklist for 0.11.0
+
+1. Search your project for `translateStrings` and add the `defaultValue` parameter to every callback; drop any
+   `null as unknown as string` cast, since the return type now properly includes `null`/`undefined`.
+2. If any callback relied on a declined key keeping a previous translation rather than the English default, make
+   it supply every key it wants translated on every call instead.
+3. Drop a `:key="locale"`-style remount workaround on `<df-rtf-editor>` if you added one for this - it is no
+   longer needed, though leaving it in place is harmless.
+
 ## Upgrading to v0.10.0 (from v0.9.2)
 
 `<df-rtf-editor>` is built on [TipTap](https://tiptap.dev/) instead of CKEditor 5. CKEditor 5's core is
