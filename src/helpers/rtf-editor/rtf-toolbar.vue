@@ -1,25 +1,13 @@
 <template>
   <div class="rtf-toolbar" :class="{ 'rtf-toolbar--disabled': !editable }">
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.Undo"
-      :disabled="!editable || !state.canUndo"
-      @click="editor?.chain().focus().undo().run()"
-    >
-      <cached-icon name="mdi-undo" />
-    </v-btn>
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.Redo"
-      :disabled="!editable || !state.canRedo"
-      @click="editor?.chain().focus().redo().run()"
-    >
-      <cached-icon name="mdi-redo" />
-    </v-btn>
+    <v-btn-group size="small" variant="text" rounded="sm">
+      <v-btn icon :title="t.Undo" :disabled="!editable || !state.canUndo" @click="editor?.chain().focus().undo().run()">
+        <cached-icon name="mdi-undo" />
+      </v-btn>
+      <v-btn icon :title="t.Redo" :disabled="!editable || !state.canRedo" @click="editor?.chain().focus().redo().run()">
+        <cached-icon name="mdi-redo" />
+      </v-btn>
+    </v-btn-group>
 
     <v-divider vertical inset class="mx-1" />
 
@@ -27,6 +15,7 @@
       icon
       size="small"
       variant="text"
+      rounded="sm"
       :title="t.SelectAll"
       :disabled="!editable"
       @click="editor?.chain().focus().selectAll().run()"
@@ -74,275 +63,227 @@
 
     <v-divider vertical inset class="mx-1" />
 
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.Bold"
-      :disabled="!editable"
-      :active="state.bold"
-      @click="editor?.chain().focus().toggleBold().run()"
-    >
-      <cached-icon name="mdi-format-bold" />
-    </v-btn>
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.Italic"
-      :disabled="!editable"
-      :active="state.italic"
-      @click="editor?.chain().focus().toggleItalic().run()"
-    >
-      <cached-icon name="mdi-format-italic" />
-    </v-btn>
+    <v-btn-group size="small" variant="text" rounded="sm">
+      <v-btn
+        icon
+        :title="t.Bold"
+        :disabled="!editable"
+        :active="state.bold"
+        @click="editor?.chain().focus().toggleBold().run()"
+      >
+        <cached-icon name="mdi-format-bold" />
+      </v-btn>
+      <v-btn
+        icon
+        :title="t.Italic"
+        :disabled="!editable"
+        :active="state.italic"
+        @click="editor?.chain().focus().toggleItalic().run()"
+      >
+        <cached-icon name="mdi-format-italic" />
+      </v-btn>
+    </v-btn-group>
 
     <v-divider vertical inset class="mx-1" />
 
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.HorizontalLine"
-      :disabled="!editable"
-      @click="editor?.chain().focus().setHorizontalRule().run()"
-    >
-      <cached-icon name="mdi-minus" />
-    </v-btn>
+    <v-btn-group size="small" variant="text" rounded="sm">
+      <v-btn
+        icon
+        :title="t.HorizontalLine"
+        :disabled="!editable"
+        @click="editor?.chain().focus().setHorizontalRule().run()"
+      >
+        <cached-icon name="mdi-minus" />
+      </v-btn>
 
-    <v-menu :close-on-content-click="false" @update:model-value="(shown: boolean) => shown && openLinkMenu()">
-      <template #activator="{ props: menuProps }">
-        <v-btn
-          icon
-          size="small"
-          variant="text"
-          :title="t.Link"
-          :disabled="!editable"
-          :active="state.link"
-          v-bind="menuProps"
-        >
-          <cached-icon name="mdi-link-variant" />
-        </v-btn>
-      </template>
-      <v-card min-width="280" class="pa-3">
-        <v-text-field
-          v-model="linkUrl"
-          :label="t.LinkUrl"
-          density="compact"
-          hide-details
-          autofocus
-          @keydown.enter="applyLink"
-        />
-        <v-checkbox v-model="linkDownloadable" :label="t.Downloadable" density="compact" hide-details class="mt-1" />
-        <div class="d-flex justify-end ga-2 mt-2">
-          <v-btn v-if="state.link" size="small" variant="text" @click="removeLink">{{ t.LinkRemove }}</v-btn>
-          <v-btn size="small" color="primary" variant="tonal" @click="applyLink">{{ t.LinkApply }}</v-btn>
-        </div>
-      </v-card>
-    </v-menu>
-
-    <v-menu :close-on-content-click="false">
-      <template #activator="{ props: menuProps }">
-        <v-btn icon size="small" variant="text" :title="t.Image" :disabled="!editable" v-bind="menuProps">
-          <cached-icon name="mdi-image-plus" />
-        </v-btn>
-      </template>
-      <v-card min-width="280" class="pa-3">
-        <v-text-field
-          v-model="imageUrl"
-          :label="t.ImageUrl"
-          density="compact"
-          hide-details
-          autofocus
-          @keydown.enter="insertImageFromUrl"
-        />
-        <div class="d-flex justify-space-between align-center ga-2 mt-2">
-          <v-btn size="small" variant="text" prepend-icon="mdi-upload" @click="triggerImageUpload">
-            {{ t.ImageUpload }}
+      <v-menu :close-on-content-click="false" @update:model-value="(shown: boolean) => shown && openLinkMenu()">
+        <template #activator="{ props: menuProps }">
+          <v-btn icon :title="t.Link" :disabled="!editable" :active="state.link" v-bind="menuProps">
+            <cached-icon name="mdi-link-variant" />
           </v-btn>
-          <v-btn size="small" color="primary" variant="tonal" @click="insertImageFromUrl">
-            {{ t.ImageInsert }}
+        </template>
+        <v-card min-width="280" class="pa-3">
+          <v-text-field
+            v-model="linkUrl"
+            :label="t.LinkUrl"
+            density="compact"
+            hide-details
+            autofocus
+            @keydown.enter="applyLink"
+          />
+          <v-checkbox v-model="linkDownloadable" :label="t.Downloadable" density="compact" hide-details class="mt-1" />
+          <div class="d-flex justify-end ga-2 mt-2">
+            <v-btn v-if="state.link" size="small" variant="text" @click="removeLink">{{ t.LinkRemove }}</v-btn>
+            <v-btn size="small" color="primary" variant="tonal" @click="applyLink">{{ t.LinkApply }}</v-btn>
+          </div>
+        </v-card>
+      </v-menu>
+
+      <v-menu :close-on-content-click="false">
+        <template #activator="{ props: menuProps }">
+          <v-btn icon :title="t.Image" :disabled="!editable" v-bind="menuProps">
+            <cached-icon name="mdi-image-plus" />
           </v-btn>
-        </div>
-      </v-card>
-    </v-menu>
-    <input ref="imageInput" type="file" accept="image/*" class="d-none" @change="onImageFileChosen" />
+        </template>
+        <v-card min-width="280" class="pa-3">
+          <v-text-field
+            v-model="imageUrl"
+            :label="t.ImageUrl"
+            density="compact"
+            hide-details
+            autofocus
+            @keydown.enter="insertImageFromUrl"
+          />
+          <div class="d-flex justify-space-between align-center ga-2 mt-2">
+            <v-btn size="small" variant="text" prepend-icon="mdi-upload" @click="triggerImageUpload">
+              {{ t.ImageUpload }}
+            </v-btn>
+            <v-btn size="small" color="primary" variant="tonal" @click="insertImageFromUrl">
+              {{ t.ImageInsert }}
+            </v-btn>
+          </div>
+        </v-card>
+      </v-menu>
+      <input ref="imageInput" type="file" accept="image/*" class="d-none" @change="onImageFileChosen" />
 
-    <v-menu :close-on-content-click="false">
-      <template #activator="{ props: menuProps }">
-        <v-btn icon size="small" variant="text" :title="t.MediaEmbed" :disabled="!editable" v-bind="menuProps">
-          <cached-icon name="mdi-video-plus" />
-        </v-btn>
-      </template>
-      <v-card min-width="280" class="pa-3">
-        <v-text-field
-          v-model="embedUrl"
-          :label="t.MediaEmbedUrl"
-          density="compact"
-          hide-details
-          autofocus
-          @keydown.enter="insertMediaEmbed"
-        />
-        <div class="d-flex justify-end mt-2">
-          <v-btn size="small" color="primary" variant="tonal" @click="insertMediaEmbed">
-            {{ t.MediaEmbedInsert }}
+      <v-menu :close-on-content-click="false">
+        <template #activator="{ props: menuProps }">
+          <v-btn icon :title="t.MediaEmbed" :disabled="!editable" v-bind="menuProps">
+            <cached-icon name="mdi-video-plus" />
           </v-btn>
-        </div>
-      </v-card>
-    </v-menu>
+        </template>
+        <v-card min-width="280" class="pa-3">
+          <v-text-field
+            v-model="embedUrl"
+            :label="t.MediaEmbedUrl"
+            density="compact"
+            hide-details
+            autofocus
+            @keydown.enter="insertMediaEmbed"
+          />
+          <div class="d-flex justify-end mt-2">
+            <v-btn size="small" color="primary" variant="tonal" @click="insertMediaEmbed">
+              {{ t.MediaEmbedInsert }}
+            </v-btn>
+          </div>
+        </v-card>
+      </v-menu>
 
-    <v-menu>
-      <template #activator="{ props: menuProps }">
-        <v-btn icon size="small" variant="text" :title="t.Table" :disabled="!editable" v-bind="menuProps">
-          <cached-icon name="mdi-table" />
-        </v-btn>
-      </template>
-      <v-list density="compact">
-        <v-list-item @click="editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()">
-          <template #prepend><cached-icon name="mdi-table-plus" /></template>
-          <v-list-item-title>{{ t.TableInsert }}</v-list-item-title>
-        </v-list-item>
-        <v-divider />
-        <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addRowBefore().run()">
-          <template #prepend><cached-icon name="mdi-table-row-plus-before" /></template>
-          <v-list-item-title>{{ t.TableAddRowAbove }}</v-list-item-title>
-        </v-list-item>
-        <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addRowAfter().run()">
-          <template #prepend><cached-icon name="mdi-table-row-plus-after" /></template>
-          <v-list-item-title>{{ t.TableAddRowBelow }}</v-list-item-title>
-        </v-list-item>
-        <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().deleteRow().run()">
-          <template #prepend><cached-icon name="mdi-table-row-remove" /></template>
-          <v-list-item-title>{{ t.TableDeleteRow }}</v-list-item-title>
-        </v-list-item>
-        <v-divider />
-        <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addColumnBefore().run()">
-          <template #prepend><cached-icon name="mdi-table-column-plus-before" /></template>
-          <v-list-item-title>{{ t.TableAddColumnBefore }}</v-list-item-title>
-        </v-list-item>
-        <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addColumnAfter().run()">
-          <template #prepend><cached-icon name="mdi-table-column-plus-after" /></template>
-          <v-list-item-title>{{ t.TableAddColumnAfter }}</v-list-item-title>
-        </v-list-item>
-        <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().deleteColumn().run()">
-          <template #prepend><cached-icon name="mdi-table-column-remove" /></template>
-          <v-list-item-title>{{ t.TableDeleteColumn }}</v-list-item-title>
-        </v-list-item>
-        <v-divider />
-        <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().toggleHeaderRow().run()">
-          <template #prepend><cached-icon name="mdi-table-row" /></template>
-          <v-list-item-title>{{ t.TableToggleHeaderRow }}</v-list-item-title>
-        </v-list-item>
-        <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().deleteTable().run()">
-          <template #prepend><cached-icon name="mdi-table-remove" /></template>
-          <v-list-item-title>{{ t.TableDeleteTable }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu>
+      <v-menu>
+        <template #activator="{ props: menuProps }">
+          <v-btn icon :title="t.Table" :disabled="!editable" v-bind="menuProps">
+            <cached-icon name="mdi-table" />
+          </v-btn>
+        </template>
+        <v-list density="compact">
+          <v-list-item @click="editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()">
+            <template #prepend><cached-icon name="mdi-table-plus" /></template>
+            <v-list-item-title>{{ t.TableInsert }}</v-list-item-title>
+          </v-list-item>
+          <v-divider />
+          <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addRowBefore().run()">
+            <template #prepend><cached-icon name="mdi-table-row-plus-before" /></template>
+            <v-list-item-title>{{ t.TableAddRowAbove }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addRowAfter().run()">
+            <template #prepend><cached-icon name="mdi-table-row-plus-after" /></template>
+            <v-list-item-title>{{ t.TableAddRowBelow }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().deleteRow().run()">
+            <template #prepend><cached-icon name="mdi-table-row-remove" /></template>
+            <v-list-item-title>{{ t.TableDeleteRow }}</v-list-item-title>
+          </v-list-item>
+          <v-divider />
+          <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addColumnBefore().run()">
+            <template #prepend><cached-icon name="mdi-table-column-plus-before" /></template>
+            <v-list-item-title>{{ t.TableAddColumnBefore }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addColumnAfter().run()">
+            <template #prepend><cached-icon name="mdi-table-column-plus-after" /></template>
+            <v-list-item-title>{{ t.TableAddColumnAfter }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().deleteColumn().run()">
+            <template #prepend><cached-icon name="mdi-table-column-remove" /></template>
+            <v-list-item-title>{{ t.TableDeleteColumn }}</v-list-item-title>
+          </v-list-item>
+          <v-divider />
+          <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().toggleHeaderRow().run()">
+            <template #prepend><cached-icon name="mdi-table-row" /></template>
+            <v-list-item-title>{{ t.TableToggleHeaderRow }}</v-list-item-title>
+          </v-list-item>
+          <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().deleteTable().run()">
+            <template #prepend><cached-icon name="mdi-table-remove" /></template>
+            <v-list-item-title>{{ t.TableDeleteTable }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.Blockquote"
-      :disabled="!editable"
-      :active="state.blockquote"
-      @click="editor?.chain().focus().toggleBlockquote().run()"
-    >
-      <cached-icon name="mdi-format-quote-close" />
-    </v-btn>
+      <v-btn
+        icon
+        :title="t.Blockquote"
+        :disabled="!editable"
+        :active="state.blockquote"
+        @click="editor?.chain().focus().toggleBlockquote().run()"
+      >
+        <cached-icon name="mdi-format-quote-close" />
+      </v-btn>
+    </v-btn-group>
 
     <v-divider vertical inset class="mx-1" />
 
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.AlignLeft"
-      :disabled="!editable"
-      :active="state.alignLeft"
-      @click="editor?.chain().focus().setTextAlign('left').run()"
-    >
-      <cached-icon name="mdi-format-align-left" />
-    </v-btn>
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.AlignCenter"
-      :disabled="!editable"
-      :active="state.alignCenter"
-      @click="editor?.chain().focus().setTextAlign('center').run()"
-    >
-      <cached-icon name="mdi-format-align-center" />
-    </v-btn>
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.AlignRight"
-      :disabled="!editable"
-      :active="state.alignRight"
-      @click="editor?.chain().focus().setTextAlign('right').run()"
-    >
-      <cached-icon name="mdi-format-align-right" />
-    </v-btn>
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.AlignJustify"
-      :disabled="!editable"
-      :active="state.alignJustify"
-      @click="editor?.chain().focus().setTextAlign('justify').run()"
-    >
-      <cached-icon name="mdi-format-align-justify" />
-    </v-btn>
+    <v-btn-toggle :model-value="alignValue" size="small" variant="text" rounded="sm" @update:model-value="setAlign">
+      <v-btn icon value="left" :title="t.AlignLeft" :disabled="!editable">
+        <cached-icon name="mdi-format-align-left" />
+      </v-btn>
+      <v-btn icon value="center" :title="t.AlignCenter" :disabled="!editable">
+        <cached-icon name="mdi-format-align-center" />
+      </v-btn>
+      <v-btn icon value="right" :title="t.AlignRight" :disabled="!editable">
+        <cached-icon name="mdi-format-align-right" />
+      </v-btn>
+      <v-btn icon value="justify" :title="t.AlignJustify" :disabled="!editable">
+        <cached-icon name="mdi-format-align-justify" />
+      </v-btn>
+    </v-btn-toggle>
 
     <v-divider vertical inset class="mx-1" />
 
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.BulletedList"
-      :disabled="!editable"
-      :active="state.bulletList"
-      @click="editor?.chain().focus().toggleBulletList().run()"
-    >
-      <cached-icon name="mdi-format-list-bulleted" />
-    </v-btn>
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.NumberedList"
-      :disabled="!editable"
-      :active="state.orderedList"
-      @click="editor?.chain().focus().toggleOrderedList().run()"
-    >
-      <cached-icon name="mdi-format-list-numbered" />
-    </v-btn>
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.Outdent"
-      :disabled="!editable || !state.canLift"
-      @click="editor?.chain().focus().liftListItem('listItem').run()"
-    >
-      <cached-icon name="mdi-format-indent-decrease" />
-    </v-btn>
-    <v-btn
-      icon
-      size="small"
-      variant="text"
-      :title="t.Indent"
-      :disabled="!editable || !state.canSink"
-      @click="editor?.chain().focus().sinkListItem('listItem').run()"
-    >
-      <cached-icon name="mdi-format-indent-increase" />
-    </v-btn>
+    <v-btn-group size="small" variant="text" rounded="sm">
+      <v-btn
+        icon
+        :title="t.BulletedList"
+        :disabled="!editable"
+        :active="state.bulletList"
+        @click="editor?.chain().focus().toggleBulletList().run()"
+      >
+        <cached-icon name="mdi-format-list-bulleted" />
+      </v-btn>
+      <v-btn
+        icon
+        :title="t.NumberedList"
+        :disabled="!editable"
+        :active="state.orderedList"
+        @click="editor?.chain().focus().toggleOrderedList().run()"
+      >
+        <cached-icon name="mdi-format-list-numbered" />
+      </v-btn>
+      <v-btn
+        icon
+        :title="t.Outdent"
+        :disabled="!editable || !state.canLift"
+        @click="editor?.chain().focus().liftListItem('listItem').run()"
+      >
+        <cached-icon name="mdi-format-indent-decrease" />
+      </v-btn>
+      <v-btn
+        icon
+        :title="t.Indent"
+        :disabled="!editable || !state.canSink"
+        @click="editor?.chain().focus().sinkListItem('listItem').run()"
+      >
+        <cached-icon name="mdi-format-indent-increase" />
+      </v-btn>
+    </v-btn-group>
   </div>
 </template>
 
@@ -387,6 +328,19 @@ const state = computed(() => {
     canSink: !!e?.can().sinkListItem('listItem'),
   };
 });
+
+const alignValue = computed(() => {
+  if (state.value.alignLeft) return 'left';
+  if (state.value.alignCenter) return 'center';
+  if (state.value.alignRight) return 'right';
+  if (state.value.alignJustify) return 'justify';
+  return undefined;
+});
+
+function setAlign(value: unknown) {
+  if (typeof value !== 'string') return;
+  editor.value?.chain().focus().setTextAlign(value).run();
+}
 
 const headingOptions = computed(
   () =>

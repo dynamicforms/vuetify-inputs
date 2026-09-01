@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a complete statement of the current locale, not a patch on top of the last one.
 - Bumps the `@dynamicforms/vue-forms` peer range to `^0.18.0` and adds `@dynamicforms/translatable` (`^0.1.0`) as a
   peer dependency.
+- `<df-rtf-editor>`'s toolbar buttons are rounded rectangles grouped with `v-btn-group`, rather than individual
+  circular icon buttons - an active button's background reads as a segment of its group instead of a colored
+  circle sitting on its own. The alignment buttons are a `v-btn-toggle`, since only one alignment is ever active.
 
 ## [0.10.5] - 2026-08-27
 
