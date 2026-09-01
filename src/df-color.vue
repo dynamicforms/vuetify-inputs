@@ -29,7 +29,7 @@
 import { computed, ref } from 'vue';
 
 import { DfColorProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
+import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, translatableStrings, useInputBase } from './helpers';
 
 const props = withDefaults(defineProps<DfColorProps>(), { ...defaultBaseProps, allowNull: false });
 
@@ -49,7 +49,7 @@ const rules = computed<((val: string) => boolean | string)[]>(() => [
     if (!val && props.allowNull) return true; // allowed empty values are also not a problem
 
     const regex = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{4}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;
-    return regex.test(val) ? true : 'Not a valid hex string.';
+    return regex.test(val) ? true : translatableStrings.InvalidHexColor;
   },
 ]);
 </script>

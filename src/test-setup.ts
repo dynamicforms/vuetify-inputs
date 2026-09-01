@@ -14,3 +14,7 @@ globalThis.ResizeObserver = class {
   unobserve() {}
   disconnect() {}
 };
+
+// jsdom has no `visualViewport` at all - not even as an `undefined` property - so a bare reference to it (as
+// Vuetify's overlay positioning does) throws a ReferenceError instead of short-circuiting on optional chaining.
+globalThis.visualViewport = null;

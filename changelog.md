@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-09-01
+
+### Added
+
+- `InvalidHexColor` to `translatableStrings`: the message `<df-color>` shows when a typed value isn't a hex color
+  and no `control` validator is set. `translatableStrings.LinkUrl` now also names the `<df-rtf-editor>` bubble
+  menu's `window.prompt()` for a link over selected text, alongside its existing use as the link menu's URL field
+  label.
+
+### Changed
+
+- **Breaking:** `translatableStrings` is now backed by `@dynamicforms/translatable` and is reactive: a component
+  already on screen, `<df-rtf-editor>`'s toolbar and heading dropdown included, picks up a later `translateStrings`
+  call without remounting.
+- **Breaking:** `translateStrings`'s callback now takes `(key, defaultValue)` instead of `(key)`, and a key it
+  declines resets to its English default rather than keeping whatever a previous call set it to - each call is now
+  a complete statement of the current locale, not a patch on top of the last one.
+- Bumps the `@dynamicforms/vue-forms` peer range to `^1.0.0` and adds `@dynamicforms/translatable` (`^0.1.0`) as a
+  peer dependency.
+- `<df-rtf-editor>`'s toolbar buttons are rounded rectangles grouped with `v-btn-group`, rather than individual
+  circular icon buttons - an active button's background reads as a segment of its group instead of a colored
+  circle sitting on its own. The alignment buttons are a `v-btn-toggle`, since only one alignment is ever active.
+
 ## [0.10.5] - 2026-08-27
 
 ### Added

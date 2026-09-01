@@ -39,6 +39,8 @@ import { BubbleMenu } from '@tiptap/vue-3/menus';
 import { computed, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
+import { translatableStrings } from '../translations';
+
 import { ClassAttribute, Marker, Spoiler } from './block-styles';
 import { createImagePasteHandler } from './image-paste';
 import { LinkWithDownload } from './link-with-download';
@@ -148,7 +150,7 @@ function toggleBubbleLink() {
     return;
   }
 
-  const href = window.prompt('URL');
+  const href = window.prompt(translatableStrings.LinkUrl);
   if (href) instance.chain().focus().extendMarkRange('link').setLink({ href }).run();
 }
 </script>

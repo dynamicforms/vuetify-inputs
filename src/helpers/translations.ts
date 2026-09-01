@@ -1,4 +1,6 @@
-export const translatableStrings = {
+import { createTranslatable } from '@dynamicforms/translatable';
+
+export const { strings: translatableStrings, translateStrings } = createTranslatable({
   Yes: 'Yes',
   No: 'No',
   Close: 'Close',
@@ -60,13 +62,5 @@ export const translatableStrings = {
   MediaEmbed: 'Insert media',
   MediaEmbedUrl: 'Video URL',
   MediaEmbedInsert: 'Insert',
-};
-
-export function translateStrings(translationCallback: (s: string) => string) {
-  Object.keys(translatableStrings).forEach((key) => {
-    const translation = translationCallback(key);
-    if (translation != null) {
-      translatableStrings[key as keyof typeof translatableStrings] = translation;
-    }
-  });
-}
+  InvalidHexColor: 'Not a valid hex string.',
+});
