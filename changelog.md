@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] - 2026-09-05
+
+### Fixed
+
+- `<df-rtf-editor>` emits `''` as `modelValue` when the document holds no actual content (no text, no image,
+  no embed), instead of the empty paragraph's serialized HTML (`'<p></p>'`). A `required` rule checking for a
+  falsy `modelValue` now correctly rejects an editor the user left empty.
+
 ## [0.11.0] - 2026-09-01
 
 ### Added
