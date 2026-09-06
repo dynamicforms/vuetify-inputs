@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.2] - 2026-09-06
+
+### Fixed
+
+- `<df-rtf-editor>`'s toolbar icon buttons are `rounded="sm"` again. `v-btn-group` and `v-btn-toggle` only style
+  their own container with the `rounded` prop; they don't forward it to child `v-btn`s, so a toolbar button fell
+  back to its default 50% circular radius and default (larger) icon-button size instead of matching the group.
+
 ## [0.11.1] - 2026-09-05
 
 ### Fixed
