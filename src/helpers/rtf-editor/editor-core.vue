@@ -1,6 +1,6 @@
 <template>
   <div class="editor-container">
-    <rtf-toolbar :editor="editor" />
+    <rtf-toolbar :editor="editor" :button-size="toolbarButtonSize" />
     <editor-content class="editor-container__editor" :editor="editor" />
     <bubble-menu v-if="editor" :editor="editor" :should-show="bubbleShouldShow">
       <div class="rtf-bubble-menu">
@@ -54,8 +54,9 @@ const props = withDefaults(
     modelValue?: string;
     minHeight?: string;
     disabled?: boolean;
+    toolbarButtonSize?: string | number;
   }>(),
-  { modelValue: '', minHeight: '7em', disabled: false },
+  { modelValue: '', minHeight: '7em', disabled: false, toolbarButtonSize: 'small' },
 );
 
 const emit = defineEmits<{

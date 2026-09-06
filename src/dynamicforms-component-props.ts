@@ -79,6 +79,9 @@ export interface DfLabelProps {
 
 export interface DfRtfEditorProps extends BaseProps {
   minHeight?: string;
+  /** Size of the toolbar's buttons, forwarded to each one's `size` prop (`v-btn`'s, or `<df-actions>`'s
+   * `buttonSize` for the grouped clusters). See https://vuetifyjs.com/en/api/v-btn/#props-size */
+  toolbarButtonSize?: string | number;
 }
 
 export interface DfSelectProps extends BaseProps {

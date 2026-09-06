@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.3] - 2026-09-06
+
+### Added
+
+- `<df-rtf-editor>`'s `toolbarButtonSize` prop sets the size of every toolbar button (`v-btn`'s `size`, or
+  `<df-actions>`'s `buttonSize` for the grouped clusters), so an app can render a bigger or more compact toolbar
+  without overriding the component's internal markup.
+
+### Fixed
+
+- `<df-rtf-editor>`'s toolbar buttons render at a consistent size again. The static button clusters (undo/redo,
+  bold/italic, alignment, lists) now render through `<df-actions>` rather than `v-btn-group`/`v-btn-toggle`,
+  whose child `v-btn`s only inherit a handful of props (`height`, `color`, `density`, `variant`, `size`) from
+  the group - not `rounded`, as 0.11.2 fixed - and are sized by a different formula than a standalone icon
+  button of the same nominal size. The remaining cluster that hosts dropdown menus (horizontal rule, link,
+  image, media, table, blockquote) - which `<df-actions>` has no slot to render - is now a plain flex row
+  styled the same way, rather than a `v-btn-group`, so its buttons match the rest of the toolbar.
+
 ## [0.11.2] - 2026-09-06
 
 ### Fixed
