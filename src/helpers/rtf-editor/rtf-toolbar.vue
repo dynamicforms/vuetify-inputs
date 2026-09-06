@@ -301,26 +301,40 @@ function setAlign(value: unknown) {
   editor.value?.chain().focus().setTextAlign(value).run();
 }
 
-// Static button clusters rendered through `<df-actions>` rather than `<v-btn-group>`/`<v-btn-toggle>`: each
-// button is a self-contained `Action`, so its look (size, rounded corners, active/disabled state) is drawn
-// from its own value rather than from props a parent component may or may not forward to it.
-function makeToolbarAction(icon: string, onClick: () => void): Action<ActionRenderOptions> {
-  return new Action<ActionRenderOptions>({
-    value: { icon, renderAs: ActionDisplayStyle.TEXT, showIcon: true, showLabel: false },
-    actions: [
-      new ExecuteAction((action, supr, params) => {
-        onClick();
-        return supr(action, params);
-      }),
-    ],
-  });
-}
-
 interface ToolbarActionSync {
   action: Action<ActionRenderOptions>;
   title: () => string;
   disabled: () => boolean;
   active?: () => boolean;
+}
+
+const toolbarActionSyncs: ToolbarActionSync[] = [];
+
+// Static button clusters rendered through `<df-actions>` rather than `<v-btn-group>`/`<v-btn-toggle>`: each
+// button is a self-contained `Action`, so its look (size, rounded corners, active/disabled state) is drawn
+// from its own value rather than from props a parent component may or may not forward to it.
+//
+// `title`/`disabled`/`active` are getters, not one-off values, because an `Action`'s `value`/`enabled` are plain
+// assignments rather than bindings to a computed - the `watchEffect` below re-runs them on every reactive change
+// and writes the result into the action it was registered against.
+function toolbarAction(
+  icon: string,
+  onClick: () => void,
+  title: () => string,
+  disabled: () => boolean,
+  active?: () => boolean,
+): Action<ActionRenderOptions> {
+  const action = new Action<ActionRenderOptions>({
+    value: { icon, renderAs: ActionDisplayStyle.TEXT, showIcon: true, showLabel: false },
+    actions: [
+      new ExecuteAction((a, supr, params) => {
+        onClick();
+        return supr(a, params);
+      }),
+    ],
+  });
+  toolbarActionSyncs.push({ action, title, disabled, active });
+  return action;
 }
 
 function syncToolbarAction({ action, title, disabled, active }: ToolbarActionSync) {
@@ -337,77 +351,81 @@ function syncToolbarAction({ action, title, disabled, active }: ToolbarActionSyn
   if (action.enabled !== wantEnabled) action.enabled = wantEnabled;
 }
 
-const undoAction = makeToolbarAction('mdi-undo', () => editor.value?.chain().focus().undo().run());
-const redoAction = makeToolbarAction('mdi-redo', () => editor.value?.chain().focus().redo().run());
-const undoRedoActions = [undoAction, redoAction];
+const undoRedoActions = [
+  toolbarAction(
+    'mdi-undo',
+    () => editor.value?.chain().focus().undo().run(),
+    () => t.Undo,
+    () => !editable.value || !state.value.canUndo,
+  ),
+  toolbarAction(
+    'mdi-redo',
+    () => editor.value?.chain().focus().redo().run(),
+    () => t.Redo,
+    () => !editable.value || !state.value.canRedo,
+  ),
+];
 
-const boldAction = makeToolbarAction('mdi-format-bold', () => editor.value?.chain().focus().toggleBold().run());
-const italicAction = makeToolbarAction('mdi-format-italic', () => editor.value?.chain().focus().toggleItalic().run());
-const boldItalicActions = [boldAction, italicAction];
+const boldItalicActions = [
+  toolbarAction(
+    'mdi-format-bold',
+    () => editor.value?.chain().focus().toggleBold().run(),
+    () => t.Bold,
+    () => !editable.value,
+    () => state.value.bold,
+  ),
+  toolbarAction(
+    'mdi-format-italic',
+    () => editor.value?.chain().focus().toggleItalic().run(),
+    () => t.Italic,
+    () => !editable.value,
+    () => state.value.italic,
+  ),
+];
 
-const alignLeftAction = makeToolbarAction('mdi-format-align-left', () => setAlign('left'));
-const alignCenterAction = makeToolbarAction('mdi-format-align-center', () => setAlign('center'));
-const alignRightAction = makeToolbarAction('mdi-format-align-right', () => setAlign('right'));
-const alignJustifyAction = makeToolbarAction('mdi-format-align-justify', () => setAlign('justify'));
-const alignActions = [alignLeftAction, alignCenterAction, alignRightAction, alignJustifyAction];
+const ALIGN_DEFS: { value: string; icon: string; title: () => string }[] = [
+  { value: 'left', icon: 'mdi-format-align-left', title: () => t.AlignLeft },
+  { value: 'center', icon: 'mdi-format-align-center', title: () => t.AlignCenter },
+  { value: 'right', icon: 'mdi-format-align-right', title: () => t.AlignRight },
+  { value: 'justify', icon: 'mdi-format-align-justify', title: () => t.AlignJustify },
+];
+const alignActions = ALIGN_DEFS.map((def) =>
+  toolbarAction(
+    def.icon,
+    () => setAlign(def.value),
+    def.title,
+    () => !editable.value,
+    () => alignValue.value === def.value,
+  ),
+);
 
-const bulletedListAction = makeToolbarAction('mdi-format-list-bulleted', () =>
-  editor.value?.chain().focus().toggleBulletList().run(),
-);
-const numberedListAction = makeToolbarAction('mdi-format-list-numbered', () =>
-  editor.value?.chain().focus().toggleOrderedList().run(),
-);
-const outdentAction = makeToolbarAction('mdi-format-indent-decrease', () =>
-  editor.value?.chain().focus().liftListItem('listItem').run(),
-);
-const indentAction = makeToolbarAction('mdi-format-indent-increase', () =>
-  editor.value?.chain().focus().sinkListItem('listItem').run(),
-);
-const listActions = [bulletedListAction, numberedListAction, outdentAction, indentAction];
-
-const toolbarActionSyncs: ToolbarActionSync[] = [
-  { action: undoAction, title: () => t.Undo, disabled: () => !editable.value || !state.value.canUndo },
-  { action: redoAction, title: () => t.Redo, disabled: () => !editable.value || !state.value.canRedo },
-  { action: boldAction, title: () => t.Bold, disabled: () => !editable.value, active: () => state.value.bold },
-  { action: italicAction, title: () => t.Italic, disabled: () => !editable.value, active: () => state.value.italic },
-  {
-    action: alignLeftAction,
-    title: () => t.AlignLeft,
-    disabled: () => !editable.value,
-    active: () => alignValue.value === 'left',
-  },
-  {
-    action: alignCenterAction,
-    title: () => t.AlignCenter,
-    disabled: () => !editable.value,
-    active: () => alignValue.value === 'center',
-  },
-  {
-    action: alignRightAction,
-    title: () => t.AlignRight,
-    disabled: () => !editable.value,
-    active: () => alignValue.value === 'right',
-  },
-  {
-    action: alignJustifyAction,
-    title: () => t.AlignJustify,
-    disabled: () => !editable.value,
-    active: () => alignValue.value === 'justify',
-  },
-  {
-    action: bulletedListAction,
-    title: () => t.BulletedList,
-    disabled: () => !editable.value,
-    active: () => state.value.bulletList,
-  },
-  {
-    action: numberedListAction,
-    title: () => t.NumberedList,
-    disabled: () => !editable.value,
-    active: () => state.value.orderedList,
-  },
-  { action: outdentAction, title: () => t.Outdent, disabled: () => !editable.value || !state.value.canLift },
-  { action: indentAction, title: () => t.Indent, disabled: () => !editable.value || !state.value.canSink },
+const listActions = [
+  toolbarAction(
+    'mdi-format-list-bulleted',
+    () => editor.value?.chain().focus().toggleBulletList().run(),
+    () => t.BulletedList,
+    () => !editable.value,
+    () => state.value.bulletList,
+  ),
+  toolbarAction(
+    'mdi-format-list-numbered',
+    () => editor.value?.chain().focus().toggleOrderedList().run(),
+    () => t.NumberedList,
+    () => !editable.value,
+    () => state.value.orderedList,
+  ),
+  toolbarAction(
+    'mdi-format-indent-decrease',
+    () => editor.value?.chain().focus().liftListItem('listItem').run(),
+    () => t.Outdent,
+    () => !editable.value || !state.value.canLift,
+  ),
+  toolbarAction(
+    'mdi-format-indent-increase',
+    () => editor.value?.chain().focus().sinkListItem('listItem').run(),
+    () => t.Indent,
+    () => !editable.value || !state.value.canSink,
+  ),
 ];
 
 watchEffect(() => {
