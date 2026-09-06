@@ -7,11 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.11.2] - 2026-09-06
 
+### Added
+
+- `<df-rtf-editor>`'s `toolbarButtonSize` prop sets the size of every toolbar button (`v-btn`'s `size`, or
+  `<df-actions>`'s `buttonSize` for the grouped clusters), so an app can render a bigger or more compact toolbar
+  without overriding the component's internal markup.
+
 ### Fixed
 
-- `<df-rtf-editor>`'s toolbar icon buttons are `rounded="sm"` again. `v-btn-group` and `v-btn-toggle` only style
-  their own container with the `rounded` prop; they don't forward it to child `v-btn`s, so a toolbar button fell
-  back to its default 50% circular radius and default (larger) icon-button size instead of matching the group.
+- `<df-rtf-editor>`'s toolbar buttons render at a consistent size and with rounded-rectangle corners again. The
+  static button clusters (undo/redo, bold/italic, alignment, lists) now render through `<df-actions>` rather than
+  `v-btn-group`/`v-btn-toggle`, whose child `v-btn`s only inherit a handful of props (`height`, `color`,
+  `density`, `variant`, `size`) from the group - not `rounded` - and are sized by a different formula than a
+  standalone icon button of the same nominal size. The remaining cluster that hosts dropdown menus (horizontal
+  rule, link, image, media, table, blockquote) - which `<df-actions>` has no slot to render - is now a plain
+  flex row styled the same way, rather than a `v-btn-group`, so its buttons match the rest of the toolbar.
 
 ## [0.11.1] - 2026-09-05
 
