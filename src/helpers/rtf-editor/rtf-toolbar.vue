@@ -1,10 +1,22 @@
 <template>
   <div class="rtf-toolbar" :class="{ 'rtf-toolbar--disabled': !editable }">
     <v-btn-group size="small" variant="text" rounded="sm">
-      <v-btn icon :title="t.Undo" :disabled="!editable || !state.canUndo" @click="editor?.chain().focus().undo().run()">
+      <v-btn
+        icon
+        rounded="sm"
+        :title="t.Undo"
+        :disabled="!editable || !state.canUndo"
+        @click="editor?.chain().focus().undo().run()"
+      >
         <cached-icon name="mdi-undo" />
       </v-btn>
-      <v-btn icon :title="t.Redo" :disabled="!editable || !state.canRedo" @click="editor?.chain().focus().redo().run()">
+      <v-btn
+        icon
+        rounded="sm"
+        :title="t.Redo"
+        :disabled="!editable || !state.canRedo"
+        @click="editor?.chain().focus().redo().run()"
+      >
         <cached-icon name="mdi-redo" />
       </v-btn>
     </v-btn-group>
@@ -66,6 +78,7 @@
     <v-btn-group size="small" variant="text" rounded="sm">
       <v-btn
         icon
+        rounded="sm"
         :title="t.Bold"
         :disabled="!editable"
         :active="state.bold"
@@ -75,6 +88,7 @@
       </v-btn>
       <v-btn
         icon
+        rounded="sm"
         :title="t.Italic"
         :disabled="!editable"
         :active="state.italic"
@@ -89,6 +103,7 @@
     <v-btn-group size="small" variant="text" rounded="sm">
       <v-btn
         icon
+        rounded="sm"
         :title="t.HorizontalLine"
         :disabled="!editable"
         @click="editor?.chain().focus().setHorizontalRule().run()"
@@ -98,7 +113,7 @@
 
       <v-menu :close-on-content-click="false" @update:model-value="(shown: boolean) => shown && openLinkMenu()">
         <template #activator="{ props: menuProps }">
-          <v-btn icon :title="t.Link" :disabled="!editable" :active="state.link" v-bind="menuProps">
+          <v-btn icon rounded="sm" :title="t.Link" :disabled="!editable" :active="state.link" v-bind="menuProps">
             <cached-icon name="mdi-link-variant" />
           </v-btn>
         </template>
@@ -121,7 +136,7 @@
 
       <v-menu :close-on-content-click="false">
         <template #activator="{ props: menuProps }">
-          <v-btn icon :title="t.Image" :disabled="!editable" v-bind="menuProps">
+          <v-btn icon rounded="sm" :title="t.Image" :disabled="!editable" v-bind="menuProps">
             <cached-icon name="mdi-image-plus" />
           </v-btn>
         </template>
@@ -148,7 +163,7 @@
 
       <v-menu :close-on-content-click="false">
         <template #activator="{ props: menuProps }">
-          <v-btn icon :title="t.MediaEmbed" :disabled="!editable" v-bind="menuProps">
+          <v-btn icon rounded="sm" :title="t.MediaEmbed" :disabled="!editable" v-bind="menuProps">
             <cached-icon name="mdi-video-plus" />
           </v-btn>
         </template>
@@ -171,7 +186,7 @@
 
       <v-menu>
         <template #activator="{ props: menuProps }">
-          <v-btn icon :title="t.Table" :disabled="!editable" v-bind="menuProps">
+          <v-btn icon rounded="sm" :title="t.Table" :disabled="!editable" v-bind="menuProps">
             <cached-icon name="mdi-table" />
           </v-btn>
         </template>
@@ -220,6 +235,7 @@
 
       <v-btn
         icon
+        rounded="sm"
         :title="t.Blockquote"
         :disabled="!editable"
         :active="state.blockquote"
@@ -232,16 +248,16 @@
     <v-divider vertical inset class="mx-1" />
 
     <v-btn-toggle :model-value="alignValue" size="small" variant="text" rounded="sm" @update:model-value="setAlign">
-      <v-btn icon value="left" :title="t.AlignLeft" :disabled="!editable">
+      <v-btn icon rounded="sm" value="left" :title="t.AlignLeft" :disabled="!editable">
         <cached-icon name="mdi-format-align-left" />
       </v-btn>
-      <v-btn icon value="center" :title="t.AlignCenter" :disabled="!editable">
+      <v-btn icon rounded="sm" value="center" :title="t.AlignCenter" :disabled="!editable">
         <cached-icon name="mdi-format-align-center" />
       </v-btn>
-      <v-btn icon value="right" :title="t.AlignRight" :disabled="!editable">
+      <v-btn icon rounded="sm" value="right" :title="t.AlignRight" :disabled="!editable">
         <cached-icon name="mdi-format-align-right" />
       </v-btn>
-      <v-btn icon value="justify" :title="t.AlignJustify" :disabled="!editable">
+      <v-btn icon rounded="sm" value="justify" :title="t.AlignJustify" :disabled="!editable">
         <cached-icon name="mdi-format-align-justify" />
       </v-btn>
     </v-btn-toggle>
@@ -251,6 +267,7 @@
     <v-btn-group size="small" variant="text" rounded="sm">
       <v-btn
         icon
+        rounded="sm"
         :title="t.BulletedList"
         :disabled="!editable"
         :active="state.bulletList"
@@ -260,6 +277,7 @@
       </v-btn>
       <v-btn
         icon
+        rounded="sm"
         :title="t.NumberedList"
         :disabled="!editable"
         :active="state.orderedList"
@@ -269,6 +287,7 @@
       </v-btn>
       <v-btn
         icon
+        rounded="sm"
         :title="t.Outdent"
         :disabled="!editable || !state.canLift"
         @click="editor?.chain().focus().liftListItem('listItem').run()"
@@ -277,6 +296,7 @@
       </v-btn>
       <v-btn
         icon
+        rounded="sm"
         :title="t.Indent"
         :disabled="!editable || !state.canSink"
         @click="editor?.chain().focus().sinkListItem('listItem').run()"
