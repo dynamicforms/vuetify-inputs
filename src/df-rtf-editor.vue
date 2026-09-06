@@ -7,6 +7,7 @@
         :class="{ 'mt-6': !!label }"
         :min-height="minHeight"
         :disabled="vuetifyBindings.disabled"
+        :toolbar-button-size="toolbarButtonSize"
         v-bind="passthroughAttrs"
         @focusin="slotProps.focus()"
         @focusout="slotProps.blur()"

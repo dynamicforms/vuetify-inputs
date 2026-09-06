@@ -1,31 +1,12 @@
 <template>
   <div class="rtf-toolbar" :class="{ 'rtf-toolbar--disabled': !editable }">
-    <v-btn-group size="small" variant="text" rounded="sm">
-      <v-btn
-        icon
-        rounded="sm"
-        :title="t.Undo"
-        :disabled="!editable || !state.canUndo"
-        @click="editor?.chain().focus().undo().run()"
-      >
-        <cached-icon name="mdi-undo" />
-      </v-btn>
-      <v-btn
-        icon
-        rounded="sm"
-        :title="t.Redo"
-        :disabled="!editable || !state.canRedo"
-        @click="editor?.chain().focus().redo().run()"
-      >
-        <cached-icon name="mdi-redo" />
-      </v-btn>
-    </v-btn-group>
+    <df-actions :actions="undoRedoActions" :button-size="buttonSize" show-as-group="grouped-no-borders" />
 
     <v-divider vertical inset class="mx-1" />
 
     <v-btn
       icon
-      size="small"
+      :size="buttonSize"
       variant="text"
       rounded="sm"
       :title="t.SelectAll"
@@ -39,7 +20,13 @@
 
     <v-menu>
       <template #activator="{ props: menuProps }">
-        <v-btn size="small" variant="text" :disabled="!editable" v-bind="menuProps" append-icon="mdi-chevron-down">
+        <v-btn
+          :size="buttonSize"
+          variant="text"
+          :disabled="!editable"
+          v-bind="menuProps"
+          append-icon="mdi-chevron-down"
+        >
           {{ headingLabel }}
         </v-btn>
       </template>
@@ -57,7 +44,13 @@
 
     <v-menu>
       <template #activator="{ props: menuProps }">
-        <v-btn size="small" variant="text" :disabled="!editable" v-bind="menuProps" append-icon="mdi-chevron-down">
+        <v-btn
+          :size="buttonSize"
+          variant="text"
+          :disabled="!editable"
+          v-bind="menuProps"
+          append-icon="mdi-chevron-down"
+        >
           {{ t.Style }}
         </v-btn>
       </template>
@@ -75,35 +68,15 @@
 
     <v-divider vertical inset class="mx-1" />
 
-    <v-btn-group size="small" variant="text" rounded="sm">
-      <v-btn
-        icon
-        rounded="sm"
-        :title="t.Bold"
-        :disabled="!editable"
-        :active="state.bold"
-        @click="editor?.chain().focus().toggleBold().run()"
-      >
-        <cached-icon name="mdi-format-bold" />
-      </v-btn>
-      <v-btn
-        icon
-        rounded="sm"
-        :title="t.Italic"
-        :disabled="!editable"
-        :active="state.italic"
-        @click="editor?.chain().focus().toggleItalic().run()"
-      >
-        <cached-icon name="mdi-format-italic" />
-      </v-btn>
-    </v-btn-group>
+    <df-actions :actions="boldItalicActions" :button-size="buttonSize" show-as-group="grouped-no-borders" />
 
     <v-divider vertical inset class="mx-1" />
 
-    <v-btn-group size="small" variant="text" rounded="sm">
+    <div class="rtf-toolbar-group">
       <v-btn
         icon
-        rounded="sm"
+        :size="buttonSize"
+        variant="text"
         :title="t.HorizontalLine"
         :disabled="!editable"
         @click="editor?.chain().focus().setHorizontalRule().run()"
@@ -113,7 +86,15 @@
 
       <v-menu :close-on-content-click="false" @update:model-value="(shown: boolean) => shown && openLinkMenu()">
         <template #activator="{ props: menuProps }">
-          <v-btn icon rounded="sm" :title="t.Link" :disabled="!editable" :active="state.link" v-bind="menuProps">
+          <v-btn
+            icon
+            :size="buttonSize"
+            variant="text"
+            :title="t.Link"
+            :disabled="!editable"
+            :active="state.link"
+            v-bind="menuProps"
+          >
             <cached-icon name="mdi-link-variant" />
           </v-btn>
         </template>
@@ -136,7 +117,7 @@
 
       <v-menu :close-on-content-click="false">
         <template #activator="{ props: menuProps }">
-          <v-btn icon rounded="sm" :title="t.Image" :disabled="!editable" v-bind="menuProps">
+          <v-btn icon :size="buttonSize" variant="text" :title="t.Image" :disabled="!editable" v-bind="menuProps">
             <cached-icon name="mdi-image-plus" />
           </v-btn>
         </template>
@@ -163,7 +144,7 @@
 
       <v-menu :close-on-content-click="false">
         <template #activator="{ props: menuProps }">
-          <v-btn icon rounded="sm" :title="t.MediaEmbed" :disabled="!editable" v-bind="menuProps">
+          <v-btn icon :size="buttonSize" variant="text" :title="t.MediaEmbed" :disabled="!editable" v-bind="menuProps">
             <cached-icon name="mdi-video-plus" />
           </v-btn>
         </template>
@@ -186,7 +167,7 @@
 
       <v-menu>
         <template #activator="{ props: menuProps }">
-          <v-btn icon rounded="sm" :title="t.Table" :disabled="!editable" v-bind="menuProps">
+          <v-btn icon :size="buttonSize" variant="text" :title="t.Table" :disabled="!editable" v-bind="menuProps">
             <cached-icon name="mdi-table" />
           </v-btn>
         </template>
@@ -235,7 +216,8 @@
 
       <v-btn
         icon
-        rounded="sm"
+        :size="buttonSize"
+        variant="text"
         :title="t.Blockquote"
         :disabled="!editable"
         :active="state.blockquote"
@@ -243,75 +225,27 @@
       >
         <cached-icon name="mdi-format-quote-close" />
       </v-btn>
-    </v-btn-group>
+    </div>
 
     <v-divider vertical inset class="mx-1" />
 
-    <v-btn-toggle :model-value="alignValue" size="small" variant="text" rounded="sm" @update:model-value="setAlign">
-      <v-btn icon rounded="sm" value="left" :title="t.AlignLeft" :disabled="!editable">
-        <cached-icon name="mdi-format-align-left" />
-      </v-btn>
-      <v-btn icon rounded="sm" value="center" :title="t.AlignCenter" :disabled="!editable">
-        <cached-icon name="mdi-format-align-center" />
-      </v-btn>
-      <v-btn icon rounded="sm" value="right" :title="t.AlignRight" :disabled="!editable">
-        <cached-icon name="mdi-format-align-right" />
-      </v-btn>
-      <v-btn icon rounded="sm" value="justify" :title="t.AlignJustify" :disabled="!editable">
-        <cached-icon name="mdi-format-align-justify" />
-      </v-btn>
-    </v-btn-toggle>
+    <df-actions :actions="alignActions" :button-size="buttonSize" show-as-group="grouped-no-borders" />
 
     <v-divider vertical inset class="mx-1" />
 
-    <v-btn-group size="small" variant="text" rounded="sm">
-      <v-btn
-        icon
-        rounded="sm"
-        :title="t.BulletedList"
-        :disabled="!editable"
-        :active="state.bulletList"
-        @click="editor?.chain().focus().toggleBulletList().run()"
-      >
-        <cached-icon name="mdi-format-list-bulleted" />
-      </v-btn>
-      <v-btn
-        icon
-        rounded="sm"
-        :title="t.NumberedList"
-        :disabled="!editable"
-        :active="state.orderedList"
-        @click="editor?.chain().focus().toggleOrderedList().run()"
-      >
-        <cached-icon name="mdi-format-list-numbered" />
-      </v-btn>
-      <v-btn
-        icon
-        rounded="sm"
-        :title="t.Outdent"
-        :disabled="!editable || !state.canLift"
-        @click="editor?.chain().focus().liftListItem('listItem').run()"
-      >
-        <cached-icon name="mdi-format-indent-decrease" />
-      </v-btn>
-      <v-btn
-        icon
-        rounded="sm"
-        :title="t.Indent"
-        :disabled="!editable || !state.canSink"
-        @click="editor?.chain().focus().sinkListItem('listItem').run()"
-      >
-        <cached-icon name="mdi-format-indent-increase" />
-      </v-btn>
-    </v-btn-group>
+    <df-actions :actions="listActions" :button-size="buttonSize" show-as-group="grouped-no-borders" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { Action, ExecuteAction } from '@dynamicforms/vue-forms';
 import { Editor } from '@tiptap/vue-3';
-import { computed, ref } from 'vue';
+import { isEqual } from 'lodash-es';
+import { computed, ref, watchEffect } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
+import DfActions from '../../df-actions.vue';
+import { ActionDisplayStyle, ActionRenderOptions } from '../action';
 import { translatableStrings } from '../translations';
 
 import { applyStyle, isStyleActive, STYLE_DEFS } from './block-styles';
@@ -319,7 +253,12 @@ import { fileToDataUrl } from './image-paste';
 import { toEmbedSrc } from './media-embed';
 import { useEditorTick } from './use-editor-tick';
 
-const props = defineProps<{ editor?: Editor }>();
+const props = withDefaults(defineProps<{ editor?: Editor; buttonSize?: string | number }>(), {
+  editor: undefined,
+  buttonSize: 'small',
+});
+
+const buttonSize = computed(() => props.buttonSize);
 
 const t = translatableStrings;
 
@@ -361,6 +300,137 @@ function setAlign(value: unknown) {
   if (typeof value !== 'string') return;
   editor.value?.chain().focus().setTextAlign(value).run();
 }
+
+interface ToolbarActionSync {
+  action: Action<ActionRenderOptions>;
+  title: () => string;
+  disabled: () => boolean;
+  active?: () => boolean;
+}
+
+const toolbarActionSyncs: ToolbarActionSync[] = [];
+
+// Static button clusters rendered through `<df-actions>` rather than `<v-btn-group>`/`<v-btn-toggle>`: each
+// button is a self-contained `Action`, so its look (size, rounded corners, active/disabled state) is drawn
+// from its own value rather than from props a parent component may or may not forward to it.
+//
+// `title`/`disabled`/`active` are getters, not one-off values, because an `Action`'s `value`/`enabled` are plain
+// assignments rather than bindings to a computed - the `watchEffect` below re-runs them on every reactive change
+// and writes the result into the action it was registered against.
+function toolbarAction(
+  icon: string,
+  onClick: () => void,
+  title: () => string,
+  disabled: () => boolean,
+  active?: () => boolean,
+): Action<ActionRenderOptions> {
+  const action = new Action<ActionRenderOptions>({
+    value: { icon, renderAs: ActionDisplayStyle.TEXT, showIcon: true, showLabel: false },
+    actions: [
+      new ExecuteAction((a, supr, params) => {
+        onClick();
+        return supr(a, params);
+      }),
+    ],
+  });
+  toolbarActionSyncs.push({ action, title, disabled, active });
+  return action;
+}
+
+function syncToolbarAction({ action, title, disabled, active }: ToolbarActionSync) {
+  // `value` writes first: `Action`/`Field` refuses to change `value` while `enabled` is false, so flipping
+  // `enabled` first would lock passthroughAttrs (the button's title/active state) to whatever it last held
+  // the moment a button first goes disabled.
+  const wantAttrs: Record<string, unknown> = { title: title(), icon: true };
+  if (active) wantAttrs.active = active();
+  if (!isEqual(action.value.passthroughAttrs ?? {}, wantAttrs)) {
+    action.value = { ...action.value, passthroughAttrs: wantAttrs };
+  }
+
+  const wantEnabled = !disabled();
+  if (action.enabled !== wantEnabled) action.enabled = wantEnabled;
+}
+
+const undoRedoActions = [
+  toolbarAction(
+    'mdi-undo',
+    () => editor.value?.chain().focus().undo().run(),
+    () => t.Undo,
+    () => !editable.value || !state.value.canUndo,
+  ),
+  toolbarAction(
+    'mdi-redo',
+    () => editor.value?.chain().focus().redo().run(),
+    () => t.Redo,
+    () => !editable.value || !state.value.canRedo,
+  ),
+];
+
+const boldItalicActions = [
+  toolbarAction(
+    'mdi-format-bold',
+    () => editor.value?.chain().focus().toggleBold().run(),
+    () => t.Bold,
+    () => !editable.value,
+    () => state.value.bold,
+  ),
+  toolbarAction(
+    'mdi-format-italic',
+    () => editor.value?.chain().focus().toggleItalic().run(),
+    () => t.Italic,
+    () => !editable.value,
+    () => state.value.italic,
+  ),
+];
+
+const ALIGN_DEFS: { value: string; icon: string; title: () => string }[] = [
+  { value: 'left', icon: 'mdi-format-align-left', title: () => t.AlignLeft },
+  { value: 'center', icon: 'mdi-format-align-center', title: () => t.AlignCenter },
+  { value: 'right', icon: 'mdi-format-align-right', title: () => t.AlignRight },
+  { value: 'justify', icon: 'mdi-format-align-justify', title: () => t.AlignJustify },
+];
+const alignActions = ALIGN_DEFS.map((def) =>
+  toolbarAction(
+    def.icon,
+    () => setAlign(def.value),
+    def.title,
+    () => !editable.value,
+    () => alignValue.value === def.value,
+  ),
+);
+
+const listActions = [
+  toolbarAction(
+    'mdi-format-list-bulleted',
+    () => editor.value?.chain().focus().toggleBulletList().run(),
+    () => t.BulletedList,
+    () => !editable.value,
+    () => state.value.bulletList,
+  ),
+  toolbarAction(
+    'mdi-format-list-numbered',
+    () => editor.value?.chain().focus().toggleOrderedList().run(),
+    () => t.NumberedList,
+    () => !editable.value,
+    () => state.value.orderedList,
+  ),
+  toolbarAction(
+    'mdi-format-indent-decrease',
+    () => editor.value?.chain().focus().liftListItem('listItem').run(),
+    () => t.Outdent,
+    () => !editable.value || !state.value.canLift,
+  ),
+  toolbarAction(
+    'mdi-format-indent-increase',
+    () => editor.value?.chain().focus().sinkListItem('listItem').run(),
+    () => t.Indent,
+    () => !editable.value || !state.value.canSink,
+  ),
+];
+
+watchEffect(() => {
+  toolbarActionSyncs.forEach(syncToolbarAction);
+});
 
 const headingOptions = computed(
   () =>
@@ -469,5 +539,26 @@ function insertMediaEmbed() {
 
 .rtf-toolbar--disabled {
   opacity: 0.6;
+}
+
+/* Mirrors `<df-actions>`'s own `button-group` look for the one cluster it can't render (it has no slot for a
+   `v-menu` activator): a plain flex row rather than Vuetify's `v-btn-group`, whose child buttons are sized by a
+   different formula than a standalone (or `<df-actions>`-rendered) icon button of the same `size`. */
+.rtf-toolbar-group {
+  display: flex;
+}
+
+.rtf-toolbar-group .v-btn {
+  border-radius: 0;
+}
+
+.rtf-toolbar-group .v-btn:first-child {
+  border-start-start-radius: 0.5em;
+  border-end-start-radius: 0.5em;
+}
+
+.rtf-toolbar-group .v-btn:last-child {
+  border-start-end-radius: 0.5em;
+  border-end-end-radius: 0.5em;
 }
 </style>
