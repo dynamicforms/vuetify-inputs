@@ -3,7 +3,15 @@ import { type Locale } from 'date-fns';
 import { MaybeRef } from 'vue';
 import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
 
-import { BaseProps, FileComms, Label, SelectChoice, SelectFetchChoices } from './helpers';
+import {
+  BaseProps,
+  FileComms,
+  Label,
+  SelectChoice,
+  SelectFetchChoices,
+  VuetifyButtonSize,
+  VuetifyDensity,
+} from './helpers';
 
 type ShowAsGroup = 'no' | 'grouped' | 'grouped-no-borders';
 
@@ -11,7 +19,9 @@ export interface DfActionsProps {
   /** The actions to draw, this library's `Action` or a bare `@dynamicforms/vue-forms` one: what each button
    * renders as is read off the action's value, and a value stating nothing renders as the defaults. */
   actions: MaybeRef<Action[]>;
-  buttonSize?: string | number; // see https://vuetifyjs.com/en/api/v-btn/#props-size
+  buttonSize?: VuetifyButtonSize; // see https://vuetifyjs.com/en/api/v-btn/#props-size
+  /** Forwarded to each button's `density` prop. See https://vuetifyjs.com/en/api/v-btn/#props-density */
+  buttonDensity?: VuetifyDensity;
   showAsGroup?: ShowAsGroup;
 }
 
@@ -81,7 +91,7 @@ export interface DfRtfEditorProps extends BaseProps {
   minHeight?: string;
   /** Size of the toolbar's buttons, forwarded to each one's `size` prop (`v-btn`'s, or `<df-actions>`'s
    * `buttonSize` for the grouped clusters). See https://vuetifyjs.com/en/api/v-btn/#props-size */
-  toolbarButtonSize?: string | number;
+  toolbarButtonSize?: VuetifyButtonSize;
 }
 
 export interface DfSelectProps extends BaseProps {

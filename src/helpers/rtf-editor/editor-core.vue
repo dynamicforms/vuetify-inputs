@@ -1,22 +1,22 @@
 <template>
   <div class="editor-container">
-    <rtf-toolbar :editor="editor" :button-size="toolbarButtonSize" />
+    <rtf-toolbar ref="toolbarRef" :editor="editor" :button-size="toolbarButtonSize" />
     <editor-content class="editor-container__editor" :editor="editor" />
     <bubble-menu v-if="editor" :editor="editor" :should-show="bubbleShouldShow">
       <div class="rtf-bubble-menu">
-        <v-btn icon size="small" variant="text" :active="bubbleState.bold" @click="toggle('toggleBold')">
+        <v-btn v-bind="bubbleButtonProps" :active="bubbleState.bold" @click="toggle('toggleBold')">
           <cached-icon name="mdi-format-bold" />
         </v-btn>
-        <v-btn icon size="small" variant="text" :active="bubbleState.italic" @click="toggle('toggleItalic')">
+        <v-btn v-bind="bubbleButtonProps" :active="bubbleState.italic" @click="toggle('toggleItalic')">
           <cached-icon name="mdi-format-italic" />
         </v-btn>
-        <v-btn icon size="small" variant="text" :active="bubbleState.link" @click="toggleBubbleLink">
+        <v-btn v-bind="bubbleButtonProps" :active="bubbleState.link" @click="toggleBubbleLink">
           <cached-icon name="mdi-link-variant" />
         </v-btn>
-        <v-btn icon size="small" variant="text" :active="bubbleState.bulletList" @click="toggle('toggleBulletList')">
+        <v-btn v-bind="bubbleButtonProps" :active="bubbleState.bulletList" @click="toggle('toggleBulletList')">
           <cached-icon name="mdi-format-list-bulleted" />
         </v-btn>
-        <v-btn icon size="small" variant="text" :active="bubbleState.orderedList" @click="toggle('toggleOrderedList')">
+        <v-btn v-bind="bubbleButtonProps" :active="bubbleState.orderedList" @click="toggle('toggleOrderedList')">
           <cached-icon name="mdi-format-list-numbered" />
         </v-btn>
       </div>
@@ -36,9 +36,10 @@ import { NodeSelection } from '@tiptap/pm/state';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
-import { computed, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
+import { VuetifyButtonSize } from '../input-base';
 import { translatableStrings } from '../translations';
 
 import { ClassAttribute, Marker, Spoiler } from './block-styles';
@@ -54,7 +55,7 @@ const props = withDefaults(
     modelValue?: string;
     minHeight?: string;
     disabled?: boolean;
-    toolbarButtonSize?: string | number;
+    toolbarButtonSize?: VuetifyButtonSize;
   }>(),
   { modelValue: '', minHeight: '7em', disabled: false, toolbarButtonSize: 'small' },
 );
@@ -62,6 +63,27 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void;
 }>();
+
+// `<df-rtf-editor>`'s label is positioned by a fixed `translate()` in its own stylesheet, tuned around a
+// single-row toolbar - it has no other way to know the toolbar's actual height, since the label (drawn by
+// `v-field`'s `#label` slot) and the toolbar (drawn by this component, inside `v-field`'s default slot) are
+// siblings, not ancestor/descendant. Publishing the toolbar's measured height as a CSS custom property on their
+// shared `.v-field` ancestor lets that `translate()` read a real value instead of guessing one - it still needs
+// to reach up past this component's own root to a DOM node it doesn't otherwise touch, which is what the
+// `.closest()` below is for.
+const toolbarRef = ref<InstanceType<typeof RtfToolbar>>();
+let toolbarResizeObserver: ResizeObserver | undefined;
+
+onMounted(() => {
+  const toolbarEl = toolbarRef.value?.$el as HTMLElement | undefined;
+  const fieldEl = toolbarEl?.closest<HTMLElement>('.v-field');
+  if (!toolbarEl || !fieldEl) return;
+  toolbarResizeObserver = new ResizeObserver(([entry]) => {
+    fieldEl.style.setProperty('--rtf-toolbar-height', `${entry.contentRect.height}px`);
+  });
+  toolbarResizeObserver.observe(toolbarEl);
+});
+onBeforeUnmount(() => toolbarResizeObserver?.disconnect());
 
 const editor = useEditor({
   content: props.modelValue,
@@ -121,6 +143,8 @@ watch(
   (disabled) => editor.value?.setEditable(!disabled),
 );
 watch(editor, (instance) => instance?.setEditable(!props.disabled));
+
+const bubbleButtonProps = { icon: true, size: 'small', density: 'comfortable', variant: 'text' } as const;
 
 const bubbleTick = useEditorTick(editor);
 const bubbleState = computed(() => {
