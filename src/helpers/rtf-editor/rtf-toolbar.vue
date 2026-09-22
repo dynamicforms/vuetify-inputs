@@ -1,16 +1,14 @@
 <template>
   <div class="rtf-toolbar" :class="{ 'rtf-toolbar--disabled': !editable }">
-    <df-actions :actions="undoRedoActions" :button-size="buttonSize" show-as-group="grouped-no-borders" />
+    <df-actions :actions="undoRedoActions" v-bind="dfActionsProps" show-as-group="grouped-no-borders" />
 
     <v-divider vertical inset class="mx-1" />
 
     <v-btn
+      v-bind="toolbarButtonProps"
       icon
-      :size="buttonSize"
-      variant="text"
       rounded="sm"
       :title="t.SelectAll"
-      :disabled="!editable"
       @click="editor?.chain().focus().selectAll().run()"
     >
       <cached-icon name="mdi-select-all" />
@@ -20,13 +18,7 @@
 
     <v-menu>
       <template #activator="{ props: menuProps }">
-        <v-btn
-          :size="buttonSize"
-          variant="text"
-          :disabled="!editable"
-          v-bind="menuProps"
-          append-icon="mdi-chevron-down"
-        >
+        <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" append-icon="mdi-chevron-down">
           {{ headingLabel }}
         </v-btn>
       </template>
@@ -44,13 +36,7 @@
 
     <v-menu>
       <template #activator="{ props: menuProps }">
-        <v-btn
-          :size="buttonSize"
-          variant="text"
-          :disabled="!editable"
-          v-bind="menuProps"
-          append-icon="mdi-chevron-down"
-        >
+        <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" append-icon="mdi-chevron-down">
           {{ t.Style }}
         </v-btn>
       </template>
@@ -68,17 +54,15 @@
 
     <v-divider vertical inset class="mx-1" />
 
-    <df-actions :actions="boldItalicActions" :button-size="buttonSize" show-as-group="grouped-no-borders" />
+    <df-actions :actions="boldItalicActions" v-bind="dfActionsProps" show-as-group="grouped-no-borders" />
 
     <v-divider vertical inset class="mx-1" />
 
     <div class="rtf-toolbar-group">
       <v-btn
+        v-bind="toolbarButtonProps"
         icon
-        :size="buttonSize"
-        variant="text"
         :title="t.HorizontalLine"
-        :disabled="!editable"
         @click="editor?.chain().focus().setHorizontalRule().run()"
       >
         <cached-icon name="mdi-minus" />
@@ -86,15 +70,7 @@
 
       <v-menu :close-on-content-click="false" @update:model-value="(shown: boolean) => shown && openLinkMenu()">
         <template #activator="{ props: menuProps }">
-          <v-btn
-            icon
-            :size="buttonSize"
-            variant="text"
-            :title="t.Link"
-            :disabled="!editable"
-            :active="state.link"
-            v-bind="menuProps"
-          >
+          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t.Link" :active="state.link">
             <cached-icon name="mdi-link-variant" />
           </v-btn>
         </template>
@@ -117,7 +93,7 @@
 
       <v-menu :close-on-content-click="false">
         <template #activator="{ props: menuProps }">
-          <v-btn icon :size="buttonSize" variant="text" :title="t.Image" :disabled="!editable" v-bind="menuProps">
+          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t.Image">
             <cached-icon name="mdi-image-plus" />
           </v-btn>
         </template>
@@ -144,7 +120,7 @@
 
       <v-menu :close-on-content-click="false">
         <template #activator="{ props: menuProps }">
-          <v-btn icon :size="buttonSize" variant="text" :title="t.MediaEmbed" :disabled="!editable" v-bind="menuProps">
+          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t.MediaEmbed">
             <cached-icon name="mdi-video-plus" />
           </v-btn>
         </template>
@@ -167,7 +143,7 @@
 
       <v-menu>
         <template #activator="{ props: menuProps }">
-          <v-btn icon :size="buttonSize" variant="text" :title="t.Table" :disabled="!editable" v-bind="menuProps">
+          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t.Table">
             <cached-icon name="mdi-table" />
           </v-btn>
         </template>
@@ -215,11 +191,9 @@
       </v-menu>
 
       <v-btn
+        v-bind="toolbarButtonProps"
         icon
-        :size="buttonSize"
-        variant="text"
         :title="t.Blockquote"
-        :disabled="!editable"
         :active="state.blockquote"
         @click="editor?.chain().focus().toggleBlockquote().run()"
       >
@@ -229,11 +203,11 @@
 
     <v-divider vertical inset class="mx-1" />
 
-    <df-actions :actions="alignActions" :button-size="buttonSize" show-as-group="grouped-no-borders" />
+    <df-actions :actions="alignActions" v-bind="dfActionsProps" show-as-group="grouped-no-borders" />
 
     <v-divider vertical inset class="mx-1" />
 
-    <df-actions :actions="listActions" :button-size="buttonSize" show-as-group="grouped-no-borders" />
+    <df-actions :actions="listActions" v-bind="dfActionsProps" show-as-group="grouped-no-borders" />
   </div>
 </template>
 
@@ -246,6 +220,7 @@ import { CachedIcon } from 'vue-cached-icon';
 
 import DfActions from '../../df-actions.vue';
 import { ActionDisplayStyle, ActionRenderOptions } from '../action';
+import { VuetifyButtonSize } from '../input-base';
 import { translatableStrings } from '../translations';
 
 import { applyStyle, isStyleActive, STYLE_DEFS } from './block-styles';
@@ -253,7 +228,7 @@ import { fileToDataUrl } from './image-paste';
 import { toEmbedSrc } from './media-embed';
 import { useEditorTick } from './use-editor-tick';
 
-const props = withDefaults(defineProps<{ editor?: Editor; buttonSize?: string | number }>(), {
+const props = withDefaults(defineProps<{ editor?: Editor; buttonSize?: VuetifyButtonSize }>(), {
   editor: undefined,
   buttonSize: 'small',
 });
@@ -264,7 +239,20 @@ const t = translatableStrings;
 
 const editor = computed(() => props.editor);
 const tick = useEditorTick(editor);
-const editable = computed(() => !!props.editor?.isEditable);
+const editable = computed(() => {
+  void tick.value;
+  return !!props.editor?.isEditable;
+});
+
+// Shared across every standalone `<v-btn>`/`<df-actions>` in this toolbar, so a call site states only what
+// actually varies between buttons (icon, title, active/click handler) rather than repeating this on each one.
+const toolbarButtonProps = computed(() => ({
+  size: buttonSize.value,
+  density: 'comfortable' as const,
+  variant: 'text' as const,
+  disabled: !editable.value,
+}));
+const dfActionsProps = computed(() => ({ buttonSize: buttonSize.value, buttonDensity: 'comfortable' as const }));
 
 const state = computed(() => {
   void tick.value;

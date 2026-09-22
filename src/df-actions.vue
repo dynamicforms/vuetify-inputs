@@ -16,6 +16,7 @@
       :loading="action.action.busy"
       :elevation="0"
       :size="buttonSize"
+      :density="buttonDensity"
       :class="{
         'd-none': action.action.visibility === DisplayMode.HIDDEN,
         invisible: action.action.visibility === DisplayMode.INVISIBLE,
@@ -40,6 +41,7 @@ import { ActionDisplayStyle, ActionRenderOptions, getRenderOptionsForBreakpoint,
 
 const props = withDefaults(defineProps<DfActionsProps>(), {
   buttonSize: 'default',
+  buttonDensity: 'default',
   showAsGroup: 'no',
 });
 

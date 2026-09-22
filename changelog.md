@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.4] - 2026-09-22
+
+### Added
+
+- `<df-actions>`'s `buttonDensity` prop, forwarded to each button's `density`. Defaults to Vuetify's own
+  `'default'`, unchanged from before.
+- `toolbarButtonSize`/`buttonSize` props now type as a set of named Vuetify sizes (`'x-small' | 'small' |
+  'default' | 'large' | 'x-large'`) in addition to an arbitrary string or number, so an IDE suggests the named
+  sizes instead of collapsing the prop's type to a bare `string`.
+
+### Fixed
+
+- `<df-rtf-editor>`'s toolbar buttons render at `density="comfortable"`, closing the gap between an icon button's
+  box and the icon inside it that Vuetify's default icon-button density otherwise leaves. At `size="small"` an
+  icon button now renders at 28px instead of 40px, and at `size="x-small"` at 20px instead of 32px.
+- `<df-rtf-editor>`'s toolbar buttons disable immediately when the editor becomes non-editable. `setEditable()`
+  emits `update`, not `transaction`, so a toolbar computed that only re-evaluated on `transaction` kept reading
+  the editor's previous `isEditable` value until the next actual edit.
+- `<df-rtf-editor>`'s label no longer draws over a wrapped toolbar's second (or later) row. It was positioned by
+  a fixed offset tuned for a single-row toolbar; the offset now tracks the toolbar's actual measured height.
+
 ## [0.11.3] - 2026-09-06
 
 ### Added
