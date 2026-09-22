@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.5] - 2026-09-22
+
+### Changed
+
+- `<df-rtf-editor>` no longer loads Lato and Oswald from Google Fonts on its own. The editing area and its named
+  block styles (article category, Title, Subtitle, Info box, Side quote) now default to `font-family: inherit`,
+  taking on whatever font the surrounding page already set, and a new `fontFamily` prop sets it explicitly. An
+  application that wants the previous look back loads Lato/Oswald itself and passes `font-family` accordingly;
+  loading a web font is an application concern, not something this library should do behind the scenes.
+
 ## [0.11.4] - 2026-09-22
 
 ### Added

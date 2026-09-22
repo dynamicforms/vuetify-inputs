@@ -30,6 +30,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | minHeight | `string` | `'7em'` | Minimum height of the editing area |
+| fontFamily | `string` | `'inherit'` | `font-family` of the editing area and its named block styles. The component loads no font of its own; pass a value here (and load the font itself, if needed) to use something other than the surrounding page's font |
 
 ### Inherited Props
 

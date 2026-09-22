@@ -56,8 +56,9 @@ const props = withDefaults(
     minHeight?: string;
     disabled?: boolean;
     toolbarButtonSize?: VuetifyButtonSize;
+    fontFamily?: string;
   }>(),
-  { modelValue: '', minHeight: '7em', disabled: false, toolbarButtonSize: 'small' },
+  { modelValue: '', minHeight: '7em', disabled: false, toolbarButtonSize: 'small', fontFamily: 'inherit' },
 );
 
 const emit = defineEmits<{
@@ -184,9 +185,6 @@ function toggleBubbleLink() {
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Oswald&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
 @media print {
   body {
     margin: 0 !important;
@@ -194,12 +192,11 @@ function toggleBubbleLink() {
 }
 
 .editor-container {
-  font-family: 'Lato';
+  font-family: v-bind(fontFamily);
   width: 100%;
 }
 
 .rtf-content {
-  font-family: 'Lato';
   line-height: 1.6;
   word-break: break-word;
   min-height: v-bind(minHeight);
@@ -283,7 +280,6 @@ function toggleBubbleLink() {
   right: 0;
   white-space: nowrap;
   font-size: 12px;
-  font-family: 'Lato';
   padding: 2px 6px;
   border-radius: 4px;
   background: rgb(var(--v-theme-surface-variant));
@@ -310,7 +306,6 @@ function toggleBubbleLink() {
 }
 
 .rtf-content h3.category {
-  font-family: 'Oswald';
   font-size: 20px;
   font-weight: bold;
   color: #555;
@@ -320,7 +315,6 @@ function toggleBubbleLink() {
 }
 
 .rtf-content h2.document-title {
-  font-family: 'Oswald';
   font-size: 50px;
   font-weight: bold;
   margin: 0;
@@ -329,7 +323,6 @@ function toggleBubbleLink() {
 }
 
 .rtf-content h3.document-subtitle {
-  font-family: 'Oswald';
   font-size: 20px;
   color: #555;
   margin: 0 0 1em;
@@ -361,7 +354,6 @@ function toggleBubbleLink() {
 }
 
 .rtf-content blockquote.side-quote {
-  font-family: 'Oswald';
   font-style: normal;
   float: right;
   width: 35%;

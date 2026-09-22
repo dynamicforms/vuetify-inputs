@@ -8,6 +8,7 @@
         :min-height="minHeight"
         :disabled="vuetifyBindings.disabled"
         :toolbar-button-size="toolbarButtonSize"
+        :font-family="fontFamily"
         v-bind="passthroughAttrs"
         @focusin="slotProps.focus()"
         @focusout="slotProps.blur()"
