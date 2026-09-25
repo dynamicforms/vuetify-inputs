@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { isEqual, unionBy } from 'lodash-es';
+import { castArray, isEqual, unionBy } from 'lodash-es';
 import { computed, nextTick, ref, toRefs, unref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import { VAutocomplete, VCombobox } from 'vuetify/components';
@@ -124,6 +124,10 @@ const options = computed(() => convertItems(loadedChoices.value));
 const searchText = ref<string | null>(null);
 const fetchCounterGlobal = ref(0);
 const isMultiline = ref(false);
+// Number of fetchChoices calls in flight that resolve ids held by the value (resolveValueChoices()). While any is
+// pending, loadedChoices is not yet complete for the value, so `selected` - which only holds ids loadedChoices has a
+// choice for - is not written back into the value: that would drop every id still being resolved.
+const resolvingValue = ref(0);
 
 if (choices.value?.length && propsWithDefaults.fetchChoices !== undefined) {
   console.warn('Both choices and fetchChoices are set. Only one of them should be set.');
@@ -204,7 +208,7 @@ function onMouseDown(event: MouseEvent) {
 watch(
   selected,
   (newValue) => {
-    if (vuetifyBindings.value.readonly) return;
+    if (vuetifyBindings.value.readonly || resolvingValue.value > 0) return;
     nextTick(() => {
       const mcVal = multipleCompliantValue(newValue, multiple.value);
       emitModelValueDisplay(mcVal);
@@ -216,10 +220,15 @@ watch(
 watch(
   resultingValue,
   (newValue: any) => {
-    if (!setResultingValueGuard.value) {
-      const mcVal = multipleCompliantValue(newValue, multiple.value);
+    if (setResultingValueGuard.value) return;
+    const mcVal = multipleCompliantValue(newValue, multiple.value);
+    const resolved = resolveValueChoices(mcVal);
+    updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
+    resolved?.then(() => {
+      // A value set while this call was in flight started its own resolution and owns `selected` from then on.
+      if (!isEqual(multipleCompliantValue(resultingValue.value, multiple.value), mcVal)) return;
       updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
-    }
+    });
   },
   { deep: true },
 );
@@ -273,17 +282,44 @@ async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
   const fetchCounter = ++fetchCounterGlobal.value;
   loading.value = true;
   try {
-    const selectedChoices = getSelectedChoices(
-      loadedChoices.value,
-      multipleCompliantValue(selected.value, multiple.value),
-    );
     const newChoices = await propsWithDefaults.fetchChoices(queryValue, idValue);
     if (fetchCounter !== fetchCounterGlobal.value) return;
+    // Taken after the fetch, from the value: choices resolveValueChoices() loaded while this call was in flight
+    // must survive the search results replacing the rest.
+    const selectedChoices = getSelectedChoices(
+      loadedChoices.value,
+      multipleCompliantValue(resultingValue.value, multiple.value),
+    );
     loaded.value = unionBy([...selectedChoices, ...newChoices], 'id');
     takeLoaded.value = true;
   } finally {
     loading.value = false;
   }
+}
+
+/**
+ * Loads the choices for the ids in `mcVal` that loadedChoices has none for, through fetchChoices' idValue. Returns
+ * null when there is nothing to load: no fetchChoices, a taggable select (its value is not limited to choices), or
+ * every id already has its choice. An id fetchChoices returns no choice for stays without one, and the next
+ * reconciliation against loadedChoices drops it from the value.
+ */
+function resolveValueChoices(mcVal: any): Promise<void> | null {
+  const fetchChoices = propsWithDefaults.fetchChoices;
+  if (fetchChoices === undefined || taggable.value || mcVal == null) return null;
+  const unresolved = castArray(mcVal).filter((val) => !loadedChoices.value.some((choice) => choice.id === val));
+  if (!unresolved.length) return null;
+  resolvingValue.value++;
+  loading.value = true;
+  return (async () => {
+    try {
+      const newChoices = await fetchChoices(undefined, multiple.value ? unresolved : unresolved[0]);
+      loaded.value = unionBy([...loadedChoices.value, ...newChoices], 'id');
+      takeLoaded.value = true;
+    } finally {
+      resolvingValue.value--;
+      loading.value = false;
+    }
+  })();
 }
 
 function initialValueCheck() {
@@ -294,18 +330,25 @@ function initialValueCheck() {
   }
   val = multipleCompliantValue(val, multiple.value);
   updateSelectedFromValue(val, selected, multiple.value, taggable.value, loadedChoices.value);
+  if (resolvingValue.value > 0) return;
   emitModelValueDisplay(val);
   setResultingValue(val);
 }
 
+// Starting settings: with fetchChoices, a value is first resolved into its choices and only then reconciled against
+// them. Anything else - an empty value, a taggable select - goes through queryOptions() with the value as idValue.
+let initialLoad: Promise<void> | null = null;
+if (propsWithDefaults.fetchChoices !== undefined) {
+  initialLoad =
+    resolveValueChoices(multipleCompliantValue(resultingValue.value, multiple.value)) ??
+    queryOptions(undefined, resultingValue.value);
+}
+
 initialValueCheck();
 
-// Starting settings: check if ajax and current value is not loaded yet - then load the value from back-end
-if (propsWithDefaults.fetchChoices !== undefined) {
-  queryOptions(undefined, resultingValue.value).then(() => {
-    initialValueCheck();
-  });
-}
+initialLoad?.then(() => {
+  initialValueCheck();
+});
 </script>
 
 <style scoped>
