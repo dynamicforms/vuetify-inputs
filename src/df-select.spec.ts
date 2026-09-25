@@ -3,6 +3,7 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
+import { VAutocomplete } from 'vuetify/components';
 
 import DfSelect from '@/df-select.vue';
 import { SelectChoice } from '@/helpers';
@@ -59,8 +60,10 @@ describe('DfSelect', () => {
       await flushPromises();
       expect(control.value).toEqual([2, 3]);
       expect(fetchChoices).toHaveBeenCalledWith(undefined, [2, 3]);
+      expect(wrapper.findComponent(VAutocomplete).props('loading')).toBe(true);
 
       await release();
+      expect(wrapper.findComponent(VAutocomplete).props('loading')).toBe(false);
       expect(control.value).toEqual([2, 3]);
       expect(chipTexts(wrapper)).toEqual(['Choice 2', 'Choice 3']);
     });

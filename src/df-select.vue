@@ -118,7 +118,6 @@ const selected = ref<any>(null);
 const takeLoaded = ref(false);
 const loaded = ref<SelectChoice[]>([]);
 const loadedChoices = computed<SelectChoice[]>(() => (unref(takeLoaded) ? unref(loaded) : unref(choices) || []));
-const loading = ref<boolean>(false);
 
 const options = computed(() => convertItems(loadedChoices.value));
 const searchText = ref<string | null>(null);
@@ -128,6 +127,9 @@ const isMultiline = ref(false);
 // pending, loadedChoices is not yet complete for the value, so `selected` - which only holds ids loadedChoices has a
 // choice for - is not written back into the value: that would drop every id still being resolved.
 const resolvingValue = ref(0);
+// Number of queryOptions() calls in flight.
+const searching = ref(0);
+const loading = computed(() => searching.value > 0 || resolvingValue.value > 0);
 
 if (choices.value?.length && propsWithDefaults.fetchChoices !== undefined) {
   console.warn('Both choices and fetchChoices are set. Only one of them should be set.');
@@ -280,7 +282,7 @@ async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
   searchText.value = queryValue;
   if (choices.value || propsWithDefaults.fetchChoices === undefined) return;
   const fetchCounter = ++fetchCounterGlobal.value;
-  loading.value = true;
+  searching.value++;
   try {
     const newChoices = await propsWithDefaults.fetchChoices(queryValue, idValue);
     if (fetchCounter !== fetchCounterGlobal.value) return;
@@ -293,7 +295,7 @@ async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
     loaded.value = unionBy([...selectedChoices, ...newChoices], 'id');
     takeLoaded.value = true;
   } finally {
-    loading.value = false;
+    searching.value--;
   }
 }
 
@@ -309,7 +311,6 @@ function resolveValueChoices(mcVal: any): Promise<void> | null {
   const unresolved = castArray(mcVal).filter((val) => !loadedChoices.value.some((choice) => choice.id === val));
   if (!unresolved.length) return null;
   resolvingValue.value++;
-  loading.value = true;
   return (async () => {
     try {
       const newChoices = await fetchChoices(undefined, multiple.value ? unresolved : unresolved[0]);
@@ -317,7 +318,6 @@ function resolveValueChoices(mcVal: any): Promise<void> | null {
       takeLoaded.value = true;
     } finally {
       resolvingValue.value--;
-      loading.value = false;
     }
   })();
 }
