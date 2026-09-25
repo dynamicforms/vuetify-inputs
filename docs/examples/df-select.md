@@ -83,7 +83,14 @@ When using the `fetchChoices` prop instead of static `choices`, the component:
 1. Calls the function while the component is being set up, before it is mounted
 2. Calls the function when the user types in the search field
 3. Uses the search text as the query parameter
-4. Uses the current value(s) as the idValue parameter (for initial loading)
+4. Uses the ids of the value that no loaded choice covers as the idValue parameter - an array when `multiple` is set,
+   a single id otherwise. This happens while the component is being set up and whenever the value changes from
+   outside the component, also when the field is read-only. With an empty value, the setup call passes the value
+   itself (`null`) as idValue and expects the unfiltered choices back.
+
+Until that call answers, the value stays exactly as it is, even though no chip can show the ids yet. Once it has
+answered, the value is reconciled against the loaded choices as with static `choices`: an id the call returned no
+choice for is dropped from the value (unless `allowTags` is set).
 
 ```typescript
 const fetchChoices = async (query?: string, idValue?: any): Promise<SelectChoice[]> => {
@@ -103,8 +110,9 @@ In addition to the [common events from InputBase](./input-base):
 
 - `update:modelValue` - When the selected value(s) change
 - `update:modelValueDisplay` - Carries a `SelectChoice[]` holding the choices that match the current value. It is
-  emitted whenever the value settles: once while the component is being set up, again when the initial `fetchChoices`
-  call resolves, and on every later change of the selection
+  emitted whenever the value settles: once while the component is being set up (with `fetchChoices` and a non-empty
+  value, only once the choices for the value have been fetched), again when the initial `fetchChoices` call resolves,
+  and on every later change of the selection
 
 ## Slots
 

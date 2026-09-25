@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.6] - 2026-09-25
+
+### Fixed
+
+- `<df-select>` with `fetchChoices` and `multiple` no longer clears its value on mount. While the setup-time
+  `fetchChoices` call was still loading the choices for the value, the component reconciled the value against the
+  still-empty choices and wrote the empty result back into the model, so a field opened with a value showed no chips
+  and held `null`. A value is now reconciled only once `fetchChoices` has answered for all its ids; an id it returns
+  no choice for is still dropped then, as before.
+- `<df-select>` with `fetchChoices` resolves the ids of a value set from outside the component after mount (a form
+  loading another record into the same field) through `fetchChoices`' idValue, instead of dropping every id the
+  already loaded choices do not cover.
+- `<df-select>` with `fetchChoices` shows the chips for its value when read-only. The setup-time call used to be
+  skipped for a read-only field, leaving it without choices to display the value by.
+
 ## [0.11.5] - 2026-09-22
 
 ### Changed
