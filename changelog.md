@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.7] - 2026-09-29
+
+### Fixed
+
+- `<df-select>` bound with `v-model` no longer swaps between the new and the previous value without end after a
+  selection. The component compared the written value against `modelValue` before the parent had passed the new
+  value back, took the old one as a refused write and emitted it again. Affected single and multiple selection
+  since 0.9.0; a `<df-select>` bound through `control` was not affected.
+
 ## [0.11.6] - 2026-09-25
 
 ### Fixed

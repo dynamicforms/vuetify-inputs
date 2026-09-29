@@ -1,6 +1,7 @@
-import { Field } from '@dynamicforms/vue-forms';
+import { Field, ValueChangedAction } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { defineComponent, h, ref } from 'vue';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import { VAutocomplete } from 'vuetify/components';
@@ -157,6 +158,68 @@ describe('DfSelect', () => {
 
       await flushPromises();
       expect(control.value).toEqual([2]);
+    });
+  });
+
+  describe('with v-model', () => {
+    /**
+     * Mounts the select under a parent that binds it with v-model. The parent stops taking values after
+     * MAX_UPDATES, so a select and a parent that keep swapping values end the test instead of hanging it.
+     */
+    const MAX_UPDATES = 10;
+    const mountWithVModel = (initial: any, props: Record<string, any>) => {
+      const model = ref<any>(initial);
+      const updates: any[] = [];
+      const Parent = defineComponent({
+        setup: () => () =>
+          h(DfSelect, {
+            label: 'Select',
+            ...props,
+            modelValue: model.value,
+            'onUpdate:modelValue': (value: any) => {
+              updates.push(value);
+              if (updates.length <= MAX_UPDATES) model.value = value;
+            },
+          }),
+      });
+      const wrapper = mount(Parent, { global: { plugins: [vuetify] } });
+      return { wrapper, model, updates };
+    };
+
+    it.each([
+      { multiple: true, initial: [1], picked: [1, 2] },
+      { multiple: false, initial: 1, picked: 2 },
+    ])('keeps a selection the parent passes back (multiple: $multiple)', async ({ multiple, initial, picked }) => {
+      const { wrapper, model, updates } = mountWithVModel(initial, { multiple, choices: ALL_CHOICES });
+      await flushPromises();
+      updates.length = 0;
+
+      wrapper.findComponent(VAutocomplete).vm.$emit('update:modelValue', picked);
+      await flushPromises();
+
+      expect(model.value).toEqual(picked);
+      expect(updates.every((value) => JSON.stringify(value) === JSON.stringify(picked))).toBe(true);
+    });
+  });
+
+  describe('with a control that does not take a write verbatim', () => {
+    it('shows the value the control holds', async () => {
+      const control = new Field<number[] | null>({ value: [1] });
+      control.registerAction(
+        new ValueChangedAction<number[] | null>((field, supr, newValue, oldValue) => {
+          const withoutFour = (newValue ?? []).filter((id) => id !== 4);
+          if (withoutFour.length !== (newValue ?? []).length) field.value = withoutFour;
+          return supr(field, newValue, oldValue);
+        }),
+      );
+      const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
+      await flushPromises();
+
+      wrapper.findComponent(VAutocomplete).vm.$emit('update:modelValue', [1, 4]);
+      await flushPromises();
+
+      expect(control.value).toEqual([1]);
+      expect(wrapper.findComponent(VAutocomplete).props('modelValue')).toEqual([1]);
     });
   });
 });

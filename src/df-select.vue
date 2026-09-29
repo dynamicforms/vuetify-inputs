@@ -151,17 +151,14 @@ function setResultingValue(newValue: any) {
     // handler that throws and unwinds it - never reaches that watch, so the chips would go on showing a selection
     // the control never took. Comparing what the control holds against what was written is what restores it, and
     // it needs a deep comparison: for multiple selection the value reads back as a different array holding the
-    // same items.
-    if (!isEqual(multipleCompliantValue(resultingValue.value, multiple.value), newValue)) {
-      updateSelectedFromValue(
-        multipleCompliantValue(resultingValue.value, multiple.value),
-        selected,
-        multiple.value,
-        taggable.value,
-        loadedChoices.value,
-      );
-    }
+    // same items. The comparison waits for the next tick: under v-model the parent passes the written value back as
+    // modelValue only when it re-renders, and a read before that sees the previous value, reverts the selection and
+    // emits it, which the parent passes back in turn - the two keep swapping values without end.
     nextTick(() => {
+      const current = multipleCompliantValue(resultingValue.value, multiple.value);
+      if (!isEqual(current, newValue)) {
+        updateSelectedFromValue(current, selected, multiple.value, taggable.value, loadedChoices.value);
+      }
       setResultingValueGuard.value = false;
     });
   }
