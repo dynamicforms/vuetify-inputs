@@ -98,8 +98,6 @@ The stylesheet is a single file and carries everything the components need beyon
   checkbox on the same row line up.
 - the `inline` density. Vuetify has no such density, so the rules under `.df-density-inline` produce it: field outlines
   and floating labels are hidden, padding and minimum heights are cut to what a table cell can hold.
-- the `invisible` class for `DisplayMode.INVISIBLE`. Vuetify ships `d-none` for `HIDDEN`, but nothing that hides an
-  element while keeping its box, and that distinction is the point of the two modes.
 - the components' own styles: the `df-actions` button group, the multi-row select, label layout, the cached-icon
   wrapper, and the RTF editor's toolbar and content area, styled to follow the application's Vuetify theme.
 

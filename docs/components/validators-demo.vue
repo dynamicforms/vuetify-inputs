@@ -144,8 +144,9 @@ function resetForm() {
   });
 }
 
-// A value changed action on the group fires for a change in any of its fields. The handler stays synchronous:
-// the write that triggers it returns once the chain has run, so nothing awaits a promise it hands back.
+// A value changed action on the group fires whenever the group's value changes: a field written, enabled or
+// disabled. The handler stays synchronous: the write that triggers it returns once the chain has run, so nothing
+// awaits a promise it hands back.
 validatedForm.registerAction(new ValueChangedAction((field, supr, newValue, oldValue) => {
   console.log('Form value has changed');
   return supr(field, newValue, oldValue);

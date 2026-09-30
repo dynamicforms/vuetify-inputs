@@ -41,7 +41,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | fetchChoices | `(query?: any, idValue?: any) => Promise<SelectChoice[]>` | `undefined` | Function to load choices dynamically |
 | multiple | `boolean` | `false` | Whether multiple selection is allowed |
 | allowTags | `boolean` | `false` | Whether custom values can be entered |
-| allowNull | `boolean` | `true` | Whether null/empty selection is allowed |
+| allowNull | `boolean` | `true` | Whether null/empty selection is allowed. With `false`, an enabled select whose value is empty selects the first choice; a disabled one leaves the value as it is and selects the first choice once it is enabled |
 
 ### Inherited Props
 

@@ -74,12 +74,12 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const injectedVariant = inject<FieldVariant | null>('field-variant', null);
   const internalValue = ref<T | null>(null);
 
-  // A write is not a statement about what the control ends up holding. A ValueChangedAction may write a different
-  // value back, a disabled field drops the write, and a handler that throws unwinds it. The rendered control has
-  // the written value in its DOM by then, so it is the read here that has to correct it - and where the value the
-  // control ends up holding is the one it started with, as under a rule that puts back the five characters a
-  // six-character write exceeded, the read does not move and Vue schedules no render at all. Holding the written
-  // value for one tick makes the read change twice, so the repaint that restores what the control holds happens.
+  // A write is not a statement about what the control ends up holding. A ValueChangedAction may write a different value
+  // back, and a handler that throws unwinds it. The rendered control has the written value in its DOM by then, so it is
+  // the read here that has to correct it - and where the value the control ends up holding is the one it started with,
+  // as under a rule that puts back the five characters a six-character write exceeded, the read does not move and Vue
+  // schedules no render at all. Holding the written value for one tick makes the read change twice, so the repaint that
+  // restores what the control holds happens.
   const pendingWrite = shallowRef<{ value: T } | null>(null);
 
   const value = computed({
@@ -141,7 +141,6 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const isRendered = computed(() => visibility.value !== Form.DisplayMode.SUPPRESS);
   const visibilityClass = computed(() => ({
     'd-none': visibility.value === Form.DisplayMode.HIDDEN,
-    invisible: visibility.value === Form.DisplayMode.INVISIBLE,
   }));
   // the presentation the bound element carries: what a prop does not state is taken from here before any default
   const extra = computed(() => props.control?.extra ?? {});

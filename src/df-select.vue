@@ -146,14 +146,14 @@ function setResultingValue(newValue: any) {
   try {
     resultingValue.value = newValue;
   } finally {
-    // The guard suppresses the watch that pushes the model's value back into `selected`. A write the control does
-    // not take verbatim - a ValueChangedAction that writes another value back, a disabled field that drops it, a
-    // handler that throws and unwinds it - never reaches that watch, so the chips would go on showing a selection
-    // the control never took. Comparing what the control holds against what was written is what restores it, and
-    // it needs a deep comparison: for multiple selection the value reads back as a different array holding the
-    // same items. The comparison waits for the next tick: under v-model the parent passes the written value back as
-    // modelValue only when it re-renders, and a read before that sees the previous value, reverts the selection and
-    // emits it, which the parent passes back in turn - the two keep swapping values without end.
+    // The guard suppresses the watch that pushes the model's value back into `selected`. A write the control does not
+    // take verbatim - a ValueChangedAction that writes another value back, a handler that throws and unwinds it - never
+    // reaches that watch, so the chips would go on showing a selection the control never took. Comparing what the
+    // control holds against what was written is what restores it, and it needs a deep comparison: for multiple
+    // selection the value reads back as a different array holding the same items. The comparison waits for the next
+    // tick: under v-model the parent passes the written value back as modelValue only when it re-renders, and a read
+    // before that sees the previous value, reverts the selection and emits it, which the parent passes back in turn -
+    // the two keep swapping values without end.
     nextTick(() => {
       const current = multipleCompliantValue(resultingValue.value, multiple.value);
       if (!isEqual(current, newValue)) {
@@ -320,8 +320,11 @@ function resolveValueChoices(mcVal: any): Promise<void> | null {
 }
 
 function initialValueCheck() {
+  // A disabled select shows what the field holds and writes nothing into it: the field takes the write, and a
+  // default chosen by the control would mark it changed and put the choice into the form's data.
+  const readonly = vuetifyBindings.value.readonly;
   let val = resultingValue.value;
-  if (!allowNull.value && val == null && options.value.length) {
+  if (!readonly && !allowNull.value && val == null && options.value.length) {
     // Starting settings: check if value is mandatory and select the first item from the options
     val = options.value[0].value;
   }
@@ -329,7 +332,7 @@ function initialValueCheck() {
   updateSelectedFromValue(val, selected, multiple.value, taggable.value, loadedChoices.value);
   if (resolvingValue.value > 0) return;
   emitModelValueDisplay(val);
-  setResultingValue(val);
+  if (!readonly) setResultingValue(val);
 }
 
 // Starting settings: with fetchChoices, a value is first resolved into its choices and only then reconciled against
@@ -346,6 +349,14 @@ initialValueCheck();
 initialLoad?.then(() => {
   initialValueCheck();
 });
+
+// a select enabled after mount states its default then
+watch(
+  () => vuetifyBindings.value.readonly,
+  (readonly) => {
+    if (!readonly) initialValueCheck();
+  },
+);
 </script>
 
 <style scoped>

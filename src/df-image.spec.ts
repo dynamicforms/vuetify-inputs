@@ -129,6 +129,21 @@ describe('DfImage', () => {
     expect(comms.touch).toHaveBeenCalledWith('https://example.com/uploaded.png');
   });
 
+  it('keeps the uploaded image when the field is disabled while the upload runs', async () => {
+    let finishUpload!: (id: string) => void;
+    comms.upload = vi.fn(() => new Promise<string>((resolve) => (finishUpload = resolve)));
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountImage({ control, touchInterval: 1_000 });
+    await pickImage(wrapper, pngFile());
+
+    control.enabled = false;
+    finishUpload('https://example.com/uploaded.png');
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    expect(control.value).toBe('https://example.com/uploaded.png');
+    expect(comms.touch).toHaveBeenCalledWith('https://example.com/uploaded.png');
+  });
+
   it('clears the field and preview and reports the error on control when touch reports the image is gone', async () => {
     comms.touch = vi.fn(async () => {
       throw new FileGoneError('The uploaded image is no longer available on the server.');

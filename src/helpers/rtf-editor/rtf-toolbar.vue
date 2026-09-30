@@ -326,9 +326,6 @@ function toolbarAction(
 }
 
 function syncToolbarAction({ action, title, disabled, active }: ToolbarActionSync) {
-  // `value` writes first: `Action`/`Field` refuses to change `value` while `enabled` is false, so flipping
-  // `enabled` first would lock passthroughAttrs (the button's title/active state) to whatever it last held
-  // the moment a button first goes disabled.
   const wantAttrs: Record<string, unknown> = { title: title(), icon: true };
   if (active) wantAttrs.active = active();
   if (!isEqual(action.value.passthroughAttrs ?? {}, wantAttrs)) {

@@ -112,7 +112,7 @@ const toggleField = (fieldName) => {
   }
 };
 
-// A value changed action on the group fires for a change in any of its fields
+// A value changed action on the group fires whenever the group's value changes: a field written, enabled or disabled
 personForm.registerAction(new ValueChangedAction(async (field, supr, newValue, oldValue) => {
   return supr(field, newValue, oldValue);
 }));

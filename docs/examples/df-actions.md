@@ -137,7 +137,6 @@ or via `action.enabled` / `action.visibility` directly; `busy` is a read) - but 
   disabled.
 - `busy` disables the button and draws it `loading` for as long as a run of the action has yet to settle.
 - `visibility: DisplayMode.HIDDEN` keeps the button in the DOM with a `d-none` class.
-- `visibility: DisplayMode.INVISIBLE` keeps the button in the layout with an `invisible` class (`visibility: hidden`).
 - `visibility: DisplayMode.SUPPRESS` removes the button from the rendered list entirely.
 
 ### ActionDisplayStyle
@@ -347,7 +346,8 @@ const submitAction = new Action({
 ```
 
 `form` here is a `Group`: it hands out what it holds through the `value` property, or through `fullValue` where
-disabled members have to be in the payload.
+disabled members have to be in the payload. Both follow `visibility`: a `SUPPRESS`ed member is left out of either and
+a `HIDDEN` one is sent as `null`.
 
 This approach separates visual presentation (the `Action` and its render options) from business logic (the
 `ExecuteAction` handlers), and lets each screen size get the presentation that fits it.

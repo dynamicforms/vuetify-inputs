@@ -68,15 +68,6 @@ describe('DisplayMode visibility', () => {
 
       expect(wrapper.find('.v-input').exists()).toBe(true);
       expect(wrapper.classes()).toContain('d-none');
-      expect(wrapper.classes()).not.toContain('invisible');
-    });
-
-    it('renders with the invisible class when control visibility is INVISIBLE', () => {
-      const wrapper = mountWith(component, extraProps, Form.DisplayMode.INVISIBLE);
-
-      expect(wrapper.find('.v-input').exists()).toBe(true);
-      expect(wrapper.classes()).toContain('invisible');
-      expect(wrapper.classes()).not.toContain('d-none');
     });
 
     it('renders without visibility classes when control visibility is FULL', () => {
@@ -84,7 +75,6 @@ describe('DisplayMode visibility', () => {
 
       expect(wrapper.find('.v-input').exists()).toBe(true);
       expect(wrapper.classes()).not.toContain('d-none');
-      expect(wrapper.classes()).not.toContain('invisible');
     });
 
     it('falls back to the visibility prop when no control is bound', () => {

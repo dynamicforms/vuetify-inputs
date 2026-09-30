@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { format, parse } from 'date-fns';
+import { format, parse, parseISO } from 'date-fns';
 import { toNumber, isNaN } from 'lodash-es';
 import { ref, computed, watch, toRefs, unref } from 'vue';
 
@@ -132,31 +132,37 @@ const timeMenuShown = computed({
 const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, 'HH:mm')}:00`;
 
 const valueISOFull = ref<string | null>(null);
+// the date and time parts of `base` with one of them replaced by the same part of `newISOValue`
+function mergeParts(base: string, newISOValue: string, dateOrTimeIdx: number) {
+  const vif = base.split(/[TZ]/g);
+  vif[dateOrTimeIdx] = newISOValue.split(/[TZ]/g)[dateOrTimeIdx];
+  return vif;
+}
+
+const naiveFromParts = (vif: string[]) => formatNaive(new Date(`${vif[0]}T${vif[1].split('.')[0]}`));
+
+// Reading the field's value (dateOrTimeIdx -1) only sets what the control shows: the field keeps the string it holds
+// until the user edits the date or the time. parseISO reads a date without a time as local midnight, where the Date
+// constructor reads it as UTC midnight and shows the previous day west of Greenwich.
 function setValueISOFull(newISOValue: string | null, dateOrTimeIdx: number) {
   if (newISOValue == null) {
     valueISOFull.value = null;
   } else if (dateOrTimeIdx === -1) {
-    // setting valueISOFull from value
     if (unref(inputType) === 'time') {
-      valueISOFull.value = formatNaive(new Date());
-      setValueISOFull(`T${newISOValue}`, 1);
+      valueISOFull.value = naiveFromParts(mergeParts(formatNaive(new Date()), `T${newISOValue}`, 1));
     } else {
-      const val = formatNaive(new Date(newISOValue));
-      setValueISOFull(val, 0);
-      setValueISOFull(val, 1);
+      valueISOFull.value = formatNaive(parseISO(newISOValue));
     }
   } else {
-    if (valueISOFull.value == null) valueISOFull.value = formatNaive(new Date());
-    const vif = valueISOFull.value.split(/[TZ]/g);
-    const nv = newISOValue!.split(/[TZ]/g);
-    vif[dateOrTimeIdx] = nv[dateOrTimeIdx];
-    valueISOFull.value = formatNaive(new Date(`${vif[0]}T${vif[1].split('.')[0]}`));
-
+    const vif = mergeParts(valueISOFull.value ?? formatNaive(new Date()), newISOValue, dateOrTimeIdx);
+    valueISOFull.value = naiveFromParts(vif);
     if (unref(inputType) === 'date') value.value = vif[0];
     else if (unref(inputType) === 'time') value.value = vif[1];
-    else value.value = unref(valueISOFull) + format(new Date(), 'XXX');
+    // the offset is the one in force on the date written, not today's: across a DST change the two differ by an hour
+    else value.value = valueISOFull.value + format(new Date(valueISOFull.value), 'XXX');
   }
 }
+
 watch(value, (newValue: string | null) => setValueISOFull(newValue, -1), { immediate: true });
 
 const valueAsDate = computed({

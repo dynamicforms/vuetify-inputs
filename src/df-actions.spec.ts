@@ -465,18 +465,6 @@ describe('DfActions', () => {
       expect(wrapper.find('.v-btn').classes()).toContain('d-none');
     });
 
-    it('doda razred invisible, ko je visibility INVISIBLE', () => {
-      const action = createMockAction('save', 'Save');
-      action.visibility = DisplayMode.INVISIBLE;
-
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
-
-      expect(wrapper.find('.v-btn').classes()).toContain('invisible');
-    });
-
     it('ne prikaže gumba, ko je visibility SUPPRESS', () => {
       const shownAction = createMockAction('save', 'Save');
       const suppressedAction = createMockAction('secret', 'Secret');
@@ -502,7 +490,6 @@ describe('DfActions', () => {
 
       const button = wrapper.find('.v-btn');
       expect(button.classes()).not.toContain('d-none');
-      expect(button.classes()).not.toContain('invisible');
     });
   });
 

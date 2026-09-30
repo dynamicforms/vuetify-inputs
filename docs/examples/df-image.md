@@ -48,6 +48,9 @@ The component stores and displays a URL string, not the file itself:
 2. The same value is used in subsequent operations (delete, touch) to reference the image.
 3. It is stored in the form data when using DynamicForms.
 
+An upload the user started completes whatever happens to the field meanwhile: where the field is disabled before
+`upload` resolves, the URL is still written into it and touched from then on.
+
 ## FileComms Interface
 
 The `comms` prop requires an object implementing the same `FileComms` interface `df-file` uses:

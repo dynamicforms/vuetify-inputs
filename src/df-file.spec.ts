@@ -107,6 +107,21 @@ describe('DfFile', () => {
     expect(comms.touch).toHaveBeenCalledWith('file-id-1');
   });
 
+  it('keeps the uploaded file when the field is disabled while the upload runs', async () => {
+    let finishUpload!: (id: string) => void;
+    comms.upload = vi.fn(() => new Promise<string>((resolve) => (finishUpload = resolve)));
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountFile({ control, touchInterval: 1_000 });
+    await pickFile(wrapper, pdfFile());
+
+    control.enabled = false;
+    finishUpload('file-id-1');
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    expect(control.value).toBe('file-id-1');
+    expect(comms.touch).toHaveBeenCalledWith('file-id-1');
+  });
+
   it('clears the field and reports the error on control when touch reports the file is gone', async () => {
     comms.touch = vi.fn(async () => {
       throw new FileGoneError('The uploaded file is no longer available on the server.');

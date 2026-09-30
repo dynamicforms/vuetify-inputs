@@ -8,6 +8,131 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.12.0 (from v0.11.x)
+
+0.12.0 requires `@dynamicforms/vue-forms` 2.0. Upgrade the two together, and read the
+[vue-forms migration guide](https://docs.velis.si/dynamicforms/vue-forms/guide/migration) first: most of what changes
+in a form's behaviour comes from vue-forms, and this section covers only what changes in the components on top of
+it. Four of the changes below are silent - code that relied on them keeps compiling and behaves differently - and
+they come first. There is a [checklist](#checklist-for-0-12-0) at the end of this section.
+
+```bash
+npm install @dynamicforms/vue-forms@^2.0.0 @dynamicforms/vuetify-inputs@^0.12.0
+```
+
+### What vue-forms 2.0 changes under the components
+
+Three vue-forms changes reach every form these components render:
+
+- **A hidden input is out of the form's data.** An input whose field is `HIDDEN` is sent as `null`, and one that is
+  `SUPPRESS`ed is left out of the container's `value` and `fullValue`. Neither counts in the container's `valid`, so
+  an invalid field the user cannot see no longer blocks a submit button bound to `form.valid`. A form that hid an
+  input and also disabled it to keep it out of the payload can drop the `enabled` write.
+- **Enabling or disabling a field is a change of the form.** A `ValueChangedAction` on a `Group` also runs when a
+  member is enabled or disabled and the group's value changes because of it. A handler that saves or recomputes on
+  every change of the form runs for these switches as well.
+- **A disabled field takes a write.** `enabled` decides whether the input accepts what the user types and whether the
+  field is serialized, not whether a write reaches the field. Code that disabled a field to protect it from an
+  assignment needs the assignment itself to be conditional. The components adjust to this below.
+
+### `<df-datetime>` writes only what the user edits
+
+A value the field is bound with is shown in the user's local time and stays in the field exactly as it was given.
+Before, the component rewrote it on mount into the local offset, which changed the string and marked the field - and
+every group above it - as changed before the user touched anything:
+
+```typescript
+const when = new Field({ value: '2026-01-15T09:00:00Z' });
+// rendered with <df-datetime :control="when" /> in Europe/Ljubljana
+when.value;      // before: '2026-01-15T10:00:00+01:00'   after: '2026-01-15T09:00:00Z'
+when.isChanged;  // before: true                           after: false
+```
+
+The field now holds the backend's own string until the user edits the date or the time; from then on it holds the
+edited value in the user's local offset, as before. A form that tested `isChanged` to decide whether to save, or to
+warn about unsaved changes, no longer sees a change on every record with a date-time field in it. Code that read the
+field's value expecting the local offset - comparing it as a string, or cutting the offset off - receives whatever
+the backend sent until the user edits it, and should parse the value instead of relying on its form. A disabled
+date-time field is never written by the component at all.
+
+### `<df-datetime>` writes the offset of the date, not today's
+
+The offset the component appends to an edited value is the one in force on that date. Before, it was today's, which
+in a time zone with daylight saving time is an hour off for every date on the other side of the change:
+
+```typescript
+// in Europe/Ljubljana, on a day in July, the user sets 11:30 on 15 January
+when.value;      // before: '2026-01-15T11:30:00+02:00' (10:30 local)   after: '2026-01-15T11:30:00+01:00'
+```
+
+The same mismatch made the component rewrite its own value without end: a field bound to a date on the other side
+of the change from today stopped with "Maximum recursive updates exceeded" on mount. Records saved from such a form
+by an earlier version, in a time zone with daylight saving time, may hold a time shifted by an hour or more; nothing
+in the upgrade corrects them.
+
+In `date` mode a date without a time is read as that day in local time. Before, it was read as UTC midnight, so west
+of Greenwich `'2026-01-15'` was shown as 14 January and the component stopped with the same error.
+
+### `<df-select>` states no default while disabled
+
+With `allowNull: false`, an enabled select whose value is empty selects the first choice, as before. A select drawn
+disabled leaves the value empty, and selects the first choice when it is enabled. Two cases behave differently:
+
+```typescript
+const country = new Field<string | null>({ value: null });
+const form = new Group({ country }, { enabled: false });
+// rendered with <df-select :control="country" :choices="countries" :allow-null="false" />
+country.value;           // before: the first choice   after: null
+form.isChanged;          // before: true               after: false
+
+form.enabled = true;
+country.value;           // the first choice either way
+
+const region = new Field<string | null>({ value: null, enabled: false });
+// rendered the same way
+region.enabled = true;
+region.value;            // before: null               after: the first choice
+```
+
+- A select inside a disabled `Group` is drawn disabled, but the field itself is enabled, so the first choice used to
+  be written into it on mount. It no longer is: the form's data carries no choice the user did not make, and the form
+  does not start out changed.
+- A select whose own field was disabled at mount stayed empty after it was enabled. It now selects the first choice
+  at that moment, like a select that was enabled from the start.
+
+Where a disabled select has to carry a value, give the field that value when it is created.
+
+### An upload that finishes on a disabled field keeps its file
+
+`<df-file>` and `<df-image>` write the identifier `comms.upload` resolves to into the field even where the field was
+disabled while the upload ran, and touch it from then on. Before, vue-forms refused that write: the component showed
+the uploaded file while the field stayed empty, the form was submitted without it, and the file on the backend was
+never touched again. No code change is needed; a backend that cleaned up such orphaned uploads sees fewer of them.
+
+### `DisplayMode.INVISIBLE` is gone
+
+vue-forms 2.0 removes `DisplayMode.INVISIBLE`, and the components remove what drew it:
+
+- `visibility="invisible"` and `:visibility="8"` throw while the component renders, like any other mode that does
+  not exist. Use `HIDDEN` or `SUPPRESS`.
+- `useInputBase().visibilityClass` is `{ 'd-none': boolean }`; the `invisible` key is gone. A custom component that
+  bound the object keeps working.
+- `global.css` no longer defines `.invisible`. Markup of your own that used the class needs the rule
+  `.invisible { visibility: hidden; }` in your own styles.
+
+### Checklist for 0.12.0
+
+1. Upgrade `@dynamicforms/vue-forms` to `^2.0.0` alongside this release, and work through its migration guide.
+2. Search for `INVISIBLE` and `'invisible'` and replace them with `HIDDEN` or `SUPPRESS`; add a `.invisible` rule of
+   your own if your markup uses the class.
+3. Search for code that disabled a field to keep it out of the payload and for handlers on a form's
+   `ValueChangedAction`: the first can use `SUPPRESS`, the second now also runs on enabling and disabling.
+4. Search for code that reads a `<df-datetime>` field's value as a string in the local offset, and parse it instead.
+5. Where a `<df-select>` with `allowNull: false` inside a disabled section was expected to hold the first choice, give
+   the field that value when it is created.
+6. If users in a time zone with daylight saving time edited date-times with an earlier version, check stored values
+   for dates on the other side of the change from the day they were saved.
+
 ## Upgrading to v0.11.0 (from v0.10.5)
 
 `translatableStrings` is now backed by [`@dynamicforms/translatable`](https://github.com/dynamicforms/translatable)
