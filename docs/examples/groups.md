@@ -49,7 +49,8 @@ const budgetLimit = 2000;
 // The checkbox that decides whether the second traveller section is on the form
 const addTraveller = new Field({ value: false });
 
-// A nested group: its fields are addressed as traveller.fields.name, and its value is a member of form.value
+// A nested group: its fields are addressed as traveller.fields.name, and while it is shown its value is a member
+// of form.value
 const traveller = new Group({
   name: new Field({ value: '' }),
   ticket: new Field({ value: 400 }),
@@ -186,6 +187,10 @@ property of the group alone, so the template consumes it once: render the sectio
 the DOM. A field whose own control carries the action needs no `v-if`: the input component bound to
 that field reads its control's visibility itself.
 
+`visibility` also decides what the section contributes to the form's data. A `SUPPRESS`ed group is left out of
+`form.value` and `form.fullValue`, and its fields no longer count in `form.valid`; a `HIDDEN` one is sent as `null`
+and does not count either. The group keeps what its fields hold, so showing the section again brings the values back.
+
 `ConditionalEnabledAction` takes the same statement and sets `enabled` instead.
 `ConditionalValueAction` takes a statement and the value to assign,
 `new ConditionalValueAction(statement, valueWhenTrue)`; it writes that value while the statement
@@ -197,7 +202,7 @@ holds and leaves the field alone otherwise.
 - **Error rendering**: `DfInputHint` renders `group.errors` the same way it renders field errors
 - **Group validity**: `group.valid` covers both the group's own errors and those of its fields
 - **Conditional group**: one `ConditionalVisibilityAction` shows and hides an entire section
-- **Nested group**: `traveller` contributes its own object to `form.value`
+- **Nested group**: `traveller` contributes its own object to `form.value` while it is shown
 - **Reactive value**: `group.value` re-renders the template as fields change
 
 ## Try It Yourself

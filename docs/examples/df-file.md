@@ -45,6 +45,9 @@ The component stores and emits a string identifier for the file, not the file it
 2. Used in subsequent operations (delete, touch) to reference the file
 3. Stored in the form data when using DynamicForms
 
+An upload the user started completes whatever happens to the field meanwhile: where the field is disabled before
+`upload` resolves, the identifier is still written into it and touched from then on.
+
 ## FileComms Interface
 
 The `comms` prop requires an object implementing the FileComms interface:
@@ -101,8 +104,8 @@ The component displays a progress bar during file upload, using the values provi
 
 After a file has been uploaded to the backend, it is touched every `touchInterval` milliseconds (60 seconds by
 default) to let the backend know that it's still relevant. If a touch rejects with a `FileGoneError`, the field is
-cleared and, where a `control` is bound, the error's `errorText` is shown as a validation error. Any other rejection
-is treated as a transient failure and left to the consumer.
+cleared - a disabled one as well - and, where a `control` is bound, the error's `errorText` is shown as a validation
+error. Any other rejection is treated as a transient failure and left to the consumer.
 
 ## Events
 

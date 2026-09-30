@@ -48,6 +48,9 @@ The component stores and displays a URL string, not the file itself:
 2. The same value is used in subsequent operations (delete, touch) to reference the image.
 3. It is stored in the form data when using DynamicForms.
 
+An upload the user started completes whatever happens to the field meanwhile: where the field is disabled before
+`upload` resolves, the URL is still written into it and touched from then on.
+
 ## FileComms Interface
 
 The `comms` prop requires an object implementing the same `FileComms` interface `df-file` uses:
@@ -99,8 +102,8 @@ The component displays a progress bar during upload, using the values provided b
 
 After an image has been uploaded to the backend, it is touched every `touchInterval` milliseconds (60 seconds by
 default) to let the backend know that it's still relevant. If a touch rejects with a `FileGoneError`, the field and
-preview are cleared and, where a `control` is bound, the error's `errorText` is shown as a validation error. Any
-other rejection is treated as a transient failure and left to the consumer.
+preview are cleared - a disabled field as well - and, where a `control` is bound, the error's `errorText` is shown as
+a validation error. Any other rejection is treated as a transient failure and left to the consumer.
 
 ## Non-image Files
 

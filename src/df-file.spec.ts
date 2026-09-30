@@ -107,6 +107,21 @@ describe('DfFile', () => {
     expect(comms.touch).toHaveBeenCalledWith('file-id-1');
   });
 
+  it('keeps the uploaded file when the field is disabled while the upload runs', async () => {
+    let finishUpload!: (id: string) => void;
+    comms.upload = vi.fn(() => new Promise<string>((resolve) => (finishUpload = resolve)));
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountFile({ control, touchInterval: 1_000 });
+    await pickFile(wrapper, pdfFile());
+
+    control.enabled = false;
+    finishUpload('file-id-1');
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    expect(control.value).toBe('file-id-1');
+    expect(comms.touch).toHaveBeenCalledWith('file-id-1');
+  });
+
   it('clears the field and reports the error on control when touch reports the file is gone', async () => {
     comms.touch = vi.fn(async () => {
       throw new FileGoneError('The uploaded file is no longer available on the server.');
@@ -123,6 +138,24 @@ describe('DfFile', () => {
     expect((control.errors[0] as ValidationErrorRenderContent).resolvedText).toBe(
       'The uploaded file is no longer available on the server.',
     );
+  });
+
+  it('clears a disabled field when touch reports the file is gone', async () => {
+    comms.touch = vi.fn(async () => {
+      throw new FileGoneError('The uploaded file is no longer available on the server.');
+    });
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountFile({ control, touchInterval: 1_000 });
+    await pickFile(wrapper, pdfFile());
+    await vi.advanceTimersByTimeAsync(0);
+    expect(control.value).toBe('file-id-1');
+
+    control.enabled = false;
+    await vi.advanceTimersByTimeAsync(1_000);
+    await wrapper.vm.$nextTick();
+
+    expect(control.value).toBeNull();
+    expect(control.errors).toHaveLength(1);
   });
 
   it('clears the field without throwing when touch reports the file is gone and no control is bound', async () => {

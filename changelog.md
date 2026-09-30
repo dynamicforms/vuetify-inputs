@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-09-30
+
+### Changed
+
+- **Breaking:** requires `@dynamicforms/vue-forms` 2.0 (`peerDependencies` `^2.0.0`). What vue-forms 2.0 changes in
+  a form's data - `visibility` deciding what an element contributes to its container, a disabled field taking a
+  write, enabling and disabling announcing a change of the containers above - applies to every form these components
+  render; see the vue-forms migration guide.
+- **Breaking:** `DisplayMode.INVISIBLE` is gone from vue-forms, and with it the `invisible` class: the input
+  components and `df-actions` no longer set it, `global.css` no longer ships `.invisible`, and
+  `useInputBase().visibilityClass` is `{ 'd-none': boolean }`. The `visibility` prop throws on `'invisible'` and `8`.
+- `<df-datetime>` writes into the field only when the user edits the date or the time. A bound value is shown in the
+  user's local time and stays in the field as it was given, so displaying a record no longer rewrites it into the
+  local offset or marks the field as changed.
+- `<df-select>` with `allowNull: false` selects the first choice only while it is drawn enabled, and selects it at the
+  moment it is enabled. A select inside a disabled container no longer writes the first choice into its field on
+  mount, and one whose field was disabled at mount no longer stays empty once enabled.
+- `<df-file>` and `<df-image>` write into a disabled field: an upload that finishes after the field was disabled keeps
+  its identifier, and a touch that rejects with `FileGoneError` clears the field.
+
+### Fixed
+
+- `<df-datetime>` writes the offset in force on the date written rather than today's. In a time zone with daylight
+  saving time a value on the other side of the change from today stopped the component with "Maximum recursive
+  updates exceeded" on mount, and an edited time on such a date was written an hour off.
+- `<df-datetime>` in `date` mode reads a date without a time as that day in local time. West of Greenwich it was read
+  as UTC midnight, shown as the previous day, and the component stopped with "Maximum recursive updates exceeded".
+
 ## [0.11.7] - 2026-09-29
 
 ### Fixed

@@ -17,10 +17,7 @@
       :elevation="0"
       :size="buttonSize"
       :density="buttonDensity"
-      :class="{
-        'd-none': action.action.visibility === DisplayMode.HIDDEN,
-        invisible: action.action.visibility === DisplayMode.INVISIBLE,
-      }"
+      :class="{ 'd-none': action.action.visibility === DisplayMode.HIDDEN }"
       v-bind="action.passthroughAttrs"
       @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >

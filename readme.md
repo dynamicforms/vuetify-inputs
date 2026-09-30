@@ -58,7 +58,7 @@ consistent appearance.
 - **Errors, hints and help text** in one row, rendered through vue-forms' `MessagesWidget`, so an error may be
   plain text, markdown or a component of its own
 - **Labels with icons and markdown**, through the `Label` class and `MdString`
-- **Visibility through `DisplayMode`** — `FULL`, `HIDDEN`, `INVISIBLE`, `SUPPRESS` — and enablement that follows the
+- **Visibility through `DisplayMode`** — `FULL`, `HIDDEN`, `SUPPRESS` — and enablement that follows the
   containing section
 - **`passthroughAttrs`**: any prop of the underlying Vuetify component, without this library declaring it
 - **Actions**: the `Action` class with render options, `defaultConfirm` / `defaultReject`, the ready-made

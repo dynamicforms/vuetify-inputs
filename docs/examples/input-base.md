@@ -21,7 +21,7 @@ All input components inherit the following properties:
 | placeholder      | `string`                      | `undefined`    | Placeholder text displayed when the input is empty                                                 |
 | errors           | `string[]`                    | `undefined`    | List of errors (used only without control)                                                         |
 | enabled          | `boolean`                     | `undefined`    | The input is enabled unless the prop is `false` (used only without control)                        |
-| visibility       | `DisplayMode \| string`       | `undefined`    | Component visibility mode (FULL, HIDDEN, INVISIBLE, SUPPRESS), see [Display Modes](#display-modes) |
+| visibility       | `DisplayMode \| string`       | `undefined`    | Component visibility mode (FULL, HIDDEN, SUPPRESS), see [Display Modes](#display-modes)            |
 | cssClass         | `string`                      | `undefined`    | Additional CSS classes                                                                             |
 | clearable        | `boolean`                     | `true`         | Whether the value can be cleared                                                                   |
 | passthroughAttrs | `Record<string, any>`         | `undefined`    | Additional attributes to pass through to the underlying Vuetify component                          |
@@ -129,9 +129,11 @@ Every input component applies the display mode to its own root element:
 
 - `FULL`: the component renders normally and is available for interaction
 - `HIDDEN`: the root element gets the `d-none` class, so the component is not displayed and takes up no space
-- `INVISIBLE`: the root element gets the `invisible` class, so the component is not painted but still takes up its space
-  in the layout
 - `SUPPRESS`: the root element is not rendered in the DOM at all
+
+The mode is the bound element's, and in vue-forms it decides more than rendering: a `HIDDEN` element is sent as
+`null` and a `SUPPRESS` one is left out of its container's `value` and `fullValue`, and neither counts in the
+container's validity. See [what a container serializes](https://docs.velis.si/dynamicforms/vue-forms/api/container#what-a-container-serializes).
 
 The mode comes from the `control` when one is bound: `control.visibility` is the answer, and the `visibility` prop is
 not consulted. Without a control the prop decides, and when neither is given the mode is `FULL`. A
@@ -146,7 +148,7 @@ exported by `@dynamicforms/vue-forms` - or the name of one, matched case-insensi
 <df-input v-model="secret" label="Secret" :visibility="DisplayMode.HIDDEN" />
 ```
 
-A value that names no constant - a misspelled name, or a number that is none of the four - throws an `Error` naming
+A value that names no constant - a misspelled name, or a number that is none of the three - throws an `Error` naming
 the value. The mode is read while the component renders, so that is where the error surfaces; a mode nobody defined
 never renders as `FULL`.
 
@@ -335,7 +337,7 @@ then, so a control of the wrong kind fails at mount rather than misbehaving late
 | enabled | `ComputedRef<boolean>` | `control.effectiveEnabled` — `false` where the element or any container above it is disabled — or `props.enabled !== false` when there is no control |
 | visibility | `ComputedRef<DisplayMode>` | The resolved display mode, see [Display Modes](#display-modes) |
 | isRendered | `ComputedRef<boolean>` | `false` only for `SUPPRESS`; it is the `v-if` on the component's root element |
-| visibilityClass | `ComputedRef<{ 'd-none': boolean, invisible: boolean }>` | The class object for `HIDDEN` and `INVISIBLE`, to bind on the root element |
+| visibilityClass | `ComputedRef<{ 'd-none': boolean }>` | The class object for `HIDDEN`, to bind on the root element |
 | label | `ComputedRef<Label>` | The label as a `Label` instance: a `string` or `MdString` is wrapped, a `Label` is passed through |
 | touched | `WritableComputedRef<boolean> \| Ref<boolean>` | Bound to `control.touched` when there is a control, a standalone ref otherwise. Components write `true` to it on blur |
 | density | `ComputedRef<FieldDensity>` | The `density` prop, then the control's `extra.density`, then the injected `field-density`, then the plugin's `defaultDensity`, then `'default'` |

@@ -46,10 +46,15 @@ This component inherits all common props from [InputBase](./input-base), includi
 
 The component accepts and outputs values in the following formats:
 
-- **datetime** mode: ISO 8601 format (`YYYY-MM-DDTHH:mm:ssXXX`)
-  :::info note that resulting value will always carry user's local timezone value
-- **date** mode: ISO 8601 date format (`YYYY-MM-DD`)
+- **datetime** mode: ISO 8601 format (`YYYY-MM-DDTHH:mm:ssXXX`). The value written carries the offset of the user's
+  local time zone in force on that date, so in a zone with daylight saving time a January value carries the winter
+  offset whatever the date of editing.
+- **date** mode: ISO 8601 date format (`YYYY-MM-DD`). A date without a time is read as that day in local time.
 - **time** mode: 24-hour time format (`HH:mm:ss`)
+
+The component writes a value only when the user edits the date or the time. A value the field is bound with is shown
+in the user's local time and stays in the field as it was given - with its own offset, `Z` included - so displaying a
+record neither changes the field nor marks it as changed.
 
 ## Display Format
 
