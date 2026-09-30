@@ -140,6 +140,24 @@ describe('DfFile', () => {
     );
   });
 
+  it('clears a disabled field when touch reports the file is gone', async () => {
+    comms.touch = vi.fn(async () => {
+      throw new FileGoneError('The uploaded file is no longer available on the server.');
+    });
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountFile({ control, touchInterval: 1_000 });
+    await pickFile(wrapper, pdfFile());
+    await vi.advanceTimersByTimeAsync(0);
+    expect(control.value).toBe('file-id-1');
+
+    control.enabled = false;
+    await vi.advanceTimersByTimeAsync(1_000);
+    await wrapper.vm.$nextTick();
+
+    expect(control.value).toBeNull();
+    expect(control.errors).toHaveLength(1);
+  });
+
   it('clears the field without throwing when touch reports the file is gone and no control is bound', async () => {
     comms.touch = vi.fn(async () => {
       throw new FileGoneError('The uploaded file is no longer available on the server.');

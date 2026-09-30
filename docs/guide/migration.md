@@ -102,12 +102,16 @@ region.value;            // before: null               after: the first choice
 
 Where a disabled select has to carry a value, give the field that value when it is created.
 
-### An upload that finishes on a disabled field keeps its file
+### `<df-file>` and `<df-image>` write into a disabled field
 
 `<df-file>` and `<df-image>` write the identifier `comms.upload` resolves to into the field even where the field was
 disabled while the upload ran, and touch it from then on. Before, vue-forms refused that write: the component showed
 the uploaded file while the field stayed empty, the form was submitted without it, and the file on the backend was
 never touched again. No code change is needed; a backend that cleaned up such orphaned uploads sees fewer of them.
+
+A touch that rejects with `FileGoneError` clears a disabled field too. Before, the write was refused: the component
+showed no file while the field went on holding the identifier the backend had discarded, and the form was submitted
+with it. No code change is needed.
 
 ### `DisplayMode.INVISIBLE` is gone
 

@@ -102,8 +102,8 @@ The component displays a progress bar during upload, using the values provided b
 
 After an image has been uploaded to the backend, it is touched every `touchInterval` milliseconds (60 seconds by
 default) to let the backend know that it's still relevant. If a touch rejects with a `FileGoneError`, the field and
-preview are cleared and, where a `control` is bound, the error's `errorText` is shown as a validation error. Any
-other rejection is treated as a transient failure and left to the consumer.
+preview are cleared - a disabled field as well - and, where a `control` is bound, the error's `errorText` is shown as
+a validation error. Any other rejection is treated as a transient failure and left to the consumer.
 
 ## Non-image Files
 

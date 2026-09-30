@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `<df-select>` with `allowNull: false` selects the first choice only while it is drawn enabled, and selects it at the
   moment it is enabled. A select inside a disabled container no longer writes the first choice into its field on
   mount, and one whose field was disabled at mount no longer stays empty once enabled.
+- `<df-file>` and `<df-image>` write into a disabled field: an upload that finishes after the field was disabled keeps
+  its identifier, and a touch that rejects with `FileGoneError` clears the field.
 
 ### Fixed
 

@@ -163,6 +163,24 @@ describe('DfImage', () => {
     expect(wrapper.findComponent({ name: 'VImg' }).exists()).toBe(false);
   });
 
+  it('clears a disabled field when touch reports the image is gone', async () => {
+    comms.touch = vi.fn(async () => {
+      throw new FileGoneError('The uploaded image is no longer available on the server.');
+    });
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountImage({ control, touchInterval: 1_000 });
+    await pickImage(wrapper, pngFile());
+    await vi.advanceTimersByTimeAsync(0);
+    expect(control.value).toBe('https://example.com/uploaded.png');
+
+    control.enabled = false;
+    await vi.advanceTimersByTimeAsync(1_000);
+    await wrapper.vm.$nextTick();
+
+    expect(control.value).toBeNull();
+    expect(control.errors).toHaveLength(1);
+  });
+
   it('clears the field without throwing when touch reports the image is gone and no control is bound', async () => {
     comms.touch = vi.fn(async () => {
       throw new FileGoneError('The uploaded image is no longer available on the server.');
