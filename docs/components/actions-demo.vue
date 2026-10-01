@@ -135,7 +135,7 @@ const actions: Ref<Action[]> = ref([saveAction, deleteAction, cancelAction]);
 const section = new Group({ save: saveAction, delete: deleteAction, cancel: cancelAction });
 const sectionEnabled = ref(true);
 watchEffect(() => {
-  section.enabled = sectionEnabled.value;
+  section.access = sectionEnabled.value ? 'editable' : 'disabled';
 });
 
 // Get current breakpoint

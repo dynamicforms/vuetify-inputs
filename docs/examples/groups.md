@@ -32,8 +32,8 @@ The demo's form, without the cards it is laid out in:
 ```js
 import { computed } from 'vue';
 import {
+  ConditionalAccessAction,
   ConditionalVisibilityAction,
-  DisplayMode,
   Field,
   Group,
   MdString,
@@ -49,15 +49,18 @@ const budgetLimit = 2000;
 // The checkbox that decides whether the second traveller section is on the form
 const addTraveller = new Field({ value: false });
 
-// A nested group: its fields are addressed as traveller.fields.name, and while it is shown its value is a member
-// of form.value
+// A nested group: its fields are addressed as traveller.fields.name, and while it is sent its value is a member of
+// form.value
 const traveller = new Group({
   name: new Field({ value: '' }),
   ticket: new Field({ value: 400 }),
 });
 
-// One action on the group: the template renders the whole section under the group's visibility
-traveller.registerAction(new ConditionalVisibilityAction(new Statement(addTraveller, Operator.EQUALS, true)));
+// Two actions on the group, over one statement: visibility decides whether the template draws the section, access
+// whether the form sends it - and validates it
+const travelling = new Statement(addTraveller, Operator.EQUALS, true);
+traveller.registerAction(new ConditionalVisibilityAction(travelling));
+traveller.registerAction(new ConditionalAccessAction(travelling));
 
 const form = new Group({
   flights: new Field({ value: 900 }),
@@ -111,7 +114,7 @@ const total = computed(() => tripTotal());
     <df-checkbox :control="form.fields.addTraveller" label="Book a second traveller" />
 
     <!-- The whole section follows the visibility of the traveller group -->
-    <v-card v-if="traveller.visibility !== DisplayMode.SUPPRESS" variant="outlined" class="pa-4 mt-2">
+    <v-card v-if="traveller.visibility !== 'suppress'" variant="outlined" class="pa-4 mt-2">
       <div class="text-subtitle-1 mb-2">Second traveller</div>
       <df-input :control="traveller.fields.name" label="Full name" />
       <df-input :control="traveller.fields.ticket" input-type="number" label="Ticket" :min="0" :step="50" />
@@ -140,6 +143,18 @@ without any conversion:
 
 ```vue
 <df-input-hint :errors="form.errors" />
+```
+
+The demo renders the group's errors as they are, so the budget message appears the moment the total passes the
+limit. To show them by the rule the inputs follow — once the user has touched a field of the group, or at once where
+the server returned them — bind [`useShownErrors(form)`](/examples/input-base#shown-errors) instead:
+
+```js
+const formErrors = useShownErrors(form);
+```
+
+```vue
+<df-input-hint :errors="formErrors" />
 ```
 
 `DfInputHint` treats a non-empty `errors` value as an error and applies `errorClasses`
@@ -181,17 +196,17 @@ discounts.registerAction(new ConditionalVisibilityAction(showStatement));
 ```
 
 The action watches every field the statement mentions and sets the group's `visibility` to
-`DisplayMode.FULL` or `DisplayMode.SUPPRESS` as the statement's result changes. `visibility` is a
+`'full'` or `'suppress'` as the statement's result changes. `visibility` is a
 property of the group alone, so the template consumes it once: render the section under
-`v-if="group.visibility !== DisplayMode.SUPPRESS"` and the whole section, its fields included, leaves
+`v-if="group.visibility !== 'suppress'"` and the whole section, its fields included, leaves
 the DOM. A field whose own control carries the action needs no `v-if`: the input component bound to
 that field reads its control's visibility itself.
 
-`visibility` also decides what the section contributes to the form's data. A `SUPPRESS`ed group is left out of
-`form.value` and `form.fullValue`, and its fields no longer count in `form.valid`; a `HIDDEN` one is sent as `null`
-and does not count either. The group keeps what its fields hold, so showing the section again brings the values back.
-
-`ConditionalEnabledAction` takes the same statement and sets `enabled` instead.
+`visibility` is presentation alone: a suppressed section is not drawn, and it is still sent and validated. What the
+section contributes to the form's data is its `access`, which `ConditionalAccessAction` sets from the same statement —
+`'editable'` while it holds and `'disabled'` otherwise, or the two accesses you pass. A `'disabled'` group is left out
+of `form.value` and none of its fields is validated; `'disabled-null'` sends it as `null`. The group keeps what its
+fields hold either way, so switching the section back on brings the values back.
 `ConditionalValueAction` takes a statement and the value to assign,
 `new ConditionalValueAction(statement, valueWhenTrue)`; it writes that value while the statement
 holds and leaves the field alone otherwise.
@@ -201,8 +216,9 @@ holds and leaves the field alone otherwise.
 - **Group-level validator**: a rule over several fields, with its error in `group.errors`
 - **Error rendering**: `DfInputHint` renders `group.errors` the same way it renders field errors
 - **Group validity**: `group.valid` covers both the group's own errors and those of its fields
-- **Conditional group**: one `ConditionalVisibilityAction` shows and hides an entire section
-- **Nested group**: `traveller` contributes its own object to `form.value` while it is shown
+- **Conditional group**: a `ConditionalVisibilityAction` and a `ConditionalAccessAction` over one statement show,
+  send and validate an entire section together
+- **Nested group**: `traveller` contributes its own object to `form.value` while it is sent
 - **Reactive value**: `group.value` re-renders the template as fields change
 
 ## Try It Yourself

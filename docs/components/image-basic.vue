@@ -66,7 +66,7 @@ const imageComms = {
 };
 
 function toggleEnabled() {
-  imageField.enabled = !imageField.enabled;
+  imageField.access = imageField.enabled ? 'disabled' : 'editable';
 }
 </script>
 

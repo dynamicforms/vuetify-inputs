@@ -9,5 +9,6 @@ export * from './input-base';
 export { default as InputBase } from './input-base.vue';
 export * from './action';
 export * from './settings';
+export * from './shown-errors';
 export * from './translations';
 export * from './use-file-touch-keepalive';

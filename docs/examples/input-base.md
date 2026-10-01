@@ -21,7 +21,7 @@ All input components inherit the following properties:
 | placeholder      | `string`                      | `undefined`    | Placeholder text displayed when the input is empty                                                 |
 | errors           | `string[]`                    | `undefined`    | List of errors (used only without control)                                                         |
 | enabled          | `boolean`                     | `undefined`    | The input is enabled unless the prop is `false` (used only without control)                        |
-| visibility       | `DisplayMode \| string`       | `undefined`    | Component visibility mode (FULL, HIDDEN, SUPPRESS), see [Display Modes](#display-modes)            |
+| visibility       | `Visibility`                  | `undefined`    | `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, see [Display Modes](#display-modes)           |
 | cssClass         | `string`                      | `undefined`    | Additional CSS classes                                                                             |
 | clearable        | `boolean`                     | `true`         | Whether the value can be cleared                                                                   |
 | passthroughAttrs | `Record<string, any>`         | `undefined`    | Additional attributes to pass through to the underlying Vuetify component                          |
@@ -125,32 +125,68 @@ themselves, clearing the value and deleting the uploaded file respectively.
 
 ## Display Modes
 
-Every input component applies the display mode to its own root element:
+Every input component applies the visibility to its own root element:
 
-- `FULL`: the component renders normally and is available for interaction
-- `HIDDEN`: the root element gets the `d-none` class, so the component is not displayed and takes up no space
-- `SUPPRESS`: the root element is not rendered in the DOM at all
+- `'full'`: the component renders normally and is available for interaction
+- `'invisible'`: the root element gets the `invisible` class, so the component is not painted but keeps its space in
+  the layout
+- `'hidden'`: the root element gets the `d-none` class, so the component is not displayed and takes up no space
+- `'suppress'`: the root element is not rendered in the DOM at all
 
-The mode is the bound element's, and in vue-forms it decides more than rendering: a `HIDDEN` element is sent as
-`null` and a `SUPPRESS` one is left out of its container's `value` and `fullValue`, and neither counts in the
-container's validity. See [what a container serializes](https://docs.velis.si/dynamicforms/vue-forms/api/container#what-a-container-serializes).
+Visibility is presentation alone. What the bound element sends and whether it is validated is its `access`, which
+the component reads as `effectiveEnabled` to decide whether it accepts input — see
+[what a container serializes](https://docs.velis.si/dynamicforms/vue-forms/api/container#what-a-container-serializes).
 
-The mode comes from the `control` when one is bound: `control.visibility` is the answer, and the `visibility` prop is
-not consulted. Without a control the prop decides, and when neither is given the mode is `FULL`. A
+The visibility comes from the `control` when one is bound: `control.visibility` is the answer, and the `visibility`
+prop is not consulted. Without a control the prop decides, and when neither is given it is `'full'`. A
 `ConditionalVisibilityAction` registered on the control therefore shows and hides the input on its own, with no `v-if`
 in the template.
 
-The prop is resolved through vue-forms' `DisplayMode.fromAny`, so it takes either the constant - `DisplayMode` is
-exported by `@dynamicforms/vue-forms` - or the name of one, matched case-insensitively. These two are the same input:
+The prop takes one of the four strings, exactly as vue-forms spells them:
 
 ```vue
 <df-input v-model="secret" label="Secret" visibility="hidden" />
-<df-input v-model="secret" label="Secret" :visibility="DisplayMode.HIDDEN" />
 ```
 
-A value that names no constant - a misspelled name, or a number that is none of the three - throws an `Error` naming
-the value. The mode is read while the component renders, so that is where the error surfaces; a mode nobody defined
-never renders as `FULL`.
+Anything else - a misspelled or upper-case name, a number - throws an `Error` naming the value. The visibility is read
+while the component renders, so that is where the error surfaces; a visibility nobody defined never renders as
+`'full'`.
+
+## Shown errors
+
+`errors` and `valid` on a vue-forms element state the verdict, and a submit needs it at once: a form opened empty is
+invalid from the first render. What the user is shown waits for the user — a form covered in errors before anything
+was typed tells the user nothing they can act on. Every component in this library shows `shownErrors`, chosen by one
+rule:
+
+- nothing where the bound element is sent nowhere (its `effectiveAccess` is `'disabled'`);
+- an error whose [origin](https://docs.velis.si/dynamicforms/vue-forms/api/validators#origin) is `'server'` at once —
+  the server answered something the user did, so nothing has to be marked touched for it to appear;
+- every other error — a validator's, or one the application wrote — once the field is touched. A submit attempt that
+  should reveal every error assigns `form.touched = true`, which reaches every member.
+
+Without a control, the errors come from the `errors` prop and are shown once the component is touched.
+
+The application replaces the rule with a condition of its own through the
+[`shownErrors` setting](/examples/configuration): it is asked for each error with the answer the rule gives, and its
+answer stands. That is where an origin of the application's own is treated:
+
+```typescript
+app.use(DynamicFormsInputs, {
+  // errors a sync with another tab reports are shown at once, everything else as the rule has it
+  shownErrors: (error, control, shownByDefault) => error.origin === 'sync' || shownByDefault,
+});
+```
+
+A template that renders errors of its own — a group's, say — shows them by the same rule with `useShownErrors`:
+
+```typescript
+import { useShownErrors } from '@dynamicforms/vuetify-inputs';
+
+const formErrors = useShownErrors(form);   // ComputedRef<ValidationError[]>, tracked like every read
+```
+
+`selectShownErrors(errors, control, touched, settings)` is the rule itself, for code that has the settings in hand.
 
 ## passthroughAttrs
 
@@ -261,7 +297,7 @@ It emits `BaseEmits` plus one event of its own:
 | click:clear | - | The clear button was clicked. The button is drawn only while `clearable` is set and the value is not empty |
 | blur | - | The hosted control lost focus. `touched` is set to `true` before this is emitted, so a listener already reads the field as touched |
 
-The root element is a `v-input`, rendered only when the display mode is not `SUPPRESS`, carrying the `name`,
+The root element is a `v-input`, rendered only when the visibility is not `'suppress'`, carrying the `name`,
 `density`, `hint`, `persistent-hint`, `hide-details` and `errorMessages` bindings together with the `cssClass` prop
 and the visibility classes. Its `message` slot renders `DfInputHint` with the errors of a touched field. Inside it, a
 `v-field` carries the `variant`, `density`, `label` and `disabled` bindings, is `dirty` while there is a value or a
@@ -333,11 +369,11 @@ then, so a control of the wrong kind fails at mount rather than misbehaving late
 | value | `WritableComputedRef<T>` | The value. Reads from the control, or from `modelValue`, or from an internal ref when neither is given. Writing writes the control, keeps the internal ref in step and emits `update:modelValue` with the value the control ended up holding |
 | valid | `ComputedRef<boolean>` | `control.valid`, or `true` when there is no control |
 | errors | `ComputedRef<ValidationError[]>` | `control.errors`, or the `errors` prop with each string wrapped in a `ValidationErrorRenderContent` |
-| showErrors | `ComputedRef<ValidationError[] \| undefined>` | The same errors once the field is touched, `undefined` before that. This is what gets bound to `DfInputHint` |
+| shownErrors | `ComputedRef<ValidationError[]>` | The errors to show now, see [Shown errors](#shown-errors). This is what gets bound to `DfInputHint` |
 | enabled | `ComputedRef<boolean>` | `control.effectiveEnabled` — `false` where the element or any container above it is disabled — or `props.enabled !== false` when there is no control |
-| visibility | `ComputedRef<DisplayMode>` | The resolved display mode, see [Display Modes](#display-modes) |
-| isRendered | `ComputedRef<boolean>` | `false` only for `SUPPRESS`; it is the `v-if` on the component's root element |
-| visibilityClass | `ComputedRef<{ 'd-none': boolean }>` | The class object for `HIDDEN`, to bind on the root element |
+| visibility | `ComputedRef<Visibility>` | The resolved visibility, see [Display Modes](#display-modes) |
+| isRendered | `ComputedRef<boolean>` | `false` only for `'suppress'`; it is the `v-if` on the component's root element |
+| visibilityClass | `ComputedRef<{ 'd-none': boolean, invisible: boolean }>` | The class object for `'hidden'` and `'invisible'`, to bind on the root element |
 | label | `ComputedRef<Label>` | The label as a `Label` instance: a `string` or `MdString` is wrapped, a `Label` is passed through |
 | touched | `WritableComputedRef<boolean> \| Ref<boolean>` | Bound to `control.touched` when there is a control, a standalone ref otherwise. Components write `true` to it on blur |
 | density | `ComputedRef<FieldDensity>` | The `density` prop, then the control's `extra.density`, then the injected `field-density`, then the plugin's `defaultDensity`, then `'default'` |
@@ -372,7 +408,7 @@ control repaints from the value the field actually holds.
 | helpText | The `helpText` prop, `''` when unset |
 
 `errorMessages` carries a single space rather than the messages themselves: it only puts the Vuetify control into its
-error state, while the messages are rendered by `DfInputHint` from `showErrors`. That is what lets a vue-forms error
+error state, while the messages are rendered by `DfInputHint` from `shownErrors`. That is what lets a vue-forms error
 render as markdown or as a component instead of a plain string.
 
 `passthroughAttrs` is spread into this object last, so a caller's attribute wins over every key above - see
@@ -395,7 +431,7 @@ adds, default them with `defaultBaseProps`, call `useInputBase()`, and bind the 
       @blur="touched = true"
     >
       <template #label><df-label :label="label" /></template>
-      <template #message="{ message }"><df-input-hint :message="message" :errors="showErrors" /></template>
+      <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
     </v-slider>
   </div>
 </template>
@@ -421,7 +457,7 @@ const props = withDefaults(defineProps<MySliderProps>(), { ...defaultBaseProps, 
 interface Emits extends BaseEmits<number> {}
 const emits = defineEmits<Emits>();
 
-const { densityClass, isRendered, label, showErrors, touched, value, visibilityClass, vuetifyBindings } =
+const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } =
   useInputBase<number>(props, emits);
 </script>
 ```

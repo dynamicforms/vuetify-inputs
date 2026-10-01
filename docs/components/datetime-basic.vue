@@ -88,7 +88,7 @@ const timeField = new Field({
 });
 
 function toggleEnabled() {
-  dateTimeField.enabled = !dateTimeField.enabled;
+  dateTimeField.access = dateTimeField.enabled ? 'disabled' : 'editable';
 }
 
 function resetField() {

@@ -108,11 +108,11 @@ const countries = Object.values(getAllCountries()).map(
 const toggleField = (fieldName) => {
   const field = personForm.fields[fieldName];
   if (field) {
-    field.enabled = !field.enabled;
+    field.access = field.enabled ? 'disabled' : 'editable';
   }
 };
 
-// A value changed action on the group fires whenever the group's value changes: a field written, enabled or disabled
+// A value changed action on the group fires whenever what the group holds changes: a field written
 personForm.registerAction(new ValueChangedAction(async (field, supr, newValue, oldValue) => {
   return supr(field, newValue, oldValue);
 }));

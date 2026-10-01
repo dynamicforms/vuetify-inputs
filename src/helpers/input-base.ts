@@ -3,6 +3,7 @@ import { isEmpty, isString } from 'lodash-es';
 import { computed, inject, nextTick, ref, shallowRef, toRaw } from 'vue';
 
 import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
+import { selectShownErrors } from './shown-errors';
 
 export class Label {
   constructor(
@@ -53,7 +54,7 @@ export interface BaseProps<T = any> {
   helpText?: string;
   hint?: string;
   enabled?: boolean;
-  visibility?: Form.DisplayMode | string;
+  visibility?: Form.Visibility;
   cssClass?: string;
   clearable?: boolean;
   passthroughAttrs?: Record<string, any>;
@@ -125,22 +126,26 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const errors = computed(() =>
     props.control ? props.control.errors : (props.errors || []).map((error) => new ValidationErrorRenderContent(error)),
   );
-  const anyErrors = computed(() => (touched.value && errors.value.length > 0 ? ' ' : undefined));
-  const showErrors = computed(() => (touched.value ? errors.value : undefined));
+  // what the user is shown, by the rule selectShownErrors states and the application's shownErrors setting
+  const shownErrors = computed(() => selectShownErrors(errors.value, props.control, touched.value, settings));
+  const anyErrors = computed(() => (shownErrors.value.length > 0 ? ' ' : undefined));
   // a field inside a disabled section is drawn disabled: effectiveEnabled is false where the element or any
   // container above it is disabled, which is the question a rendered input asks
   const enabled = computed(() => (props.control ? props.control.effectiveEnabled : props.enabled !== false));
-  // A control resolves its own mode - vue-forms refuses anything that is not a DisplayMode constant and reads a
-  // name case-insensitively. The prop is resolved the same way, so `visibility="hidden"` states what it looks
-  // like it states and an unrecognised mode is refused here as loudly as it is there.
-  const visibility = computed(() => {
+  // A control states its own visibility - vue-forms refuses anything that is not one of the four. The prop is held to
+  // the same, so an unrecognised visibility is refused here as loudly as it is there.
+  const visibility = computed((): Form.Visibility => {
     if (props.control) return props.control.visibility;
-    if (props.visibility == null) return Form.DisplayMode.FULL;
-    return Form.DisplayMode.fromAny(props.visibility);
+    if (props.visibility == null) return Form.defaultVisibility;
+    if (!Form.isVisibility(props.visibility)) {
+      throw new Error(`'${props.visibility}' is not a visibility: ${Form.visibilityValues.join(', ')}`);
+    }
+    return props.visibility;
   });
-  const isRendered = computed(() => visibility.value !== Form.DisplayMode.SUPPRESS);
+  const isRendered = computed(() => visibility.value !== 'suppress');
   const visibilityClass = computed(() => ({
-    'd-none': visibility.value === Form.DisplayMode.HIDDEN,
+    'd-none': visibility.value === 'hidden',
+    invisible: visibility.value === 'invisible',
   }));
   // the presentation the bound element carries: what a prop does not state is taken from here before any default
   const extra = computed(() => props.control?.extra ?? {});
@@ -168,7 +173,7 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
     valid,
     enabled,
     errors,
-    showErrors,
+    shownErrors,
     visibility,
     isRendered,
     visibilityClass,

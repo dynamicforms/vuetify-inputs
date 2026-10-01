@@ -114,7 +114,7 @@ describe('DfFile', () => {
     const wrapper = mountFile({ control, touchInterval: 1_000 });
     await pickFile(wrapper, pdfFile());
 
-    control.enabled = false;
+    control.access = 'disabled';
     finishUpload('file-id-1');
     await vi.advanceTimersByTimeAsync(1_000);
 
@@ -150,7 +150,7 @@ describe('DfFile', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(control.value).toBe('file-id-1');
 
-    control.enabled = false;
+    control.access = 'disabled';
     await vi.advanceTimersByTimeAsync(1_000);
     await wrapper.vm.$nextTick();
 

@@ -333,7 +333,7 @@ function syncToolbarAction({ action, title, disabled, active }: ToolbarActionSyn
   }
 
   const wantEnabled = !disabled();
-  if (action.enabled !== wantEnabled) action.enabled = wantEnabled;
+  if (action.enabled !== wantEnabled) action.access = wantEnabled ? 'editable' : 'disabled';
 }
 
 const undoRedoActions = [

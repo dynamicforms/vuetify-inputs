@@ -128,16 +128,16 @@ subclass's, and answer what the action draws — the text where `showLabel` stat
 missing or empty, whatever the value holds. The breakpoint-resolved options `<df-actions>` renders from are
 filtered the same way, which is why the component reads none of these accessors.
 
-`enabled`, `busy` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` members
-of `@dynamicforms/vue-forms` (`enabled` and `visibility` settable at the top level of the `new Action()` parameters,
-or via `action.enabled` / `action.visibility` directly; `busy` is a read) - but `<df-actions>` reacts to them too:
+`access`, `busy` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` members
+of `@dynamicforms/vue-forms` (`access` and `visibility` settable at the top level of the `new Action()` parameters,
+or via `action.access` / `action.visibility` directly; `busy` is a read) - but `<df-actions>` reacts to them too:
 
-- `enabled: false` disables the button (`<v-btn disabled>`), and so does a disabled container above the action: what
-  the button binds is `effectiveEnabled`, which is `false` where the action or any `Group` or `List` holding it is
-  disabled.
+- an `access` other than `'editable'` disables the button (`<v-btn disabled>`), and so does a container above the
+  action that is not editable: what the button binds is `effectiveEnabled`.
 - `busy` disables the button and draws it `loading` for as long as a run of the action has yet to settle.
-- `visibility: DisplayMode.HIDDEN` keeps the button in the DOM with a `d-none` class.
-- `visibility: DisplayMode.SUPPRESS` removes the button from the rendered list entirely.
+- `visibility: 'invisible'` keeps the button in the layout with an `invisible` class (`visibility: hidden`).
+- `visibility: 'hidden'` keeps the button in the DOM with a `d-none` class.
+- `visibility: 'suppress'` removes the button from the rendered list entirely.
 
 ### ActionDisplayStyle
 
@@ -345,9 +345,9 @@ const submitAction = new Action({
 });
 ```
 
-`form` here is a `Group`: it hands out what it holds through the `value` property, or through `fullValue` where
-disabled members have to be in the payload. Both follow `visibility`: a `SUPPRESS`ed member is left out of either and
-a `HIDDEN` one is sent as `null`.
+`form` here is a `Group`: it hands out what it sends through the `value` property, or what it holds through
+`fullValue` where disabled members have to be in the payload. Each member's `access` decides what `value` carries
+for it; `visibility` changes neither.
 
 This approach separates visual presentation (the `Action` and its render options) from business logic (the
 `ExecuteAction` handlers), and lets each screen size get the presentation that fits it.

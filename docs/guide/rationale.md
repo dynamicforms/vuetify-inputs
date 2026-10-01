@@ -70,7 +70,7 @@ looks like.
   text, markdown, or a component of its own. [df-input-hint](/examples/df-input-hint)
 - **Labels with icons and markdown.** A label is a string, a `Label` carrying an icon, or an `MdString`.
   [Label](/examples/input-base#label)
-- **Visibility through `DisplayMode`** — `FULL`, `HIDDEN` or `SUPPRESS`, taken from the bound element
+- **Visibility** — `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, taken from the bound element
   or from the `visibility` prop. [Display modes](/examples/input-base#display-modes)
 - **Enablement that follows the section.** A field reads `effectiveEnabled`, so the fields of a disabled group are
   drawn disabled without being disabled one by one. An action button reads the same, and its `busy` besides.

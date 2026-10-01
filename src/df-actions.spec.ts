@@ -1,5 +1,5 @@
 // df-actions.spec.ts
-import { Action as FormAction, DisplayMode, ExecuteAction, Group } from '@dynamicforms/vue-forms';
+import { Action as FormAction, ExecuteAction, Group } from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { vi } from 'vitest';
 import { nextTick, Ref, ref } from 'vue';
@@ -327,7 +327,7 @@ describe('DfActions', () => {
   describe('enabled / disabled', () => {
     it('gumb je onemogočen, ko je action.enabled false', () => {
       const action = createMockAction('save', 'Save');
-      action.enabled = false;
+      action.access = 'disabled';
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
@@ -353,7 +353,7 @@ describe('DfActions', () => {
     it('gumb je onemogočen, ko je onemogočena skupina, ki akcijo drži', () => {
       const action = createMockAction('save', 'Save');
       const form = new Group({ save: action });
-      form.enabled = false;
+      form.access = 'disabled';
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
@@ -455,7 +455,7 @@ describe('DfActions', () => {
   describe('visibility', () => {
     it('doda razred d-none, ko je visibility HIDDEN', () => {
       const action = createMockAction('save', 'Save');
-      action.visibility = DisplayMode.HIDDEN;
+      action.visibility = 'hidden';
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
@@ -465,10 +465,22 @@ describe('DfActions', () => {
       expect(wrapper.find('.v-btn').classes()).toContain('d-none');
     });
 
+    it('doda razred invisible, ko je visibility invisible', () => {
+      const action = createMockAction('save', 'Save');
+      action.visibility = 'invisible';
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [action] },
+        global: { plugins: [vuetify] },
+      });
+
+      expect(wrapper.find('.v-btn').classes()).toContain('invisible');
+    });
+
     it('ne prikaže gumba, ko je visibility SUPPRESS', () => {
       const shownAction = createMockAction('save', 'Save');
       const suppressedAction = createMockAction('secret', 'Secret');
-      suppressedAction.visibility = DisplayMode.SUPPRESS;
+      suppressedAction.visibility = 'suppress';
 
       const wrapper = mount(DfActions, {
         props: { actions: [shownAction, suppressedAction] },

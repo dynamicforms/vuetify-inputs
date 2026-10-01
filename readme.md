@@ -56,9 +56,10 @@ consistent appearance.
 - **A control, a v-model, or neither**: a bound element owns the value, validity, touched, enabled and visibility;
   `v-model` reports changes to the parent; neither keeps the value internally
 - **Errors, hints and help text** in one row, rendered through vue-forms' `MessagesWidget`, so an error may be
-  plain text, markdown or a component of its own
+  plain text, markdown or a component of its own; an error is shown by one rule an application can replace — the
+  server's at once, every other once the field is touched
 - **Labels with icons and markdown**, through the `Label` class and `MdString`
-- **Visibility through `DisplayMode`** — `FULL`, `HIDDEN`, `SUPPRESS` — and enablement that follows the
+- **Visibility** — `'full'`, `'invisible'`, `'hidden'`, `'suppress'` — and enablement that follows the
   containing section
 - **`passthroughAttrs`**: any prop of the underlying Vuetify component, without this library declaring it
 - **Actions**: the `Action` class with render options, `defaultConfirm` / `defaultReject`, the ready-made

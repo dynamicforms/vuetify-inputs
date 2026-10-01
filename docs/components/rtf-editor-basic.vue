@@ -57,7 +57,7 @@ const contentField = new Field({
 });
 
 function toggleEnabled() {
-  contentField.enabled = !contentField.enabled;
+  contentField.access = contentField.enabled ? 'disabled' : 'editable';
 }
 
 function resetField() {

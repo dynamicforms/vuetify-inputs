@@ -47,7 +47,7 @@ describe('DisplayMode visibility', () => {
     vuetify = createVuetify({ components });
   });
 
-  const mountWith = (component: any, extraProps: Record<string, any>, visibility: Form.DisplayMode) => {
+  const mountWith = (component: any, extraProps: Record<string, any>, visibility: Form.Visibility) => {
     const control = new Form.Field({ value: null, visibility });
     return mount(component, {
       props: { control, label: 'Test Label', ...extraProps },
@@ -57,21 +57,30 @@ describe('DisplayMode visibility', () => {
 
   describe.each(inputComponents)('%s', (_name, component, extraProps) => {
     it('renders nothing when control visibility is SUPPRESS', () => {
-      const wrapper = mountWith(component, extraProps, Form.DisplayMode.SUPPRESS);
+      const wrapper = mountWith(component, extraProps, 'suppress');
 
       expect(wrapper.find('.v-input').exists()).toBe(false);
       expect(wrapper.html()).toBe('<!--v-if-->');
     });
 
-    it('renders with the d-none class when control visibility is HIDDEN', () => {
-      const wrapper = mountWith(component, extraProps, Form.DisplayMode.HIDDEN);
+    it("renders with the d-none class when control visibility is 'hidden'", () => {
+      const wrapper = mountWith(component, extraProps, 'hidden');
 
       expect(wrapper.find('.v-input').exists()).toBe(true);
       expect(wrapper.classes()).toContain('d-none');
+      expect(wrapper.classes()).not.toContain('invisible');
+    });
+
+    it("renders with the invisible class when control visibility is 'invisible'", () => {
+      const wrapper = mountWith(component, extraProps, 'invisible');
+
+      expect(wrapper.find('.v-input').exists()).toBe(true);
+      expect(wrapper.classes()).toContain('invisible');
+      expect(wrapper.classes()).not.toContain('d-none');
     });
 
     it('renders without visibility classes when control visibility is FULL', () => {
-      const wrapper = mountWith(component, extraProps, Form.DisplayMode.FULL);
+      const wrapper = mountWith(component, extraProps, 'full');
 
       expect(wrapper.find('.v-input').exists()).toBe(true);
       expect(wrapper.classes()).not.toContain('d-none');
@@ -79,7 +88,7 @@ describe('DisplayMode visibility', () => {
 
     it('falls back to the visibility prop when no control is bound', () => {
       const wrapper = mount(component, {
-        props: { visibility: Form.DisplayMode.HIDDEN, label: 'Test Label', ...extraProps },
+        props: { visibility: 'hidden', label: 'Test Label', ...extraProps },
         global: { plugins: [vuetify] },
       });
 
@@ -87,9 +96,9 @@ describe('DisplayMode visibility', () => {
     });
 
     it('takes visibility from the control when the prop says otherwise', () => {
-      const control = new Form.Field({ value: null, visibility: Form.DisplayMode.FULL });
+      const control = new Form.Field({ value: null, visibility: 'full' });
       const wrapper = mount(component, {
-        props: { control, visibility: Form.DisplayMode.SUPPRESS, label: 'Test Label', ...extraProps },
+        props: { control, visibility: 'suppress', label: 'Test Label', ...extraProps },
         global: { plugins: [vuetify] },
       });
 
@@ -98,7 +107,7 @@ describe('DisplayMode visibility', () => {
     });
 
     it('reacts to control visibility changes', async () => {
-      const control = new Form.Field({ value: null, visibility: Form.DisplayMode.FULL });
+      const control = new Form.Field({ value: null, visibility: 'full' });
       const wrapper = mount(component, {
         props: { control, label: 'Test Label', ...extraProps },
         global: { plugins: [vuetify] },
@@ -106,12 +115,12 @@ describe('DisplayMode visibility', () => {
 
       expect(wrapper.classes()).not.toContain('d-none');
 
-      control.visibility = Form.DisplayMode.HIDDEN;
+      control.visibility = 'hidden';
       await wrapper.vm.$nextTick();
 
       expect(wrapper.classes()).toContain('d-none');
 
-      control.visibility = Form.DisplayMode.SUPPRESS;
+      control.visibility = 'suppress';
       await wrapper.vm.$nextTick();
 
       expect(wrapper.html()).toBe('<!--v-if-->');
