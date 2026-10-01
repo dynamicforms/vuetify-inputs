@@ -277,20 +277,42 @@ describe('input-base', () => {
         expect(errors.value).toEqual([]);
       });
 
-      it('showErrors returns errors only when touched', async () => {
+      it('shownErrors holds an error back until the control is touched', async () => {
         const control = new Form.Field({ value: '' });
         control.errors = [new ValidationErrorRenderContent('Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
 
-        const { showErrors, touched } = useInputBase(props, emit);
+        const { shownErrors, touched } = useInputBase(props, emit);
 
-        expect(showErrors.value).toBeUndefined();
+        expect(shownErrors.value).toEqual([]);
 
         touched.value = true;
         await nextTick();
 
-        expect(showErrors.value).toEqual(control.errors);
+        expect(shownErrors.value).toEqual(control.errors);
+      });
+
+      it('shownErrors shows an error the server returned at once', () => {
+        const control = new Form.Field({ value: '' });
+        control.errors = [new ValidationErrorRenderContent('Taken', '', 'taken', 'server')];
+
+        const { shownErrors, touched } = useInputBase({ control }, vi.fn());
+
+        expect(touched.value).toBe(false);
+        expect(shownErrors.value).toHaveLength(1);
+      });
+
+      it('shownErrors shows nothing for a control that is sent nowhere', () => {
+        const control = new Form.Field({ value: '' });
+        const section = new Form.Group({ control }, { access: 'disabled-null' });
+        control.errors = [new ValidationErrorRenderContent('Taken', '', 'taken', 'server')];
+        control.touched = true;
+
+        const { shownErrors } = useInputBase({ control }, vi.fn());
+
+        expect(section.fields.control.effectiveAccess).toBe('disabled');
+        expect(shownErrors.value).toEqual([]);
       });
 
       it('anyErrors returns space when touched and has errors', async () => {
@@ -312,7 +334,7 @@ describe('input-base', () => {
 
     describe('enabled', () => {
       it('returns control.enabled when control is provided', () => {
-        const control = new Form.Field({ value: 'test', enabled: false });
+        const control = new Form.Field({ value: 'test', access: 'disabled' });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -334,64 +356,64 @@ describe('input-base', () => {
     });
 
     describe('visibility', () => {
-      const fromProp = (visibility: Form.DisplayMode): BaseProps => ({ visibility });
-      const fromControl = (visibility: Form.DisplayMode): BaseProps => ({
+      const fromProp = (visibility: Form.Visibility): BaseProps => ({ visibility });
+      const fromControl = (visibility: Form.Visibility): BaseProps => ({
         control: new Form.Field({ value: 'test', visibility }),
       });
 
       it('returns control.visibility when control is provided', () => {
-        const control = new Form.Field({ value: 'test', visibility: Form.DisplayMode.HIDDEN });
+        const control = new Form.Field({ value: 'test', visibility: 'hidden' });
         const props: BaseProps = { control };
         const emit = vi.fn();
 
         const { visibility } = useInputBase(props, emit);
 
-        expect(visibility.value).toBe(Form.DisplayMode.HIDDEN);
+        expect(visibility.value).toBe('hidden');
       });
 
       it('returns props.visibility when provided and no control', () => {
-        const props: BaseProps = { visibility: Form.DisplayMode.HIDDEN };
+        const props: BaseProps = { visibility: 'hidden' };
         const emit = vi.fn();
 
         const { visibility } = useInputBase(props, emit);
 
-        expect(visibility.value).toBe(Form.DisplayMode.HIDDEN);
+        expect(visibility.value).toBe('hidden');
       });
 
-      it('returns DisplayMode.FULL as default when no control and no visibility prop', () => {
+      it("returns 'full' as default when no control and no visibility prop", () => {
         const props: BaseProps = {};
         const emit = vi.fn();
 
         const { visibility } = useInputBase(props, emit);
 
-        expect(visibility.value).toBe(Form.DisplayMode.FULL);
+        expect(visibility.value).toBe('full');
       });
 
       it('control.visibility takes precedence over the visibility prop', () => {
-        const control = new Form.Field({ value: 'test', visibility: Form.DisplayMode.SUPPRESS });
-        const props: BaseProps = { control, visibility: Form.DisplayMode.FULL };
+        const control = new Form.Field({ value: 'test', visibility: 'suppress' });
+        const props: BaseProps = { control, visibility: 'full' };
         const emit = vi.fn();
 
         const result = useInputBase(props, emit);
 
-        expect(result.visibility.value).toBe(Form.DisplayMode.SUPPRESS);
+        expect(result.visibility.value).toBe('suppress');
         expect(result.isRendered.value).toBe(false);
       });
 
       it('isRendered is false only for SUPPRESS when driven by control', () => {
         const emit = vi.fn();
 
-        expect(useInputBase(fromControl(Form.DisplayMode.FULL), emit).isRendered.value).toBe(true);
-        expect(useInputBase(fromControl(Form.DisplayMode.HIDDEN), emit).isRendered.value).toBe(true);
-        expect(useInputBase(fromControl(Form.DisplayMode.SUPPRESS), emit).isRendered.value).toBe(false);
+        expect(useInputBase(fromControl('full'), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromControl('hidden'), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromControl('suppress'), emit).isRendered.value).toBe(false);
       });
 
       it('isRendered is false only for SUPPRESS when driven by the visibility prop', () => {
         const emit = vi.fn();
 
-        expect(useInputBase(fromProp(Form.DisplayMode.FULL), emit).isRendered.value).toBe(true);
-        expect(useInputBase(fromProp(Form.DisplayMode.HIDDEN), emit).isRendered.value).toBe(true);
-        expect(useInputBase(fromProp(Form.DisplayMode.SUPPRESS), emit).isRendered.value).toBe(false);
+        expect(useInputBase(fromProp('full'), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromProp('hidden'), emit).isRendered.value).toBe(true);
+        expect(useInputBase(fromProp('suppress'), emit).isRendered.value).toBe(false);
       });
 
       it('isRendered is true when no control and no visibility prop', () => {
@@ -403,38 +425,26 @@ describe('input-base', () => {
         expect(isRendered.value).toBe(true);
       });
 
-      it('visibilityClass sets d-none for HIDDEN only when driven by control', () => {
+      it.each([
+        ['full', { 'd-none': false, invisible: false }],
+        ['invisible', { 'd-none': false, invisible: true }],
+        ['hidden', { 'd-none': true, invisible: false }],
+        ['suppress', { 'd-none': false, invisible: false }],
+      ] as const)('visibilityClass for %s, driven by the control and by the prop alike', (visibility, classes) => {
         const emit = vi.fn();
 
-        expect(useInputBase(fromControl(Form.DisplayMode.FULL), emit).visibilityClass.value).toEqual({
-          'd-none': false,
-        });
-        expect(useInputBase(fromControl(Form.DisplayMode.HIDDEN), emit).visibilityClass.value).toEqual({
-          'd-none': true,
-        });
-        expect(useInputBase(fromControl(Form.DisplayMode.SUPPRESS), emit).visibilityClass.value).toEqual({
-          'd-none': false,
-        });
-      });
-
-      it('visibilityClass sets d-none for HIDDEN only from the prop', () => {
-        const emit = vi.fn();
-
-        expect(useInputBase(fromProp(Form.DisplayMode.FULL), emit).visibilityClass.value).toEqual({ 'd-none': false });
-        expect(useInputBase(fromProp(Form.DisplayMode.HIDDEN), emit).visibilityClass.value).toEqual({ 'd-none': true });
-        expect(useInputBase(fromProp(Form.DisplayMode.SUPPRESS), emit).visibilityClass.value).toEqual({
-          'd-none': false,
-        });
+        expect(useInputBase(fromControl(visibility), emit).visibilityClass.value).toEqual(classes);
+        expect(useInputBase(fromProp(visibility), emit).visibilityClass.value).toEqual(classes);
       });
 
       it('visibilityClass follows the control rather than the visibility prop', () => {
-        const control = new Form.Field({ value: 'test', visibility: Form.DisplayMode.HIDDEN });
-        const props: BaseProps = { control, visibility: Form.DisplayMode.FULL };
+        const control = new Form.Field({ value: 'test', visibility: 'hidden' });
+        const props: BaseProps = { control, visibility: 'full' };
         const emit = vi.fn();
 
         const { visibilityClass } = useInputBase(props, emit);
 
-        expect(visibilityClass.value).toEqual({ 'd-none': true });
+        expect(visibilityClass.value).toEqual({ 'd-none': true, invisible: false });
       });
 
       it('visibilityClass sets no class when no control and no visibility prop', () => {
@@ -443,7 +453,7 @@ describe('input-base', () => {
 
         const { visibilityClass } = useInputBase(props, emit);
 
-        expect(visibilityClass.value).toEqual({ 'd-none': false });
+        expect(visibilityClass.value).toEqual({ 'd-none': false, invisible: false });
       });
 
       it('isRendered and visibilityClass follow control.visibility changes', async () => {
@@ -454,14 +464,14 @@ describe('input-base', () => {
         const { isRendered, visibilityClass } = useInputBase(props, emit);
 
         expect(isRendered.value).toBe(true);
-        expect(visibilityClass.value).toEqual({ 'd-none': false });
+        expect(visibilityClass.value).toEqual({ 'd-none': false, invisible: false });
 
-        control.visibility = Form.DisplayMode.HIDDEN;
+        control.visibility = 'invisible';
         await nextTick();
 
-        expect(visibilityClass.value).toEqual({ 'd-none': true });
+        expect(visibilityClass.value).toEqual({ 'd-none': false, invisible: true });
 
-        control.visibility = Form.DisplayMode.SUPPRESS;
+        control.visibility = 'suppress';
         await nextTick();
 
         expect(isRendered.value).toBe(false);
@@ -571,7 +581,7 @@ describe('input-base', () => {
 
         expect(enabled.value).toBe(true);
 
-        section.enabled = false;
+        section.access = 'disabled';
 
         expect(section.fields.amount.enabled).toBe(true);
         expect(enabled.value).toBe(false);
@@ -581,29 +591,29 @@ describe('input-base', () => {
     });
 
     describe('visibility prop', () => {
-      it('resolves a mode named as a string', () => {
+      it('takes the visibility it names', () => {
         const emit = vi.fn();
 
         const { visibility, isRendered } = useInputBase({ visibility: 'hidden' }, emit);
 
-        expect(visibility.value).toBe(Form.DisplayMode.HIDDEN);
+        expect(visibility.value).toBe('hidden');
         expect(isRendered.value).toBe(true);
       });
 
-      it('refuses a mode that names no DisplayMode constant', () => {
+      it('refuses a string that is none of the four visibilities', () => {
         const emit = vi.fn();
 
-        const { visibility } = useInputBase({ visibility: 'hiden' }, emit);
+        const { visibility } = useInputBase({ visibility: 'hiden' as Form.Visibility }, emit);
 
-        expect(() => visibility.value).toThrow();
+        expect(() => visibility.value).toThrow("'hiden' is not a visibility");
       });
 
-      it('is FULL when the prop names nothing', () => {
+      it("is 'full' when the prop names nothing", () => {
         const emit = vi.fn();
 
         const { visibility } = useInputBase({}, emit);
 
-        expect(visibility.value).toBe(Form.DisplayMode.FULL);
+        expect(visibility.value).toBe('full');
       });
     });
 

@@ -136,7 +136,7 @@ describe('DfImage', () => {
     const wrapper = mountImage({ control, touchInterval: 1_000 });
     await pickImage(wrapper, pngFile());
 
-    control.enabled = false;
+    control.access = 'disabled';
     finishUpload('https://example.com/uploaded.png');
     await vi.advanceTimersByTimeAsync(1_000);
 
@@ -173,7 +173,7 @@ describe('DfImage', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(control.value).toBe('https://example.com/uploaded.png');
 
-    control.enabled = false;
+    control.access = 'disabled';
     await vi.advanceTimersByTimeAsync(1_000);
     await wrapper.vm.$nextTick();
 

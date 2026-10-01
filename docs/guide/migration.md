@@ -8,32 +8,51 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
-## Upgrading to v0.12.0 (from v0.11.x)
+## Upgrading to v0.12.1 (from v0.11.x)
 
-0.12.0 requires `@dynamicforms/vue-forms` 2.0. Upgrade the two together, and read the
+0.12.1 requires `@dynamicforms/vue-forms` 2.0.2; 0.12.0 was withdrawn, and a project on it follows this section as
+well, from 0.11. Upgrade the two together, and read the
 [vue-forms migration guide](https://docs.velis.si/dynamicforms/vue-forms/guide/migration) first: most of what changes
-in a form's behaviour comes from vue-forms, and this section covers only what changes in the components on top of
-it. Four of the changes below are silent - code that relied on them keeps compiling and behaves differently - and
-they come first. There is a [checklist](#checklist-for-0-12-0) at the end of this section.
+in a form's behaviour comes from vue-forms, and this section covers what changes in the components on top of it. The
+silent changes come first. There is a [checklist](#checklist-for-0-12-1) at the end of this section.
 
 ```bash
-npm install @dynamicforms/vue-forms@^2.0.0 @dynamicforms/vuetify-inputs@^0.12.0
+npm install @dynamicforms/vue-forms@^2.0.2 @dynamicforms/vuetify-inputs@^0.12.1
 ```
 
-### What vue-forms 2.0 changes under the components
+### What vue-forms 2.0.2 changes under the components
 
-Three vue-forms changes reach every form these components render:
+- **`access` decides what an input sends, and whether it is validated.** `enabled` is read from it: an input accepts
+  typing where its field's `effectiveAccess` is `'editable'`. A field that is `'disabled'` — or sits in a container
+  that is `'disabled'` or `'disabled-null'` — is not sent and not validated, so its errors neither block a submit nor
+  appear under the input. Code that toggled `field.enabled` writes `field.access` instead.
+- **`visibility` is presentation alone.** The input reads it to draw itself and nothing else: a hidden input is still
+  sent and validated. A form that hid an input to keep it out of the payload sets its access as well.
+- **A field takes a write whatever its access.** Code that disabled a field to protect it from an assignment needs
+  the assignment itself to be conditional. The components adjust to this below.
 
-- **A hidden input is out of the form's data.** An input whose field is `HIDDEN` is sent as `null`, and one that is
-  `SUPPRESS`ed is left out of the container's `value` and `fullValue`. Neither counts in the container's `valid`, so
-  an invalid field the user cannot see no longer blocks a submit button bound to `form.valid`. A form that hid an
-  input and also disabled it to keep it out of the payload can drop the `enabled` write.
-- **Enabling or disabling a field is a change of the form.** A `ValueChangedAction` on a `Group` also runs when a
-  member is enabled or disabled and the group's value changes because of it. A handler that saves or recomputes on
-  every change of the form runs for these switches as well.
-- **A disabled field takes a write.** `enabled` decides whether the input accepts what the user types and whether the
-  field is serialized, not whether a write reaches the field. Code that disabled a field to protect it from an
-  assignment needs the assignment itself to be conditional. The components adjust to this below.
+### An error is shown by one rule, and an error from the server is shown at once
+
+The inputs show `shownErrors` rather than every error once the field is touched. A validator's error, and one the
+application wrote, still appear once the field is touched. An error whose
+[origin](https://docs.velis.si/dynamicforms/vue-forms/api/validators#origin) is `'server'` appears at once, so code
+that marked fields touched after the server answered, to make its errors appear, can drop that. An input whose field
+is sent nowhere shows no error at all.
+
+```typescript
+// before: the server's errors stayed out of sight until each field was marked touched
+field.errors.push(new ValidationErrorText(message));
+field.touched = true;
+
+// after: the origin says where the error comes from, and the input shows it
+field.errors.push(new ValidationErrorText(message, '', 'server-error', 'server'));
+```
+
+`useInputBase()` returns the list as `shownErrors`, in place of `showErrors`, and it is an empty array rather than
+`undefined` while nothing is to be shown. A custom component binding `showErrors` to `DfInputHint` binds
+`shownErrors`. The rule is replaced application-wide through the `shownErrors` setting, and a template rendering
+errors of its own — a group's — shows them by the same rule with `useShownErrors(element)`; see
+[Shown errors](/examples/input-base#shown-errors).
 
 ### `<df-datetime>` writes only what the user edits
 
@@ -73,34 +92,35 @@ in the upgrade corrects them.
 In `date` mode a date without a time is read as that day in local time. Before, it was read as UTC midnight, so west
 of Greenwich `'2026-01-15'` was shown as 14 January and the component stopped with the same error.
 
-### `<df-select>` states no default while disabled
+### `<df-select>` states no default while it accepts no input
 
-With `allowNull: false`, an enabled select whose value is empty selects the first choice, as before. A select drawn
-disabled leaves the value empty, and selects the first choice when it is enabled. Two cases behave differently:
+With `allowNull: false`, an editable select whose value is empty selects the first choice, as before. A select drawn
+without input leaves the value empty, and selects the first choice when it becomes editable. Two cases behave
+differently:
 
 ```typescript
 const country = new Field<string | null>({ value: null });
-const form = new Group({ country }, { enabled: false });
+const form = new Group({ country }, { access: 'readonly' });   // before: { enabled: false }
 // rendered with <df-select :control="country" :choices="countries" :allow-null="false" />
 country.value;           // before: the first choice   after: null
 form.isChanged;          // before: true               after: false
 
-form.enabled = true;
+form.access = 'editable';
 country.value;           // the first choice either way
 
-const region = new Field<string | null>({ value: null, enabled: false });
+const region = new Field<string | null>({ value: null, access: 'disabled' });   // before: { enabled: false }
 // rendered the same way
-region.enabled = true;
+region.access = 'editable';
 region.value;            // before: null               after: the first choice
 ```
 
-- A select inside a disabled `Group` is drawn disabled, but the field itself is enabled, so the first choice used to
-  be written into it on mount. It no longer is: the form's data carries no choice the user did not make, and the form
-  does not start out changed.
-- A select whose own field was disabled at mount stayed empty after it was enabled. It now selects the first choice
-  at that moment, like a select that was enabled from the start.
+- A select inside a section that accepts no input is drawn without input, but its own field is editable, so the
+  first choice used to be written into it on mount. It no longer is: the form's data carries no choice the user did
+  not make, and the form does not start out changed.
+- A select whose own field accepted no input at mount stayed empty once it did. It now selects the first choice at
+  that moment, like a select that was editable from the start.
 
-Where a disabled select has to carry a value, give the field that value when it is created.
+Where a select that accepts no input has to carry a value, give the field that value when it is created.
 
 ### `<df-file>` and `<df-image>` write into a disabled field
 
@@ -113,28 +133,45 @@ A touch that rejects with `FileGoneError` clears a disabled field too. Before, t
 showed no file while the field went on holding the identifier the backend had discarded, and the form was submitted
 with it. No code change is needed.
 
-### `DisplayMode.INVISIBLE` is gone
+### The `visibility` prop takes the visibility strings
 
-vue-forms 2.0 removes `DisplayMode.INVISIBLE`, and the components remove what drew it:
+The prop takes `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, exactly as vue-forms spells them. The
+`DisplayMode` constants are gone from vue-forms, and a number or an upper-case name throws while the component
+renders. `'invisible'` draws as it did, with the `invisible` class.
 
-- `visibility="invisible"` and `:visibility="8"` throw while the component renders, like any other mode that does
-  not exist. Use `HIDDEN` or `SUPPRESS`.
-- `useInputBase().visibilityClass` is `{ 'd-none': boolean }`; the `invisible` key is gone. A custom component that
-  bound the object keeps working.
-- `global.css` no longer defines `.invisible`. Markup of your own that used the class needs the rule
-  `.invisible { visibility: hidden; }` in your own styles.
+```vue
+<!-- before -->
+<df-input v-model="secret" :visibility="DisplayMode.HIDDEN" />
+<df-input v-model="secret" visibility="HIDDEN" />
+<!-- after -->
+<df-input v-model="secret" visibility="hidden" />
+```
 
-### Checklist for 0.12.0
+### `ActionDisplayStyle` is a string
 
-1. Upgrade `@dynamicforms/vue-forms` to `^2.0.0` alongside this release, and work through its migration guide.
-2. Search for `INVISIBLE` and `'invisible'` and replace them with `HIDDEN` or `SUPPRESS`; add a `.invisible` rule of
-   your own if your markup uses the class.
-3. Search for code that disabled a field to keep it out of the payload and for handlers on a form's
-   `ValueChangedAction`: the first can use `SUPPRESS`, the second now also runs on enabling and disabling.
-4. Search for code that reads a `<df-datetime>` field's value as a string in the local offset, and parse it instead.
-5. Where a `<df-select>` with `allowNull: false` inside a disabled section was expected to hold the first choice, give
-   the field that value when it is created.
-6. If users in a time zone with daylight saving time edited date-times with an earlier version, check stored values
+`ActionDisplayStyle` is the type `'button' | 'text'` rather than an enum, and an action's `renderAs` states one of the
+two strings. `ActionDisplayStyle.BUTTON` and `.TEXT` are compile errors, and a number, an upper-case name or any other
+value throws when the action is rendered, where it used to be drawn as a button.
+
+```typescript
+// before
+new Action({ value: { label: 'Save', renderAs: ActionDisplayStyle.BUTTON, xl: { renderAs: 'TEXT' } } });
+// after
+new Action({ value: { label: 'Save', renderAs: 'button', xl: { renderAs: 'text' } } });
+```
+
+### Checklist for 0.12.1
+
+1. Upgrade `@dynamicforms/vue-forms` to `^2.0.2` alongside this release, and work through its migration guide.
+2. Replace writes of `field.enabled` with `field.access`, the `DisplayMode` constants, numbers and upper-case names
+   given to `visibility` with the visibility strings, and `ActionDisplayStyle.BUTTON`/`.TEXT` with `'button'`/`'text'`.
+3. Where hiding an input was meant to keep it out of the payload, set its access as well.
+4. Give errors the server returned the origin `'server'`, and drop code that marked fields touched to make them
+   appear; replace `showErrors` with `shownErrors` in custom components built on `useInputBase()`.
+5. Search for code that reads a `<df-datetime>` field's value as a string in the local offset, and parse it instead.
+6. Where a `<df-select>` with `allowNull: false` in a section that accepts no input was expected to hold the first
+   choice, give the field that value when it is created.
+7. If users in a time zone with daylight saving time edited date-times with an earlier version, check stored values
    for dates on the other side of the change from the day they were saved.
 
 ## Upgrading to v0.11.0 (from v0.10.5)

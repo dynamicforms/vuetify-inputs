@@ -70,7 +70,7 @@ describe('DfDateTime', () => {
     });
 
     it('leaves a disabled field as it is', async () => {
-      const control = new Field<string | null>({ value: '2026-01-15T09:00:00Z', enabled: false });
+      const control = new Field<string | null>({ value: '2026-01-15T09:00:00Z', access: 'disabled' });
       mountDateTime({ control });
 
       await flushPromises();

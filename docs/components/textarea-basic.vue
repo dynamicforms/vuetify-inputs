@@ -38,7 +38,7 @@ const descriptionField = new Field({
 });
 
 function toggleEnabled() {
-  descriptionField.enabled = !descriptionField.enabled;
+  descriptionField.access = descriptionField.enabled ? 'disabled' : 'editable';
 }
 
 function resetField() {

@@ -54,7 +54,7 @@
       </v-list-item>
     </template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="showErrors" />
+      <df-input-hint :message="message" :errors="shownErrors" />
     </template>
     <template v-if="$slots['append-inner']" #append-inner="props">
       <slot name="append-inner" v-bind="props" />
@@ -107,7 +107,7 @@ const {
   densityClass,
   isRendered,
   label,
-  showErrors,
+  shownErrors,
   touched,
   value: resultingValue,
   visibilityClass,

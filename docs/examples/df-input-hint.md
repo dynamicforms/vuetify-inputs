@@ -47,14 +47,15 @@ Markdown needs a globally registered `vue-markdown` component and the vue-forms 
 Every input component in the library overrides the Vuetify `#message` slot of the control it wraps with the same line:
 
 ```vue
-<template #message="{ message }"><df-input-hint :message="message" :errors="showErrors" /></template>
+<template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
 ```
 
 `message` is what Vuetify hands the slot, which is the `hint` prop: the inputs bind `persistent-hint` always and
-`hide-details="auto"`, so the row is there whenever there is something to put in it and gone otherwise. `showErrors` is
+`hide-details="auto"`, so the row is there whenever there is something to put in it and gone otherwise. `shownErrors` is
 the field's errors — `control.errors` when a control is bound, and the `errors` string array wrapped in
-`ValidationErrorRenderContent` when the component is used with `v-model` — but only once the field is touched;
-before that it is `undefined` and the hint holds the row. `helpText` is not part of this row.
+`ValidationErrorRenderContent` when the component is used with `v-model` — as far as they are to be shown now: an error
+the server returned at once, every other once the field is touched (see
+[Shown errors](/examples/input-base#shown-errors)). While it is empty the hint holds the row. `helpText` is not part of this row.
 
 The inputs also report a single blank error message to Vuetify while a touched field is invalid. That is what paints
 the control's error state and keeps the message row on screen; the text in the row is `DfInputHint`'s.

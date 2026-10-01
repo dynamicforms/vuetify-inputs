@@ -65,7 +65,7 @@ const colorField = new Field({
 const directColor = ref('#81C784');
 
 function toggleEnabled() {
-  colorField.enabled = !colorField.enabled;
+  colorField.access = colorField.enabled ? 'disabled' : 'editable';
 }
 
 function resetField() {

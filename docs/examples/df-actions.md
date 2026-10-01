@@ -35,7 +35,7 @@ interface ActionBreakpointOptions {
   name?: string;                    // Unique identifier for the action
   label?: string;                   // Display text
   icon?: string;                    // Icon name, resolved by vue-cached-icon (e.g. ion-save-outline, mdi-content-save)
-  renderAs?: ActionDisplayStyle;    // BUTTON or TEXT
+  renderAs?: ActionDisplayStyle;    // 'button' or 'text'
   showIcon?: boolean;               // Whether to show the icon
   showLabel?: boolean;              // Whether to show the label
   defaultConfirm?: boolean;         // Marks the action as the "confirm" one - colored primary by default
@@ -87,7 +87,7 @@ value renders as at one breakpoint, defaults filled in and `label` / `icon` filt
 Actions are created with the `Action` constructor:
 
 ```typescript
-import { Action, ActionDisplayStyle } from '@dynamicforms/vuetify-inputs';
+import { Action } from '@dynamicforms/vuetify-inputs';
 import { ExecuteAction } from '@dynamicforms/vue-forms';
 
 const saveAction = new Action({
@@ -95,7 +95,7 @@ const saveAction = new Action({
     name: 'save',
     label: 'Save',
     icon: 'save-outline',
-    renderAs: ActionDisplayStyle.BUTTON,
+    renderAs: 'button',
     showIcon: true,
     showLabel: true
   },
@@ -112,7 +112,7 @@ The `value` object defines the visual appearance and behavior:
 | `name` | `string` | Unique identifier for the action |
 | `label` | `string` | Display text |
 | `icon` | `string` | Icon name, resolved by `vue-cached-icon`; both `ion-` and `mdi-` prefixed names work |
-| `renderAs` | `ActionDisplayStyle` | How to render: `BUTTON` or `TEXT` |
+| `renderAs` | `ActionDisplayStyle` | How to render: `'button'` or `'text'` |
 | `showIcon` | `boolean` | Whether to display the icon |
 | `showLabel` | `boolean` | Whether to display the label |
 | `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the button `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
@@ -128,21 +128,26 @@ subclass's, and answer what the action draws — the text where `showLabel` stat
 missing or empty, whatever the value holds. The breakpoint-resolved options `<df-actions>` renders from are
 filtered the same way, which is why the component reads none of these accessors.
 
-`enabled`, `busy` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` members
-of `@dynamicforms/vue-forms` (`enabled` and `visibility` settable at the top level of the `new Action()` parameters,
-or via `action.enabled` / `action.visibility` directly; `busy` is a read) - but `<df-actions>` reacts to them too:
+`access`, `busy` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` members
+of `@dynamicforms/vue-forms` (`access` and `visibility` settable at the top level of the `new Action()` parameters,
+or via `action.access` / `action.visibility` directly; `busy` is a read) - but `<df-actions>` reacts to them too:
 
-- `enabled: false` disables the button (`<v-btn disabled>`), and so does a disabled container above the action: what
-  the button binds is `effectiveEnabled`, which is `false` where the action or any `Group` or `List` holding it is
-  disabled.
+- an `access` other than `'editable'` disables the button (`<v-btn disabled>`), and so does a container above the
+  action that is not editable: what the button binds is `effectiveEnabled`.
 - `busy` disables the button and draws it `loading` for as long as a run of the action has yet to settle.
-- `visibility: DisplayMode.HIDDEN` keeps the button in the DOM with a `d-none` class.
-- `visibility: DisplayMode.SUPPRESS` removes the button from the rendered list entirely.
+- `visibility: 'invisible'` keeps the button in the layout with an `invisible` class (`visibility: hidden`).
+- `visibility: 'hidden'` keeps the button in the DOM with a `d-none` class.
+- `visibility: 'suppress'` removes the button from the rendered list entirely.
 
 ### ActionDisplayStyle
 
-- **`ActionDisplayStyle.BUTTON`**: Renders as a Material Design button with background
-- **`ActionDisplayStyle.TEXT`**: Renders as a text link without background
+`ActionDisplayStyle` is `'button' | 'text'`:
+
+- **`'button'`**: Renders as a Material Design button with background (the default, `defaultDisplayStyle`)
+- **`'text'`**: Renders as a text link without background
+
+Any other `renderAs` throws an `Error` naming the value when the action is rendered. `isActionDisplayStyle(value)`
+answers whether a value is one of the two, and `actionDisplayStyles` lists them.
 
 ### Responsive Breakpoints
 
@@ -154,7 +159,7 @@ const responsiveAction = new Action({
     name: 'save',
     label: 'Save Document',
     icon: 'save-outline',
-    renderAs: ActionDisplayStyle.BUTTON,
+    renderAs: 'button',
     showIcon: false,      // Default: no icon
     showLabel: true,      // Default: show label
     
@@ -172,7 +177,7 @@ const responsiveAction = new Action({
     
     // Large screens: render as text link
     lg: { 
-      renderAs: ActionDisplayStyle.TEXT 
+      renderAs: 'text' 
     }
   }
 });
@@ -260,7 +265,7 @@ const noAction = Action.noAction();
 const customCloseAction = Action.closeAction({
   value: {
     label: 'Cancel',
-    renderAs: ActionDisplayStyle.TEXT
+    renderAs: 'text'
   }
 });
 ```
@@ -300,7 +305,7 @@ const deleteAction = new Action({
     name: 'delete',
     label: 'Delete',
     icon: 'trash-outline',
-    renderAs: ActionDisplayStyle.BUTTON,
+    renderAs: 'button',
     showIcon: true,
     showLabel: true,
     passthroughAttrs: { color: 'error', variant: 'flat' },
@@ -312,7 +317,7 @@ const deleteAction = new Action({
 ### Complete Example
 
 ```typescript
-import { Action, ActionDisplayStyle } from '@dynamicforms/vuetify-inputs';
+import { Action } from '@dynamicforms/vuetify-inputs';
 import { ExecuteAction } from '@dynamicforms/vue-forms';
 
 // Business logic
@@ -328,7 +333,7 @@ const submitAction = new Action({
     name: 'submit',
     label: 'Submit Form',
     icon: 'checkmark-outline',
-    renderAs: ActionDisplayStyle.BUTTON,
+    renderAs: 'button',
     showIcon: false,
     showLabel: true,
     
@@ -339,15 +344,15 @@ const submitAction = new Action({
     md: { showIcon: true, showLabel: true },
     
     // Desktop: text link style
-    xl: { renderAs: ActionDisplayStyle.TEXT }
+    xl: { renderAs: 'text' }
   },
   actions: [submitFormAction]
 });
 ```
 
-`form` here is a `Group`: it hands out what it holds through the `value` property, or through `fullValue` where
-disabled members have to be in the payload. Both follow `visibility`: a `SUPPRESS`ed member is left out of either and
-a `HIDDEN` one is sent as `null`.
+`form` here is a `Group`: it hands out what it sends through the `value` property, or what it holds through
+`fullValue` where disabled members have to be in the payload. Each member's `access` decides what `value` carries
+for it; `visibility` changes neither.
 
 This approach separates visual presentation (the `Action` and its render options) from business logic (the
 `ExecuteAction` handlers), and lets each screen size get the presentation that fits it.
@@ -362,7 +367,7 @@ const saveAction = new Action({
     name: 'save',
     label: 'Save',
     icon: 'save-outline',
-    renderAs: ActionDisplayStyle.BUTTON,
+    renderAs: 'button',
     showIcon: true,
     showLabel: false,
     md: { showLabel: true, showIcon: false }, // Medium screens and up
@@ -394,7 +399,7 @@ The `showAsGroup` property allows you to control the visual grouping of buttons:
 
 <script setup>
   import { ExecuteAction } from '@dynamicforms/vue-forms';
-  import { Action, ActionDisplayStyle } from '@dynamicforms/vuetify-inputs';
+  import { Action } from '@dynamicforms/vuetify-inputs';
 
   // Create form action
   const saveFormAction = new ExecuteAction((action, supr, params) => {
@@ -410,7 +415,7 @@ The `showAsGroup` property allows you to control the visual grouping of buttons:
         name: 'save',
         label: 'Save',
         icon: 'save-outline',
-        renderAs: ActionDisplayStyle.BUTTON,
+        renderAs: 'button',
         showIcon: true,
         showLabel: true
       },
@@ -422,7 +427,7 @@ The `showAsGroup` property allows you to control the visual grouping of buttons:
         name: 'cancel',
         label: 'Cancel',
         icon: 'close-outline',
-        renderAs: ActionDisplayStyle.BUTTON,
+        renderAs: 'button',
         showIcon: true,
         showLabel: true
       }

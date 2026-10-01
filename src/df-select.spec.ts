@@ -163,20 +163,20 @@ describe('DfSelect', () => {
 
   describe('with a disabled control', () => {
     it('selects no default while disabled and selects the first choice once enabled', async () => {
-      const control = new Field<number | null>({ value: null, enabled: false });
+      const control = new Field<number | null>({ value: null, access: 'disabled' });
       mountSelect({ control, choices: ALL_CHOICES, allowNull: false });
 
       await flushPromises();
       expect(control.value).toBeNull();
       expect(control.isChanged).toBe(false);
 
-      control.enabled = true;
+      control.access = 'editable';
       await flushPromises();
       expect(control.value).toBe(1);
     });
 
     it('keeps ids that are not among the choices', async () => {
-      const control = new Field<number[] | null>({ value: [2, 99], enabled: false });
+      const control = new Field<number[] | null>({ value: [2, 99], access: 'disabled' });
       mountSelect({ control, multiple: true, choices: ALL_CHOICES });
 
       await flushPromises();
@@ -185,7 +185,7 @@ describe('DfSelect', () => {
 
     it('selects no default inside a disabled container', async () => {
       const control = new Field<number | null>({ value: null });
-      const form = new Group({ choice: control }, { enabled: false });
+      const form = new Group({ choice: control }, { access: 'disabled' });
       mountSelect({ control, choices: ALL_CHOICES, allowNull: false });
 
       await flushPromises();

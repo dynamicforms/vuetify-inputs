@@ -121,7 +121,7 @@ function toggleBinary() {
 }
 
 function toggleEnabled(field) {
-  field.enabled = !field.enabled;
+  field.access = field.enabled ? 'disabled' : 'editable';
 }
 
 function toggleAutoSwitch() {

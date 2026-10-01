@@ -1,7 +1,12 @@
 import { ActionValue } from '@dynamicforms/vue-forms';
 import { isBoolean, isEmpty, isObjectLike, isPlainObject, isString } from 'lodash-es';
 
-import { ActionDisplayStyle } from './action-display-style';
+import {
+  type ActionDisplayStyle,
+  actionDisplayStyles,
+  defaultDisplayStyle,
+  isActionDisplayStyle,
+} from './action-display-style';
 import { BreakpointNames, BreakpointsJSON, ResponsiveRenderOptions } from './responsive-render-options';
 
 export interface ActionRenderOptions extends ActionValue {
@@ -18,8 +23,7 @@ export interface ActionRenderOptions extends ActionValue {
    * `Form.Group`) - not this `name` field - is what the modal's promise actually resolves with; keeping them
    * in sync is what lets callers do e.g. `if (await modal.yesNo(...) === 'yes')`. */
   name?: string;
-  /** How the action is rendered: {@link ActionDisplayStyle.BUTTON} for a tonal `<v-btn>`, or
-   * {@link ActionDisplayStyle.TEXT} for a text-variant `<v-btn>`. */
+  /** How the action is rendered: `'button'` for a tonal `<v-btn>`, or `'text'` for a text-variant `<v-btn>`. */
   renderAs?: ActionDisplayStyle;
   /** Whether the label is shown. If `label` is empty, the label is never shown regardless of this flag. */
   showLabel?: boolean;
@@ -57,13 +61,19 @@ export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<Actio
 
     const result: ActionRenderOptions = {};
     if (defaultIfEmpty) {
-      result.renderAs = ActionDisplayStyle.BUTTON;
+      result.renderAs = defaultDisplayStyle;
       result.showLabel = true;
       result.showIcon = true;
     }
 
     if (bp) {
-      if (bp.renderAs != null) result.renderAs = ActionDisplayStyle.fromAny(bp.renderAs);
+      if (bp.renderAs != null) {
+        // a style nobody defined is refused rather than drawn as the default
+        if (!isActionDisplayStyle(bp.renderAs)) {
+          throw new Error(`'${bp.renderAs}' is not an action display style: ${actionDisplayStyles.join(', ')}`);
+        }
+        result.renderAs = bp.renderAs;
+      }
       if (isString(bp.label)) result.label = bp.label;
       if (isString(bp.icon)) result.icon = bp.icon;
       if (isBoolean(bp.showLabel)) result.showLabel = bp.showLabel;

@@ -5,25 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.12.0] - 2026-09-30
+## [0.12.1] - 2026-10-01
+
+0.12.0 was withdrawn from npm; what changed relative to 0.11.7 is listed here.
+
+### Added
+
+- Every component shows `shownErrors`: an error whose origin is `'server'` at once, every other once the field is
+  touched, and nothing for a field that is sent nowhere. The `shownErrors` setting replaces the rule with a condition
+  of the application's own, asked for each error with the default answer; `useShownErrors(element)` shows a
+  template's own errors - a group's - by the same rule, and `selectShownErrors()` is the rule itself.
 
 ### Changed
 
-- **Breaking:** requires `@dynamicforms/vue-forms` 2.0 (`peerDependencies` `^2.0.0`). What vue-forms 2.0 changes in
-  a form's data - `visibility` deciding what an element contributes to its container, a disabled field taking a
-  write, enabling and disabling announcing a change of the containers above - applies to every form these components
-  render; see the vue-forms migration guide.
-- **Breaking:** `DisplayMode.INVISIBLE` is gone from vue-forms, and with it the `invisible` class: the input
-  components and `df-actions` no longer set it, `global.css` no longer ships `.invisible`, and
-  `useInputBase().visibilityClass` is `{ 'd-none': boolean }`. The `visibility` prop throws on `'invisible'` and `8`.
+- **Breaking:** requires `@dynamicforms/vue-forms` 2.0.2 (`peerDependencies` `^2.0.2`). Its `access` decides what an
+  input sends, whether it is validated and, through `effectiveEnabled`, whether it accepts typing; `visibility` is
+  presentation alone. See the vue-forms migration guide.
+- **Breaking:** `useInputBase()` returns `shownErrors` in place of `showErrors`, an empty array rather than `undefined`
+  while nothing is to be shown.
+- **Breaking:** the `visibility` prop takes `'full'`, `'invisible'`, `'hidden'` or `'suppress'`; a `DisplayMode`
+  constant, a number or an upper-case name throws.
+- **Breaking:** `ActionDisplayStyle` is the string type `'button' | 'text'` rather than an enum, and `renderAs` takes
+  one of the two; `ActionDisplayStyle.BUTTON`/`.TEXT`, numbers and upper-case names are gone, and an unknown
+  `renderAs` throws where it was drawn as a button. `isActionDisplayStyle()` and `actionDisplayStyles` are exported.
 - `<df-datetime>` writes into the field only when the user edits the date or the time. A bound value is shown in the
   user's local time and stays in the field as it was given, so displaying a record no longer rewrites it into the
   local offset or marks the field as changed.
-- `<df-select>` with `allowNull: false` selects the first choice only while it is drawn enabled, and selects it at the
-  moment it is enabled. A select inside a disabled container no longer writes the first choice into its field on
-  mount, and one whose field was disabled at mount no longer stays empty once enabled.
-- `<df-file>` and `<df-image>` write into a disabled field: an upload that finishes after the field was disabled keeps
-  its identifier, and a touch that rejects with `FileGoneError` clears the field.
+- `<df-select>` with `allowNull: false` selects the first choice only while it is drawn editable, and selects it at
+  the moment it becomes editable. A select in a section that accepts no input no longer writes the first choice into
+  its field on mount, and one whose field accepted no input at mount no longer stays empty once it does.
+- `<df-file>` and `<df-image>` write into a field that accepts no input: an upload that finishes after the field was
+  disabled keeps its identifier, and a touch that rejects with `FileGoneError` clears the field.
 
 ### Fixed
 

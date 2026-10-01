@@ -1,7 +1,6 @@
 import { ref } from 'vue';
 
 import { Action } from './action';
-import { ActionDisplayStyle } from './action-display-style';
 import { BreakpointNames } from './responsive-render-options';
 
 describe('Action', () => {
@@ -10,7 +9,7 @@ describe('Action', () => {
       const actionData = {
         label: 'Test action',
         icon: 'test-icon',
-        renderAs: ActionDisplayStyle.BUTTON,
+        renderAs: 'button' as const,
         showLabel: true,
         showIcon: true,
       };
@@ -18,7 +17,7 @@ describe('Action', () => {
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('Test action');
       expect(action.icon).toBe('test-icon');
-      expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
+      expect(action.renderAs).toBe('button');
       expect(action.showLabel).toBe(true);
       expect(action.showIcon).toBe(true);
     });
@@ -28,7 +27,7 @@ describe('Action', () => {
         value: {
           label: 'Save',
           icon: 'save-icon',
-          renderAs: ActionDisplayStyle.BUTTON,
+          renderAs: 'button' as const,
           showLabel: true,
           showIcon: true,
         },
@@ -46,13 +45,13 @@ describe('Action', () => {
 
     it('keeps the render options when label is written', () => {
       const action = new Action({
-        value: { name: 'save', label: 'Save', icon: 'save-icon', renderAs: ActionDisplayStyle.TEXT, showLabel: true },
+        value: { name: 'save', label: 'Save', icon: 'save-icon', renderAs: 'text' as const, showLabel: true },
       });
 
       action.label = 'Saving';
 
       expect(action.name).toBe('save');
-      expect(action.renderAs).toBe(ActionDisplayStyle.TEXT);
+      expect(action.renderAs).toBe('text');
       expect(action.value.icon).toBe('save-icon');
     });
 
@@ -104,11 +103,11 @@ describe('Action', () => {
       const actionData = {
         label: 'Test action',
         icon: 'test-icon',
-        renderAs: ActionDisplayStyle.BUTTON,
+        renderAs: 'button' as const,
         showLabel: false,
         showIcon: true,
         md: { showLabel: true, showIcon: false },
-        xl: { renderAs: ActionDisplayStyle.TEXT },
+        xl: { renderAs: 'text' as const },
       };
       const action = new Action({ value: actionData });
 
@@ -118,11 +117,11 @@ describe('Action', () => {
       expect(breakpointValue.value.icon).toBeUndefined(); // showIcon is false for md
       expect(breakpointValue.value.showLabel).toBe(true); // overridden for md
       expect(breakpointValue.value.showIcon).toBe(false); // overridden for md
-      expect(breakpointValue.value.renderAs).toBe(ActionDisplayStyle.BUTTON);
+      expect(breakpointValue.value.renderAs).toBe('button');
 
       // Test reactivity - change breakpoint
       breakpoint.value = 'xl';
-      expect(breakpointValue.value.renderAs).toBe(ActionDisplayStyle.TEXT); // overridden for xl
+      expect(breakpointValue.value.renderAs).toBe('text'); // overridden for xl
     });
   });
 
@@ -162,7 +161,7 @@ describe('Action', () => {
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('Close');
       expect(action.icon).toBe('ion-close-outline');
-      expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
+      expect(action.renderAs).toBe('button');
     });
 
     it('yesAction() should return an Action object with correct values', () => {
@@ -170,7 +169,7 @@ describe('Action', () => {
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('Yes');
       expect(action.icon).toBe('ion-thumbs-up-outline');
-      expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
+      expect(action.renderAs).toBe('button');
     });
 
     it('noAction() should return an Action object with correct values', () => {
@@ -178,21 +177,21 @@ describe('Action', () => {
       expect(action).toBeInstanceOf(Action);
       expect(action.label).toBe('No');
       expect(action.icon).toBe('ion-thumbs-down-outline');
-      expect(action.renderAs).toBe(ActionDisplayStyle.BUTTON);
+      expect(action.renderAs).toBe('button');
     });
 
     it('template functions accept override data', () => {
       const customData = {
         value: {
           label: 'Custom Close',
-          renderAs: ActionDisplayStyle.TEXT,
+          renderAs: 'text' as const,
         },
       };
       const action = Action.closeAction(customData);
 
       expect(action.label).toBe('Custom Close');
       expect(action.icon).toBe('ion-close-outline'); // should keep default icon
-      expect(action.renderAs).toBe(ActionDisplayStyle.TEXT); // should use override
+      expect(action.renderAs).toBe('text'); // should use override
     });
   });
 });

@@ -98,7 +98,7 @@ const fileComms = {
 };
 
 function toggleEnabled() {
-  fileField.enabled = !fileField.enabled;
+  fileField.access = fileField.enabled ? 'disabled' : 'editable';
 }
 
 function formatFileSize(bytes) {

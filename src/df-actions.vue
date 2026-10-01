@@ -10,14 +10,17 @@
     <v-btn
       v-for="(action, idx) in actionsWithBreakpoint"
       :key="idx"
-      :variant="action.renderAs === ActionDisplayStyle.BUTTON ? 'tonal' : 'text'"
+      :variant="action.renderAs === 'button' ? 'tonal' : 'text'"
       :color="defaultActionColor(action)"
       :disabled="!action.action.effectiveEnabled || action.action.busy"
       :loading="action.action.busy"
       :elevation="0"
       :size="buttonSize"
       :density="buttonDensity"
-      :class="{ 'd-none': action.action.visibility === DisplayMode.HIDDEN }"
+      :class="{
+        'd-none': action.action.visibility === 'hidden',
+        invisible: action.action.visibility === 'invisible',
+      }"
       v-bind="action.passthroughAttrs"
       @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >
@@ -29,12 +32,11 @@
 </template>
 
 <script setup lang="ts">
-import { DisplayMode } from '@dynamicforms/vue-forms';
 import { computed, unref } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfActionsProps } from './dynamicforms-component-props';
-import { ActionDisplayStyle, ActionRenderOptions, getRenderOptionsForBreakpoint, useBreakpoint } from './helpers';
+import { ActionRenderOptions, getRenderOptionsForBreakpoint, useBreakpoint } from './helpers';
 
 const props = withDefaults(defineProps<DfActionsProps>(), {
   buttonSize: 'default',
@@ -43,7 +45,7 @@ const props = withDefaults(defineProps<DfActionsProps>(), {
 });
 
 const breakpoint = useBreakpoint();
-const actionsRef = computed(() => unref(props.actions).filter((action) => action.visibility !== DisplayMode.SUPPRESS));
+const actionsRef = computed(() => unref(props.actions).filter((action) => action.visibility !== 'suppress'));
 // What each button draws is read off the action's value rather than through the accessors this library's `Action`
 // adds over it, so an action declared as a `@dynamicforms/vue-forms` one - which declares none of them - is drawn
 // as well. The spread is that value resolved at the current breakpoint.

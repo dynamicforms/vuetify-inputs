@@ -35,6 +35,7 @@ settings) plus the two registration flags.
 | `defaultDensity` | `FieldDensity` | unset, so `'default'` applies | Application-wide density for all fields |
 | `defaultVariant` | `FieldVariant` | unset, so `'underlined'` applies | Application-wide variant for all fields |
 | `defaultTouchInterval` | `number` | unset, so `60000` applies | Milliseconds between `<df-file>`/`<df-image>` keep-alive touches, application-wide |
+| `shownErrors` | `(error, control, shownByDefault) => boolean` | unset, so the default rule applies | The condition that decides whether a component shows an error, asked for each error with the answer the default rule gives; its answer stands. See [Shown errors](/examples/input-base#shown-errors) |
 
 `FieldDensity` is `'default' | 'comfortable' | 'compact' | 'inline'`, `FieldVariant` is
 `'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled'`.
@@ -98,6 +99,8 @@ The stylesheet is a single file and carries everything the components need beyon
   checkbox on the same row line up.
 - the `inline` density. Vuetify has no such density, so the rules under `.df-density-inline` produce it: field outlines
   and floating labels are hidden, padding and minimum heights are cut to what a table cell can hold.
+- the `invisible` class for the visibility `'invisible'`. Vuetify ships `d-none` for `'hidden'`, but nothing that hides
+  an element while keeping its box, and that distinction is the point of the two.
 - the components' own styles: the `df-actions` button group, the multi-row select, label layout, the cached-icon
   wrapper, and the RTF editor's toolbar and content area, styled to follow the application's Vuetify theme.
 

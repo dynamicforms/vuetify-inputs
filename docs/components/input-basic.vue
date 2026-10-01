@@ -97,7 +97,7 @@ watch(selectedType, (newType) => {
 });
 
 function toggleEnabled() {
-  inputField.enabled = !inputField.enabled;
+  inputField.access = inputField.enabled ? 'disabled' : 'editable';
 }
 
 function resetField() {

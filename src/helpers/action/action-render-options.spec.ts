@@ -1,35 +1,35 @@
-import { ActionDisplayStyle } from './action-display-style';
+import { type ActionDisplayStyle, isActionDisplayStyle } from './action-display-style';
 import { getRenderOptionsForBreakpoint, ResponsiveActionRenderOptions } from './action-render-options';
 
 describe('ResponsiveRenderOptions', () => {
   it('check parsing and correct breakpoint resolution', () => {
     const options = new ResponsiveActionRenderOptions({
-      renderAs: 'BUTTON' as unknown as ActionDisplayStyle, // hack to still pass it as string
+      renderAs: 'button',
       showIcon: true,
       sm: { showLabel: false },
       md: {
         showIcon: false,
         showLabel: true,
       },
-      xl: { renderAs: 'TEXT' as unknown as ActionDisplayStyle }, // hack to still pass it as string
+      xl: { renderAs: 'text' },
     });
 
     expect(options.getOptionsForBreakpoint('xs')).toEqual({
-      renderAs: ActionDisplayStyle.BUTTON,
+      renderAs: 'button',
       showIcon: true,
       showLabel: true,
       label: undefined,
     });
 
     expect(options.getOptionsForBreakpoint('sm')).toEqual({
-      renderAs: ActionDisplayStyle.BUTTON,
+      renderAs: 'button',
       showIcon: true,
       showLabel: false,
       label: undefined,
     });
 
     expect(options.getOptionsForBreakpoint('lg')).toEqual({
-      renderAs: ActionDisplayStyle.BUTTON,
+      renderAs: 'button',
       showIcon: false,
       showLabel: true,
       label: undefined,
@@ -37,7 +37,7 @@ describe('ResponsiveRenderOptions', () => {
   });
   it('check correct breakpoint carry-over between breakpoints', () => {
     const options = new ResponsiveActionRenderOptions({
-      renderAs: 'BUTTON' as unknown as ActionDisplayStyle, // hack to still pass it as string
+      renderAs: 'button',
       showIcon: true,
       sm: { showLabel: false },
       md: {},
@@ -45,12 +45,12 @@ describe('ResponsiveRenderOptions', () => {
         showIcon: false,
         showLabel: true,
       },
-      xl: { renderAs: 'TEXT' as unknown as ActionDisplayStyle }, // hack to still pass it as string
+      xl: { renderAs: 'text' },
     });
 
     // should carry-over from "global" settings
     expect(options.getOptionsForBreakpoint('xs')).toEqual({
-      renderAs: ActionDisplayStyle.BUTTON,
+      renderAs: 'button',
       showIcon: true,
       showLabel: true,
       label: undefined,
@@ -58,7 +58,7 @@ describe('ResponsiveRenderOptions', () => {
 
     // should carry-over from sm
     expect(options.getOptionsForBreakpoint('md')).toEqual({
-      renderAs: ActionDisplayStyle.BUTTON,
+      renderAs: 'button',
       showIcon: true,
       showLabel: false,
       label: undefined,
@@ -66,7 +66,7 @@ describe('ResponsiveRenderOptions', () => {
 
     // should carry-over from lg, bt also have xl-specific renderAs
     expect(options.getOptionsForBreakpoint('xl')).toEqual({
-      renderAs: ActionDisplayStyle.TEXT,
+      renderAs: 'text',
       showIcon: false,
       showLabel: true,
       label: undefined,
@@ -80,7 +80,7 @@ describe('getRenderOptionsForBreakpoint', () => {
       name: undefined,
       label: 'Save',
       icon: undefined,
-      renderAs: ActionDisplayStyle.BUTTON,
+      renderAs: 'button',
       showLabel: true,
       showIcon: false,
     });
@@ -130,5 +130,20 @@ describe('getRenderOptionsForBreakpoint', () => {
     expect(getRenderOptionsForBreakpoint(value, 'md').passthroughAttrs).toEqual({ color: 'blue', density: 'compact' });
     // the action's own object is left as it was declared
     expect(value.passthroughAttrs).toEqual({ color: 'red', density: 'compact' });
+  });
+
+  it('refuses a renderAs that is no display style', () => {
+    const value = { label: 'Save', renderAs: 'BUTTON' as unknown as ActionDisplayStyle };
+
+    expect(() => getRenderOptionsForBreakpoint(value, 'sm')).toThrow("'BUTTON' is not an action display style");
+  });
+});
+
+describe('isActionDisplayStyle', () => {
+  it("answers for 'button' and 'text' and for nothing else", () => {
+    expect(isActionDisplayStyle('button')).toBe(true);
+    expect(isActionDisplayStyle('text')).toBe(true);
+    expect(isActionDisplayStyle('BUTTON')).toBe(false);
+    expect(isActionDisplayStyle(0)).toBe(false);
   });
 });

@@ -10,7 +10,7 @@
       @blur="touched = true"
     >
       <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
-      <template #message="{ message }"><df-input-hint :message="message" :errors="showErrors" /></template>
+      <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
     </v-textarea>
   </div>
 </template>
@@ -30,7 +30,7 @@ const props = withDefaults(defineProps<DfTextAreaProps>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { densityClass, isRendered, label, showErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
+const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
   props,
   emits,
 );

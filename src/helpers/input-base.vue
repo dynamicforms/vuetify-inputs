@@ -32,7 +32,7 @@
       </template>
     </v-field>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="showErrors" />
+      <df-input-hint :message="message" :errors="shownErrors" />
     </template>
     <template v-if="$slots.prepend" #prepend="prependProps"><slot name="prepend" v-bind="prependProps" /></template>
   </v-input>
@@ -48,7 +48,7 @@ import { BaseEmits, BaseProps, useInputBase } from './input-base';
 const props = defineProps<BaseProps & { loading?: boolean }>();
 const emits = defineEmits<BaseEmits & { (e: 'blur'): void }>();
 
-const { isRendered, label, showErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
+const { isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 
 const isClearable = computed(() => !!(unref(props.clearable) && unref(value)));
 const focused = ref<boolean>(false);
