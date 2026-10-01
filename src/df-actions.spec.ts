@@ -7,7 +7,7 @@ import { createVuetify } from 'vuetify';
 import { VBtn } from 'vuetify/components';
 
 import DfActions from '@/df-actions.vue';
-import { Action, ActionDisplayStyle } from '@/helpers';
+import { Action } from '@/helpers';
 
 describe('DfActions', () => {
   let vuetify: any;
@@ -23,7 +23,7 @@ describe('DfActions', () => {
         name,
         label,
         icon,
-        renderAs: ActionDisplayStyle.BUTTON,
+        renderAs: 'button',
         showLabel: true,
         showIcon: !!icon,
       },
@@ -107,7 +107,7 @@ describe('DfActions', () => {
   it('renderira gumb kot text variant', () => {
     const action = createMockAction('save', 'Save');
     // Nastavi renderAs na TEXT
-    action.value.renderAs = ActionDisplayStyle.TEXT;
+    action.value.renderAs = 'text';
 
     const wrapper = mount(DfActions, {
       props: { actions: [action] },

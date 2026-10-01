@@ -42,7 +42,7 @@
 import { ExecuteAction, Group } from '@dynamicforms/vue-forms';
 import { ref, computed, Ref, watchEffect } from 'vue';
 import { useDisplay } from 'vuetify';
-import { Action, ActionDisplayStyle, DfActions } from '../../src';
+import { Action, DfActions } from '../../src';
 
 // Size options
 const sizeOptions = [
@@ -89,7 +89,7 @@ const saveAction = new Action({
     name: 'save',
     label: 'Save',
     icon: 'mdi-content-save',
-    renderAs: ActionDisplayStyle.BUTTON,
+    renderAs: 'button',
     showIcon: true,
     showLabel: false,
     defaultConfirm: true,
@@ -104,11 +104,11 @@ const deleteAction = new Action({
     name: 'delete',
     label: 'Delete',
     icon: 'mdi-delete',
-    renderAs: ActionDisplayStyle.BUTTON,
+    renderAs: 'button',
     showIcon: true,
     showLabel: false,
     md: { showLabel: true, showIcon: false }, // Medium screen and bigger, show label, but not icon
-    lg: { showIcon: true, renderAs: ActionDisplayStyle.TEXT } // On large screens, show as text
+    lg: { showIcon: true, renderAs: 'text' } // On large screens, show as text
   },
   actions: [mockFormAction],
 });
@@ -118,7 +118,7 @@ const cancelAction = new Action({
     name: 'cancel',
     label: 'Cancel',
     icon: 'mdi-close-box',
-    renderAs: ActionDisplayStyle.BUTTON,
+    renderAs: 'button',
     showIcon: true,
     showLabel: false,
     defaultReject: true,

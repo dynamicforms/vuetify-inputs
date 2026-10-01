@@ -4,7 +4,6 @@ import { computed, Ref } from 'vue';
 
 import { translatableStrings } from '../translations';
 
-import { ActionDisplayStyle } from './action-display-style';
 import { ActionBreakpointOptions, getRenderOptionsForBreakpoint } from './action-render-options';
 import { BreakpointNames } from './responsive-render-options';
 
@@ -72,7 +71,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
         name: 'close',
         label: translatableStrings.Close,
         icon: 'ion-close-outline',
-        renderAs: ActionDisplayStyle.BUTTON,
+        renderAs: 'button',
         showLabel: true,
         showIcon: true,
       },
@@ -88,7 +87,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
         name: 'yes',
         label: translatableStrings.Yes,
         icon: 'ion-thumbs-up-outline',
-        renderAs: ActionDisplayStyle.BUTTON,
+        renderAs: 'button',
         showLabel: true,
         showIcon: true,
       },
@@ -104,7 +103,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
         name: 'no',
         label: translatableStrings.No,
         icon: 'ion-thumbs-down-outline',
-        renderAs: ActionDisplayStyle.BUTTON,
+        renderAs: 'button',
         showLabel: true,
         showIcon: true,
       },

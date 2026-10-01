@@ -219,7 +219,7 @@ import { computed, ref, watchEffect } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import DfActions from '../../df-actions.vue';
-import { ActionDisplayStyle, ActionRenderOptions } from '../action';
+import { ActionRenderOptions } from '../action';
 import { VuetifyButtonSize } from '../input-base';
 import { translatableStrings } from '../translations';
 
@@ -313,7 +313,7 @@ function toolbarAction(
   active?: () => boolean,
 ): Action<ActionRenderOptions> {
   const action = new Action<ActionRenderOptions>({
-    value: { icon, renderAs: ActionDisplayStyle.TEXT, showIcon: true, showLabel: false },
+    value: { icon, renderAs: 'text', showIcon: true, showLabel: false },
     actions: [
       new ExecuteAction((a, supr, params) => {
         onClick();

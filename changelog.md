@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   while nothing is to be shown.
 - **Breaking:** the `visibility` prop takes `'full'`, `'invisible'`, `'hidden'` or `'suppress'`; a `DisplayMode`
   constant, a number or an upper-case name throws.
+- **Breaking:** `ActionDisplayStyle` is the string type `'button' | 'text'` rather than an enum, and `renderAs` takes
+  one of the two; `ActionDisplayStyle.BUTTON`/`.TEXT`, numbers and upper-case names are gone, and an unknown
+  `renderAs` throws where it was drawn as a button. `isActionDisplayStyle()` and `actionDisplayStyles` are exported.
 - `<df-datetime>` writes into the field only when the user edits the date or the time. A bound value is shown in the
   user's local time and stays in the field as it was given, so displaying a record no longer rewrites it into the
   local offset or marks the field as changed.

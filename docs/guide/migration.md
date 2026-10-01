@@ -147,11 +147,24 @@ renders. `'invisible'` draws as it did, with the `invisible` class.
 <df-input v-model="secret" visibility="hidden" />
 ```
 
+### `ActionDisplayStyle` is a string
+
+`ActionDisplayStyle` is the type `'button' | 'text'` rather than an enum, and an action's `renderAs` states one of the
+two strings. `ActionDisplayStyle.BUTTON` and `.TEXT` are compile errors, and a number, an upper-case name or any other
+value throws when the action is rendered, where it used to be drawn as a button.
+
+```typescript
+// before
+new Action({ value: { label: 'Save', renderAs: ActionDisplayStyle.BUTTON, xl: { renderAs: 'TEXT' } } });
+// after
+new Action({ value: { label: 'Save', renderAs: 'button', xl: { renderAs: 'text' } } });
+```
+
 ### Checklist for 0.12.1
 
 1. Upgrade `@dynamicforms/vue-forms` to `^2.0.2` alongside this release, and work through its migration guide.
-2. Replace writes of `field.enabled` with `field.access`, and the `DisplayMode` constants, numbers and upper-case names
-   given to `visibility` with the visibility strings.
+2. Replace writes of `field.enabled` with `field.access`, the `DisplayMode` constants, numbers and upper-case names
+   given to `visibility` with the visibility strings, and `ActionDisplayStyle.BUTTON`/`.TEXT` with `'button'`/`'text'`.
 3. Where hiding an input was meant to keep it out of the payload, set its access as well.
 4. Give errors the server returned the origin `'server'`, and drop code that marked fields touched to make them
    appear; replace `showErrors` with `shownErrors` in custom components built on `useInputBase()`.

@@ -10,7 +10,7 @@
     <v-btn
       v-for="(action, idx) in actionsWithBreakpoint"
       :key="idx"
-      :variant="action.renderAs === ActionDisplayStyle.BUTTON ? 'tonal' : 'text'"
+      :variant="action.renderAs === 'button' ? 'tonal' : 'text'"
       :color="defaultActionColor(action)"
       :disabled="!action.action.effectiveEnabled || action.action.busy"
       :loading="action.action.busy"
@@ -36,7 +36,7 @@ import { computed, unref } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfActionsProps } from './dynamicforms-component-props';
-import { ActionDisplayStyle, ActionRenderOptions, getRenderOptionsForBreakpoint, useBreakpoint } from './helpers';
+import { ActionRenderOptions, getRenderOptionsForBreakpoint, useBreakpoint } from './helpers';
 
 const props = withDefaults(defineProps<DfActionsProps>(), {
   buttonSize: 'default',
