@@ -80,9 +80,10 @@
             </v-chip>
           </div>
 
-          <!-- The group-level validator writes here, so the message belongs to the form, not to any single field -->
+          <!-- The group-level validator writes here, so the message belongs to the form, not to any single field. It is
+               shown by the rule the inputs follow: once a field of the form has been touched -->
           <div class="mt-1">
-            <df-input-hint :errors="form.errors" />
+            <df-input-hint :errors="formErrors" />
           </div>
         </v-form>
       </v-card-text>
@@ -110,7 +111,7 @@ import {
   ValidationErrorRenderContent,
   Validators,
 } from '@dynamicforms/vue-forms';
-import { DfCheckbox, DfInput, DfInputHint } from '../../src'
+import { DfCheckbox, DfInput, DfInputHint, useShownErrors } from '../../src'
 
 const budgetLimit = 2000;
 
@@ -160,6 +161,9 @@ form.registerAction(new Validators.Validator(() => {
 
 // group.value is reactive, so both the total and the JSON dump follow every keystroke
 const total = computed(() => tripTotal());
+
+// the group's own errors, shown by the rule the inputs follow
+const formErrors = useShownErrors(form);
 </script>
 
 <style scoped>

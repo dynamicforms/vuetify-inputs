@@ -42,7 +42,7 @@ import {
   ValidationErrorRenderContent,
   Validators,
 } from '@dynamicforms/vue-forms';
-import { DfCheckbox, DfInput, DfInputHint } from '@dynamicforms/vuetify-inputs';
+import { DfCheckbox, DfInput, DfInputHint, useShownErrors } from '@dynamicforms/vuetify-inputs';
 
 const budgetLimit = 2000;
 
@@ -92,6 +92,9 @@ form.registerAction(new Validators.Validator(() => {
 
 // group.value is reactive, so the total and the rendered form value follow every keystroke
 const total = computed(() => tripTotal());
+
+// the group's own errors, shown by the rule the inputs follow
+const formErrors = useShownErrors(form);
 ```
 
 ### Vue Template
@@ -128,8 +131,9 @@ const total = computed(() => tripTotal());
       </v-chip>
     </div>
 
-    <!-- The group-level validator writes here, so the message belongs to the form, not to any single field -->
-    <df-input-hint :errors="form.errors" />
+    <!-- The group-level validator writes here, so the message belongs to the form, not to any single field. It is
+         shown by the rule the inputs follow: once a field of the form has been touched -->
+    <df-input-hint :errors="formErrors" />
 
     <pre>{{ JSON.stringify(form.value, null, 2) }}</pre>
   </v-form>
@@ -138,16 +142,10 @@ const total = computed(() => tripTotal());
 
 ## Rendering group errors
 
-`group.errors` is a `ValidationError[]`, the same type a field exposes, so `DfInputHint` renders it
-without any conversion:
-
-```vue
-<df-input-hint :errors="form.errors" />
-```
-
-The demo renders the group's errors as they are, so the budget message appears the moment the total passes the
-limit. To show them by the rule the inputs follow — once the user has touched a field of the group, or at once where
-the server returned them — bind [`useShownErrors(form)`](/examples/input-base#shown-errors) instead:
+`group.errors` is a `ValidationError[]`, the same type a field exposes, so `DfInputHint` renders it without any
+conversion. The inputs show their errors by one rule — once the user has touched the field, or at once where the
+server returned them — and [`useShownErrors(form)`](/examples/input-base#shown-errors) applies the same rule to the
+group's own errors, so the budget message appears once a field of the form has been touched, as the inputs' do:
 
 ```js
 const formErrors = useShownErrors(form);
@@ -156,6 +154,9 @@ const formErrors = useShownErrors(form);
 ```vue
 <df-input-hint :errors="formErrors" />
 ```
+
+Binding `form.errors` itself shows the message the moment the total passes the limit, before the user has done
+anything — out of step with the inputs.
 
 `DfInputHint` treats a non-empty `errors` value as an error and applies `errorClasses`
 (`text-error` by default); with an empty array it falls back to `message`, so a form that satisfies
