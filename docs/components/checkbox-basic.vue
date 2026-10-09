@@ -103,8 +103,8 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { Group, Field, MdString } from '@dynamicforms/vue-forms';
-import { DfCheckbox, Label } from '../../src';
+import { Group, Field } from '@dynamicforms/vue-forms';
+import { DfCheckbox, Label, MdString } from '../../src';
 
 const form = new Group({
   binaryField: new Field({ value: false }),

@@ -48,18 +48,28 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Field, MdString, Validators } from '@dynamicforms/vue-forms';
-import { DfColor } from '../../src';
+import { inject, provide, ref } from 'vue';
+import { Field, Validators } from '@dynamicforms/vue-forms';
+import { DfColor, MdString, vuetifyInputsSettingsKey } from '../../src';
 
 const colorField = new Field({
   value: '#42A5F5',
   validators: [
-    new Validators.Pattern(
-      /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/,
-      new MdString('Please enter a valid **hex color code** (e.g., *#FF0000* or *#FF0000FF*)'),
-    ),
+    new Validators.Pattern(/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/, {
+      code: 'hex_color',
+      detail: 'Please enter a valid hex color code (e.g., #FF0000 or #FF0000FF)',
+    }),
   ]
+});
+
+// the fields below render the hex_color error as markdown; every other error keeps its default text
+const settings = inject(vuetifyInputsSettingsKey, {});
+provide(vuetifyInputsSettingsKey, {
+  ...settings,
+  errorText: (error) =>
+    error.code === 'hex_color'
+      ? new MdString('Please enter a valid **hex color code** (e.g., *#FF0000* or *#FF0000FF*)')
+      : settings.errorText?.(error),
 });
 
 const directColor = ref('#81C784');

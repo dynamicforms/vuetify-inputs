@@ -58,7 +58,7 @@ const colorField = new Field({
     new Validators.Validator((value) => {
       // Your custom validation logic
       if (value && !value.startsWith('#')) {
-        return [new ValidationErrorText('Color must start with #')];
+        return [new ValidationError('hash_prefix', {}, 'Color must start with #')];
       }
       return null; // Return null for valid values
     })
@@ -83,7 +83,7 @@ This component emits all [common events from InputBase](./input-base):
 </template>
 
 <script setup>
-import { Field, ValidationErrorText, Validators } from '@dynamicforms/vue-forms';
+import { Field, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { DfColor } from '@dynamicforms/vuetify-inputs';
 
 // Valid brand colors
@@ -95,7 +95,7 @@ const colorField = new Field({
     new Validators.Validator((value) => {
       if (!value) return null;
       if (!brandColors.includes(value)) {
-        return [new ValidationErrorText('Please select a color from the brand palette')];
+        return [new ValidationError('not_brand_color', { allowedValues: brandColors }, 'Please select a color from the brand palette')];
       }
       return null;
     })

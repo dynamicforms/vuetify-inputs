@@ -8,6 +8,86 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.13.0 (from v0.12.x)
+
+0.13.0 requires `@dynamicforms/vue-forms` 3.0.0. Upgrade the two together, and read the
+[vue-forms migration guide](https://docs.velis.si/dynamicforms/vue-forms/guide/migration) first. vue-forms 3.0 no
+longer renders: an error is a `code`, `params` and an English `detail`, and the rendering vue-forms exported is
+exported by this library. There is a [checklist](#checklist-for-0-13-0) at the end of this section.
+
+```bash
+npm install @dynamicforms/vue-forms@^3.0.0 @dynamicforms/vuetify-inputs@^0.13.0
+```
+
+### Render content is imported from this library
+
+`MessagesWidget`, `MdString`, `RenderableValue`, `SimpleComponentDef`, `ClassType`, `ClassTypes`, the
+`RenderContent` types, `isSimpleComponentDef` and `isCallableFunction` are exported by
+`@dynamicforms/vuetify-inputs`:
+
+```typescript
+// before
+import { MdString, MessagesWidget, RenderableValue } from '@dynamicforms/vue-forms';
+
+// after
+import { MdString, MessagesWidget, RenderableValue } from '@dynamicforms/vuetify-inputs';
+```
+
+`RenderableValue` takes `(content, classes?)` and is not an error: it has no `code`, `origin` or `sameAs()`.
+`getTextType` is `kind`. `MessagesWidget` renders markdown with `vue-markdown-render` itself; a globally registered
+`vue-markdown` component is not needed.
+
+### An error renders by its code
+
+A component renders an error as the `translatableStrings` entry named by its `code`, with its `params` substituted,
+and as its `detail` where there is no such entry. The codes of vue-forms' built-in validators (`required`,
+`min_value`, `max_length`, …) are entries of `translatableStrings`, so `translateStrings()` translates validator
+errors along with the rest of this library's strings:
+
+```typescript
+translateStrings((key, defaultValue) => t(`df_inputs.${key}`, defaultValue));
+// df_inputs.required, df_inputs.min_value, … translate the validator errors
+```
+
+The `errorText` setting replaces the text of an error. It answers plain text, an `MdString` or a
+`SimpleComponentDef`, or `undefined` for the default:
+
+```typescript
+app.use(DynamicFormsInputs, {
+  errorText: (error) => (error.code === 'email' ? new MdString('Please enter a valid **email address**') : undefined),
+});
+```
+
+A validator message given as an `MdString` or a component in vue-forms 2.0 is an `errorText` answer for the
+validator's code.
+
+A validator given only a `detail` keeps its built-in code, and its error renders as the `translatableStrings` entry
+of that code, not as the `detail`. Give such a validator a `code` of its own:
+
+```typescript
+new Validators.Required({ code: 'role_required', detail: 'Select a role' });
+```
+
+### Errors the components create
+
+- A string of the `errors` prop is `new ValidationError('', {}, text, 'application')`.
+- `setFileGoneError()` sets `new ValidationError('file_gone', {}, text, 'server')`.
+
+### `defaultConfirm` and `defaultReject` answer a boolean
+
+`Action.defaultConfirm` and `Action.defaultReject` are vue-forms' getters and answer `false` where the value states
+nothing. They answered `undefined`.
+
+### Checklist for 0.13.0
+
+1. Import `MessagesWidget`, `MdString`, `RenderableValue`, `SimpleComponentDef`, `ClassTypes` and the render
+   content types from `@dynamicforms/vuetify-inputs`.
+2. Replace `getTextType` with `kind`.
+3. Move translations of validator messages to the error codes of `translatableStrings`.
+4. Replace markdown or component validator messages with an `errorText` setting keyed by code.
+5. Give a validator whose `detail` differs from the built-in text a `code` of its own.
+6. Replace `=== undefined` checks of `defaultConfirm` and `defaultReject` with a boolean test.
+
 ## Upgrading to v0.12.1 (from v0.11.x)
 
 0.12.1 requires `@dynamicforms/vue-forms` 2.0.2; 0.12.0 was withdrawn, and a project on it follows this section as

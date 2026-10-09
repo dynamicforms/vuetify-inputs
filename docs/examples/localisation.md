@@ -2,8 +2,9 @@
 
 The library renders a small number of English strings of its own: the labels of the three predefined actions,
 every tooltip, dropdown entry and dialog label the RTF editor's toolbar draws — the toolbar is built from this
-library's own Vuetify components, so its entire text lives in the same table as everything else — and the upload
-and download prompts on `<df-image>` and `<df-file>`. All of it is translatable. Dates and times are a separate
+library's own Vuetify components, so its entire text lives in the same table as everything else — the upload
+and download prompts on `<df-image>` and `<df-file>`, and the messages of vue-forms' built-in validators. All of it
+is translatable. Dates and times are a separate
 concern, driven by a date-fns locale rather than by a string table.
 
 The two mechanisms are independent. An application that needs both calls both, and the
@@ -56,9 +57,59 @@ later `translateStrings` call on its own.
 | `MediaEmbedUrl` | `Video URL` | `<df-rtf-editor>` media-embed menu, the URL field's label |
 | `MediaEmbedInsert` | `Insert` | `<df-rtf-editor>` media-embed menu, the insert button |
 | `InvalidHexColor` | `Not a valid hex string.` | `<df-color>`'s built-in validation rule, shown when the typed value isn't a hex color and no `control` validator is set |
+| `required` | `Please enter a value` | An error of code `required`, raised by `Validators.Required` |
+| `pattern` | `Value must match pattern "{pattern}"` | An error of code `pattern`, raised by `Validators.Pattern` |
+| `min_value` | `Value must be larger or equal to {minValue}` | An error of code `min_value`, raised by `Validators.MinValue` |
+| `max_value` | `Value must be less than or equal to {maxValue}` | An error of code `max_value`, raised by `Validators.MaxValue` |
+| `value_in_range` | `Value must be between {minValue} and {maxValue}` | An error of code `value_in_range`, raised by `Validators.ValueInRange` |
+| `min_length` | `Length must be larger or equal to {minLength}` | An error of code `min_length`, raised by `Validators.MinLength` |
+| `max_length` | `Length must be less than or equal to {maxLength}` | An error of code `max_length`, raised by `Validators.MaxLength` |
+| `length_in_range` | `Length must be between {minLength} and {maxLength}` | An error of code `length_in_range`, raised by `Validators.LengthInRange` |
+| `in_allowed_values` | `Must be one of [{allowedAsText}]` | An error of code `in_allowed_values`, raised by `Validators.InAllowedValues` |
+| `compare_to` | `Value does not match the comparison with {otherValue}` | An error of code `compare_to`, raised by `Validators.CompareTo` |
+| `validation_failed` | `Validation could not be completed` | An error of code `validation_failed`, which vue-forms raises for a rejected validation promise |
 
 The style-preset entries name CSS classes that are fixed and not affected by a translation, so the saved HTML is the
 same whatever language the toolbar speaks.
+
+## Validation messages
+
+An error is rendered by its `code`. `defaultErrorText(error)` answers the `translatableStrings` entry named by
+`error.code`, with each `{name}` placeholder replaced by `error.params[name]` (an array param as its items joined with
+`, `), and `error.detail` where the table has no entry of that name. The lower-case entries of the table above are the
+codes of vue-forms' built-in validators, so `translateStrings` translates their messages together with the rest of the
+library's strings, and a translated entry keeps the placeholders it uses:
+
+```typescript
+translateStrings((key, defaultValue) =>
+  ({ required: 'Vnesite vrednost', min_length: 'Dolžina mora biti vsaj {minLength}' })[key] ?? defaultValue,
+);
+```
+
+An error with a code of the application's own - a validator given `{ code, detail }`, an error a custom validator
+returns, an error from the server - renders as its `detail` until the table, or the `errorText` setting, has
+something for that code. A string in a component's `errors` prop becomes an error with an empty code, so it renders as
+written.
+
+The `errorText` setting replaces this per error. It is given at install, or provided under `vuetifyInputsSettingsKey`
+for a subtree, and answers the content an error renders as - a string, an `MdString` for markdown, or a
+`SimpleComponentDef` - or `undefined` for `defaultErrorText`'s answer. It runs while the errors are rendered, so a
+locale it reads is tracked:
+
+```typescript
+import { defaultErrorText, DynamicFormsInputs, MdString } from '@dynamicforms/vuetify-inputs';
+
+app.use(DynamicFormsInputs, {
+  errorText: (error) => {
+    if (error.code === 'over_budget') return new MdString(`Over the budget by **${error.params.over} €**`);
+    const key = `errors.${error.code}`;
+    return i18n.global.te(key) ? i18n.global.t(key, error.params) : undefined;
+  },
+});
+```
+
+`defaultErrorText` is exported, so an `errorText` that changes only a few codes can call it for the rest instead of
+answering `undefined`.
 
 ## translateStrings
 
@@ -166,10 +217,10 @@ import { useI18n } from 'vue-i18n';
 const dateFnsLocales: Record<string, Locale> = { en: enUS, de };
 
 export function useDfLocale() {
-  const { locale, t } = useI18n();
+  const { locale, t, te } = useI18n();
 
   const apply = (code: string) => {
-    translateStrings((key, defaultValue) => t(`df_inputs.${key}`, defaultValue));
+    translateStrings((key, defaultValue) => (te(`df_inputs.${key}`) ? t(`df_inputs.${key}`) : defaultValue));
     DateTimeLocaleConfig.setDateTimeLocale(dateFnsLocales[code] ?? enUS);
   };
 
@@ -178,10 +229,14 @@ export function useDfLocale() {
 }
 ```
 
-A locale the switcher offers only needs the keys it actually translates — vue-i18n's `t(path, defaultValue)` falls
-back to `defaultValue` for a message a locale doesn't carry, and `translateStrings` falls back to the English default
-in turn for a key the callback declines. The full key list is the table above; a few entries are enough to show the
-shape:
+A locale the switcher offers only needs the keys it actually translates: the callback answers the English default
+for a message the locale doesn't carry. The full key list is the table above; a few entries are enough to show the
+shape.
+
+The validator entries hold `{name}` placeholders that this library substitutes when it renders the error. vue-i18n's
+`t` interpolates `{name}` itself and replaces a placeholder it has no value for with nothing, so a catalogue entry
+writes the placeholder in vue-i18n's literal interpolation, `{'{'}minLength{'}'}`, and `t` answers it as
+`{minLength}`:
 
 ```typescript
 const messages = {
@@ -204,6 +259,8 @@ const messages = {
       Bold: 'Fett', Italic: 'Kursiv',
       Link: 'Link', LinkUrl: 'URL', LinkApply: 'Übernehmen', LinkRemove: 'Link entfernen',
       Downloadable: 'Herunterladbar',
+      required: 'Bitte geben Sie einen Wert ein',
+      min_length: "Die Länge muss mindestens {'{'}minLength{'}'} betragen",
       // ...the rest of the table above
     },
   },
@@ -241,9 +298,9 @@ const dialogActions = computed(() => {
 
 - **Labels, hints and placeholders.** Every one of them is a prop you pass, so their language is the application's
   concern. `label` accepts a `Label` object and `hint` a string; feed either from your own catalogue.
-- **Validation messages.** They come from the validators, which take the message as a constructor argument. Passing a
-  `computed` keeps the message reactive, so a locale switch reaches the rendered error — see
-  [validator messages](:vue-forms:/api/validators.html) in vue-forms.
+- **Messages of the application's own error codes.** An error whose code has no entry in `translatableStrings`
+  renders its `detail`, which is English as the validator or the server wrote it; translate it with the `errorText`
+  setting - see [Validation messages](#validation-messages).
 - **Vuetify's own strings**, including the month and weekday names in the date picker. Configure them through
   Vuetify's `locale` option when you create the Vuetify instance.
 - **The RTF editor's resize-handle hint** ("Hold Shift to keep the aspect ratio"), which is plain CSS `content`, not

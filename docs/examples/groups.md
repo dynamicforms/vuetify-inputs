@@ -30,19 +30,25 @@ The demo's form, without the cards it is laid out in:
 ### JavaScript/TypeScript
 
 ```js
-import { computed } from 'vue';
+import { computed, inject, provide } from 'vue';
 import {
   ConditionalAccessAction,
   ConditionalVisibilityAction,
   Field,
   Group,
-  MdString,
   Operator,
   Statement,
-  ValidationErrorRenderContent,
+  ValidationError,
   Validators,
 } from '@dynamicforms/vue-forms';
-import { DfCheckbox, DfInput, DfInputHint, useShownErrors } from '@dynamicforms/vuetify-inputs';
+import {
+  DfCheckbox,
+  DfInput,
+  DfInputHint,
+  MdString,
+  useShownErrors,
+  vuetifyInputsSettingsKey,
+} from '@dynamicforms/vuetify-inputs';
 
 const budgetLimit = 2000;
 
@@ -83,12 +89,21 @@ function tripTotal() {
 form.registerAction(new Validators.Validator(() => {
   const total = tripTotal();
   if (total <= budgetLimit) return null;
+  const over = total - budgetLimit;
   return [
-    new ValidationErrorRenderContent(
-      new MdString(`The trip totals **${total} €**, which is ${total - budgetLimit} € over the budget.`),
-    ),
+    new ValidationError('over_budget', { total, over }, `The trip totals ${total} €, which is ${over} € over the budget.`),
   ];
 }));
+
+// The error carries its code and params; the errorText setting provided here renders over_budget as markdown
+const settings = inject(vuetifyInputsSettingsKey, {});
+provide(vuetifyInputsSettingsKey, {
+  ...settings,
+  errorText: (error) =>
+    error.code === 'over_budget'
+      ? new MdString(`The trip totals **${error.params.total} €**, which is ${error.params.over} € over the budget.`)
+      : settings.errorText?.(error),
+});
 
 // group.value is reactive, so the total and the rendered form value follow every keystroke
 const total = computed(() => tripTotal());
@@ -160,8 +175,11 @@ anything — out of step with the inputs.
 
 `DfInputHint` treats a non-empty `errors` value as an error and applies `errorClasses`
 (`text-error` by default); with an empty array it falls back to `message`, so a form that satisfies
-the rule shows nothing. Each `ValidationError` chooses its own rendering: plain text, an `MdString`
-for markdown, or a component definition.
+the rule shows nothing. An error renders by its `code`: as the content the
+[`errorText` setting](/examples/configuration) answers for it, which may be plain text, an `MdString` for markdown or
+a component definition, and otherwise as its `detail` (or the `translatableStrings` entry of that name). The budget
+error carries `total` and `over` in its `params`, and the demo provides an `errorText` that renders `over_budget` as
+markdown from them.
 
 ## Writing a group-level validator
 
@@ -174,7 +192,7 @@ state. The function reads the fields it needs through `group.fields`:
 form.registerAction(new Validators.Validator((newValue, oldValue, group) => {
   const { password, confirmation } = group.fields;
   if (!confirmation.value || password.value === confirmation.value) return null;
-  return [new ValidationErrorRenderContent('The two passwords do not match')];
+  return [new ValidationError('passwords_differ', {}, 'The two passwords do not match')];
 }));
 ```
 

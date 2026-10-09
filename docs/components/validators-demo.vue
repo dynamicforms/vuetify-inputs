@@ -87,9 +87,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { Group, Field, MdString, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
-import { DfInput, DfSelect, DfTextArea } from '../../src'
+import { computed, inject, provide } from 'vue';
+import { Group, Field, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
+import { DfInput, DfSelect, DfTextArea, MdString, vuetifyInputsSettingsKey } from '../../src';
 
 // Create a form group with validated fields
 const validatedForm = new Group({
@@ -103,10 +103,10 @@ const validatedForm = new Group({
   email: new Field({
     value: '',
     validators: [
-      new Validators.Pattern(
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        new MdString('Please enter a valid **email address**'),
-      ),
+      new Validators.Pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
+        code: 'email_format',
+        detail: 'Please enter a valid email address',
+      }),
     ]
   }),
 
@@ -127,6 +127,16 @@ const validatedForm = new Group({
     value: '',
     validators: [new Validators.LengthInRange(10, 200)]
   })
+});
+
+// The fields below render the email_format error as markdown; every other error keeps its default text
+const settings = inject(vuetifyInputsSettingsKey, {});
+provide(vuetifyInputsSettingsKey, {
+  ...settings,
+  errorText: (error) =>
+    error.code === 'email_format'
+      ? new MdString('Please enter a valid **email address**')
+      : settings.errorText?.(error),
 });
 
 // group.valid covers the group's own errors and those of every field it holds

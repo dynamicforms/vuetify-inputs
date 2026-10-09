@@ -1,6 +1,6 @@
 # Validators Example
 
-This example demonstrates how to use validators with form fields in `@dynamicforms/vue-forms`.
+This example demonstrates how to use the validators of `@dynamicforms/vue-forms` with this library's components.
 
 ## Demo
 
@@ -15,8 +15,9 @@ Here's the source code for the demo above:
 ### JavaScript/TypeScript
 
 ```js
-import { computed } from 'vue';
-import { Group, Field, MdString, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
+import { computed, inject, provide } from 'vue';
+import { Group, Field, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
+import { MdString, vuetifyInputsSettingsKey } from '@dynamicforms/vuetify-inputs';
 
 // Create a form group with validated fields
 const validatedForm = new Group({
@@ -30,10 +31,10 @@ const validatedForm = new Group({
   email: new Field({
     value: '',
     validators: [
-      new Validators.Pattern(
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        new MdString('Please enter a valid **email address**'),
-      ),
+      new Validators.Pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
+        code: 'email_format',
+        detail: 'Please enter a valid email address',
+      }),
     ]
   }),
 
@@ -54,6 +55,16 @@ const validatedForm = new Group({
     value: '',
     validators: [new Validators.LengthInRange(10, 200)]
   })
+});
+
+// The fields below render the email_format error as markdown; every other error keeps its default text
+const settings = inject(vuetifyInputsSettingsKey, {});
+provide(vuetifyInputsSettingsKey, {
+  ...settings,
+  errorText: (error) =>
+    error.code === 'email_format'
+      ? new MdString('Please enter a valid **email address**')
+      : settings.errorText?.(error),
 });
 
 // group.valid covers the group's own errors and those of every field it holds
@@ -80,10 +91,16 @@ validatedForm.registerAction(new ValueChangedAction((field, supr, newValue, oldV
 }));
 ```
 
-Each validator is built without a message here, so the field shows the built-in one - `'Please enter a value'`,
-`'Value must be between **18** and **100**'` and so on. Pass a message as the last constructor argument (the first,
-for `Required`) to replace it; a plain string renders as text and an `MdString` as markdown, as the email field
-shows.
+Each validator except the email one is built without options, so its error carries the validator's own `code` -
+`required`, `value_in_range` and so on - and renders as the `translatableStrings` entry of that name with the error's
+`params` substituted: `'Please enter a value'`, `'Value must be between 18 and 100'`. Pass `{ code, detail }` as the
+last constructor argument (the only one, for `Required`) to replace them. A component renders an error by its `code`
+first: a `detail` given alone does not change what a `translatableStrings` entry renders for the validator's own code,
+so a replaced message takes a `code` of its own, whose `detail` renders where no entry has that name.
+
+The email field's error renders as markdown through the [`errorText` setting](/examples/configuration), which the demo
+provides for the fields under it under `vuetifyInputsSettingsKey`. An error carries no markdown of its own; the
+setting answers an `MdString` for the codes that need one and `undefined` for the rest.
 
 ### Vue Template
 
@@ -183,15 +200,15 @@ shows.
   `null` or `undefined`. A string is measured after it is trimmed, so a field holding nothing but spaces is empty
   and invalid; `new Validators.Required({ trim: false })` measures the string as it stands. Only strings are
   trimmed - an array, an object or any other value is measured as it is
-- **Pattern Validator**: Tests `String(value)` against a regular expression (email format here), so `undefined` is
-  tested as the string `"undefined"`
-- **ValueInRange Validator**: Fails when the value is below the minimum, above the maximum, or `undefined`. The
-  bounds are compared with `<` and `>`, which coerce `null` to `0`, so the `null` the age field starts out with fails
-  a range that begins at 18
+- **Pattern Validator**: Tests `String(value)` against a regular expression (email format here)
+- **ValueInRange Validator**: Fails when the value is below the minimum or above the maximum, or cannot be compared
+  with the bounds. Numbers compare with numbers, strings with strings and dates with dates
 - **InAllowedValues Validator**: Restricts input to a predefined set of values, read at each validation rather than
   at construction
 - **LengthInRange Validator**: Validates that the length of the value is within the given bounds; strings, arrays
   and plain objects are measured by their own length, anything else by the length of `String(value)`
+- **Empty values**: every validator except `Required` passes `null`, `undefined`, `''`, `[]` and `{}`, so the empty
+  age, role and bio fields are valid until something is entered; a field that must be filled adds `Required`
 - **Form-level Validation**: `group.valid` covers the group's own errors and those of every field it holds
 - **Error Display**: Showing validation errors to the user
 

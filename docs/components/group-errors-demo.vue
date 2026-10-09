@@ -99,19 +99,25 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, inject, provide } from 'vue';
 import {
   ConditionalAccessAction,
   ConditionalVisibilityAction,
   Field,
   Group,
-  MdString,
   Operator,
   Statement,
-  ValidationErrorRenderContent,
+  ValidationError,
   Validators,
 } from '@dynamicforms/vue-forms';
-import { DfCheckbox, DfInput, DfInputHint, useShownErrors } from '../../src'
+import {
+  DfCheckbox,
+  DfInput,
+  DfInputHint,
+  MdString,
+  useShownErrors,
+  vuetifyInputsSettingsKey,
+} from '../../src';
 
 const budgetLimit = 2000;
 
@@ -152,12 +158,21 @@ function tripTotal() {
 form.registerAction(new Validators.Validator(() => {
   const total = tripTotal();
   if (total <= budgetLimit) return null;
+  const over = total - budgetLimit;
   return [
-    new ValidationErrorRenderContent(
-      new MdString(`The trip totals **${total} €**, which is ${total - budgetLimit} € over the budget.`),
-    ),
+    new ValidationError('over_budget', { total, over }, `The trip totals ${total} €, which is ${over} € over the budget.`),
   ];
 }));
+
+// The error carries its code and params; the errorText setting provided here renders over_budget as markdown
+const settings = inject(vuetifyInputsSettingsKey, {});
+provide(vuetifyInputsSettingsKey, {
+  ...settings,
+  errorText: (error) =>
+    error.code === 'over_budget'
+      ? new MdString(`The trip totals **${error.params.total} €**, which is ${error.params.over} € over the budget.`)
+      : settings.errorText?.(error),
+});
 
 // group.value is reactive, so both the total and the JSON dump follow every keystroke
 const total = computed(() => tripTotal());

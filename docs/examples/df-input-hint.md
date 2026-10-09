@@ -10,37 +10,83 @@ places that need a message row without an input — a group's errors, a section 
 
 ## Props
 
-| Prop           | Type                          | Default        | Description                                                    |
-|----------------|-------------------------------|----------------|----------------------------------------------------------------|
-| errors         | `string \| ValidationError[]` | `''`           | The errors to render. Anything non-empty here wins over `message` |
-| message        | `string \| ValidationError[]` | `''`           | What renders while no error stands, typically the field's hint |
-| errorClasses   | `ClassTypes`                  | `'text-error'` | Classes applied to each rendered message while an error stands |
-| messageClasses | `ClassTypes`                  | `''`           | Classes applied to each rendered message while none does       |
+| Prop           | Type                                               | Default        | Description                                                       |
+|----------------|----------------------------------------------------|----------------|-------------------------------------------------------------------|
+| errors         | `string \| (RenderableValue \| ErrorDescription)[]` | `''`           | The errors to render. Anything non-empty here wins over `message` |
+| message        | `string \| RenderableValue[]`                      | `''`           | What renders while no error stands, typically the field's hint    |
+| errorClasses   | `ClassTypes`                                       | `'text-error'` | Classes applied to each rendered message while an error stands    |
+| messageClasses | `ClassTypes`                                       | `''`           | Classes applied to each rendered message while none does          |
 
 The component renders one row, never two. `errors` decides which of the two values that row carries: a non-empty
-`ValidationError[]`, or a string with at least one non-whitespace character. A string of spaces alone is no error, so a
-caller that keeps a Vuetify message slot alive with a blank string still gets the hint. The same choice picks the
-classes: `errorClasses` while the row holds errors, `messageClasses` while it holds the message.
+array, or a string with at least one non-whitespace character. A string of spaces alone is no error, so a caller that
+keeps a Vuetify message slot alive with a blank string still gets the hint. The same choice picks the classes:
+`errorClasses` while the row holds errors, `messageClasses` while it holds the message.
 
-`ClassTypes` comes from [vue-forms](:vue-forms:/api/components.html): `ClassType | ClassType[]`, where a `ClassType` is
-a class name, an array of class names, or a `Record<string, boolean>` of conditional classes.
+`ErrorDescription` is vue-forms' read-only shape of an error (`code`, `params`, `detail`, `origin`), which every
+`ValidationError` implements. `ClassTypes` is `ClassType | ClassType[]`, where a `ClassType` is a class name, an array
+of class names, or a `Record<string, boolean>` of conditional classes. Both `ClassTypes` and `RenderableValue` are
+exported by this library; see [Render content](#render-content).
 
 ## Rendering
 
-`DfInputHint` does not render the text itself. It hands the chosen value and the chosen classes to vue-forms'
-[`MessagesWidget`](:vue-forms:/api/components.html), which decides how each message is drawn:
+`DfInputHint` does not render the text itself. It hands the chosen value and the chosen classes to `MessagesWidget`,
+which draws each message:
 
 - a `string` renders as a single `<span>`
-- a `ValidationError[]` renders one node per error
-- each `ValidationError` chooses its own form: plain text, markdown through an `MdString`, or a component of its own
-  named by `componentName`
+- an array renders one node per item
+- an error renders as the content the [`errorText` setting](/examples/configuration) gives for it; where that setting
+  is not given or answers `undefined`, as the text `defaultErrorText` gives: the `translatableStrings` entry named by
+  the error's `code` with its `params` substituted, or the error's `detail` where no entry has that name (see
+  [Localisation](/examples/localisation#validation-messages))
+- a `RenderableValue` renders its own content: plain text, markdown or a component
 
-Because the errors keep their own rendering, a validator that phrases its message as an `MdString` renders as markdown
-inside the message row, and one that returns a `ValidationError` subclass with a `componentName` renders that component
-there. The classes given here are merged with each error's own `extraClasses`.
+An error carries no markdown or component of its own. The `errorText` setting is what renders an error as markdown or
+as a component: it answers an `MdString` or a `SimpleComponentDef` for the codes that need one. The classes given here
+are merged with each `RenderableValue`'s own `classes`.
 
-Markdown needs a globally registered `vue-markdown` component and the vue-forms stylesheet; see
-[Markdown Support](:vue-forms:/examples/messages-widget.html) for the details.
+Markdown renders through `vue-markdown-render`, which `MessagesWidget` imports itself; the library's stylesheet
+removes the outer margins of a markdown message.
+
+## Render content
+
+`MessagesWidget`, `RenderableValue`, `MdString` and the render-content types are exported from
+`@dynamicforms/vuetify-inputs`.
+
+```typescript
+class MdString extends String {
+  constructor(value: string, options?: any, plugins?: any[]);
+}
+
+interface SimpleComponentDef {
+  componentName: string;
+  componentProps?: Record<any, any>;
+  componentVHtml?: string;
+}
+
+type RenderContentNonCallable = string | MdString | SimpleComponentDef;
+type RenderContent = RenderContentNonCallable | (() => RenderContentNonCallable);
+type RenderContentRef = RenderContent | Ref<RenderContent>;
+
+class RenderableValue {
+  constructor(content?: RenderContentRef, classes?: ClassTypes);
+}
+```
+
+| Content | Renders as |
+|---|---|
+| `string` | a `<div>` holding the text |
+| `MdString` | markdown, through `vue-markdown-render` with the string's `options` and `plugins` |
+| `SimpleComponentDef` | the component named by `componentName`, with `componentProps` as its props and `componentVHtml` as its inner HTML. A common HTML element name renders as that element; any other name is resolved as a globally registered component |
+
+A `RenderableValue` reads a ref or a function on every render, so the content it answers reaches the screen without
+the value being built again. `isSimpleComponentDef(content)` and `isCallableFunction(content)` tell the forms apart.
+
+`MessagesWidget` takes two props:
+
+| Prop | Type | Description |
+|---|---|---|
+| message | `string \| (RenderableValue \| ErrorDescription)[]` | A plain text, or the items to render, each in its own element |
+| classes | `ClassTypes` | Classes for every rendered item, beside the item's own `classes` |
 
 ## How the inputs use it
 
@@ -52,8 +98,9 @@ Every input component in the library overrides the Vuetify `#message` slot of th
 
 `message` is what Vuetify hands the slot, which is the `hint` prop: the inputs bind `persistent-hint` always and
 `hide-details="auto"`, so the row is there whenever there is something to put in it and gone otherwise. `shownErrors` is
-the field's errors — `control.errors` when a control is bound, and the `errors` string array wrapped in
-`ValidationErrorRenderContent` when the component is used with `v-model` — as far as they are to be shown now: an error
+the field's errors — `control.errors` when a control is bound, and the `errors` prop when the component is used with
+`v-model`, each string wrapped in a `ValidationError` with an empty `code` and the string as its `detail` — as far as
+they are to be shown now: an error
 the server returned at once, every other once the field is touched (see
 [Shown errors](/examples/input-base#shown-errors)). While it is empty the hint holds the row. `helpText` is not part of this row.
 
@@ -98,13 +145,16 @@ The demo, without the cards it is laid out in:
 
 ```ts
 import { computed, ref } from 'vue';
-import { Field, Group, ValidationErrorRenderContent, Validators } from '@dynamicforms/vue-forms';
+import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { DfInput, DfInputHint, DfSelect } from '@dynamicforms/vuetify-inputs';
 
 const email = new Field<string>({ value: '' });
 email.registerAction(new Validators.Required());
 email.registerAction(
-  new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, 'An address of the form name@example.com, please'),
+  new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
+    code: 'email_format',
+    detail: 'An address of the form name@example.com, please',
+  }),
 );
 
 const errorSource = ref<'none' | 'blank' | 'text'>('none');
@@ -126,7 +176,7 @@ credentials.registerAction(
   new Validators.Validator(() => {
     const { password, confirmation } = credentials.fields;
     if (!confirmation.value || password.value === confirmation.value) return null;
-    return [new ValidationErrorRenderContent('The two entries do not match')];
+    return [new ValidationError('passwords_differ', {}, 'The two entries do not match')];
   }),
 );
 ```
@@ -158,7 +208,8 @@ credentials.registerAction(
 - **One row, two sources**: errors when there are any, the message otherwise
 - **Whitespace is not an error**: a blank `errors` string leaves the message in place
 - **Per-state classes**: `errorClasses` and `messageClasses` apply to whichever value is rendered
-- **Delegated rendering**: text, markdown and component errors all render through `MessagesWidget`
+- **Rendering by code**: each error renders through `MessagesWidget`, by its `code`, or by its `detail` where no
+  `translatableStrings` entry has that name
 - **Standalone rows**: a group's errors rendered next to the section they describe
 
 ## Try It Yourself
@@ -166,7 +217,8 @@ credentials.registerAction(
 Experiment with the demo by:
 1. Leaving the email field empty and clicking away, to watch the hint give up the row to the errors, which both
    validators contribute to and which render one node each
-2. Typing an address without an `@` and leaving the field again, to see the second validator's message
+2. Typing an address without an `@` and leaving the field again, to see the second validator's message, which its
+   own `code` and `detail` replace
 3. Switching the standalone row between the empty string, three spaces and a message
 4. Typing two different passwords, to bring up the group's error under the pair
 

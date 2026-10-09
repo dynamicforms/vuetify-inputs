@@ -36,6 +36,7 @@ settings) plus the two registration flags.
 | `defaultVariant` | `FieldVariant` | unset, so `'underlined'` applies | Application-wide variant for all fields |
 | `defaultTouchInterval` | `number` | unset, so `60000` applies | Milliseconds between `<df-file>`/`<df-image>` keep-alive touches, application-wide |
 | `shownErrors` | `(error, control, shownByDefault) => boolean` | unset, so the default rule applies | The condition that decides whether a component shows an error, asked for each error with the answer the default rule gives; its answer stands. See [Shown errors](/examples/input-base#shown-errors) |
+| `errorText` | `(error: ErrorDescription) => RenderContentNonCallable \| undefined` | unset, so `defaultErrorText` applies | The content an error renders as: a string, an `MdString` for markdown or a `SimpleComponentDef` for a component. `undefined` renders the `translatableStrings` entry named by the error's `code` with its `params` substituted, or its `detail`. It runs while the errors are rendered, and what it reads reactively is tracked. See [Validation messages](/examples/localisation#validation-messages) |
 
 `FieldDensity` is `'default' | 'comfortable' | 'compact' | 'inline'`, `FieldVariant` is
 `'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled'`.

@@ -73,13 +73,16 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { Field, Group, ValidationErrorRenderContent, Validators } from '@dynamicforms/vue-forms';
+import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { DfInput, DfInputHint, DfSelect } from '../../src';
 
 const email = new Field<string>({ value: '' });
 email.registerAction(new Validators.Required());
 email.registerAction(
-  new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, 'An address of the form name@example.com, please'),
+  new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
+    code: 'email_format',
+    detail: 'An address of the form name@example.com, please',
+  }),
 );
 
 const errorSources = [
@@ -105,7 +108,7 @@ credentials.registerAction(
   new Validators.Validator(() => {
     const { password, confirmation } = credentials.fields;
     if (!confirmation.value || password.value === confirmation.value) return null;
-    return [new ValidationErrorRenderContent('The two entries do not match')];
+    return [new ValidationError('passwords_differ', {}, 'The two entries do not match')];
   }),
 );
 </script>

@@ -122,7 +122,8 @@ The `value` object defines the visual appearance and behavior:
 Every one of these but `name`, `defaultConfirm` and `defaultReject` can also be stated per breakpoint.
 
 `label` and `icon` are `@dynamicforms/vue-forms`' own accessors: each reads the member of the same name off the
-value and each takes a write, which is an ordinary value change. `renderedLabel` and `renderedIcon` are this
+value and each takes a write, which is an ordinary value change. `defaultConfirm` and `defaultReject` are vue-forms' read-only
+accessors: each reads the member of the same name off the value and answers `false` where it is unset. `renderedLabel` and `renderedIcon` are this
 subclass's, and answer what the action draws — the text where `showLabel` states it is shown, the icon name where
 `showIcon` does, and `undefined` otherwise. `showLabel` and `showIcon` answer `false` where the text they govern is
 missing or empty, whatever the value holds. The breakpoint-resolved options `<df-actions>` renders from are
@@ -236,7 +237,7 @@ the runtime rather than through the form, and the action carries no trace of it.
 and Vue attaches its own catch to the promise such a handler answers with, so the rejection goes to Vue's error
 handling instead of nowhere. Where the user has to be told what failed, catch it in the `ExecuteAction` handler.
 
-See [handling a failed run](:vue-forms:/api/actions.html#handling-a-failed-run) for the whole contract.
+See [handling a failed run](:vue-forms:/api/action.html#handling-a-failed-run) for the whole contract.
 
 #### Reporting a run in flight
 

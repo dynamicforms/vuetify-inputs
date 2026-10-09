@@ -45,7 +45,7 @@ drawn, but the component handles no `click:clear`, so pressing it leaves the tex
 
 A bound `control` carries the presentation the component renders it with. `label`, `placeholder`, `helpText`,
 `hint`, `cssClass`, `density` and `variant` are declared on
-[`Extras`](:vue-forms:/api/field.html#extended-properties), which is the augmentation point
+[`Extras`](:vue-forms:/api/field-base.html#extended-properties), which is the augmentation point
 `@dynamicforms/vue-forms` provides for exactly this, so they are typed on every element in an application that
 installs this library — including the fields written inline in a `Group` declaration, which no type argument on the
 group can annotate.
@@ -165,7 +165,11 @@ rule:
 - every other error — a validator's, or one the application wrote — once the field is touched. A submit attempt that
   should reveal every error assigns `form.touched = true`, which reaches every member.
 
-Without a control, the errors come from the `errors` prop and are shown once the component is touched.
+Without a control, the errors come from the `errors` prop and are shown once the component is touched. Each string
+becomes a `ValidationError` with an empty `code`, the string as its `detail` and the origin `'application'`.
+
+What a shown error renders as is decided by its `code`, not by the error: see
+[df-input-hint](/examples/df-input-hint#rendering).
 
 The application replaces the rule with a condition of its own through the
 [`shownErrors` setting](/examples/configuration): it is asked for each error with the answer the rule gives, and its
@@ -368,7 +372,7 @@ then, so a control of the wrong kind fails at mount rather than misbehaving late
 |--------|------|-------------|
 | value | `WritableComputedRef<T>` | The value. Reads from the control, or from `modelValue`, or from an internal ref when neither is given. Writing writes the control, keeps the internal ref in step and emits `update:modelValue` with the value the control ended up holding |
 | valid | `ComputedRef<boolean>` | `control.valid`, or `true` when there is no control |
-| errors | `ComputedRef<ValidationError[]>` | `control.errors`, or the `errors` prop with each string wrapped in a `ValidationErrorRenderContent` |
+| errors | `ComputedRef<ValidationError[]>` | `control.errors`, or the `errors` prop with each string wrapped in `new ValidationError('', {}, text, 'application')` |
 | shownErrors | `ComputedRef<ValidationError[]>` | The errors to show now, see [Shown errors](#shown-errors). This is what gets bound to `DfInputHint` |
 | enabled | `ComputedRef<boolean>` | `control.effectiveEnabled` — `false` where the element or any container above it is disabled — or `props.enabled !== false` when there is no control |
 | visibility | `ComputedRef<Visibility>` | The resolved visibility, see [Display Modes](#display-modes) |
@@ -408,8 +412,9 @@ control repaints from the value the field actually holds.
 | helpText | The `helpText` prop, `''` when unset |
 
 `errorMessages` carries a single space rather than the messages themselves: it only puts the Vuetify control into its
-error state, while the messages are rendered by `DfInputHint` from `shownErrors`. That is what lets a vue-forms error
-render as markdown or as a component instead of a plain string.
+error state, while the messages are rendered by `DfInputHint` from `shownErrors`. That is what lets an error render as
+the content the [`errorText` setting](/examples/configuration) gives for its `code` - markdown or a component as well as
+plain text - instead of a plain string.
 
 `passthroughAttrs` is spread into this object last, so a caller's attribute wins over every key above - see
 [passthroughAttrs](#passthroughattrs).

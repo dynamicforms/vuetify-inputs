@@ -66,8 +66,10 @@ looks like.
   `variant` are declared on vue-forms' `Extras` augmentation point, so a form declared in code states them where the
   field is declared and the tag that draws it carries no presentation attributes.
   [Presentation on the element](/examples/input-base#presentation-carried-by-the-element)
-- **Errors, hints and help text** in one row, rendered through vue-forms' `MessagesWidget`, so an error may be plain
-  text, markdown, or a component of its own. [df-input-hint](/examples/df-input-hint)
+- **Errors, hints and help text** in one row, rendered through this library's `MessagesWidget`. An error renders by
+  its `code`: as the `translatableStrings` entry of that name, so the validators' messages are translated with the
+  rest of the library's strings, or as plain text, markdown or a component that the `errorText` setting gives for it.
+  [df-input-hint](/examples/df-input-hint)
 - **Labels with icons and markdown.** A label is a string, a `Label` carrying an icon, or an `MdString`.
   [Label](/examples/input-base#label)
 - **Visibility** — `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, taken from the bound element

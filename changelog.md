@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - Unreleased
+
+### Added
+
+- `MessagesWidget`, `MdString`, `RenderableValue`, `SimpleComponentDef`, `ClassType`, `ClassTypes`, the
+  `RenderContent` types, `isSimpleComponentDef` and `isCallableFunction`, which `@dynamicforms/vue-forms` 3.0 no
+  longer exports. `RenderableValue` takes `(content, classes?)`, and `kind` names the form of its content.
+  `MessagesWidget` renders markdown with `vue-markdown-render` without a global registration.
+- An error renders as the `translatableStrings` entry named by its `code`, with its `params`, and as its `detail`
+  where there is no such entry. The codes of vue-forms' built-in validators are entries of `translatableStrings`.
+  `defaultErrorText()` is that rule.
+- The `errorText` setting: the content an error renders as, plain text, an `MdString` or a `SimpleComponentDef`, or
+  `undefined` for `defaultErrorText()`.
+
+### Changed
+
+- **Breaking:** requires `@dynamicforms/vue-forms` 3.0.0 (`peerDependencies` `^3.0.0`).
+- A string of the `errors` prop is a `ValidationError` with the code `''`, the string as its detail and the origin
+  `'application'`. `setFileGoneError()` sets an error with the code `file_gone` and the origin `'server'`.
+- `Action.defaultConfirm` and `defaultReject` are vue-forms' getters and answer `false` where the value states
+  nothing.
+
 ## [0.12.1] - 2026-10-01
 
 0.12.0 was withdrawn from npm; what changed relative to 0.11.7 is listed here.

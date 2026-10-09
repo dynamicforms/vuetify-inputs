@@ -104,7 +104,7 @@ function resetField() {
   inputField.value = '';
 }
 
-function getHintForType(type) {
+function getHintForType(type: string) {
   switch (type) {
     case 'text':
       return 'Enter any text (3-50 characters)';

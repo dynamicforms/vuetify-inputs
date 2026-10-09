@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { ExecuteAction, Group } from '@dynamicforms/vue-forms';
-import { ref, computed, Ref, watchEffect } from 'vue';
+import { ref, computed, shallowRef, watchEffect } from 'vue';
 import { useDisplay } from 'vuetify';
 import { Action, DfActions } from '../../src';
 
@@ -128,7 +128,7 @@ const cancelAction = new Action({
   actions: [mockFormAction],
 });
 
-const actions: Ref<Action[]> = ref([saveAction, deleteAction, cancelAction]);
+const actions = shallowRef<Action[]>([saveAction, deleteAction, cancelAction]);
 
 // The buttons follow the enablement of the group holding them: each reads effectiveEnabled, which is false where
 // the action or any container above it is disabled.

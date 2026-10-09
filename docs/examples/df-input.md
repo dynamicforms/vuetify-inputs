@@ -88,7 +88,7 @@ const form = new Group({
     validators: [
       new Validators.MinLength(3),
       new Validators.MaxLength(20),
-      new Validators.Pattern(/^[a-zA-Z0-9_]+$/, 'Letters, digits and underscores only'),
+      new Validators.Pattern(/^[a-zA-Z0-9_]+$/, { code: 'username_chars', detail: 'Letters, digits and underscores only' }),
     ],
   }),
 });
