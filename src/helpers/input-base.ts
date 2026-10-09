@@ -1,7 +1,8 @@
-import Form, { MdString, ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import Form, { ValidationError } from '@dynamicforms/vue-forms';
 import { isEmpty, isString } from 'lodash-es';
 import { computed, inject, nextTick, ref, shallowRef, toRaw } from 'vue';
 
+import type { MdString } from './render-content';
 import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 import { selectShownErrors } from './shown-errors';
 
@@ -124,7 +125,9 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const touched = props.control ? controlTouch : ref(false);
   const valid = computed(() => (props.control ? props.control.valid : true));
   const errors = computed(() =>
-    props.control ? props.control.errors : (props.errors || []).map((error) => new ValidationErrorRenderContent(error)),
+    props.control
+      ? props.control.errors
+      : (props.errors || []).map((error) => new ValidationError('', {}, error, 'application')),
   );
   // what the user is shown, by the rule selectShownErrors states and the application's shownErrors setting
   const shownErrors = computed(() => selectShownErrors(errors.value, props.control, touched.value, settings));

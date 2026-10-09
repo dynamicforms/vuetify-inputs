@@ -1,4 +1,4 @@
-import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import Form, { ValidationError } from '@dynamicforms/vue-forms';
 import { inject, onBeforeUnmount, ref, watch, type Ref } from 'vue';
 
 import { FileComms, FileGoneError } from './df-file.interface';
@@ -49,5 +49,5 @@ export function useFileTouchKeepAlive(
  * goes through `Form.FieldBase`'s own setter, the same way `useInputBase`'s `touched` does.
  */
 export function setFileGoneError(control: Form.FieldBase | undefined, errorText: string) {
-  if (control) control.errors = [new ValidationErrorRenderContent(errorText)];
+  if (control) control.errors = [new ValidationError('file_gone', {}, errorText, 'server')];
 }

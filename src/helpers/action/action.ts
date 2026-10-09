@@ -49,16 +49,6 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return this.value.renderAs;
   }
 
-  /** @see ActionRenderOptions.defaultConfirm */
-  get defaultConfirm() {
-    return this.value.defaultConfirm;
-  }
-
-  /** @see ActionRenderOptions.defaultReject */
-  get defaultReject() {
-    return this.value.defaultReject;
-  }
-
   /** @see ActionRenderOptions.passthroughAttrs */
   get passthroughAttrs() {
     return this.value.passthroughAttrs;

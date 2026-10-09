@@ -1,6 +1,7 @@
-import type { FieldBase, ValidationError } from '@dynamicforms/vue-forms';
+import type { ErrorDescription, FieldBase, ValidationError } from '@dynamicforms/vue-forms';
 
 import { FieldDensity, type FieldVariant } from '@/helpers/input-base';
+import type { RenderContentNonCallable } from '@/helpers/render-content';
 
 export interface VuetifyInputsSettings {
   defaultVariant?: FieldVariant;
@@ -15,6 +16,12 @@ export interface VuetifyInputsSettings {
    * is synchronous and changes nothing.
    */
   shownErrors?: (error: ValidationError, control: FieldBase | undefined, shownByDefault: boolean) => boolean;
+  /**
+   * The content an error renders as: plain text, an `MdString` or a `SimpleComponentDef`. `undefined` renders
+   * the text `defaultErrorText` gives, which is the `translatableStrings` entry named by the error's `code`, or
+   * its `detail`. It runs while the errors are rendered and its reactive reads, such as the locale, are tracked.
+   */
+  errorText?: (error: ErrorDescription) => RenderContentNonCallable | undefined;
 }
 
 export const vuetifyInputsSettingsKey = Symbol('vuetifyInputsSettingsKey');

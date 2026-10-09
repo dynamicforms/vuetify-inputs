@@ -17,12 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import { MdString } from '@dynamicforms/vue-forms';
 import { computed } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import VueMarkdown from 'vue-markdown-render';
 
 import type { DfLabelProps } from '../dynamicforms-component-props';
+
+import { MdString } from './render-content';
 
 const props = defineProps<DfLabelProps>();
 

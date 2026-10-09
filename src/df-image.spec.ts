@@ -1,4 +1,4 @@
-import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import Form from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
@@ -157,9 +157,7 @@ describe('DfImage', () => {
 
     expect(control.value).toBeFalsy();
     expect(control.errors).toHaveLength(1);
-    expect((control.errors[0] as ValidationErrorRenderContent).resolvedText).toBe(
-      'The uploaded image is no longer available on the server.',
-    );
+    expect(control.errors[0].detail).toBe('The uploaded image is no longer available on the server.');
     expect(wrapper.findComponent({ name: 'VImg' }).exists()).toBe(false);
   });
 

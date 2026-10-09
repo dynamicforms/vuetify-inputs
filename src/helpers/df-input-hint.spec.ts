@@ -1,8 +1,10 @@
-import { MessagesWidget, ValidationError, ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import { ValidationError } from '@dynamicforms/vue-forms';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 
 import DfInputHint from './df-input-hint.vue';
+import MessagesWidget from './messages-widget.vue';
+import { MdString, RenderableValue } from './render-content';
 
 const messagesWidgetStub = {
   template: '<div class="messages-widget">{{ message }}</div>',
@@ -64,8 +66,8 @@ describe('DfInputHint', () => {
 
   it('displays errors when errors is an array of ValidationError objects', () => {
     const validationErrors: ValidationError[] = [
-      new ValidationErrorRenderContent('Field is required'),
-      new ValidationErrorRenderContent('Invalid format'),
+      new ValidationError('required', {}, 'Field is required'),
+      new ValidationError('pattern', {}, 'Invalid format'),
     ];
     const wrapper = createWrapper({ message: 'Helper text', errors: validationErrors });
     expectMessagesWidget(wrapper, validationErrors, 'text-error');
@@ -120,9 +122,9 @@ describe('DfInputHint', () => {
     expectMessagesWidget(wrapper, '', '');
   });
 
-  it('displays complex ValidationError object', () => {
-    const complexError = new ValidationErrorRenderContent('Complex error with details');
-    const wrapper = createWrapper({ message: 'Helper text', errors: [complexError] });
-    expectMessagesWidget(wrapper, [complexError], 'text-error');
+  it('displays a RenderableValue message while there is no error', () => {
+    const message = [new RenderableValue(new MdString('**Helper** text'))];
+    const wrapper = createWrapper({ message, errors: [] });
+    expectMessagesWidget(wrapper, message, '');
   });
 });

@@ -1,4 +1,4 @@
-import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import Form from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
@@ -135,9 +135,7 @@ describe('DfFile', () => {
 
     expect(control.value).toBeFalsy();
     expect(control.errors).toHaveLength(1);
-    expect((control.errors[0] as ValidationErrorRenderContent).resolvedText).toBe(
-      'The uploaded file is no longer available on the server.',
-    );
+    expect(control.errors[0].detail).toBe('The uploaded file is no longer available on the server.');
   });
 
   it('clears a disabled field when touch reports the file is gone', async () => {

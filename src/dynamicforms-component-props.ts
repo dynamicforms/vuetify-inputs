@@ -1,12 +1,15 @@
-import { Action, ClassTypes, MdString, ValidationError } from '@dynamicforms/vue-forms';
+import { Action, type ErrorDescription } from '@dynamicforms/vue-forms';
 import { type Locale } from 'date-fns';
 import { MaybeRef } from 'vue';
 import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
 
 import {
   BaseProps,
+  type ClassTypes,
   FileComms,
   Label,
+  type MdString,
+  type RenderableValue,
   SelectChoice,
   SelectFetchChoices,
   VuetifyButtonSize,
@@ -67,11 +70,19 @@ export interface DfInputProps extends BaseProps {
   max?: number;
 }
 
+export interface MessagesWidgetProps {
+  /** A plain text, or the items to render, each in its own element: an error as the text the `errorText` setting
+   * gives for it, a `RenderableValue` as its content. */
+  message: string | (RenderableValue | ErrorDescription)[];
+  /** Classes for every rendered item, beside the item's own `extraClasses`. */
+  classes?: ClassTypes;
+}
+
 export interface DfInputHintProps {
   /** The errors to render. Rendered in place of {@link message} whenever there is one. */
-  errors?: string | ValidationError[];
+  errors?: string | (RenderableValue | ErrorDescription)[];
   /** The message to render, shown while there is no error. */
-  message?: string | ValidationError[];
+  message?: string | RenderableValue[];
   /** Classes for the rendered errors. Defaults to `text-error`. */
   errorClasses?: ClassTypes;
   /** Classes for the rendered message. Defaults to no class. */
