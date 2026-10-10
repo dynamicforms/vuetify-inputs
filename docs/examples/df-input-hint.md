@@ -34,10 +34,8 @@ which draws each message:
 
 - a `string` renders as a single `<span>`
 - an array renders one node per item
-- an error renders as the content the [`errorText` setting](/examples/configuration) gives for it; where that setting
-  is not given or answers `undefined`, as the text `defaultErrorText` gives: the `translatableStrings` entry named by
-  the error's `code` with its `params` substituted, or the error's `detail` where no entry has that name (see
-  [Localisation](/examples/localisation#validation-messages))
+- an error renders as the content the `errorText` setting returns for it, and as its `detail` where that setting is
+  not given or returns `undefined` (see [Translating errors](/examples/localisation#translating-errors))
 - a `RenderableValue` renders its own content: plain text, markdown or a component
 
 An error carries no markdown or component of its own. The `errorText` setting is what renders an error as markdown or
@@ -152,7 +150,7 @@ const email = new Field<string>({ value: '' });
 email.registerAction(new Validators.Required());
 email.registerAction(
   new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
-    code: 'email_format',
+    code: 'invalid_email',
     detail: 'An address of the form name@example.com, please',
   }),
 );
@@ -208,8 +206,8 @@ credentials.registerAction(
 - **One row, two sources**: errors when there are any, the message otherwise
 - **Whitespace is not an error**: a blank `errors` string leaves the message in place
 - **Per-state classes**: `errorClasses` and `messageClasses` apply to whichever value is rendered
-- **Rendering by code**: each error renders through `MessagesWidget`, by its `code`, or by its `detail` where no
-  `translatableStrings` entry has that name
+- **Rendering errors**: each error renders through `MessagesWidget`, as the `errorText` setting's content for it or
+  as its `detail`
 - **Standalone rows**: a group's errors rendered next to the section they describe
 
 ## Try It Yourself

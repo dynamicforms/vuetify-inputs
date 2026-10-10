@@ -5,7 +5,6 @@
     :class="[densityClass, visibilityClass]"
     :clearable="allowNull"
     type="text"
-    :rules="rules"
     v-bind="vuetifyBindings"
     @blur="touched = true"
   >
@@ -26,10 +25,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ValidationError } from '@dynamicforms/vue-forms';
+import { ref } from 'vue';
 
 import { DfColorProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, translatableStrings, useInputBase } from './helpers';
+import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 
 const props = withDefaults(defineProps<DfColorProps>(), { ...defaultBaseProps, allowNull: false });
 
@@ -37,19 +37,20 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
+const hexColor = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{4}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;
+
+// without a control the component checks the format itself; a bound control is checked by its own validators
+function hexColorErrors(): ValidationError[] {
+  const val = value.value;
+  if (!val && props.allowNull) return [];
+  if (hexColor.test(val ?? '')) return [];
+  return [new ValidationError('invalid_hex_color', {}, 'Not a valid hex string.', 'validator')];
+}
+
 const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
   props,
   emits,
+  hexColorErrors,
 );
 const dropdownShown = ref(false);
-
-const rules = computed<((val: string) => boolean | string)[]>(() => [
-  (val: string) => {
-    if (props.control) return true; // if there's a form field, we expect there to be a validator
-    if (!val && props.allowNull) return true; // allowed empty values are also not a problem
-
-    const regex = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{4}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;
-    return regex.test(val) ? true : translatableStrings.InvalidHexColor;
-  },
-]);
 </script>

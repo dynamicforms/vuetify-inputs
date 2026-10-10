@@ -13,19 +13,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `RenderContent` types, `isSimpleComponentDef` and `isCallableFunction`, which `@dynamicforms/vue-forms` 3.0 no
   longer exports. `RenderableValue` takes `(content, classes?)`, and `kind` names the form of its content.
   `MessagesWidget` renders markdown with `vue-markdown-render` without a global registration.
-- An error renders as the `translatableStrings` entry named by its `code`, with its `params`, and as its `detail`
-  where there is no such entry. The codes of vue-forms' built-in validators are entries of `translatableStrings`.
-  `defaultErrorText()` is that rule.
-- The `errorText` setting: the content an error renders as, plain text, an `MdString` or a `SimpleComponentDef`, or
-  `undefined` for `defaultErrorText()`.
+- The `errorText` setting and its type `ErrorText`: the content an error renders as, plain text, an `MdString` or a
+  `SimpleComponentDef`. An error renders as its `detail` where the setting is not given or returns `undefined`.
+- `translate(key, params?)`, the current translation of one of the library's strings.
+- `useInputBase()` takes the errors a component finds in the value itself, reported where no `control` is bound.
 
 ### Changed
 
 - **Breaking:** requires `@dynamicforms/vue-forms` 3.0.0 (`peerDependencies` `^3.0.0`).
+- **Breaking:** requires `@dynamicforms/translatable` 0.3 (`peerDependencies` `^0.3.0`). `translateStrings(t,
+  namespace?)` takes the application's translation function in place of a callback, and the strings follow the
+  reactive state `t` reads, such as vue-i18n's locale.
+- **Breaking:** `<df-color>` without a `control` reports a value that is not a hex color as a `ValidationError` of
+  code `invalid_hex_color`, shown once the field is touched, in place of a Vuetify rule message.
 - A string of the `errors` prop is a `ValidationError` with the code `''`, the string as its detail and the origin
   `'application'`. `setFileGoneError()` sets an error with the code `file_gone` and the origin `'server'`.
 - `Action.defaultConfirm` and `defaultReject` are vue-forms' getters and answer `false` where the value states
   nothing.
+
+### Fixed
+
+- `<df-input>` with `input-type="number"` marks its control touched on blur, so its validators' errors are shown.
+
+### Removed
+
+- **Breaking:** `translatableStrings`, replaced by `translate()`.
+- **Breaking:** the `InvalidHexColor` string, replaced by the error code `invalid_hex_color`.
 
 ## [0.12.1] - 2026-10-01
 

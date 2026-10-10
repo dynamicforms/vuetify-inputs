@@ -80,7 +80,7 @@ const email = new Field<string>({ value: '' });
 email.registerAction(new Validators.Required());
 email.registerAction(
   new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
-    code: 'email_format',
+    code: 'invalid_email',
     detail: 'An address of the form name@example.com, please',
   }),
 );

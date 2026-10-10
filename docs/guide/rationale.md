@@ -66,10 +66,9 @@ looks like.
   `variant` are declared on vue-forms' `Extras` augmentation point, so a form declared in code states them where the
   field is declared and the tag that draws it carries no presentation attributes.
   [Presentation on the element](/examples/input-base#presentation-carried-by-the-element)
-- **Errors, hints and help text** in one row, rendered through this library's `MessagesWidget`. An error renders by
-  its `code`: as the `translatableStrings` entry of that name, so the validators' messages are translated with the
-  rest of the library's strings, or as plain text, markdown or a component that the `errorText` setting gives for it.
-  [df-input-hint](/examples/df-input-hint)
+- **Errors, hints and help text** in one row, rendered through this library's `MessagesWidget`. An error renders as
+  the plain text, markdown or component the application's `errorText` setting returns for its `code` and `params`,
+  and as its `detail` otherwise. [df-input-hint](/examples/df-input-hint)
 - **Labels with icons and markdown.** A label is a string, a `Label` carrying an icon, or an `MdString`.
   [Label](/examples/input-base#label)
 - **Visibility** — `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, taken from the bound element
@@ -100,8 +99,9 @@ looks like.
 - **One plugin call.** `app.use(DynamicFormsInputs, options)` provides the settings, optionally registers every
   component globally, and optionally registers the Vuetify components the templates use.
   [Configuration](/examples/configuration)
-- **`translateStrings()`** replaces the strings the library produces itself, and **`DateTimeLocaleConfig`** sets the
-  date-fns locale dates are formatted and parsed with. [Localisation](/examples/localisation)
+- **`translateStrings()`** connects the strings the library produces itself to the application's translation
+  function, the **`errorText`** setting converts errors into what the user sees, and **`DateTimeLocaleConfig`** sets
+  the date-fns locale dates are formatted and parsed with. [Localisation](/examples/localisation)
 - **TypeScript throughout.** Every component's props are an exported interface, values and choices are generic, and
   the type definitions ship with the build.
 

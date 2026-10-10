@@ -1,21 +1,23 @@
 # Localisation
 
-The library renders a small number of English strings of its own: the labels of the three predefined actions,
-every tooltip, dropdown entry and dialog label the RTF editor's toolbar draws — the toolbar is built from this
-library's own Vuetify components, so its entire text lives in the same table as everything else — the upload
-and download prompts on `<df-image>` and `<df-file>`, and the messages of vue-forms' built-in validators. All of it
-is translatable. Dates and times are a separate
-concern, driven by a date-fns locale rather than by a string table.
+The library renders three kinds of text that depend on the language:
 
-The two mechanisms are independent. An application that needs both calls both, and the
-[worked example](#wiring-it-to-vue-i18n) below does exactly that.
+- **Its own strings**: the labels of the three predefined actions, every tooltip, dropdown entry and dialog label the
+  RTF editor's toolbar draws, and the upload and download prompts on `<df-image>` and `<df-file>`. They are
+  translated through [`translateStrings`](#translatestrings).
+- **Errors**: every error carries a `code`, `params` and an English `detail`, and the application converts it into
+  what the user sees through the `errorText` setting. See [Translating errors](#translating-errors).
+- **Dates and times**: driven by a date-fns locale rather than by a string table. See
+  [Dates and times](#dates-and-times).
+
+The three mechanisms are independent. The [worked example](#wiring-it-to-vue-i18n) below connects all of them to
+vue-i18n.
 
 ## The strings the library owns
 
-`translatableStrings` is the table. It is a reactive object exported from the package, and it holds the strings that
-are in force right now — not the English originals, which are its initial contents and nothing more. Reading a key
-inside a template, a `computed` or a `watchEffect` subscribes to it, so a component already on screen picks up a
-later `translateStrings` call on its own.
+Each string has a key and an English default. The library reads a string with `translate(key)` where it renders it,
+so a template, a `computed` or a `watchEffect` that reads it follows the reactive state the application's
+translation function reads, such as the locale.
 
 | Key | English default | Where it surfaces |
 |-----|-----------------|-------------------|
@@ -56,90 +58,102 @@ later `translateStrings` call on its own.
 | `MediaEmbed` | `Insert media` | `<df-rtf-editor>` toolbar button tooltip |
 | `MediaEmbedUrl` | `Video URL` | `<df-rtf-editor>` media-embed menu, the URL field's label |
 | `MediaEmbedInsert` | `Insert` | `<df-rtf-editor>` media-embed menu, the insert button |
-| `InvalidHexColor` | `Not a valid hex string.` | `<df-color>`'s built-in validation rule, shown when the typed value isn't a hex color and no `control` validator is set |
-| `required` | `Please enter a value` | An error of code `required`, raised by `Validators.Required` |
-| `pattern` | `Value must match pattern "{pattern}"` | An error of code `pattern`, raised by `Validators.Pattern` |
-| `min_value` | `Value must be larger or equal to {minValue}` | An error of code `min_value`, raised by `Validators.MinValue` |
-| `max_value` | `Value must be less than or equal to {maxValue}` | An error of code `max_value`, raised by `Validators.MaxValue` |
-| `value_in_range` | `Value must be between {minValue} and {maxValue}` | An error of code `value_in_range`, raised by `Validators.ValueInRange` |
-| `min_length` | `Length must be larger or equal to {minLength}` | An error of code `min_length`, raised by `Validators.MinLength` |
-| `max_length` | `Length must be less than or equal to {maxLength}` | An error of code `max_length`, raised by `Validators.MaxLength` |
-| `length_in_range` | `Length must be between {minLength} and {maxLength}` | An error of code `length_in_range`, raised by `Validators.LengthInRange` |
-| `in_allowed_values` | `Must be one of [{allowedAsText}]` | An error of code `in_allowed_values`, raised by `Validators.InAllowedValues` |
-| `compare_to` | `Value does not match the comparison with {otherValue}` | An error of code `compare_to`, raised by `Validators.CompareTo` |
-| `validation_failed` | `Validation could not be completed` | An error of code `validation_failed`, which vue-forms raises for a rejected validation promise |
 
 The style-preset entries name CSS classes that are fixed and not affected by a translation, so the saved HTML is the
 same whatever language the toolbar speaks.
 
-## Validation messages
-
-An error is rendered by its `code`. `defaultErrorText(error)` answers the `translatableStrings` entry named by
-`error.code`, with each `{name}` placeholder replaced by `error.params[name]` (an array param as its items joined with
-`, `), and `error.detail` where the table has no entry of that name. The lower-case entries of the table above are the
-codes of vue-forms' built-in validators, so `translateStrings` translates their messages together with the rest of the
-library's strings, and a translated entry keeps the placeholders it uses:
-
-```typescript
-translateStrings((key, defaultValue) =>
-  ({ required: 'Vnesite vrednost', min_length: 'Dolžina mora biti vsaj {minLength}' })[key] ?? defaultValue,
-);
-```
-
-An error with a code of the application's own - a validator given `{ code, detail }`, an error a custom validator
-returns, an error from the server - renders as its `detail` until the table, or the `errorText` setting, has
-something for that code. A string in a component's `errors` prop becomes an error with an empty code, so it renders as
-written.
-
-The `errorText` setting replaces this per error. It is given at install, or provided under `vuetifyInputsSettingsKey`
-for a subtree, and answers the content an error renders as - a string, an `MdString` for markdown, or a
-`SimpleComponentDef` - or `undefined` for `defaultErrorText`'s answer. It runs while the errors are rendered, so a
-locale it reads is tracked:
-
-```typescript
-import { defaultErrorText, DynamicFormsInputs, MdString } from '@dynamicforms/vuetify-inputs';
-
-app.use(DynamicFormsInputs, {
-  errorText: (error) => {
-    if (error.code === 'over_budget') return new MdString(`Over the budget by **${error.params.over} €**`);
-    const key = `errors.${error.code}`;
-    return i18n.global.te(key) ? i18n.global.t(key, error.params) : undefined;
-  },
-});
-```
-
-`defaultErrorText` is exported, so an `errorText` that changes only a few codes can call it for the rest instead of
-answering `undefined`.
-
 ## translateStrings
 
 ```typescript
-translateStrings(translationCallback: (key: string, defaultValue: string) => string | null | undefined): void
+translateStrings(t: TranslateFunction, namespace?: string): void
+// TranslateFunction = (key: string, named: Record<string, unknown>) => string
 ```
 
-`translateStrings` walks every key of `translatableStrings` in declaration order and calls the callback once per key,
-with the **key** — `'Heading1'`, `'CodeDark'` — and its English default. Whatever it returns that is not `null` or
-`undefined` is written into the table in place of the current value; a `null` or `undefined` return resets that entry
-to its English default. The function itself returns nothing.
+`translateStrings` sets the application's translation function, shaped like vue-i18n's and i18next's `t`, as the
+source of the library's strings. Each key is looked up as `${namespace}.${key}`, or as `key` without a namespace. A
+key `t` returns unchanged has no translation and renders as its English default.
 
 ```typescript
 import { translateStrings } from '@dynamicforms/vuetify-inputs';
 
-translateStrings((key, defaultValue) => myCatalogue[key] ?? defaultValue);
+translateStrings(i18n.global.t, 'df_inputs');
 ```
+
+The library calls `t` every time it reads a string, so with vue-i18n the strings follow a locale switch without
+another call. A translation function over non-reactive translations is set again with `translateStrings` after the
+translations change. The resolution order and the formatting of values are described in the
+[`@dynamicforms/translatable` readme](https://github.com/dynamicforms/translatable#readme).
 
 ### When it takes effect
 
 - **Actions.** `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()` copy the string into the action's
-  `label` when the factory runs. An action that already exists keeps the label it was built with — assign
+  `label` when the factory runs. An action that already exists keeps the label it was built with: assign
   `action.label` to change it, or build the action again.
-- **The RTF editor.** `<df-rtf-editor>`'s toolbar reads `translatableStrings` reactively, including the heading
-  dropdown, so a call to `translateStrings` reaches a toolbar that is already mounted - no remount needed.
+- **The RTF editor.** `<df-rtf-editor>`'s toolbar, the heading dropdown included, reads its strings while it renders,
+  so a toolbar that is already mounted follows a locale switch.
+- **`<df-image>` and `<df-file>`.** Their prompts are read while they render, like the toolbar's.
 
-Call `translateStrings` before the application mounts, and again on every locale change if the locale can change at
-runtime - a key the callback declines on a later call reverts to its English default rather than keeping what an
-earlier call set it to, so each call is a complete statement of the current locale, not a patch on top of the last
-one.
+## Translating errors
+
+An error is data: a `code`, `params` and an English `detail`. The application converts it into what the user sees,
+as described in vue-forms' [Error messages and translation](:vue-forms:/guide/getting-started.html#error-messages-and-translation),
+which also lists every code vue-forms raises with its params.
+
+The inputs of `@dynamicforms/vuetify-inputs` render each error as the content the `errorText` setting returns for
+it, and as its `detail` where the setting is not given or returns `undefined`. `errorText` is given once, when the
+plugin is installed, and converts every error the application shows: those of vue-forms' validators, of the
+application's own validators, of its server and of vuetify-inputs itself
+([error codes](#error-codes)).
+
+`errorText` returns plain text, an `MdString`, which renders as markdown, or a `SimpleComponentDef`. A catalogue that
+holds a markdown variant of a message under the code with `Md` appended lets the application render its errors as
+markdown without changing a validator:
+
+```typescript
+import { formatParams } from '@dynamicforms/translatable';
+import { DynamicFormsInputs, type ErrorText, MdString } from '@dynamicforms/vuetify-inputs';
+
+const { t, n, d, te } = i18n.global;
+// formats numbers and dates for the locale before t substitutes them
+const tf = formatParams(t, (value) =>
+  typeof value === 'number' ? n(value) : value instanceof Date ? d(value) : value);
+const markdown = true;
+
+const errorText: ErrorText = (error) => {
+  const key = `errors.${error.code}`;
+  if (markdown && te(`${key}Md`)) return new MdString(tf(`${key}Md`, error.params));
+  return te(key) ? tf(key, error.params) : undefined;
+};
+
+app.use(DynamicFormsInputs, { errorText });
+```
+
+```json
+{
+  "errors": {
+    "required": "Prosimo, vnesite vrednost",
+    "min_value": "Vrednost mora biti vsaj {minValue}",
+    "min_valueMd": "Vrednost mora biti vsaj **{minValue}**"
+  }
+}
+```
+
+- `errorText` runs while the errors are rendered, so the errors on screen follow a locale switch without
+  revalidating.
+- A code without a message renders as its `detail`; a code without an `Md` variant renders as plain text.
+- A message uses the placeholder names of its code's params.
+
+## Error codes
+
+The errors this library raises itself:
+
+| Code | Params | English `detail` | Raised by |
+|------|--------|------------------|-----------|
+| `invalid_hex_color` | none | `Not a valid hex string.` | `<df-color>` without a `control`, for a value that is not 3, 4, 6 or 8 hex digits with an optional leading `#`, or an empty value without `allowNull` |
+| `file_gone` | none | the server's `errorText` | `<df-file>` and `<df-image>`, when the server reports the uploaded file as gone; its origin is `'server'` |
+
+A string in a component's `errors` prop becomes an error with an empty code, so it renders as written unless
+`errorText` returns something else for it.
 
 ## Dates and times
 
@@ -203,54 +217,45 @@ See [df-date-time](/examples/df-datetime) for the display format patterns and th
 
 ## Wiring it to vue-i18n
 
-A single composable can carry both mechanisms and keep them on the application's current locale. Call it once, high in
-the component tree.
+The library's strings and the errors follow vue-i18n's locale on their own, because the library calls `t` on every
+read. The date-fns locale is set on every locale change. A composable called once, high in the component tree,
+carries the date part:
 
 ```typescript
 // use-df-locale.ts
 import type { Locale } from 'date-fns';
 import { de, enUS } from 'date-fns/locale';
-import { DateTimeLocaleConfig, translateStrings } from '@dynamicforms/vuetify-inputs';
+import { DateTimeLocaleConfig } from '@dynamicforms/vuetify-inputs';
 import { watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const dateFnsLocales: Record<string, Locale> = { en: enUS, de };
 
 export function useDfLocale() {
-  const { locale, t, te } = useI18n();
-
-  const apply = (code: string) => {
-    translateStrings((key, defaultValue) => (te(`df_inputs.${key}`) ? t(`df_inputs.${key}`) : defaultValue));
-    DateTimeLocaleConfig.setDateTimeLocale(dateFnsLocales[code] ?? enUS);
-  };
-
-  apply(locale.value);
-  watch(locale, apply);
+  const { locale } = useI18n();
+  watch(locale, (code) => DateTimeLocaleConfig.setDateTimeLocale(dateFnsLocales[code] ?? enUS), { immediate: true });
 }
 ```
 
-A locale the switcher offers only needs the keys it actually translates: the callback answers the English default
-for a message the locale doesn't carry. The full key list is the table above; a few entries are enough to show the
-shape.
+The strings and the errors are connected once, when the application is set up:
 
-The validator entries hold `{name}` placeholders that this library substitutes when it renders the error. vue-i18n's
-`t` interpolates `{name}` itself and replaces a placeholder it has no value for with nothing, so a catalogue entry
-writes the placeholder in vue-i18n's literal interpolation, `{'{'}minLength{'}'}`, and `t` answers it as
-`{minLength}`:
+```typescript
+import { formatParams } from '@dynamicforms/translatable';
+import { DynamicFormsInputs, translateStrings } from '@dynamicforms/vuetify-inputs';
+
+const { t, n, d } = i18n.global;
+const tf = formatParams(t, (value) =>
+  typeof value === 'number' ? n(value) : value instanceof Date ? d(value) : value);
+
+translateStrings(tf, 'df_inputs');
+app.use(DynamicFormsInputs, { errorText }); // errorText as in Translating errors above
+```
+
+A locale only needs the keys it translates; any other key renders as its English default. The full key list is the
+table above:
 
 ```typescript
 const messages = {
-  en: {
-    df_inputs: {
-      Yes: 'Yes', No: 'No', Close: 'Close',
-      Paragraph: 'Paragraph',
-      Heading1: 'Heading 1', Heading2: 'Heading 2', /* ...Heading3-6 */
-      Bold: 'Bold', Italic: 'Italic',
-      Link: 'Link', LinkUrl: 'URL', LinkApply: 'Apply', LinkRemove: 'Remove link',
-      Downloadable: 'Downloadable',
-      // ...the rest of the table above
-    },
-  },
   de: {
     df_inputs: {
       Yes: 'Ja', No: 'Nein', Close: 'Schließen',
@@ -259,17 +264,20 @@ const messages = {
       Bold: 'Fett', Italic: 'Kursiv',
       Link: 'Link', LinkUrl: 'URL', LinkApply: 'Übernehmen', LinkRemove: 'Link entfernen',
       Downloadable: 'Herunterladbar',
-      required: 'Bitte geben Sie einen Wert ein',
-      min_length: "Die Länge muss mindestens {'{'}minLength{'}'} betragen",
       // ...the rest of the table above
+    },
+    errors: {
+      required: 'Bitte geben Sie einen Wert ein',
+      min_length: 'Die Länge muss mindestens {minLength} betragen',
+      min_lengthMd: 'Die Länge muss mindestens **{minLength}** betragen',
+      invalid_hex_color: 'Keine gültige Hex-Farbe.',
     },
   },
 };
 ```
 
-The RTF editor's toolbar re-reads `translatableStrings` on its own, but an action does not re-read the table once
-built, so it still needs rebuilding on a locale change. Building the actions inside a `computed` on the locale is
-enough:
+An action does not re-read its label once built, so it is rebuilt on a locale change. Building the actions inside a
+`computed` on the locale is enough:
 
 ```vue
 <template>
@@ -298,13 +306,10 @@ const dialogActions = computed(() => {
 
 - **Labels, hints and placeholders.** Every one of them is a prop you pass, so their language is the application's
   concern. `label` accepts a `Label` object and `hint` a string; feed either from your own catalogue.
-- **Messages of the application's own error codes.** An error whose code has no entry in `translatableStrings`
-  renders its `detail`, which is English as the validator or the server wrote it; translate it with the `errorText`
-  setting - see [Validation messages](#validation-messages).
 - **Vuetify's own strings**, including the month and weekday names in the date picker. Configure them through
   Vuetify's `locale` option when you create the Vuetify instance.
 - **The RTF editor's resize-handle hint** ("Hold Shift to keep the aspect ratio"), which is plain CSS `content`, not
-  a string the table can reach.
+  a string `translateStrings` can reach.
 
 ---
 

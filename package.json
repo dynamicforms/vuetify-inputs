@@ -56,7 +56,7 @@
     "url": "https://github.com/dynamicforms/vuetify-inputs/issues"
   },
   "peerDependencies": {
-    "@dynamicforms/translatable": "^0.1.0",
+    "@dynamicforms/translatable": "^0.3.0",
     "@dynamicforms/vue-forms": "^3.0.0",
     "@mdi/font": "^7.4.47",
     "@tiptap/core": "^3.30.2",

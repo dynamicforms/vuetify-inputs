@@ -76,6 +76,7 @@ const selectedType = ref<'text' | 'password' | 'email' | 'url' | 'number'>('text
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const inputField = new Field<string>({ value: '' });
+inputField.registerAction(new Validators.Required());
 inputField.registerAction(new Validators.LengthInRange(3, 50));
 
 watch(selectedType, (newType) => {
@@ -87,9 +88,11 @@ watch(selectedType, (newType) => {
   // Set default value based on type
   if (newType === 'text') {
     inputField.value = 'Sample text';
+    inputField.registerAction(new Validators.Required());
     inputField.registerAction(new Validators.LengthInRange(3, 50));
   } else if (newType === 'email') {
     inputField.value = '';
+    inputField.registerAction(new Validators.Required());
     inputField.registerAction(new Validators.Pattern(emailPattern));
   } else if (newType === 'url') {
     inputField.value = 'https://';

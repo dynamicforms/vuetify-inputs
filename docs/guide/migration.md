@@ -37,36 +37,54 @@ import { MdString, MessagesWidget, RenderableValue } from '@dynamicforms/vuetify
 `getTextType` is `kind`. `MessagesWidget` renders markdown with `vue-markdown-render` itself; a globally registered
 `vue-markdown` component is not needed.
 
-### An error renders by its code
+### Errors render through the `errorText` setting
 
-A component renders an error as the `translatableStrings` entry named by its `code`, with its `params` substituted,
-and as its `detail` where there is no such entry. The codes of vue-forms' built-in validators (`required`,
-`min_value`, `max_length`, …) are entries of `translatableStrings`, so `translateStrings()` translates validator
-errors along with the rest of this library's strings:
-
-```typescript
-translateStrings((key, defaultValue) => t(`df_inputs.${key}`, defaultValue));
-// df_inputs.required, df_inputs.min_value, … translate the validator errors
-```
-
-The `errorText` setting replaces the text of an error. It answers plain text, an `MdString` or a
-`SimpleComponentDef`, or `undefined` for the default:
+A component renders an error as the content the `errorText` setting returns for it, and as its `detail` where the
+setting is not given or returns `undefined`. The setting is given at install and converts every error: those of
+vue-forms' validators, of the application's own validators, of its server and of this library. It returns plain text,
+an `MdString` or a `SimpleComponentDef`:
 
 ```typescript
 app.use(DynamicFormsInputs, {
-  errorText: (error) => (error.code === 'email' ? new MdString('Please enter a valid **email address**') : undefined),
+  errorText: (error) => {
+    const key = `errors.${error.code}`;
+    if (te(`${key}Md`)) return new MdString(t(`${key}Md`, error.params));
+    return te(key) ? t(key, error.params) : undefined;
+  },
 });
 ```
 
 A validator message given as an `MdString` or a component in vue-forms 2.0 is an `errorText` answer for the
-validator's code.
+validator's code. See [Translating errors](/examples/localisation#translating-errors) for the whole recipe and
+[the codes vue-forms raises](https://docs.velis.si/dynamicforms/vue-forms/guide/getting-started#error-messages-and-translation).
 
-A validator given only a `detail` keeps its built-in code, and its error renders as the `translatableStrings` entry
-of that code, not as the `detail`. Give such a validator a `code` of its own:
+### `translatableStrings` is replaced by `translate`, and `translateStrings` takes `t`
+
+The library's own strings are read through `@dynamicforms/translatable` 0.3, which this release requires.
+`translateStrings` takes the application's translation function and an optional namespace in place of a callback, and
+`translate(key, params?)` replaces reads of `translatableStrings`:
 
 ```typescript
-new Validators.Required({ code: 'role_required', detail: 'Select a role' });
+// before
+translateStrings((key, defaultValue) => (te(`df_inputs.${key}`) ? t(`df_inputs.${key}`) : defaultValue));
+const close = translatableStrings.Close;
+
+// after
+translateStrings(i18n.global.t, 'df_inputs');
+const close = translate('Close');
 ```
+
+With vue-i18n's `t`, the strings follow a locale switch without another `translateStrings` call.
+
+```bash
+npm install @dynamicforms/translatable@^0.3.0
+```
+
+### `<df-color>` reports an error of code `invalid_hex_color`
+
+Without a `control`, `<df-color>` reports a value that is not a hex color as a `ValidationError` of code
+`invalid_hex_color`, shown once the field is touched and rendered through `errorText`. The `InvalidHexColor` string is
+removed; translate the code with the rest of the errors.
 
 ### Errors the components create
 
@@ -83,9 +101,11 @@ nothing. They answered `undefined`.
 1. Import `MessagesWidget`, `MdString`, `RenderableValue`, `SimpleComponentDef`, `ClassTypes` and the render
    content types from `@dynamicforms/vuetify-inputs`.
 2. Replace `getTextType` with `kind`.
-3. Move translations of validator messages to the error codes of `translatableStrings`.
-4. Replace markdown or component validator messages with an `errorText` setting keyed by code.
-5. Give a validator whose `detail` differs from the built-in text a `code` of its own.
+3. Install `@dynamicforms/translatable` 0.3; pass the translation function to `translateStrings(t, namespace)` and
+   replace reads of `translatableStrings` with `translate(key)`.
+4. Give the plugin an `errorText` setting that translates error codes, and return an `MdString` or a component from
+   it where a vue-forms 2.0 validator message was one.
+5. Move a translation of `InvalidHexColor` to the error code `invalid_hex_color`.
 6. Replace `=== undefined` checks of `defaultConfirm` and `defaultReject` with a boolean test.
 
 ## Upgrading to v0.12.1 (from v0.11.x)

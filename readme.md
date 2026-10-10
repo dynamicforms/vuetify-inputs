@@ -56,9 +56,9 @@ consistent appearance.
 - **A control, a v-model, or neither**: a bound element owns the value, validity, touched, enabled and visibility;
   `v-model` reports changes to the parent; neither keeps the value internally
 - **Errors, hints and help text** in one row, rendered through the library's own `MessagesWidget`; an error
-  renders by its `code` as a translatable string, or as the plain text, markdown or component the `errorText`
-  setting gives for it, and is shown by one rule an application can replace — the server's at once, every other
-  once the field is touched
+  renders as the plain text, markdown or component the application's `errorText` setting returns for its code and
+  params, or as its English `detail`, and is shown by one rule an application can replace — the server's at once,
+  every other once the field is touched
 - **Labels with icons and markdown**, through the `Label` class and `MdString`
 - **Visibility** — `'full'`, `'invisible'`, `'hidden'`, `'suppress'` — and enablement that follows the
   containing section
@@ -69,11 +69,11 @@ consistent appearance.
   `allowTags`
 - **Uploads**: a `FileComms` object with upload progress, delete and a periodic touch
 - **Rich text**: TipTap with a Vuetify toolbar, inside the same field frame as every other input
-- **Localisable**: `translateStrings()` replaces the library's own strings, including every RTF editor toolbar
-  label and `<df-image>`/`<df-file>`'s upload and download prompts, and `DateTimeLocaleConfig` sets the date-fns
-  locale dates are formatted and parsed with — see the
-  [localisation example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/localisation.html) for every
-  key and a worked example
+- **Localisable**: `translateStrings()` connects the library's own strings, including every RTF editor toolbar
+  label and `<df-image>`/`<df-file>`'s upload and download prompts, to the application's translation function; the
+  `errorText` setting translates errors; `DateTimeLocaleConfig` sets the date-fns locale dates are formatted and
+  parsed with — see the [localisation example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/localisation.html)
+  for every key and a worked example
 - **TypeScript**: every component's props are an exported interface, and the definitions ship with the build
 
 ## Installation

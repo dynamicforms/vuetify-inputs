@@ -3,6 +3,13 @@ import type { ErrorDescription, FieldBase, ValidationError } from '@dynamicforms
 import { FieldDensity, type FieldVariant } from '@/helpers/input-base';
 import type { RenderContentNonCallable } from '@/helpers/render-content';
 
+/**
+ * Converts an error to the content it renders as: plain text, an `MdString` for markdown or a `SimpleComponentDef`
+ * for a component. `undefined` renders the error's `detail`. It runs while the errors are rendered, so the reactive
+ * state it reads, such as the locale, is tracked.
+ */
+export type ErrorText = (error: ErrorDescription) => RenderContentNonCallable | undefined;
+
 export interface VuetifyInputsSettings {
   defaultVariant?: FieldVariant;
   defaultDensity?: FieldDensity;
@@ -17,11 +24,9 @@ export interface VuetifyInputsSettings {
    */
   shownErrors?: (error: ValidationError, control: FieldBase | undefined, shownByDefault: boolean) => boolean;
   /**
-   * The content an error renders as: plain text, an `MdString` or a `SimpleComponentDef`. `undefined` renders
-   * the text `defaultErrorText` gives, which is the `translatableStrings` entry named by the error's `code`, or
-   * its `detail`. It runs while the errors are rendered and its reactive reads, such as the locale, are tracked.
+   * The content an error renders as; see `ErrorText`. Without it, an error renders as its `detail`.
    */
-  errorText?: (error: ErrorDescription) => RenderContentNonCallable | undefined;
+  errorText?: ErrorText;
 }
 
 export const vuetifyInputsSettingsKey = Symbol('vuetifyInputsSettingsKey');

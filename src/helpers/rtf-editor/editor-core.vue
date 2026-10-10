@@ -40,7 +40,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { VuetifyButtonSize } from '../input-base';
-import { translatableStrings } from '../translations';
+import { translate } from '../translations';
 
 import { ClassAttribute, Marker, Spoiler } from './block-styles';
 import { createImagePasteHandler } from './image-paste';
@@ -179,7 +179,7 @@ function toggleBubbleLink() {
     return;
   }
 
-  const href = window.prompt(translatableStrings.LinkUrl);
+  const href = window.prompt(translate('LinkUrl'));
   if (href) instance.chain().focus().extendMarkRange('link').setLink({ href }).run();
 }
 </script>

@@ -30,7 +30,7 @@ The demo's form, without the cards it is laid out in:
 ### JavaScript/TypeScript
 
 ```js
-import { computed, inject, provide } from 'vue';
+import { computed } from 'vue';
 import {
   ConditionalAccessAction,
   ConditionalVisibilityAction,
@@ -45,9 +45,7 @@ import {
   DfCheckbox,
   DfInput,
   DfInputHint,
-  MdString,
   useShownErrors,
-  vuetifyInputsSettingsKey,
 } from '@dynamicforms/vuetify-inputs';
 
 const budgetLimit = 2000;
@@ -94,16 +92,6 @@ form.registerAction(new Validators.Validator(() => {
     new ValidationError('over_budget', { total, over }, `The trip totals ${total} €, which is ${over} € over the budget.`),
   ];
 }));
-
-// The error carries its code and params; the errorText setting provided here renders over_budget as markdown
-const settings = inject(vuetifyInputsSettingsKey, {});
-provide(vuetifyInputsSettingsKey, {
-  ...settings,
-  errorText: (error) =>
-    error.code === 'over_budget'
-      ? new MdString(`The trip totals **${error.params.total} €**, which is ${error.params.over} € over the budget.`)
-      : settings.errorText?.(error),
-});
 
 // group.value is reactive, so the total and the rendered form value follow every keystroke
 const total = computed(() => tripTotal());
@@ -175,11 +163,11 @@ anything — out of step with the inputs.
 
 `DfInputHint` treats a non-empty `errors` value as an error and applies `errorClasses`
 (`text-error` by default); with an empty array it falls back to `message`, so a form that satisfies
-the rule shows nothing. An error renders by its `code`: as the content the
-[`errorText` setting](/examples/configuration) answers for it, which may be plain text, an `MdString` for markdown or
-a component definition, and otherwise as its `detail` (or the `translatableStrings` entry of that name). The budget
-error carries `total` and `over` in its `params`, and the demo provides an `errorText` that renders `over_budget` as
-markdown from them.
+the rule shows nothing. An error renders as the content the
+[`errorText` setting](/examples/localisation#translating-errors) returns for it, which may be plain text, an `MdString`
+for markdown or a component definition, and otherwise as its `detail`. The budget error carries `total` and `over` in
+its `params`; the docs' `errorText` renders `over_budget` from them, as markdown while the
+[validators demo](/examples/validators)'s markdown setting is on.
 
 ## Writing a group-level validator
 

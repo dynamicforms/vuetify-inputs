@@ -1,8 +1,19 @@
 <template>
-  <div class="validators-form-demo">
+  <v-locale-provider :rtl="errorLanguage === 'fa'" class="validators-form-demo">
     <v-card class="mb-4">
       <v-card-title>Validators Demo</v-card-title>
       <v-card-text>
+        <div class="d-flex flex-wrap ga-4 mb-4">
+          <v-select
+            v-model="errorLanguage"
+            :items="languages"
+            label="Language of the errors"
+            density="compact"
+            hide-details
+            style="max-width: 220px"
+          />
+          <v-checkbox v-model="markdownErrors" label="Markdown in errors" density="compact" hide-details />
+        </div>
         <v-form @submit.prevent>
           <!-- Username field (Required) -->
           <df-input
@@ -33,11 +44,7 @@
           <!-- Role field (InAllowedValues) -->
           <df-select
             :control="validatedForm.fields.role"
-            :choices="[
-              { id: 'admin', text: 'Admin' },
-              { id: 'user', text: 'User' },
-              { id: 'guest', text: 'Guest' }
-            ]"
+            :choices="roleChoices"
             label="Role"
             class="mb-2"
           />
@@ -83,13 +90,18 @@
         <pre class="output">{{ JSON.stringify(validatedForm.value, null, 2) }}</pre>
       </v-card-text>
     </v-card>
-  </div>
+  </v-locale-provider>
 </template>
 
 <script setup>
-import { computed, inject, provide } from 'vue';
+import { computed } from 'vue';
 import { Group, Field, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
-import { DfInput, DfSelect, DfTextArea, MdString, vuetifyInputsSettingsKey } from '../../src';
+import { DfInput, DfSelect, DfTextArea } from '../../src';
+import { errorLanguage, languages, markdownErrors, roleName } from './demo-error-text';
+
+// a role is stored as its code and shown by its name in the language of the errors
+const roles = ['admin', 'user', 'guest'];
+const roleChoices = computed(() => roles.map((id) => ({ id, text: roleName(id) })));
 
 // Create a form group with validated fields
 const validatedForm = new Group({
@@ -103,8 +115,9 @@ const validatedForm = new Group({
   email: new Field({
     value: '',
     validators: [
+      new Validators.Required(),
       new Validators.Pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
-        code: 'email_format',
+        code: 'invalid_email',
         detail: 'Please enter a valid email address',
       }),
     ]
@@ -113,30 +126,20 @@ const validatedForm = new Group({
   // Number field with range validation
   age: new Field({
     value: null,
-    validators: [new Validators.ValueInRange(18, 100)]
+    validators: [new Validators.Required(), new Validators.ValueInRange(18, 100)]
   }),
 
   // Field with allowed values validation
   role: new Field({
     value: '',
-    validators: [new Validators.InAllowedValues(['admin', 'user', 'guest'])]
+    validators: [new Validators.Required(), new Validators.InAllowedValues(roles)]
   }),
 
   // Text field with length validation
   bio: new Field({
     value: '',
-    validators: [new Validators.LengthInRange(10, 200)]
+    validators: [new Validators.Required(), new Validators.LengthInRange(10, 200)]
   })
-});
-
-// The fields below render the email_format error as markdown; every other error keeps its default text
-const settings = inject(vuetifyInputsSettingsKey, {});
-provide(vuetifyInputsSettingsKey, {
-  ...settings,
-  errorText: (error) =>
-    error.code === 'email_format'
-      ? new MdString('Please enter a valid **email address**')
-      : settings.errorText?.(error),
 });
 
 // group.valid covers the group's own errors and those of every field it holds

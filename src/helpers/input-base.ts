@@ -70,7 +70,16 @@ export interface BaseEmits<T = any> {
   (e: 'click:clear'): void;
 }
 
-export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
+/**
+ * The state and Vuetify bindings an input shares with every other input. `componentErrors` are the errors the
+ * component finds in the value itself, reported where no `control` is bound; a bound control reports through its
+ * own validators.
+ */
+export function useInputBase<T = any>(
+  props: BaseProps<T>,
+  emit: BaseEmits<T>,
+  componentErrors?: () => ValidationError[],
+) {
   const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
   const injectedDensity = inject<FieldDensity | null>('field-density', null);
   const injectedVariant = inject<FieldVariant | null>('field-variant', null);
@@ -127,7 +136,10 @@ export function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>) {
   const errors = computed(() =>
     props.control
       ? props.control.errors
-      : (props.errors || []).map((error) => new ValidationError('', {}, error, 'application')),
+      : [
+          ...(props.errors || []).map((error) => new ValidationError('', {}, error, 'application')),
+          ...(componentErrors?.() ?? []),
+        ],
   );
   // what the user is shown, by the rule selectShownErrors states and the application's shownErrors setting
   const shownErrors = computed(() => selectShownErrors(errors.value, props.control, touched.value, settings));

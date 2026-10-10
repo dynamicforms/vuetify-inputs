@@ -39,8 +39,8 @@
             <button
               type="button"
               class="df-file-download-btn"
-              :title="t.FileDownload"
-              :aria-label="t.FileDownload"
+              :title="t('FileDownload')"
+              :aria-label="t('FileDownload')"
               @click.stop.prevent="downloadFile"
             >
               <cached-icon name="mdi-download" />
@@ -62,7 +62,7 @@ import {
   defaultBaseProps,
   InputBase,
   setFileGoneError,
-  translatableStrings,
+  translate,
   useFileTouchKeepAlive,
   useInputBase,
 } from './helpers';
@@ -73,7 +73,7 @@ interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
-const t = translatableStrings;
+const t = translate;
 
 // State
 const currentFile = ref<File | null>(null);

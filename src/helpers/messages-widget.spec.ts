@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest';
 import MessagesWidget from './messages-widget.vue';
 import { MdString, RenderableValue } from './render-content';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings';
-import { translateStrings } from './translations';
 
 const MockCustomAlert = {
   name: 'CustomAlert',
@@ -60,26 +59,16 @@ describe('MessagesWidget', () => {
     expect(alert.element.innerHTML).toBe('');
   });
 
-  it('renders a validator error as the text of its code, with its params', () => {
+  it('renders a validator error as its detail', () => {
     const field = new Field({ value: 3, validators: [new Validators.MinValue(5)] });
 
     expect(buildWrapper({ message: field.errors }).text()).toBe('Value must be larger or equal to 5');
   });
 
-  it('renders the detail of an error whose code has no entry', () => {
+  it('renders a server error as its detail', () => {
     const message = [new ValidationError('name_taken', {}, 'This name is taken', 'server')];
 
     expect(buildWrapper({ message }).text()).toBe('This name is taken');
-  });
-
-  it('renders the translation of the code', () => {
-    translateStrings((key, defaultValue) => (key === 'required' ? 'Vnesite vrednost' : defaultValue));
-    try {
-      const message = [new ValidationError('required', {}, 'Please enter a value')];
-      expect(buildWrapper({ message }).text()).toBe('Vnesite vrednost');
-    } finally {
-      translateStrings((_key, defaultValue) => defaultValue);
-    }
   });
 
   it('renders what the errorText setting answers, and the default where it answers undefined', () => {

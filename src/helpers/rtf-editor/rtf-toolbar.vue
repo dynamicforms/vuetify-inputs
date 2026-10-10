@@ -8,7 +8,7 @@
       v-bind="toolbarButtonProps"
       icon
       rounded="sm"
-      :title="t.SelectAll"
+      :title="t('SelectAll')"
       @click="editor?.chain().focus().selectAll().run()"
     >
       <cached-icon name="mdi-select-all" />
@@ -37,7 +37,7 @@
     <v-menu>
       <template #activator="{ props: menuProps }">
         <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" append-icon="mdi-chevron-down">
-          {{ t.Style }}
+          {{ t('Style') }}
         </v-btn>
       </template>
       <v-list density="compact">
@@ -47,7 +47,7 @@
           :active="styleActive(def)"
           @click="editor && applyStyle(editor, def)"
         >
-          <v-list-item-title>{{ t[def.key] }}</v-list-item-title>
+          <v-list-item-title>{{ t(def.key) }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
@@ -62,7 +62,7 @@
       <v-btn
         v-bind="toolbarButtonProps"
         icon
-        :title="t.HorizontalLine"
+        :title="t('HorizontalLine')"
         @click="editor?.chain().focus().setHorizontalRule().run()"
       >
         <cached-icon name="mdi-minus" />
@@ -70,37 +70,43 @@
 
       <v-menu :close-on-content-click="false" @update:model-value="(shown: boolean) => shown && openLinkMenu()">
         <template #activator="{ props: menuProps }">
-          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t.Link" :active="state.link">
+          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t('Link')" :active="state.link">
             <cached-icon name="mdi-link-variant" />
           </v-btn>
         </template>
         <v-card min-width="280" class="pa-3">
           <v-text-field
             v-model="linkUrl"
-            :label="t.LinkUrl"
+            :label="t('LinkUrl')"
             density="compact"
             hide-details
             autofocus
             @keydown.enter="applyLink"
           />
-          <v-checkbox v-model="linkDownloadable" :label="t.Downloadable" density="compact" hide-details class="mt-1" />
+          <v-checkbox
+            v-model="linkDownloadable"
+            :label="t('Downloadable')"
+            density="compact"
+            hide-details
+            class="mt-1"
+          />
           <div class="d-flex justify-end ga-2 mt-2">
-            <v-btn v-if="state.link" size="small" variant="text" @click="removeLink">{{ t.LinkRemove }}</v-btn>
-            <v-btn size="small" color="primary" variant="tonal" @click="applyLink">{{ t.LinkApply }}</v-btn>
+            <v-btn v-if="state.link" size="small" variant="text" @click="removeLink">{{ t('LinkRemove') }}</v-btn>
+            <v-btn size="small" color="primary" variant="tonal" @click="applyLink">{{ t('LinkApply') }}</v-btn>
           </div>
         </v-card>
       </v-menu>
 
       <v-menu :close-on-content-click="false">
         <template #activator="{ props: menuProps }">
-          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t.Image">
+          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t('Image')">
             <cached-icon name="mdi-image-plus" />
           </v-btn>
         </template>
         <v-card min-width="280" class="pa-3">
           <v-text-field
             v-model="imageUrl"
-            :label="t.ImageUrl"
+            :label="t('ImageUrl')"
             density="compact"
             hide-details
             autofocus
@@ -108,10 +114,10 @@
           />
           <div class="d-flex justify-space-between align-center ga-2 mt-2">
             <v-btn size="small" variant="text" prepend-icon="mdi-upload" @click="triggerImageUpload">
-              {{ t.ImageUpload }}
+              {{ t('ImageUpload') }}
             </v-btn>
             <v-btn size="small" color="primary" variant="tonal" @click="insertImageFromUrl">
-              {{ t.ImageInsert }}
+              {{ t('ImageInsert') }}
             </v-btn>
           </div>
         </v-card>
@@ -120,14 +126,14 @@
 
       <v-menu :close-on-content-click="false">
         <template #activator="{ props: menuProps }">
-          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t.MediaEmbed">
+          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t('MediaEmbed')">
             <cached-icon name="mdi-video-plus" />
           </v-btn>
         </template>
         <v-card min-width="280" class="pa-3">
           <v-text-field
             v-model="embedUrl"
-            :label="t.MediaEmbedUrl"
+            :label="t('MediaEmbedUrl')"
             density="compact"
             hide-details
             autofocus
@@ -135,7 +141,7 @@
           />
           <div class="d-flex justify-end mt-2">
             <v-btn size="small" color="primary" variant="tonal" @click="insertMediaEmbed">
-              {{ t.MediaEmbedInsert }}
+              {{ t('MediaEmbedInsert') }}
             </v-btn>
           </div>
         </v-card>
@@ -143,49 +149,49 @@
 
       <v-menu>
         <template #activator="{ props: menuProps }">
-          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t.Table">
+          <v-btn v-bind="{ ...toolbarButtonProps, ...menuProps }" icon :title="t('Table')">
             <cached-icon name="mdi-table" />
           </v-btn>
         </template>
         <v-list density="compact">
           <v-list-item @click="editor?.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()">
             <template #prepend><cached-icon name="mdi-table-plus" /></template>
-            <v-list-item-title>{{ t.TableInsert }}</v-list-item-title>
+            <v-list-item-title>{{ t('TableInsert') }}</v-list-item-title>
           </v-list-item>
           <v-divider />
           <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addRowBefore().run()">
             <template #prepend><cached-icon name="mdi-table-row-plus-before" /></template>
-            <v-list-item-title>{{ t.TableAddRowAbove }}</v-list-item-title>
+            <v-list-item-title>{{ t('TableAddRowAbove') }}</v-list-item-title>
           </v-list-item>
           <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addRowAfter().run()">
             <template #prepend><cached-icon name="mdi-table-row-plus-after" /></template>
-            <v-list-item-title>{{ t.TableAddRowBelow }}</v-list-item-title>
+            <v-list-item-title>{{ t('TableAddRowBelow') }}</v-list-item-title>
           </v-list-item>
           <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().deleteRow().run()">
             <template #prepend><cached-icon name="mdi-table-row-remove" /></template>
-            <v-list-item-title>{{ t.TableDeleteRow }}</v-list-item-title>
+            <v-list-item-title>{{ t('TableDeleteRow') }}</v-list-item-title>
           </v-list-item>
           <v-divider />
           <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addColumnBefore().run()">
             <template #prepend><cached-icon name="mdi-table-column-plus-before" /></template>
-            <v-list-item-title>{{ t.TableAddColumnBefore }}</v-list-item-title>
+            <v-list-item-title>{{ t('TableAddColumnBefore') }}</v-list-item-title>
           </v-list-item>
           <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().addColumnAfter().run()">
             <template #prepend><cached-icon name="mdi-table-column-plus-after" /></template>
-            <v-list-item-title>{{ t.TableAddColumnAfter }}</v-list-item-title>
+            <v-list-item-title>{{ t('TableAddColumnAfter') }}</v-list-item-title>
           </v-list-item>
           <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().deleteColumn().run()">
             <template #prepend><cached-icon name="mdi-table-column-remove" /></template>
-            <v-list-item-title>{{ t.TableDeleteColumn }}</v-list-item-title>
+            <v-list-item-title>{{ t('TableDeleteColumn') }}</v-list-item-title>
           </v-list-item>
           <v-divider />
           <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().toggleHeaderRow().run()">
             <template #prepend><cached-icon name="mdi-table-row" /></template>
-            <v-list-item-title>{{ t.TableToggleHeaderRow }}</v-list-item-title>
+            <v-list-item-title>{{ t('TableToggleHeaderRow') }}</v-list-item-title>
           </v-list-item>
           <v-list-item :disabled="!state.inTable" @click="editor?.chain().focus().deleteTable().run()">
             <template #prepend><cached-icon name="mdi-table-remove" /></template>
-            <v-list-item-title>{{ t.TableDeleteTable }}</v-list-item-title>
+            <v-list-item-title>{{ t('TableDeleteTable') }}</v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -193,7 +199,7 @@
       <v-btn
         v-bind="toolbarButtonProps"
         icon
-        :title="t.Blockquote"
+        :title="t('Blockquote')"
         :active="state.blockquote"
         @click="editor?.chain().focus().toggleBlockquote().run()"
       >
@@ -221,7 +227,7 @@ import { CachedIcon } from 'vue-cached-icon';
 import DfActions from '../../df-actions.vue';
 import { ActionRenderOptions } from '../action';
 import { VuetifyButtonSize } from '../input-base';
-import { translatableStrings } from '../translations';
+import { translate } from '../translations';
 
 import { applyStyle, isStyleActive, STYLE_DEFS } from './block-styles';
 import { fileToDataUrl } from './image-paste';
@@ -235,7 +241,7 @@ const props = withDefaults(defineProps<{ editor?: Editor; buttonSize?: VuetifyBu
 
 const buttonSize = computed(() => props.buttonSize);
 
-const t = translatableStrings;
+const t = translate;
 
 const editor = computed(() => props.editor);
 const tick = useEditorTick(editor);
@@ -340,13 +346,13 @@ const undoRedoActions = [
   toolbarAction(
     'mdi-undo',
     () => editor.value?.chain().focus().undo().run(),
-    () => t.Undo,
+    () => t('Undo'),
     () => !editable.value || !state.value.canUndo,
   ),
   toolbarAction(
     'mdi-redo',
     () => editor.value?.chain().focus().redo().run(),
-    () => t.Redo,
+    () => t('Redo'),
     () => !editable.value || !state.value.canRedo,
   ),
 ];
@@ -355,24 +361,24 @@ const boldItalicActions = [
   toolbarAction(
     'mdi-format-bold',
     () => editor.value?.chain().focus().toggleBold().run(),
-    () => t.Bold,
+    () => t('Bold'),
     () => !editable.value,
     () => state.value.bold,
   ),
   toolbarAction(
     'mdi-format-italic',
     () => editor.value?.chain().focus().toggleItalic().run(),
-    () => t.Italic,
+    () => t('Italic'),
     () => !editable.value,
     () => state.value.italic,
   ),
 ];
 
 const ALIGN_DEFS: { value: string; icon: string; title: () => string }[] = [
-  { value: 'left', icon: 'mdi-format-align-left', title: () => t.AlignLeft },
-  { value: 'center', icon: 'mdi-format-align-center', title: () => t.AlignCenter },
-  { value: 'right', icon: 'mdi-format-align-right', title: () => t.AlignRight },
-  { value: 'justify', icon: 'mdi-format-align-justify', title: () => t.AlignJustify },
+  { value: 'left', icon: 'mdi-format-align-left', title: () => t('AlignLeft') },
+  { value: 'center', icon: 'mdi-format-align-center', title: () => t('AlignCenter') },
+  { value: 'right', icon: 'mdi-format-align-right', title: () => t('AlignRight') },
+  { value: 'justify', icon: 'mdi-format-align-justify', title: () => t('AlignJustify') },
 ];
 const alignActions = ALIGN_DEFS.map((def) =>
   toolbarAction(
@@ -388,27 +394,27 @@ const listActions = [
   toolbarAction(
     'mdi-format-list-bulleted',
     () => editor.value?.chain().focus().toggleBulletList().run(),
-    () => t.BulletedList,
+    () => t('BulletedList'),
     () => !editable.value,
     () => state.value.bulletList,
   ),
   toolbarAction(
     'mdi-format-list-numbered',
     () => editor.value?.chain().focus().toggleOrderedList().run(),
-    () => t.NumberedList,
+    () => t('NumberedList'),
     () => !editable.value,
     () => state.value.orderedList,
   ),
   toolbarAction(
     'mdi-format-indent-decrease',
     () => editor.value?.chain().focus().liftListItem('listItem').run(),
-    () => t.Outdent,
+    () => t('Outdent'),
     () => !editable.value || !state.value.canLift,
   ),
   toolbarAction(
     'mdi-format-indent-increase',
     () => editor.value?.chain().focus().sinkListItem('listItem').run(),
-    () => t.Indent,
+    () => t('Indent'),
     () => !editable.value || !state.value.canSink,
   ),
 ];
@@ -420,13 +426,13 @@ watchEffect(() => {
 const headingOptions = computed(
   () =>
     [
-      { level: 0, label: t.Paragraph },
-      { level: 1, label: t.Heading1 },
-      { level: 2, label: t.Heading2 },
-      { level: 3, label: t.Heading3 },
-      { level: 4, label: t.Heading4 },
-      { level: 5, label: t.Heading5 },
-      { level: 6, label: t.Heading6 },
+      { level: 0, label: t('Paragraph') },
+      { level: 1, label: t('Heading1') },
+      { level: 2, label: t('Heading2') },
+      { level: 3, label: t('Heading3') },
+      { level: 4, label: t('Heading4') },
+      { level: 5, label: t('Heading5') },
+      { level: 6, label: t('Heading6') },
     ] as const,
 );
 
@@ -436,7 +442,7 @@ function isHeadingActive(level: number) {
   return !!editor.value?.isActive('heading', { level });
 }
 const headingLabel = computed(
-  () => headingOptions.value.find((option) => isHeadingActive(option.level))?.label ?? t.Paragraph,
+  () => headingOptions.value.find((option) => isHeadingActive(option.level))?.label ?? t('Paragraph'),
 );
 
 function setHeading(level: number) {

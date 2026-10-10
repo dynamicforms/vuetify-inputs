@@ -2,7 +2,7 @@ import { Action as FormAction, IFieldConstructorParams } from '@dynamicforms/vue
 import { isEmpty, isString } from 'lodash-es';
 import { computed, Ref } from 'vue';
 
-import { translatableStrings } from '../translations';
+import { translate } from '../translations';
 
 import { ActionBreakpointOptions, getRenderOptionsForBreakpoint } from './action-render-options';
 import { BreakpointNames } from './responsive-render-options';
@@ -59,7 +59,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'close',
-        label: translatableStrings.Close,
+        label: translate('Close'),
         icon: 'ion-close-outline',
         renderAs: 'button',
         showLabel: true,
@@ -75,7 +75,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'yes',
-        label: translatableStrings.Yes,
+        label: translate('Yes'),
         icon: 'ion-thumbs-up-outline',
         renderAs: 'button',
         showLabel: true,
@@ -91,7 +91,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'no',
-        label: translatableStrings.No,
+        label: translate('No'),
         icon: 'ion-thumbs-down-outline',
         renderAs: 'button',
         showLabel: true,

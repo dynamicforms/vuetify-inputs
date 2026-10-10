@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { computed, inject, provide } from 'vue';
+import { computed } from 'vue';
 import {
   ConditionalAccessAction,
   ConditionalVisibilityAction,
@@ -114,9 +114,7 @@ import {
   DfCheckbox,
   DfInput,
   DfInputHint,
-  MdString,
   useShownErrors,
-  vuetifyInputsSettingsKey,
 } from '../../src';
 
 const budgetLimit = 2000;
@@ -163,16 +161,6 @@ form.registerAction(new Validators.Validator(() => {
     new ValidationError('over_budget', { total, over }, `The trip totals ${total} €, which is ${over} € over the budget.`),
   ];
 }));
-
-// The error carries its code and params; the errorText setting provided here renders over_budget as markdown
-const settings = inject(vuetifyInputsSettingsKey, {});
-provide(vuetifyInputsSettingsKey, {
-  ...settings,
-  errorText: (error) =>
-    error.code === 'over_budget'
-      ? new MdString(`The trip totals **${error.params.total} €**, which is ${error.params.over} € over the budget.`)
-      : settings.errorText?.(error),
-});
 
 // group.value is reactive, so both the total and the JSON dump follow every keystroke
 const total = computed(() => tripTotal());
