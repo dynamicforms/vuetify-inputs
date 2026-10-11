@@ -161,7 +161,8 @@ rule:
 
 - nothing where the bound element is sent nowhere (its `effectiveAccess` is `'disabled'`);
 - an error whose [origin](https://docs.velis.si/dynamicforms/vue-forms/api/validators#origin) is `'server'` at once —
-  the server answered something the user did, so nothing has to be marked touched for it to appear;
+  the server answered something the user did, so nothing has to be marked touched for it to appear. vue-forms
+  removes it when the field's value changes;
 - every other error — a validator's, or one the application wrote — once the field is touched. A submit attempt that
   should reveal every error assigns `form.touched = true`, which reaches every member.
 

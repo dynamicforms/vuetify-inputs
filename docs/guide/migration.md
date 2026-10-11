@@ -56,7 +56,7 @@ app.use(DynamicFormsInputs, {
 
 A validator message given as an `MdString` or a component in vue-forms 2.0 is an `errorText` answer for the
 validator's code. See [Translating errors](/examples/localisation#translating-errors) for the whole recipe and
-[the codes vue-forms raises](https://docs.velis.si/dynamicforms/vue-forms/guide/getting-started#error-messages-and-translation).
+[the codes vue-forms raises](https://docs.velis.si/dynamicforms/vue-forms/api/validators#error-codes).
 
 ### `translatableStrings` is replaced by `translate`, and `translateStrings` takes `t`
 

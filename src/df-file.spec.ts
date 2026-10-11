@@ -138,6 +138,25 @@ describe('DfFile', () => {
     expect(control.errors[0].detail).toBe('The uploaded file is no longer available on the server.');
   });
 
+  it('drops the file_gone error when a new file is uploaded', async () => {
+    comms.touch = vi.fn(async () => {
+      throw new FileGoneError('The uploaded file is no longer available on the server.');
+    });
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountFile({ control, touchInterval: 1_000 });
+    await pickFile(wrapper, pdfFile());
+    await vi.advanceTimersByTimeAsync(1_000);
+    await wrapper.vm.$nextTick();
+    expect(control.errors.map((error) => error.code)).toEqual(['file_gone']);
+
+    comms.touch = vi.fn(async () => undefined);
+    await pickFile(wrapper, pdfFile());
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(control.value).toBeTruthy();
+    expect(control.errors).toHaveLength(0);
+  });
+
   it('clears a disabled field when touch reports the file is gone', async () => {
     comms.touch = vi.fn(async () => {
       throw new FileGoneError('The uploaded file is no longer available on the server.');
