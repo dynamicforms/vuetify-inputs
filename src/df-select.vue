@@ -7,6 +7,7 @@
     readonly
   >
     <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+    <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
   </v-text-field>
   <component
     :is="taggable ? 'v-combobox' : 'v-autocomplete'"
@@ -392,8 +393,8 @@ watch(
 </script>
 
 <style scoped>
-/* Vuetify gives the focused search input a minimum width of 64px, which wraps it under a long chip of a single
-   select before anything is typed. The input's minimum width is the text typed into it, up to the width of the
+/* Vuetify gives the search input a minimum width of 64px, which wraps it under a long chip of a single select before
+   anything is typed. The input's minimum width is the text typed into it, up to the width of the
    field: it stays beside the chip while the text fits there, and wraps to a line of its own when it does not */
 .df-select-single :deep(.v-field__input > input) {
   min-width: min(var(--df-select-search-width), 100%);

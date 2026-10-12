@@ -34,7 +34,7 @@ export default defineNuxtConfig({
 
 | Component | On the server and until it is mounted | After it is mounted |
 |---|---|---|
-| `df-select` | A read-only text field with the label and the text of the chosen choices that are known without a fetch | The autocomplete |
+| `df-select` | A read-only text field with the label, the text of the chosen choices that are known without a fetch, the hint and the shown errors; without the `prepend-inner` and `append-inner` slots | The autocomplete |
 | `df-date-time` | The text fields with the formatted value | The text fields and their pickers |
 | `df-color` | The text field with the value and the swatch | The text field and its picker |
 | `df-rtf-editor` | The value's text, without the toolbar | The toolbar and the editor |

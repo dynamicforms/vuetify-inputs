@@ -154,9 +154,10 @@ const categoryOptions = [
 ## Localisation
 
 The library renders a few English strings of its own: the labels of the predefined actions, the labels of the RTF
-editor's toolbar, and the upload and download prompts of `<df-image>` and `<df-file>`. `translateStrings()` connects them
-to the application's translation function. Errors render as the `errorText` setting converts them, and
-`DateTimeLocaleConfig` sets the date-fns locale `<df-date-time>` formats and parses with.
+editor's toolbar, the buttons of the pickers, and the upload and download prompts of `<df-image>` and `<df-file>`.
+`translateStrings()`, or the `translate` setting per app, connects them to the application's translation function.
+Errors render as the `errorText` setting converts them, and `DateTimeLocaleConfig`, or the `dateTimeLocale` setting
+per app, sets the date-fns locale `<df-date-time>` formats and parses with.
 
 [Localisation](/examples/localisation) lists every translatable key with its default and where it appears, describes
 [translating errors](/examples/localisation#translating-errors), and has an example that keeps all three on the

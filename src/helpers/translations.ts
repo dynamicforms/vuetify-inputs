@@ -1,5 +1,5 @@
 import { createTranslatable, type Translatable } from '@dynamicforms/translatable';
-import { getCurrentInstance } from 'vue';
+import { getCurrentInstance, inject } from 'vue';
 
 import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
@@ -82,10 +82,8 @@ export const { translateStrings } = global;
 // one Translatable per settings object that states `translate`, made on first use
 const perApp = new WeakMap<VuetifyInputsSettings, Translatable<typeof defaults>>();
 
-function appTranslatable(): Translatable<typeof defaults> | undefined {
-  const settings = getCurrentInstance()?.appContext.provides[vuetifyInputsSettingsKey as symbol] as
-    VuetifyInputsSettings | undefined;
-  if (!settings?.translate) return undefined;
+function translatableOf(settings: VuetifyInputsSettings | undefined): Translatable<typeof defaults> {
+  if (!settings?.translate) return global;
   let translatable = perApp.get(settings);
   if (!translatable) {
     translatable = createTranslatable(defaults);
@@ -96,10 +94,21 @@ function appTranslatable(): Translatable<typeof defaults> | undefined {
 }
 
 /**
- * The current translation of one of the library's strings. Called while a component renders or sets up, it
- * translates with the `translate` setting of the component's app where one is given, and with the function
- * `translateStrings` set otherwise. Under server-side rendering each request's app states its own `translate`.
+ * The current translation of one of the library's strings. Called while a component sets up or renders, it
+ * translates with the `translate` setting the component reads, as it reads every other setting, where one is given,
+ * and with the function `translateStrings` set otherwise. Under server-side rendering each request's app states its
+ * own `translate`. An event handler or a timer reads no setting; it uses `useTranslate()`.
  */
 export function translate(key: Key, params?: Record<string, unknown>): string {
-  return (appTranslatable() ?? global).translate(key, params);
+  const settings = getCurrentInstance() ? inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {}) : undefined;
+  return translatableOf(settings).translate(key, params);
+}
+
+/**
+ * `translate` bound to the settings the calling component reads, for use outside its setup and render: in an event
+ * handler or a timer. Called in a component's setup.
+ */
+export function useTranslate(): (key: Key, params?: Record<string, unknown>) => string {
+  const translatable = translatableOf(inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {}));
+  return (key, params) => translatable.translate(key, params);
 }

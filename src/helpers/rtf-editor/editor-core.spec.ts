@@ -4,6 +4,7 @@ import { vi } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 
+import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from '../settings';
 import { translate } from '../translations';
 
 import EditorCore from './editor-core.vue';
@@ -91,6 +92,24 @@ describe('EditorCore bubble menu link prompt', () => {
     (wrapper.vm as unknown as { toggleBubbleLink: () => void }).toggleBubbleLink();
 
     expect(promptSpy).toHaveBeenCalledWith(translate('LinkUrl'));
+
+    promptSpy.mockRestore();
+  });
+
+  it('prompts with the translate setting the component reads, from an event handler', async () => {
+    const vuetify = createVuetify({ components });
+    const settings: VuetifyInputsSettings = { translate: (key) => `app:${key}` };
+    const wrapper = mount(EditorCore, {
+      props: { modelValue: '<p>hello world</p>' },
+      global: { plugins: [vuetify], provide: { [vuetifyInputsSettingsKey]: settings } },
+    });
+    await flushPromises();
+
+    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue(null);
+
+    (wrapper.vm as unknown as { toggleBubbleLink: () => void }).toggleBubbleLink();
+
+    expect(promptSpy).toHaveBeenCalledWith('app:LinkUrl');
 
     promptSpy.mockRestore();
   });

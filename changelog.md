@@ -56,9 +56,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that exists follows a locale switch. `Action.label` returns the string the label gives now.
 - **Breaking:** `<df-color>` writes a color chosen in its picker when OK or a double-click confirms it, as
   `<df-date-time>` does; Cancel and closing the menu leave the field as it was.
-- In the pickers of `<df-date-time>` and `<df-color>`, Cancel is enabled before a change and closes the picker; OK is
+- **Breaking:** requires `vue-cached-icon` 3.2 (`peerDependencies` `^3.2.0`), which fetches no icon on the server.
+- **Breaking:** in the pickers of `<df-date-time>` and `<df-color>`, Cancel is enabled before a change and closes the picker; OK is
   enabled once the choice differs from the value. Their labels are the library's strings `Cancel` and `Ok`, translated
-  as the other strings are, in place of Vuetify's.
+  as the other strings are, in place of Vuetify's `$vuetify.confirmEdit.cancel` and `$vuetify.confirmEdit.ok`.
 - **Breaking:** `SimpleComponentDef` has no `componentVHtml`, and an `innerHTML` in its `componentProps` is dropped.
   HTML content is an `HtmlString`.
 - **Breaking:** `<df-input-hint>`'s `message` takes `string | RenderableValue[]`; an error goes in `errors`.
@@ -84,8 +85,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   serialization of the value (`<b>` as `<strong>`), which marked a field the user had not edited as changed.
 - `df-select` calls `fetchChoices` in the browser only; a rejected call is logged with `console.error` in place of
   an unhandled rejection, which ended a server process.
-- Requires `vue-cached-icon` 3.2 (`peerDependencies` `^3.2.0`), which fetches no icon on the server.
-
 - `<df-input>` with `input-type="number"` marks its control touched on blur, so its validators' errors are shown.
 - `vitepress-plugin-crosslinks` is a dev dependency of the documentation, not a peer dependency of the package.
 - The emitted declarations import no type from a path a consumer cannot resolve: `InputBase`'s slots are typed by

@@ -31,9 +31,10 @@ export interface VuetifyInputsSettings {
    */
   errorText?: ErrorText;
   /**
-   * The translation function of the library's strings for this app, shaped like vue-i18n's `t`. Where it is given,
-   * `translate()` called while a component of this app renders uses it in place of the one `translateStrings` set
-   * for the process. Under server-side rendering, an app per request gives each request its own.
+   * The translation function of the library's strings, shaped like vue-i18n's `t`. Where it is given, `translate()`
+   * called while a component that reads these settings sets up or renders uses it in place of the one
+   * `translateStrings` set for the process. Under server-side rendering, an app per request gives each request its
+   * own.
    */
   translate?: TranslateFunction;
   /** The namespace `translate` looks the library's keys up under: `${translateNamespace}.${key}`. */

@@ -68,10 +68,10 @@ consistent appearance.
   `allowTags`
 - **Uploads**: a `FileComms` object with upload progress, delete and a periodic touch
 - **Rich text**: TipTap with a Vuetify toolbar, inside the same field frame as every other input
-- **Localisable**: `translateStrings()` connects the library's own strings, including every RTF editor toolbar
-  label and `<df-image>`/`<df-file>`'s upload and download prompts, to the application's translation function; the
-  `errorText` setting translates errors; `DateTimeLocaleConfig` sets the date-fns locale dates are formatted and
-  parsed with — see the [localisation example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/localisation.html)
+- **Localisable**: `translateStrings()`, or the `translate` setting per app, connects the library's own strings,
+  including every RTF editor toolbar label and `<df-image>`/`<df-file>`'s upload and download prompts, to the
+  application's translation function; the `errorText` setting translates errors; `DateTimeLocaleConfig`, or the
+  `dateTimeLocale` setting per app, sets the date-fns locale dates are formatted and parsed with — see the [localisation example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/localisation.html)
   for every key and a worked example
 - **TypeScript**: every component's props are an exported interface, and the definitions ship with the build
 

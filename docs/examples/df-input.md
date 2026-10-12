@@ -50,7 +50,7 @@ When `inputType` is set to 'number', the component:
 
 `v-number-input` keeps the value within `min` and `max`: a typed value outside them shows Vuetify's error state and
 is not written while the user types, and is set to the nearest bound on blur. The field receives the value after
-that. `min` and `max` are no validation of the field; a range the field refuses is a `ValueInRange` validator.
+that. `min` and `max` do not validate the field; a range the field refuses is a `ValueInRange` validator.
 
 The number input supports:
 - Integer and decimal values

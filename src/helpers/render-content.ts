@@ -50,6 +50,38 @@ export function isRenderContent(value: unknown): value is RenderContentNonCallab
   return typeof value === 'string' || value instanceof String || isSimpleComponentDef(value as RenderContentRef);
 }
 
+// a tag that starts or ends a block, or breaks a line: its text and the next one's are separate words
+const blockTags = [
+  'address',
+  'article',
+  'aside',
+  'blockquote',
+  'br',
+  'dd',
+  'div',
+  'dl',
+  'dt',
+  'figcaption',
+  'figure',
+  'footer',
+  'h[1-6]',
+  'header',
+  'hr',
+  'li',
+  'main',
+  'nav',
+  'ol',
+  'p',
+  'pre',
+  'section',
+  'table',
+  'td',
+  'th',
+  'tr',
+  'ul',
+];
+const blockBoundary = new RegExp(`</?(?:${blockTags.join('|')})\\b[^>]*>`, 'gi');
+
 // read last for '&amp;', so '&amp;lt;' reads as '&lt;'
 const htmlEntities: Record<string, string> = {
   '&lt;': '<',
@@ -62,15 +94,18 @@ const htmlEntities: Record<string, string> = {
 
 /**
  * The text of `content` where only text is taken, such as an `aria-label`: a string and an `MdString` as written, an
- * `HtmlString` without its tags and with `&amp;`, `&lt;`, `&gt;`, `&quot;`, `&#39;` and `&nbsp;` read, and a
- * component as `''`.
+ * `HtmlString` without its tags, its blocks separated by a space, whitespace collapsed, and with `&amp;`, `&lt;`,
+ * `&gt;`, `&quot;`, `&#39;` and `&nbsp;` read, and a component as `''`.
  */
 export function renderContentText(content: RenderContentNonCallable): string {
   if (content instanceof HtmlString) {
-    return Object.entries(htmlEntities).reduce(
-      (text, [entity, char]) => text.replaceAll(entity, char),
-      content.toString().replace(/<[^>]*>/g, ''),
-    );
+    const text = content
+      .toString()
+      .replace(blockBoundary, ' ')
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return Object.entries(htmlEntities).reduce((result, [entity, char]) => result.replaceAll(entity, char), text);
   }
   return isSimpleComponentDef(content) ? '' : content.toString();
 }
