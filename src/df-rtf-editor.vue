@@ -2,7 +2,6 @@
   <input-base v-bind="props" class="rtf-editor" :class="densityClass">
     <template #default="slotProps">
       <rtf-editor-core
-        ref="$editor"
         v-model="value"
         :class="{ 'mt-6': !!label }"
         :min-height="minHeight"

@@ -1,6 +1,6 @@
 import Form, { ValidationError } from '@dynamicforms/vue-forms';
 import { isEmpty } from 'lodash-es';
-import { computed, inject, nextTick, ref, shallowRef, toRaw } from 'vue';
+import { computed, type ComputedRef, inject, nextTick, type Ref, ref, shallowRef, toRaw } from 'vue';
 
 import { type ErrorInput, toErrorDescription } from './error-text';
 import { type RenderContentNonCallable, renderContentText } from './render-content';
@@ -66,6 +66,21 @@ export interface BaseProps<T = any> {
 }
 
 export const defaultBaseProps = { enabled: undefined, clearable: true };
+
+/** What `InputBase`'s `default` slot receives: Vuetify's `v-field` slot props. `prepend-inner` receives them without
+ * `props`. */
+export interface InputBaseSlotProps {
+  /** Attributes for the control: its `id`, `class` and ARIA attributes. */
+  props: Record<string, unknown>;
+  isActive: Ref<boolean>;
+  isFocused: Ref<boolean>;
+  iconColor: ComputedRef<string | undefined>;
+  controlRef: Ref<HTMLElement | undefined>;
+  /** Sets the field's focused state. */
+  focus: () => void;
+  /** Clears the field's focused state. */
+  blur: () => void;
+}
 
 export interface BaseEmits<T = any> {
   (e: 'update:modelValue', value: T): void;

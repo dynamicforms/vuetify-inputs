@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A label - the `label` prop and an element's `extra.label` - is content in any of the four forms. Vuetify is given
   its text.
 - `isRenderContent(value)` and `renderContentText(content)`.
+- `InputBaseSlotProps`, the props of `InputBase`'s default slot.
 - `ResolvedActionRenderOptions`, what `getRenderOptionsForBreakpoint()` returns: `ActionRenderOptions` with the
   label read.
 - A double-click on a day in `<df-date-time>`'s date picker, on its clock, or on the color area of `<df-color>`'s
@@ -70,6 +71,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `<df-input>` with `input-type="number"` marks its control touched on blur, so its validators' errors are shown.
 - `vitepress-plugin-crosslinks` is a dev dependency of the documentation, not a peer dependency of the package.
+- The emitted declarations import no type from a path a consumer cannot resolve: `InputBase`'s slots are typed by
+  `InputBaseSlotProps`, `DfLabelProps.data` is `{ label?: string; props?: Record<string, unknown> }`, and
+  `<df-rtf-editor>` exposes no template ref of its toolbar or editor.
 - `registerVuetifyComponents` registers every Vuetify component the library renders: `VBtnGroup`, `VBtnToggle`,
   `VCard`, `VCardActions`, `VDivider`, `VList` and `VListItemTitle` are added.
 

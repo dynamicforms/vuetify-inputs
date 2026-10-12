@@ -1,7 +1,6 @@
 import { Action } from '@dynamicforms/vue-forms';
 import { type Locale } from 'date-fns';
 import { MaybeRef } from 'vue';
-import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
 
 import {
   BaseProps,
@@ -93,7 +92,7 @@ export interface DfInputHintProps {
 export interface DfLabelProps {
   /** The slot data Vuetify hands a `#label` slot. Its `label`, the label's text, is rendered where {@link label} has
    * no content. */
-  data?: DefaultInputSlot & { label?: string };
+  data?: { label?: string; props?: Record<string, unknown> };
   /** The label to render: its content in any of the four forms, and the icon it carries. */
   label: Label;
   /** Whether the label wraps over several lines. It is rendered on one line by default. */

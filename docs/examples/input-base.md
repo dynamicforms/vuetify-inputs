@@ -311,6 +311,9 @@ input directly. The density class is not applied here: the host binds `:class="d
 | prepend-inner | `isActive`, `isFocused`, `iconColor`, `controlRef`, `focus()`, `blur()` | Content inside the field, before the default slot. Rendered only when the slot is supplied |
 | prepend | `id`, `messagesId`, `isDirty`, `isDisabled`, `isReadonly`, `isPristine`, `isValid`, `isValidating`, `hasDetails`, `reset()`, `resetValidation()`, `validate()` | Content outside the field, at the start of the input. Rendered only when the slot is supplied |
 
+The default slot's props are typed as `InputBaseSlotProps`, and `prepend-inner`'s as
+`Omit<InputBaseSlotProps, 'props'>`; `loader` and `prepend` are typed as `Record<string, unknown>`.
+
 The hosted control calls the `focus()` and `blur()` functions of the default and `prepend-inner` slot props from its
 own focus and blur events. `focus()` sets the field's focused state; `blur()` clears it, marks the field touched and
 emits `blur`. If the control never calls them, the field is never shown focused and never marked touched, so the

@@ -43,10 +43,17 @@ import { computed, ref, unref } from 'vue';
 
 import DfInputHint from './df-input-hint.vue';
 import DfLabel from './df-label.vue';
-import { BaseEmits, BaseProps, useInputBase } from './input-base';
+import { BaseEmits, BaseProps, type InputBaseSlotProps, useInputBase } from './input-base';
 
 const props = defineProps<BaseProps & { loading?: boolean }>();
 const emits = defineEmits<BaseEmits & { (e: 'blur'): void }>();
+// declared here, so the emitted declarations do not name Vuetify's internal slot types
+defineSlots<{
+  default?(props: InputBaseSlotProps): any;
+  'prepend-inner'?(props: Omit<InputBaseSlotProps, 'props'>): any;
+  loader?(props: Record<string, unknown>): any;
+  prepend?(props: Record<string, unknown>): any;
+}>();
 
 const { isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 
