@@ -75,7 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - A single `df-select` keeps its chip and the search input on one line while it has focus; the input took a minimum
-  width of 64px and wrapped under a long chip.
+  width of 64px and wrapped under a long chip. The input is as wide as the text typed into it, and the chip gives up
+  its width as the text grows.
 - `<df-rtf-editor>` writes nothing into the field when it mounts or when it is disabled or enabled. It wrote its own
   serialization of the value (`<b>` as `<strong>`), which marked a field the user had not edited as changed.
 - `df-select` calls `fetchChoices` in the browser only; a rejected call is logged with `console.error` in place of

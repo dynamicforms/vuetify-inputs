@@ -19,6 +19,7 @@
       visibilityClass,
       { 'df-select-multirow': isMultiline, 'df-select-single': !multiple },
     ]"
+    :style="{ '--df-select-search-width': `${(searchText?.length ?? 0) + 1}ch` }"
     :items="options"
     :return-object="false"
     chips
@@ -392,13 +393,14 @@ watch(
 
 <style scoped>
 /* a single select keeps its chip and the search input on one line: Vuetify gives the focused input a minimum width
-   of 64px, which wraps it under a long chip; the input takes the width that is left, and the chip's text is cut */
+   of 64px, which wraps it under a long chip. The input is as wide as the text typed into it, at least the width that
+   is left, and the chip gives up its width as the text grows, its own text cut */
 .df-select-single :deep(.v-field__input) {
   flex-wrap: nowrap;
 }
 
 .df-select-single :deep(.v-field__input > input) {
-  min-width: 24px;
+  min-width: var(--df-select-search-width);
 }
 
 .df-select-single :deep(.v-autocomplete__selection),
