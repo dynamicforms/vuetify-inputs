@@ -30,8 +30,8 @@
         >
           <template #default>
             <v-menu v-if="clientRendered" v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsDate" @cancel="dropdown = ''" @save="concludeEdit">
-                <template #default="{ model: proxyModel, save, actions }">
+              <v-confirm-edit v-model="valueAsDate" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
+                <template #default="{ model: proxyModel, save, cancel, isPristine }">
                   <v-date-picker
                     v-model="proxyModel.value"
                     :hide-header="true"
@@ -43,7 +43,9 @@
                     @update:year="viewChanged"
                     @dblclick="saveOnDoubleClick($event, '.v-date-picker-month__day', save)"
                   >
-                    <template #actions><component :is="actions" /></template>
+                    <template #actions>
+                      <confirm-actions :save="save" :cancel="cancel" :is-pristine="isPristine" />
+                    </template>
                   </v-date-picker>
                 </template>
               </v-confirm-edit>
@@ -71,8 +73,8 @@
         >
           <template #default>
             <v-menu v-if="clientRendered" v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsTimeString" @cancel="dropdown = ''" @save="concludeEdit">
-                <template #default="{ model: proxyModel, save, actions }">
+              <v-confirm-edit v-model="valueAsTimeString" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
+                <template #default="{ model: proxyModel, save, cancel, isPristine }">
                   <v-time-picker
                     v-model="proxyModel.value"
                     :hide-header="true"
@@ -80,7 +82,9 @@
                     @update:view-mode="viewChanged"
                     @dblclick="saveOnDoubleClick($event, '.v-time-picker-clock', save)"
                   >
-                    <template #actions><component :is="actions" /></template>
+                    <template #actions>
+                      <confirm-actions :save="save" :cancel="cancel" :is-pristine="isPristine" />
+                    </template>
                   </v-time-picker>
                 </template>
               </v-confirm-edit>
@@ -108,6 +112,7 @@ import {
   vuetifyInputsSettingsKey,
 } from './helpers';
 import { useClientRendered } from './helpers/client-rendered';
+import ConfirmActions from './helpers/confirm-actions.vue';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {

@@ -56,6 +56,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that exists follows a locale switch. `Action.label` returns the string the label gives now.
 - **Breaking:** `<df-color>` writes a color chosen in its picker when OK or a double-click confirms it, as
   `<df-date-time>` does; Cancel and closing the menu leave the field as it was.
+- In the pickers of `<df-date-time>` and `<df-color>`, Cancel is enabled before a change and closes the picker; OK is
+  enabled once the choice differs from the value. Their labels are the library's strings `Cancel` and `Ok`, translated
+  as the other strings are, in place of Vuetify's.
 - **Breaking:** `SimpleComponentDef` has no `componentVHtml`, and an `innerHTML` in its `componentProps` is dropped.
   HTML content is an `HtmlString`.
 - **Breaking:** `<df-input-hint>`'s `message` takes `string | RenderableValue[]`; an error goes in `errors`.

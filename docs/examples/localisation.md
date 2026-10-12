@@ -24,6 +24,7 @@ translation function reads, such as the locale.
 | `Yes` | `Yes` | Label of the action returned by `Action.yesAction()` |
 | `No` | `No` | Label of the action returned by `Action.noAction()` |
 | `Close` | `Close` | Label of the action returned by `Action.closeAction()` |
+| `Cancel` / `Ok` | `Cancel` / `OK` | The buttons of `<df-date-time>`'s and `<df-color>`'s pickers |
 | `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, "no heading" entry |
 | `Heading1`–`Heading6` | `Heading 1`–`Heading 6` | `<df-rtf-editor>` heading dropdown entries |
 | `Undo` / `Redo` | `Undo` / `Redo` | `<df-rtf-editor>` toolbar button tooltips |
@@ -272,7 +273,7 @@ table above:
 const messages = {
   de: {
     df_inputs: {
-      Yes: 'Ja', No: 'Nein', Close: 'Schließen',
+      Yes: 'Ja', No: 'Nein', Close: 'Schließen', Cancel: 'Abbrechen',
       Paragraph: 'Absatz',
       Heading1: 'Überschrift 1', Heading2: 'Überschrift 2', /* ...Heading3-6 */
       Bold: 'Fett', Italic: 'Kursiv',
