@@ -16,7 +16,7 @@ longer renders: an error is a `code`, `params` and an English `detail`, and the 
 exported by this library. There is a [checklist](#checklist-for-0-13-0) at the end of this section.
 
 ```bash
-npm install @dynamicforms/vue-forms@^3.0.0 @dynamicforms/vuetify-inputs@^0.13.0
+npm install @dynamicforms/vue-forms@^3.0.0-alpha.1 @dynamicforms/vuetify-inputs@^0.13.0
 ```
 
 ### Render content is imported from this library

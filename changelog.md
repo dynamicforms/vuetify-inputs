@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** requires `@dynamicforms/vue-forms` 3.0.0 (`peerDependencies` `^3.0.0`).
+- **Breaking:** requires `@dynamicforms/vue-forms` 3.0 (`peerDependencies` `^3.0.0-alpha.1`).
 - **Breaking:** requires `@dynamicforms/translatable` 0.3 (`peerDependencies` `^0.3.0`). `translateStrings(t,
   namespace?)` takes the application's translation function in place of a callback, and the strings follow the
   reactive state `t` reads, such as vue-i18n's locale.
