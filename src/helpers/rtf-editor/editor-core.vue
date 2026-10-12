@@ -155,11 +155,13 @@ watch(
   },
 );
 
+// setEditable emits an `update` unless told not to: it would write the editor's serialization of the value, which
+// differs from the value as written (`<b>` read back as `<strong>`), into the field the user has not edited
 watch(
   () => props.disabled,
-  (disabled) => editor.value?.setEditable(!disabled),
+  (disabled) => editor.value?.setEditable(!disabled, false),
 );
-watch(editor, (instance) => instance?.setEditable(!props.disabled));
+watch(editor, (instance) => instance?.setEditable(!props.disabled, false));
 
 const bubbleButtonProps = { icon: true, size: 'small', density: 'comfortable', variant: 'text' } as const;
 

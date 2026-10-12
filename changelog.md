@@ -74,6 +74,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `<df-rtf-editor>` writes nothing into the field when it mounts or when it is disabled or enabled. It wrote its own
+  serialization of the value (`<b>` as `<strong>`), which marked a field the user had not edited as changed.
 - `df-select` calls `fetchChoices` in the browser only; a rejected call is logged with `console.error` in place of
   an unhandled rejection, which ended a server process.
 - Requires `vue-cached-icon` 3.2 (`peerDependencies` `^3.2.0`), which fetches no icon on the server.
