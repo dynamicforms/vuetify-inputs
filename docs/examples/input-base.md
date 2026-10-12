@@ -380,7 +380,7 @@ const { value, shownErrors } = useInputBase<string>(props, emits, () =>
 | isRendered | `ComputedRef<boolean>` | `false` only for `'suppress'`; it is the `v-if` on the component's root element |
 | visibilityClass | `ComputedRef<{ 'd-none': boolean, invisible: boolean }>` | The class object for `'hidden'` and `'invisible'`, to bind on the root element |
 | label | `ComputedRef<Label>` | The label as a `Label` instance: a `string` or `MdString` is wrapped, a `Label` is passed through |
-| touched | `WritableComputedRef<boolean> \| Ref<boolean>` | Bound to `control.touched` when there is a control, a standalone ref otherwise. Components write `true` to it on blur, and on an edit that ends without a blur: `df-file` and `df-image` when an upload returns or the field is cleared, `df-date-time` when a value picked in its menu is saved or the field is cleared, `df-color` when its picker closes |
+| touched | `WritableComputedRef<boolean> \| Ref<boolean>` | Bound to `control.touched` when there is a control, a standalone ref otherwise. Components write `true` to it on blur, and on an edit that ends without a blur: `df-file` and `df-image` when an upload returns or the field is cleared, `df-date-time` when a value picked in its menu is saved or the field is cleared, `df-color` when a color picked in its menu is saved |
 | density | `ComputedRef<FieldDensity>` | The `density` prop, then the control's `extra.density`, then the injected `field-density`, then the plugin's `defaultDensity`, then `'default'` |
 | densityClass | `ComputedRef<string>` | `` `df-density-${density}` ``, to bind on the root element |
 | vuetifyBindings | `ComputedRef<Record<string, any>>` | Everything to `v-bind` on the Vuetify input, see below |

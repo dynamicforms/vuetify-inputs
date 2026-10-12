@@ -32,8 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   nothing.
 
 - `<df-file>` and `<df-image>` mark the field touched when an upload returns and when the field is cleared,
-  `<df-date-time>` when a value picked in its menu is saved and when the field is cleared, and `<df-color>` when its
-  picker closes. vue-forms' default `ErrorPolicy` removes an error of origin `'server'` when the field is marked
+  `<df-date-time>` when a value picked in its menu is saved and when the field is cleared, and `<df-color>` when a
+  color picked in its menu is saved. vue-forms' default `ErrorPolicy` removes an error of origin `'server'` when the field is marked
   touched with a changed value.
 
 ### Fixed

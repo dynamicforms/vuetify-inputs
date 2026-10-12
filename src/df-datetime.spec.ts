@@ -114,6 +114,66 @@ describe('DfDateTime', () => {
       expect(control.errors).toHaveLength(0);
     });
 
+    it('saves a day on a double-click on it', async () => {
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      await wrapper.find('input').trigger('click');
+      await flushPromises();
+
+      const month = wrapper.findComponent({ name: 'VDatePickerMonth' });
+      const day = month.findAll('.v-date-picker-month__day button').find((button) => button.text() === '20')!;
+      await day.trigger('click');
+      expect(control.value).toBe('2026-01-15');
+      await day.trigger('dblclick');
+      await flushPromises();
+
+      expect(control.value).toBe('2026-01-20');
+      expect(control.touched).toBe(true);
+    });
+
+    describe('a double-click on the clock', () => {
+      async function openClock() {
+        const control = new Field<string | null>({ value: '10:00' });
+        const wrapper = mountDateTime({ control, inputType: 'time' });
+        await wrapper.find('input').trigger('click');
+        await flushPromises();
+        const picker = wrapper.findComponent({ name: 'VTimePicker' });
+        const clock = picker.find('.v-time-picker-clock');
+        const press = async (view: 'hour' | 'minute') => {
+          picker.vm.$emit('update:viewMode', view);
+          await flushPromises();
+          await clock.trigger('pointerdown');
+        };
+        return { control, picker, clock, press };
+      }
+
+      it('saves where both presses are on the minutes', async () => {
+        const { control, picker, clock, press } = await openClock();
+
+        await press('minute');
+        await press('minute');
+        picker.vm.$emit('update:modelValue', '10:30');
+        await flushPromises();
+        await clock.trigger('dblclick');
+        await flushPromises();
+
+        expect(control.value).toBe('10:30');
+      });
+
+      it('does not save where the first press chose an hour', async () => {
+        const { control, picker, clock, press } = await openClock();
+
+        await press('hour');
+        await press('minute');
+        picker.vm.$emit('update:modelValue', '11:00');
+        await flushPromises();
+        await clock.trigger('dblclick');
+        await flushPromises();
+
+        expect(control.value).toBe('10:00');
+      });
+    });
+
     it('removes a server error when the field is cleared', async () => {
       const control = new Field<string | null>({ value: '2026-01-15' });
       control.errors = [serverError()];

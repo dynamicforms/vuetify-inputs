@@ -16,6 +16,12 @@
 - Date and time pickers in a menu
 - Clearing the value
 
+## Picking a value
+
+A choice in a picker is written to the field when it is confirmed: with OK, or with a double-click on a day or, in
+the minutes of the clock, on a minute. Cancel and closing the menu leave the field as it was. A double-click whose
+first click chose an hour does not confirm. A confirmed choice and a clear mark the field touched.
+
 ::: warning
 Keyboard support is minimal. `<space>` triggers the picker, but keyboard navigation within the picker is not fully 
 supported. Manual entry is provisionally supported.

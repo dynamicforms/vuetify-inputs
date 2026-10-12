@@ -1,5 +1,5 @@
 import { Field } from '@dynamicforms/vue-forms';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
@@ -63,19 +63,52 @@ describe('DfColor', () => {
     expect(wrapper.text()).not.toContain('Not a valid hex string.');
   });
 
-  it('marks a bound field touched when the picker closes', async () => {
-    const control = new Field<string>({ value: '#f00' });
-    // jsdom has no canvas for the picker the open menu renders
-    const wrapper = mount(DfColor, {
-      props: { control },
-      global: { plugins: [vuetify], stubs: { VColorPicker: true } },
+  describe('the picker', () => {
+    // jsdom has no canvas: the stub stands in for the picker, with an element of the canvas's class
+    const ColorPickerStub = {
+      props: ['modelValue'],
+      emits: ['update:modelValue'],
+      template: '<div class="color-picker-stub"><div class="v-color-picker-canvas" /></div>',
+    };
+
+    async function openPicker(control: Field<string>) {
+      const wrapper = mount(DfColor, {
+        props: { control },
+        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
+        attachTo: document.body,
+      });
+      await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
+      await flushPromises();
+      return wrapper;
+    }
+
+    it('writes a picked color when OK confirms it, and marks the field touched', async () => {
+      const control = new Field<string>({ value: '#f00' });
+      const wrapper = await openPicker(control);
+
+      wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ff00');
+      await flushPromises();
+      expect(control.value).toBe('#f00');
+
+      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
+      await ok!.trigger('click');
+
+      expect(control.value).toBe('#00ff00');
+      expect(control.touched).toBe(true);
+      wrapper.unmount();
     });
-    const menu = wrapper.findComponent({ name: 'VMenu' });
 
-    await menu.vm.$emit('update:modelValue', true);
-    expect(control.touched).toBe(false);
-    await menu.vm.$emit('update:modelValue', false);
+    it('writes a picked color on a double-click on the canvas', async () => {
+      const control = new Field<string>({ value: '#f00' });
+      const wrapper = await openPicker(control);
 
-    expect(control.touched).toBe(true);
+      wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ff00');
+      await flushPromises();
+      await wrapper.findComponent(ColorPickerStub).find('.v-color-picker-canvas').trigger('dblclick');
+
+      expect(control.value).toBe('#00ff00');
+      expect(control.touched).toBe(true);
+      wrapper.unmount();
+    });
   });
 });

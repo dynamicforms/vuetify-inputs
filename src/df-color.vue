@@ -18,7 +18,18 @@
     </template>
     <template #default>
       <v-menu v-model="dropdownShown" :close-on-content-click="false" activator="parent">
-        <v-color-picker v-model="value" mode="hexa" />
+        <v-confirm-edit v-model="value" @cancel="dropdownShown = false" @save="concludeEdit">
+          <template #default="{ model: proxyModel, save, actions }">
+            <v-card>
+              <v-color-picker
+                v-model="proxyModel.value"
+                mode="hexa"
+                @dblclick="saveOnDoubleClick($event, colorChoices, save)"
+              />
+              <v-card-actions><component :is="actions" /></v-card-actions>
+            </v-card>
+          </template>
+        </v-confirm-edit>
       </v-menu>
     </template>
   </v-text-field>
@@ -26,10 +37,11 @@
 
 <script setup lang="ts">
 import { ValidationError } from '@dynamicforms/vue-forms';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 
 import { DfColorProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
+import { saveOnDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfColorProps>(), { ...defaultBaseProps, allowNull: false });
 
@@ -53,8 +65,11 @@ const { densityClass, isRendered, label, shownErrors, touched, value, visibility
   hexColorErrors,
 );
 const dropdownShown = ref(false);
-// closing the picker concludes the edit: the field may hold no focus to lose
-watch(dropdownShown, (shown) => {
-  if (!shown) touched.value = true;
-});
+const colorChoices = '.v-color-picker-canvas, .v-color-picker-swatches__color';
+
+// a value confirmed in the picker concludes the edit: the field may hold no focus to lose
+function concludeEdit() {
+  dropdownShown.value = false;
+  touched.value = true;
+}
 </script>

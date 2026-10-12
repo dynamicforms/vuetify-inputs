@@ -31,13 +31,14 @@
           <template #default>
             <v-menu v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
               <v-confirm-edit v-model="valueAsDate" @cancel="dropdown = ''" @save="concludeEdit">
-                <template #default="{ model: proxyModel, actions }">
+                <template #default="{ model: proxyModel, save, actions }">
                   <v-date-picker
                     v-model="proxyModel.value"
                     :hide-header="true"
                     :first-day-of-week="firstDayOfWeek"
                     :show-adjacent-months="true"
                     :show-week="true"
+                    @dblclick="saveOnDoubleClick($event, '.v-date-picker-month__day', save)"
                   >
                     <template #actions><component :is="actions" /></template>
                   </v-date-picker>
@@ -68,8 +69,15 @@
           <template #default>
             <v-menu v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
               <v-confirm-edit v-model="valueAsTimeString" @cancel="dropdown = ''" @save="concludeEdit">
-                <template #default="{ model: proxyModel, actions }">
-                  <v-time-picker v-model="proxyModel.value" :hide-header="true" format="24hr">
+                <template #default="{ model: proxyModel, save, actions }">
+                  <v-time-picker
+                    v-model="proxyModel.value"
+                    v-model:view-mode="timeViewMode"
+                    :hide-header="true"
+                    format="24hr"
+                    @pointerdown.capture="recordTimeClickView"
+                    @dblclick="saveTimeOnDoubleClick($event, save)"
+                  >
                     <template #actions><component :is="actions" /></template>
                   </v-time-picker>
                 </template>
@@ -89,6 +97,7 @@ import { ref, computed, watch, toRefs, unref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
 import { BaseEmits, DateTimeLocaleConfig, defaultBaseProps, InputBase, useInputBase } from './helpers';
+import { saveOnDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {
   ...defaultBaseProps,
@@ -127,6 +136,23 @@ const timeMenuShown = computed({
 function concludeEdit() {
   dropdown.value = '';
   touched.value = true;
+}
+
+// the clock opens on the hours; a click on an hour switches it to the minutes
+const timeViewMode = ref<'hour' | 'minute' | 'second'>('hour');
+watch(timeMenuShown, (shown) => {
+  if (shown) timeViewMode.value = 'hour';
+});
+// the view each of the last two presses landed in: a double-click whose first press chose an hour has its second
+// press choose a minute the user did not aim at, so only a double-click within the minutes confirms
+let timeClickViews: string[] = [];
+
+function recordTimeClickView() {
+  timeClickViews = [...timeClickViews.slice(-1), timeViewMode.value];
+}
+
+function saveTimeOnDoubleClick(event: MouseEvent, save: () => void) {
+  if (timeClickViews.every((view) => view === 'minute')) saveOnDoubleClick(event, '.v-time-picker-clock', save);
 }
 
 function clear() {

@@ -17,6 +17,12 @@
 - Built-in hex format check for the uncontrolled (v-model) case, reported as an `invalid_hex_color` error
 - Clearing the value under `allowNull`
 
+## Picking a value
+
+A color chosen in the picker is written to the field when it is confirmed: with OK, or with a double-click on the
+color area or on a swatch. Cancel and closing the menu leave the field as it was. A confirmed color marks the field
+touched. A value typed into the field is written as it is typed.
+
 ## Props
 
 In addition to [common props from InputBase](./input-base), this component supports:
