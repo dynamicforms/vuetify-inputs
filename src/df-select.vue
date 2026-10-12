@@ -13,7 +13,12 @@
     v-else-if="isRendered"
     ref="dfSelectRef"
     v-model="selected"
-    :class="[cssClass, densityClass, visibilityClass, { 'df-select-multirow': isMultiline }]"
+    :class="[
+      cssClass,
+      densityClass,
+      visibilityClass,
+      { 'df-select-multirow': isMultiline, 'df-select-single': !multiple },
+    ]"
     :items="options"
     :return-object="false"
     chips
@@ -386,6 +391,32 @@ watch(
 </script>
 
 <style scoped>
+/* a single select keeps its chip and the search input on one line: Vuetify gives the focused input a minimum width
+   of 64px, which wraps it under a long chip; the input takes the width that is left, and the chip's text is cut */
+.df-select-single :deep(.v-field__input) {
+  flex-wrap: nowrap;
+}
+
+.df-select-single :deep(.v-field__input > input) {
+  min-width: 24px;
+}
+
+.df-select-single :deep(.v-autocomplete__selection),
+.df-select-single :deep(.v-combobox__selection) {
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+.df-select-single :deep(.v-chip) {
+  max-width: 100%;
+}
+
+.df-select-single :deep(.v-chip__content) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .df-select-multirow :deep(.v-field__clearable) {
   position: absolute;
 }
