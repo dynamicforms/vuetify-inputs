@@ -39,8 +39,8 @@
             <button
               type="button"
               class="df-file-download-btn"
-              :title="t.FileDownload"
-              :aria-label="t.FileDownload"
+              :title="t('FileDownload')"
+              :aria-label="t('FileDownload')"
               @click.stop.prevent="downloadFile"
             >
               <cached-icon name="mdi-download" />
@@ -62,7 +62,7 @@ import {
   defaultBaseProps,
   InputBase,
   setFileGoneError,
-  translatableStrings,
+  translate,
   useFileTouchKeepAlive,
   useInputBase,
 } from './helpers';
@@ -73,7 +73,7 @@ interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
-const t = translatableStrings;
+const t = translate;
 
 // State
 const currentFile = ref<File | null>(null);
@@ -129,6 +129,7 @@ async function removeFile() {
   }
 
   resetFileState();
+  touched.value = true;
 }
 
 async function upload(file: File) {
@@ -140,6 +141,8 @@ async function upload(file: File) {
       progress.value = Math.round((loaded * 100) / total);
     });
     progress.value = 100;
+    // a picked file concludes the edit: the file dialog and a drop have no blur of the field
+    touched.value = true;
     setupTouchInterval();
   } catch (err) {
     progress.value = 0;

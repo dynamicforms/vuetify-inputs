@@ -1,25 +1,25 @@
 # df-image Component
 
-The df-image component provides an image upload field: a preview of the current image, a drag & drop zone, and a
-button that opens the browser's file dialog. It shares its backend communication contract with [df-file](./df-file).
+`df-image` is an image upload field: a preview of the current image, a drag & drop zone, and a button that opens the
+browser's file dialog. It uses the backend interface of [df-file](./df-file).
 
 ## Basic Usage
 
-Below is an example of the df-image component used with DynamicForms:
+`df-image` bound to a vue-forms field:
 
 <image-basic/>
 
 ## Features
 
-- Preview of the current image, shown as soon as one is set
+- Preview of the current image
 - Drag & drop, and a click-to-browse dialog
-- Upload progress indication
-- Image deletion support
-- Downloading the currently set image - its value is already a URL the browser can fetch, so no `comms` method is
-  needed for this, unlike `df-file`'s `getDownloadUrl`
-- Automatic periodic "touches" to keep uploaded images active
-- Customizable labels, hints, and error messages
-- Backend communication abstraction through the same `FileComms` interface as `df-file`
+- Upload progress bar
+- Image deletion
+- Downloading the current image; the value is a URL, so no `comms` method is needed, unlike `df-file`'s
+  `getDownloadUrl`
+- Periodic touches that keep the uploaded image on the backend
+- Labels, hints and error messages
+- Backend communication through the `FileComms` interface of `df-file`
 
 ## Props
 
@@ -43,13 +43,13 @@ This component inherits all common props from [InputBase](./input-base), includi
 
 The component stores and displays a URL string, not the file itself:
 
-1. `comms.upload` resolves to the URL the component renders as the image's `src` - there is no separate lookup
-   for turning an identifier into a display URL, so whatever it returns must already be usable as one.
+1. `comms.upload` resolves to the URL the component renders as the image's `src`. There is no lookup from an
+   identifier to a URL, so the returned value must be a URL the browser can load.
 2. The same value is used in subsequent operations (delete, touch) to reference the image.
 3. It is stored in the form data when using DynamicForms.
 
-An upload the user started completes whatever happens to the field meanwhile: where the field is disabled before
-`upload` resolves, the URL is still written into it and touched from then on.
+A started upload completes regardless of changes to the field: if the field is disabled before `upload` resolves, the
+URL is still written into it and touched from then on.
 
 ## FileComms Interface
 
@@ -74,8 +74,8 @@ interface FileComms {
 
   /**
    * Called periodically to keep the image active. Throw FileGoneError if the backend reports the identifier
-   * no longer exists — the component then clears the field and, where a `control` is bound, shows the
-   * error's `errorText`. Any other thrown error is treated as transient and left to the consumer.
+   * no longer exists — the component then clears the field and, where a `control` is bound, reports an error
+   * of code `file_gone` with the error's `errorText` as its detail. Any other thrown error is treated as transient and left to the consumer.
    * @param fileIdentifier The URL that was returned by upload
    */
   touch: (fileIdentifier: string) => Promise<void>;
@@ -92,18 +92,22 @@ class FileGoneError extends Error {
 }
 ```
 
-`FileComms` also declares an optional `getDownloadUrl`, for `df-file`'s use — `df-image` ignores it, since its value
-already is the URL a download link needs.
+`FileComms` also declares an optional `getDownloadUrl`, used by `df-file`; `df-image` ignores it, because its value is
+the URL.
 
 ## Upload Progress
 
-The component displays a progress bar during upload, using the values provided by the `progressCallback` in the
-`upload` method.
+During an upload the component shows a progress bar from the values passed to `progressCallback` of `upload`.
 
 After an image has been uploaded to the backend, it is touched every `touchInterval` milliseconds (60 seconds by
-default) to let the backend know that it's still relevant. If a touch rejects with a `FileGoneError`, the field and
-preview are cleared - a disabled field as well - and, where a `control` is bound, the error's `errorText` is shown as
-a validation error. Any other rejection is treated as a transient failure and left to the consumer.
+default), so the backend keeps it. If a touch rejects with a `FileGoneError`, the field and preview are cleared, a
+disabled field as well, and, where a `control` is bound, its errors are replaced with one
+`ValidationError` of code `file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the
+[`errorText` setting](/examples/localisation#translating-errors) can render another text for the code. Under
+vue-forms' default [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy) the field drops the error when a
+new image is uploaded. Any other rejection is ignored by the component and left to the application.
+
+An upload that returns and a clear of the field mark the field touched.
 
 ## Non-image Files
 

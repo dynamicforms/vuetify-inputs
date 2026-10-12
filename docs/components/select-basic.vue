@@ -3,16 +3,9 @@
     <v-card>
       <v-card-title>Basic example</v-card-title>
       <v-card-text>
-        <df-select
-          v-model="selectedFruit"
-          :choices="fruits"
-          label="Choose your fruit"
-          :multiple="true"
-        />
+        <df-select v-model="selectedFruit" :choices="fruits" label="Choose your fruit" :multiple="true" />
 
-        <div class="mt-4">
-          <strong>Selected value:</strong> {{ selectedFruit }}
-        </div>
+        <div class="mt-4"><strong>Selected value:</strong> {{ selectedFruit }}</div>
       </v-card-text>
     </v-card>
   </div>
@@ -29,7 +22,7 @@ const fruits = [
   { id: 'banana', text: 'Banana' },
   { id: 'cherry', text: 'Cherry' },
   { id: 'durian', text: 'Durian' },
-  { id: 'elder', text: 'Elderflower' }
+  { id: 'elder', text: 'Elderflower' },
 ];
 </script>
 

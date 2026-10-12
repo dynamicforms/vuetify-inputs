@@ -11,7 +11,7 @@
         />
 
         <div class="mt-4">
-          <v-btn @click="toggleEnabled" color="primary" class="mr-2">
+          <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ fileField.enabled ? 'Disable' : 'Enable' }} Field
           </v-btn>
         </div>
@@ -43,7 +43,7 @@ import { CachedIcon } from 'vue-cached-icon';
 import { DfFile } from '../../src';
 
 const fileField = new Field({
-  value: 'contracts/existing-agreement.pdf'
+  value: 'contracts/existing-agreement.pdf',
 });
 
 const uploadedFiles = ref([]);
@@ -57,7 +57,7 @@ const fileComms = {
     const chunkSize = totalSize / 1000;
 
     for (let i = 0; i < 1000; i++) {
-      await new Promise(resolve => setTimeout(resolve, 3));
+      await new Promise((resolve) => setTimeout(resolve, 3));
       loaded += chunkSize;
       if (progressCallback) {
         progressCallback(loaded, totalSize);
@@ -74,7 +74,7 @@ const fileComms = {
   delete: async (fileIdentifier) => {
     // In a real implementation, this would call an API to delete the file
     console.log('Deleting file:', fileIdentifier);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // For demo purposes, we'll just clear our local array
     uploadedFiles.value = [];
@@ -91,10 +91,10 @@ const fileComms = {
   getDownloadUrl: async (fileIdentifier) => {
     // In a real implementation, this would resolve to a signed URL or a same-origin download path
     const blob = new Blob([`Hello world!\n\nThis is a mock download standing in for: ${fileIdentifier}`], {
-      type: 'text/plain'
+      type: 'text/plain',
     });
     return URL.createObjectURL(blob);
-  }
+  },
 };
 
 function toggleEnabled() {

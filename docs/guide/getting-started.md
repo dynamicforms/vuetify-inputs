@@ -33,9 +33,9 @@ Object.entries(VuetifyComponents).map(([name, component]) => app.component(name,
 
 ### Resolving a component by its tag
 
-A rendering layer that reads a component out of a map rather than through Vue's resolver - one that draws a
-serialized layout naming `df-select`, say - is handed `dfInputComponentsByTag`, which holds every component of
-this library under the tag that names it. `DfInputComponentTag` is the union of those tags.
+`dfInputComponentsByTag` holds every component of this library under its tag, for a rendering layer that looks a
+component up in a map instead of through Vue's resolver, e.g. one that renders a serialized layout naming
+`df-select`. `DfInputComponentTag` is the union of those tags.
 
 ```typescript
 import { dfInputComponentsByTag } from '@dynamicforms/vuetify-inputs';
@@ -43,8 +43,8 @@ import { dfInputComponentsByTag } from '@dynamicforms/vuetify-inputs';
 const components = { ...dfInputComponentsByTag, ...myOwnComponents };
 ```
 
-This is the map [`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:) hands its layout renderer, and
-using it instead of a list of your own is what keeps a component this library gains from going unresolved.
+[`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:) passes this map to its layout renderer. A
+component added to this library in a later version is in the map; a hand-written list does not contain it.
 
 ## Basic Usage
 
@@ -61,7 +61,7 @@ import { DfSelect, DfTextArea, DfFile } from '@dynamicforms/vuetify-inputs';
 
 ### Using with DynamicForms
 
-These components are designed to integrate with the `@dynamicforms/vue-forms` library:
+A component bound to a `@dynamicforms/vue-forms` element through `control`:
 
 ```vue
 <template>
@@ -105,7 +105,7 @@ const categoryOptions = [
 
 ### Using without DynamicForms
 
-The components can also be used standalone with v-model:
+The components also work with `v-model`:
 
 ```vue
 <template>
@@ -153,13 +153,15 @@ const categoryOptions = [
 
 ## Localisation
 
-The library renders a few English strings of its own — the labels of the predefined actions, every label the RTF
-editor's toolbar draws, and `<df-image>`/`<df-file>`'s upload and download prompts. `translateStrings()` replaces
-them, and `DateTimeLocaleConfig` sets the date-fns locale `<df-date-time>` formats and parses with.
+The library renders a few English strings of its own: the labels of the predefined actions, the labels of the RTF
+editor's toolbar, and the upload and download prompts of `<df-image>` and `<df-file>`. `translateStrings()` connects them
+to the application's translation function. Errors render as the `errorText` setting converts them, and
+`DateTimeLocaleConfig` sets the date-fns locale `<df-date-time>` formats and parses with.
 
-[Localisation](/examples/localisation) lists every translatable key with its default and where it appears, and carries
-a worked example that keeps both on the application's current locale.
+[Localisation](/examples/localisation) lists every translatable key with its default and where it appears, describes
+[translating errors](/examples/localisation#translating-errors), and has an example that keeps all three on the
+application's current locale.
 
 ## Next Steps
 
-Check out the [Examples](/examples/) section to see more advanced usage patterns to learn about all available features.
+The [Examples](/examples/) section documents every component and feature.

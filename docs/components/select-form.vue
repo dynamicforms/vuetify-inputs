@@ -6,55 +6,26 @@
         <v-form @submit.prevent>
           <v-row>
             <v-col cols="12" md="6">
-              <v-text-field
-                v-model="personForm.fields.firstName.value"
-                :disabled="!personForm.fields.firstName.enabled"
-                label="First Name"
-                outlined
-                hide-details="auto"
-              ></v-text-field>
+              <df-input :control="personForm.fields.firstName" label="First Name" />
             </v-col>
 
             <v-col cols="12" md="6">
-              <v-text-field
-                v-model="personForm.fields.lastName.value"
-                :disabled="!personForm.fields.lastName.enabled"
-                label="Last Name"
-                outlined
-                hide-details="auto"
-              ></v-text-field>
+              <df-input :control="personForm.fields.lastName" label="Last Name" />
             </v-col>
           </v-row>
 
           <v-row>
             <v-col cols="12" md="6">
-              <v-text-field
-                v-model.number="personForm.fields.age.value"
-                :disabled="!personForm.fields.age.enabled"
-                type="number"
-                label="Age"
-                outlined
-                hide-details="auto"
-              ></v-text-field>
+              <df-input :control="personForm.fields.age" input-type="number" label="Age" />
             </v-col>
 
             <v-col cols="12" md="6">
-              <v-switch
-                v-model="personForm.fields.active.value"
-                :disabled="!personForm.fields.active.enabled"
-                label="Active"
-                hide-details="auto"
-                color="primary"
-              ></v-switch>
+              <df-checkbox :control="personForm.fields.active" label="Active" />
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12">
-              <df-select
-                :control="personForm.fields.country"
-                :choices="countries"
-                label="Country"
-              />
+              <df-select :control="personForm.fields.country" :choices="countries" label="Country" />
             </v-col>
           </v-row>
         </v-form>
@@ -62,17 +33,19 @@
 
       <v-card-actions>
         <v-btn-group>
-          <v-btn @click="toggleField('firstName')" color="primary">
-            {{ personForm.fields.firstName.enabled ? 'Disable' : 'Enable' }} First Name
+          <v-btn color="primary" @click="toggleField('firstName')">
+            {{ personForm.fields.firstName.enabled ? 'Disable' : 'Enable' }}
+            First Name
           </v-btn>
-          <v-btn @click="toggleField('lastName')" color="primary">
+          <v-btn color="primary" @click="toggleField('lastName')">
             {{ personForm.fields.lastName.enabled ? 'Disable' : 'Enable' }} Last Name
           </v-btn>
-          <v-btn @click="toggleField('age')" color="primary">
+          <v-btn color="primary" @click="toggleField('age')">
             {{ personForm.fields.age.enabled ? 'Disable' : 'Enable' }} Age
           </v-btn>
-          <v-btn @click="toggleField('country')" color="primary">
-            {{ personForm.fields.country.enabled ? 'Disable' : 'Enable' }} Country
+          <v-btn color="primary" @click="toggleField('country')">
+            {{ personForm.fields.country.enabled ? 'Disable' : 'Enable' }}
+            Country
           </v-btn>
         </v-btn-group>
       </v-card-actions>
@@ -89,8 +62,9 @@
 
 <script setup>
 import { Group, Field, Validators, ValueChangedAction } from '@dynamicforms/vue-forms';
-import { DfSelect } from "../../src"; //from '@dynamicforms/vue-forms'
 import { getAllCountries } from 'countries-and-timezones';
+
+import { DfCheckbox, DfInput, DfSelect } from '../../src';
 
 // Create a form group with fields
 const personForm = new Group({
@@ -101,9 +75,10 @@ const personForm = new Group({
   country: new Field({ value: 'si', validators: [new Validators.Required()] }),
 });
 
-const countries = Object.values(getAllCountries()).map(
-  (country) => ({ id: country.id.toLowerCase(), text: country.name }),
-);
+const countries = Object.values(getAllCountries()).map((country) => ({
+  id: country.id.toLowerCase(),
+  text: country.name,
+}));
 // Function to toggle field enabled state
 const toggleField = (fieldName) => {
   const field = personForm.fields[fieldName];
@@ -113,9 +88,11 @@ const toggleField = (fieldName) => {
 };
 
 // A value changed action on the group fires whenever what the group holds changes: a field written
-personForm.registerAction(new ValueChangedAction(async (field, supr, newValue, oldValue) => {
-  return supr(field, newValue, oldValue);
-}));
+personForm.registerAction(
+  new ValueChangedAction(async (field, supr, newValue, oldValue) => {
+    return supr(field, newValue, oldValue);
+  }),
+);
 </script>
 
 <style scoped>

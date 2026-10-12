@@ -1,8 +1,8 @@
 import { Action as FormAction, IFieldConstructorParams } from '@dynamicforms/vue-forms';
 import { isEmpty, isString } from 'lodash-es';
-import { computed, Ref } from 'vue';
+import { computed, Ref, toValue } from 'vue';
 
-import { translatableStrings } from '../translations';
+import { translate } from '../translations';
 
 import { ActionBreakpointOptions, getRenderOptionsForBreakpoint } from './action-render-options';
 import { BreakpointNames } from './responsive-render-options';
@@ -11,6 +11,15 @@ class Action extends FormAction<ActionBreakpointOptions> {
   /** @see getRenderOptionsForBreakpoint, which answers the same for the value of any `Action` */
   getBreakpointValue(breakpoint: Ref<BreakpointNames>) {
     return computed(() => getRenderOptionsForBreakpoint(this.value, breakpoint.value));
+  }
+
+  /** The label read: where the value holds a ref or a function, the string it gives now. */
+  get label(): string | undefined {
+    return toValue(this.value.label);
+  }
+
+  set label(newValue: ActionBreakpointOptions['label']) {
+    super.label = newValue;
   }
 
   /** @see ActionRenderOptions.name */
@@ -22,13 +31,14 @@ class Action extends FormAction<ActionBreakpointOptions> {
    * The label as this action renders it: the text where {@link ActionRenderOptions.showLabel} states it is shown,
    * and `undefined` where it is not. `label` is the base class's, and answers the text whatever the flag says.
    */
-  get renderedLabel() {
-    return this.value.showLabel ? this.value.label : undefined;
+  get renderedLabel(): string | undefined {
+    return this.value.showLabel ? toValue(this.value.label) : undefined;
   }
 
   /** @see ActionRenderOptions.showLabel */
   get showLabel() {
-    return isString(this.value.label) && !isEmpty(this.value.label) ? this.value.showLabel : false;
+    const label = toValue(this.value.label);
+    return isString(label) && !isEmpty(label) ? this.value.showLabel : false;
   }
 
   /**
@@ -49,16 +59,6 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return this.value.renderAs;
   }
 
-  /** @see ActionRenderOptions.defaultConfirm */
-  get defaultConfirm() {
-    return this.value.defaultConfirm;
-  }
-
-  /** @see ActionRenderOptions.defaultReject */
-  get defaultReject() {
-    return this.value.defaultReject;
-  }
-
   /** @see ActionRenderOptions.passthroughAttrs */
   get passthroughAttrs() {
     return this.value.passthroughAttrs;
@@ -69,7 +69,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'close',
-        label: translatableStrings.Close,
+        label: () => translate('Close'),
         icon: 'ion-close-outline',
         renderAs: 'button',
         showLabel: true,
@@ -85,7 +85,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'yes',
-        label: translatableStrings.Yes,
+        label: () => translate('Yes'),
         icon: 'ion-thumbs-up-outline',
         renderAs: 'button',
         showLabel: true,
@@ -101,7 +101,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
       ...(data ?? {}), // any properties in data should overwrite properties in the constant
       value: {
         name: 'no',
-        label: translatableStrings.No,
+        label: () => translate('No'),
         icon: 'ion-thumbs-down-outline',
         renderAs: 'button',
         showLabel: true,

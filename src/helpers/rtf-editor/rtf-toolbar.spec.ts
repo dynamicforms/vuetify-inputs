@@ -6,7 +6,7 @@ import { nextTick } from 'vue';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 
-import { translatableStrings, translateStrings } from '../translations';
+import { translateStrings } from '../translations';
 
 import RtfToolbar from './rtf-toolbar.vue';
 
@@ -29,7 +29,7 @@ function click(wrapper: ReturnType<typeof mountToolbar>, title: string) {
 
 describe('RtfToolbar heading dropdown', () => {
   afterEach(() => {
-    translateStrings(() => undefined);
+    translateStrings((key) => key);
   });
 
   it('shows the English default heading label for a plain paragraph', () => {
@@ -45,8 +45,8 @@ describe('RtfToolbar heading dropdown', () => {
     const editor = makeEditor();
     const wrapper = mountToolbar(editor);
 
-    const translations: Partial<Record<keyof typeof translatableStrings, string>> = { Paragraph: 'Odstavek' };
-    translateStrings((key) => translations[key]);
+    const translations: Record<string, string> = { Paragraph: 'Odstavek' };
+    translateStrings((key) => translations[key] ?? key);
     await nextTick();
 
     expect(wrapper.text()).toContain('Odstavek');

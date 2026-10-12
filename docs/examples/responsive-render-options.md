@@ -1,48 +1,47 @@
 # Responsive options
 
 `ResponsiveRenderOptions` is the class behind an `Action`'s breakpoints: it holds one set of options per
-breakpoint and resolves them into the set that applies at a given screen width. `Action` uses it for its own
-render options, and it is exported so you can build your own responsive object on top of it -
-[`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:) builds its form, row and column layouts
-that way.
+breakpoint and resolves them into the set that applies at a given screen width. `Action` uses it for its render
+options. It is exported for subclasses; [`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:) builds its
+form, row and column layouts on it.
 
-If all you do is set `sm` / `md` / `lg` on an action, [df-actions](/examples/df-actions#responsive-breakpoints)
-covers what you need. This page is about writing a subclass.
+Setting `sm` / `md` / `lg` on an action is documented in [df-actions](/examples/df-actions#responsive-breakpoints).
+This page documents writing a subclass.
 
 ## How a breakpoint is resolved
 
-Options cascade from smaller breakpoints to larger ones. The options written without a breakpoint are the
-smallest size, and each breakpoint states only what changes from the one below it. Resolving `md` therefore
-walks `xs`, `sm`, `md` in order and lets each one state its part.
+Options are inherited from smaller breakpoints by larger ones. The options without a breakpoint apply to the smallest
+size, and each breakpoint sets only what differs from the one below it. Resolving `md` applies `xs`, `sm` and `md` in
+that order.
 
-What "state its part" means depends on the kind of value:
+How a breakpoint's value applies depends on its kind:
 
 | Value | At a breakpoint |
 |---|---|
-| `undefined` or `null` | says nothing - the field keeps what it inherited |
+| `undefined` or `null` | not set; the field keeps the inherited value |
 | a single value (string, number, boolean, enum) | replaces what it inherited |
 | a plain object | is merged into what it inherited, key by key |
-| anything else - an array, a `Date`, a `Map`, a class instance | replaces what it inherited |
+| anything else (an array, a `Date`, a `Map`, a class instance) | replaces what it inherited |
 
 ```typescript
 // base: { cols: 8, offset: 2 }, sm: { cols: 12 }
 options.getOptionsForBreakpoint('sm'); // { cols: 12, offset: 2 } - offset carried over
 ```
 
-The object merge is **shallow**: a nested object is a value like any other, so restating it replaces it whole.
+The object merge is **shallow**: a nested object is replaced as a whole.
 
 ```typescript
 // base: { style: { color: 'red', margin: 10 } }, sm: { style: { color: 'blue' } }
 options.getOptionsForBreakpoint('sm'); // { style: { color: 'blue' } } - margin is gone
 ```
 
-Only plain objects merge. A `Date`, a `Map`, a `Set` or an instance of your own class is replaced, because
-merging one would strip it of its prototype and leave a bare copy of its own properties behind.
+Only plain objects merge. A `Date`, a `Map`, a `Set` or a class instance is replaced; merging it would produce a plain
+copy of its own properties without its prototype.
 
 ## Writing a subclass
 
-A subclass declares the shape of its options and implements `cleanBreakpoint()`, which normalizes one
-breakpoint's worth of them - it is where you validate input and drop what you do not accept.
+A subclass declares the shape of its options and implements `cleanBreakpoint()`, which normalizes the options of one
+breakpoint: it validates them and drops unsupported ones.
 
 ```typescript
 import { ResponsiveRenderOptions } from '@dynamicforms/vuetify-inputs';
@@ -66,22 +65,20 @@ class ResponsivePanelOptions extends ResponsiveRenderOptions<PanelOptions> {
 }
 ```
 
-One rule makes the cascade behave: **return `undefined` for a field the breakpoint does not state.** An empty
-array or an empty string is a value, and the merge treats it as one - it will replace what the breakpoint
-inherited. That is what lets a breakpoint clear a list on purpose:
+**`cleanBreakpoint()` returns `undefined` for a field the breakpoint does not set.** An empty array or an empty
+string is a value and replaces the inherited one. A breakpoint clears a list with an empty array:
 
 ```typescript
 // base: { items: ['a', 'b'] }, md: { items: [] }
 options.getOptionsForBreakpoint('sm'); // items: ['a', 'b']
-options.getOptionsForBreakpoint('md'); // items: []       - emptied deliberately
+options.getOptionsForBreakpoint('md'); // items: []
 ```
 
-Watch for a class field that initializes a collection: `items: string[] = []` makes every breakpoint object
-state an empty list from the moment it is constructed, and every one of them will then clear the list instead
-of inheriting it. Leave such a field optional and fill it in when something is actually added.
+A class field initialized to a collection, e.g. `items: string[] = []`, sets an empty list on every breakpoint object,
+so every breakpoint clears the list instead of inheriting it. Such a field is declared optional and assigned when an
+item is added.
 
-A field takes part in the cascade because a breakpoint states it, not because the base does: a field named at
-`md` and nowhere else resolves from `md` upwards, and comes back `undefined` below it.
+A field set only at `md` resolves from `md` upwards and is `undefined` below it.
 
 ```typescript
 // base: {}, md: { title: 'only at md' }
@@ -91,9 +88,9 @@ options.getOptionsForBreakpoint('md'); // { title: 'only at md' }
 
 ## Options a breakpoint may not state
 
-Some options belong to the object as a whole rather than to one screen width - an identifier, a flag another
-component keys on. `BreakpointsJSON` takes a second type argument for what a breakpoint may state, so such an
-option is a type error at a breakpoint instead of a value that quietly does nothing:
+Some options apply to the object as a whole, not to one screen width, e.g. an identifier or a flag another component
+reads. `BreakpointsJSON` takes a second type argument for the options a breakpoint may set, so such an option at a
+breakpoint is a type error:
 
 ```typescript
 interface PanelOptions {

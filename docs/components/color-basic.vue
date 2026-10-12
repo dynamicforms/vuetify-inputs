@@ -5,42 +5,34 @@
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
-            <df-color
-              :control="colorField"
-              label="Choose a color"
-              hint="Click to select a color or enter hex value"
-            />
+            <df-color :control="colorField" label="Choose a color" hint="Click to select a color or enter hex value" />
           </v-col>
 
           <v-col cols="12" md="6">
-            <df-color
-              v-model="directColor"
-              :label="new MdString('Direct *v-model* color')"
-              :allow-null="true"
-            />
+            <df-color v-model="directColor" :label="new MdString('Direct *v-model* color')" :allow-null="true" />
           </v-col>
         </v-row>
 
         <div class="mt-4">
-          <v-btn @click="toggleEnabled" color="primary" class="mr-2">
+          <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ colorField.enabled ? 'Disable' : 'Enable' }} Field
           </v-btn>
-          <v-btn @click="resetField" color="secondary" class="mr-2">
-            Reset Field
-          </v-btn>
+          <v-btn color="secondary" class="mr-2" @click="resetField"> Reset Field </v-btn>
           <v-btn-group>
-            <v-btn @click="setColor('#FF0000')" color="red">Red</v-btn>
-            <v-btn @click="setColor('#00FF00')" color="green">Green</v-btn>
-            <v-btn @click="setColor('#0000FF')" color="blue">Blue</v-btn>
+            <v-btn color="red" @click="setColor('#FF0000')">Red</v-btn>
+            <v-btn color="green" @click="setColor('#00FF00')">Green</v-btn>
+            <v-btn color="blue" @click="setColor('#0000FF')">Blue</v-btn>
           </v-btn-group>
         </div>
 
         <div class="mt-4">
-          <strong>Field value:</strong> {{ colorField.value || 'No color selected' }}
+          <strong>Field value:</strong>
+          {{ colorField.value || 'No color selected' }}
         </div>
 
         <div class="mt-4">
-          <strong>Direct v-model value:</strong> {{ directColor || 'No color selected' }}
+          <strong>Direct v-model value:</strong>
+          {{ directColor || 'No color selected' }}
         </div>
       </v-card-text>
     </v-card>
@@ -48,18 +40,19 @@
 </template>
 
 <script setup>
+import { Field, Validators } from '@dynamicforms/vue-forms';
 import { ref } from 'vue';
-import { Field, MdString, Validators } from '@dynamicforms/vue-forms';
-import { DfColor } from '../../src';
+
+import { DfColor, MdString } from '../../src';
 
 const colorField = new Field({
   value: '#42A5F5',
   validators: [
-    new Validators.Pattern(
-      /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/,
-      new MdString('Please enter a valid **hex color code** (e.g., *#FF0000* or *#FF0000FF*)'),
-    ),
-  ]
+    new Validators.Pattern(/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/, {
+      code: 'hex_color',
+      detail: 'Please enter a valid hex color code (e.g., #FF0000 or #FF0000FF)',
+    }),
+  ],
 });
 
 const directColor = ref('#81C784');

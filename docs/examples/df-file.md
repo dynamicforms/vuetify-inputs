@@ -1,23 +1,22 @@
 # df-file Component
 
-The df-file component provides a file input field that integrates with both Vuetify and DynamicForms. It includes file 
-upload functionality with progress indication and handling for file operations.
+`df-file` uploads a file through a `FileComms` object, with upload progress, deletion and a periodic keep-alive touch.
 
 ## Basic Usage
 
-Below is an example of the df-file component used with DynamicForms:
+`df-file` bound to a vue-forms field:
 
 <file-basic/>
 
 ## Features
 
-- Integration with `@dynamicforms/vue-forms` for state management
-- File upload with progress indication
-- File deletion support
+- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
+- File upload with a progress bar
+- File deletion
 - Downloading the file currently held by the field, where `comms` implements `getDownloadUrl`
-- Automatic periodic "touches" to keep uploaded files active
-- Customizable labels, hints, and error messages
-- Backend communication abstraction through the FileComms interface
+- Periodic touches that keep the uploaded file on the backend
+- Labels, hints and error messages
+- Backend communication through the `FileComms` interface
 
 ## Props
 
@@ -45,8 +44,8 @@ The component stores and emits a string identifier for the file, not the file it
 2. Used in subsequent operations (delete, touch) to reference the file
 3. Stored in the form data when using DynamicForms
 
-An upload the user started completes whatever happens to the field meanwhile: where the field is disabled before
-`upload` resolves, the identifier is still written into it and touched from then on.
+A started upload completes regardless of changes to the field: if the field is disabled before `upload` resolves, the
+identifier is still written into it and touched from then on.
 
 ## FileComms Interface
 
@@ -71,15 +70,15 @@ interface FileComms {
 
   /**
    * Called periodically to keep the file active. Throw FileGoneError if the backend reports the identifier
-   * no longer exists — the component then clears the field and, where a `control` is bound, shows the
-   * error's `errorText`. Any other thrown error is treated as transient and left to the consumer.
+   * no longer exists — the component then clears the field and, where a `control` is bound, reports an error
+   * of code `file_gone` with the error's `errorText` as its detail. Any other thrown error is treated as transient and left to the consumer.
    * @param fileIdentifier The identifier that was returned by upload
    */
   touch: (fileIdentifier: string) => Promise<void>;
 
   /**
    * Called when the user asks to download the file currently held by the field. Optional - omit it if the
-   * backend offers no way to retrieve an already-uploaded file, and the component draws no download button.
+   * backend offers no way to retrieve an already-uploaded file, and the component renders no download button.
    * @param fileIdentifier The identifier that was returned by upload
    * @return A URL the browser can fetch the file from directly (e.g. a signed URL or a same-origin path)
    */
@@ -99,13 +98,17 @@ class FileGoneError extends Error {
 
 ## Upload Progress
 
-The component displays a progress bar during file upload, using the values provided by the `progressCallback` in the
-`upload` method.
+During an upload the component shows a progress bar from the values passed to `progressCallback` of `upload`.
 
 After a file has been uploaded to the backend, it is touched every `touchInterval` milliseconds (60 seconds by
-default) to let the backend know that it's still relevant. If a touch rejects with a `FileGoneError`, the field is
-cleared - a disabled one as well - and, where a `control` is bound, the error's `errorText` is shown as a validation
-error. Any other rejection is treated as a transient failure and left to the consumer.
+default), so the backend keeps it. If a touch rejects with a `FileGoneError`, the field is cleared, a disabled one as
+well, and, where a `control` is bound, its errors are replaced with one
+`ValidationError` of code `file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the
+[`errorText` setting](/examples/localisation#translating-errors) can render another text for the code. Under
+vue-forms' default [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy) the field drops the error when a
+new file is uploaded. Any other rejection is ignored by the component and left to the application.
+
+An upload that returns and a clear of the field mark the field touched.
 
 ## Events
 

@@ -1,6 +1,6 @@
 # df-select Component
 
-The df-select component provides a versatile selection field that integrates with both Vuetify and DynamicForms. It supports single or multiple choice, along with "tags" (custom new value entry) and dynamic option loading.
+`df-select` selects one or several values from static or loaded choices, and optionally accepts new values ("tags").
 
 ## Basic Usage
 
@@ -10,26 +10,26 @@ Basic demo with a fixed options list:
 
 ## Advanced Features
 
-df-select also supports dynamic options loading and icons:
+Choices loaded by `fetchChoices`, and icons:
 
 <select-ajax/>
 
 ## Integration with DynamicForms
 
-The main purpose of df-select is its integration with `@dynamicforms/vue-forms`. The demo below shows this integration:
+`df-select` bound to `@dynamicforms/vue-forms` fields:
 
 <select-form/>
 
 ## Features
 
-- Integration with `@dynamicforms/vue-forms` for state management
-- Support for single and multiple selection modes
-- Dynamic option loading via AJAX/fetch
-- Support for custom value entry (tagging)
-- Icon display in options
-- Customizable display with chips
-- Support for nullable selections
-- Search functionality with filtering
+- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
+- Single and multiple selection
+- Choices loaded through `fetchChoices`
+- Entry of new values (tagging)
+- Icons in choices
+- Chips for selected values
+- A `null` selection under `allowNull`
+- Search with filtering
 
 ## Props
 
@@ -54,7 +54,7 @@ This component inherits all common props from [InputBase](./input-base), includi
 
 ## SelectChoice Interface
 
-The component works with options that follow this interface:
+Each choice implements this interface:
 
 ```typescript
 interface SelectChoice {
@@ -66,7 +66,7 @@ interface SelectChoice {
 
 ## Value Format
 
-The component handles values based on the `multiple` setting:
+The value depends on `multiple`:
 
 - When `multiple: false` (default):
   - Returns a single value (the `id` of the selected option)
@@ -88,8 +88,7 @@ When using the `fetchChoices` prop instead of static `choices`, the component:
    outside the component, also when the field is read-only. With an empty value, the setup call passes the value
    itself (`null`) as idValue and expects the unfiltered choices back.
 
-Until that call answers, the value stays exactly as it is, even though no chip can show the ids yet. Once it has
-answered, the value is reconciled against the loaded choices as with static `choices`: an id the call returned no
+Until that call resolves, the value is unchanged, and no chip shows the ids. Once it has resolved, the value is reconciled against the loaded choices as with static `choices`: an id the call returned no
 choice for is dropped from the value (unless `allowTags` is set).
 
 ```typescript
@@ -160,7 +159,7 @@ const fruits = [
 </template>
 
 <script setup>
-import { Group, Field, ValidationErrorText, Validators } from '@dynamicforms/vue-forms';
+import { Group, Field, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { DfSelect } from '@dynamicforms/vuetify-inputs';
 
 const categories = [
@@ -174,7 +173,7 @@ const form = new Group({
     value: [1],
     validators: [
       new Validators.Validator((value) => {
-        if (!value || value.length === 0) return [new ValidationErrorText('Select at least one category')];
+        if (!value || value.length === 0) return [new ValidationError('no_category', {}, 'Select at least one category')];
         return null;
       })
     ]

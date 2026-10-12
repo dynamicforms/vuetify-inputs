@@ -1,24 +1,24 @@
 <template>
-  <div class="validators-form-demo">
+  <v-locale-provider :rtl="errorLanguage === 'fa'" class="validators-form-demo">
     <v-card class="mb-4">
       <v-card-title>Validators Demo</v-card-title>
       <v-card-text>
+        <div class="d-flex flex-wrap ga-4 mb-4">
+          <df-select
+            v-model="errorLanguage"
+            :choices="languages"
+            :allow-null="false"
+            label="Language of the errors"
+            style="max-width: 220px"
+          />
+          <df-checkbox v-model="markdownErrors" label="Markdown in errors" />
+        </div>
         <v-form @submit.prevent>
           <!-- Username field (Required) -->
-          <df-input
-            :control="validatedForm.fields.username"
-            label="Username"
-            hint="Enter your username"
-            class="mb-2"
-          />
+          <df-input :control="validatedForm.fields.username" label="Username" hint="Enter your username" class="mb-2" />
 
           <!-- Email field (Pattern) -->
-          <df-input
-            :control="validatedForm.fields.email"
-            label="Email"
-            hint="Enter your email address"
-            class="mb-2"
-          />
+          <df-input :control="validatedForm.fields.email" label="Email" hint="Enter your email address" class="mb-2" />
 
           <!-- Age field (ValueInRange) -->
           <df-input
@@ -31,16 +31,7 @@
           />
 
           <!-- Role field (InAllowedValues) -->
-          <df-select
-            :control="validatedForm.fields.role"
-            :choices="[
-              { id: 'admin', text: 'Admin' },
-              { id: 'user', text: 'User' },
-              { id: 'guest', text: 'Guest' }
-            ]"
-            label="Role"
-            class="mb-2"
-          />
+          <df-select :control="validatedForm.fields.role" :choices="roleChoices" label="Role" class="mb-2" />
 
           <!-- Bio field (LengthInRange) -->
           <df-text-area
@@ -55,78 +46,72 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn
-          color="primary"
-          :disabled="!formValid"
-        >
-          Submit
-        </v-btn>
-        <v-btn
-          color="secondary"
-          @click="resetForm"
-          class="ml-2"
-        >
-          Reset
-        </v-btn>
+        <v-btn color="primary" :disabled="!formValid"> Submit </v-btn>
+        <v-btn color="secondary" class="ml-2" @click="resetForm"> Reset </v-btn>
       </v-card-actions>
     </v-card>
 
     <v-card>
       <v-card-title>Form Validation Status</v-card-title>
       <v-card-text>
-        <v-alert
-          :type="formValid ? 'success' : 'error'"
-          class="mb-3"
-        >
+        <v-alert :type="formValid ? 'success' : 'error'" class="mb-3">
           Form is {{ formValid ? 'valid' : 'invalid' }}
         </v-alert>
         <pre class="output">{{ JSON.stringify(validatedForm.value, null, 2) }}</pre>
       </v-card-text>
     </v-card>
-  </div>
+  </v-locale-provider>
 </template>
 
 <script setup>
+import { Group, Field, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
 import { computed } from 'vue';
-import { Group, Field, MdString, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
-import { DfInput, DfSelect, DfTextArea } from '../../src'
+
+import { DfCheckbox, DfInput, DfSelect, DfTextArea } from '../../src';
+
+import { errorLanguage, languages, markdownErrors, roleName } from './demo-error-text';
+
+// a role is stored as its code and shown by its name in the language of the errors
+const roles = ['admin', 'user', 'guest'];
+const roleChoices = computed(() => roles.map((id) => ({ id, text: roleName(id) })));
 
 // Create a form group with validated fields
 const validatedForm = new Group({
   // Required field - cannot be empty, and a value of spaces alone is empty too
   username: new Field({
     value: '',
-    validators: [new Validators.Required()]
+    validators: [new Validators.Required()],
   }),
 
   // Email field with pattern validation
   email: new Field({
     value: '',
     validators: [
-      new Validators.Pattern(
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        new MdString('Please enter a valid **email address**'),
-      ),
-    ]
+      new Validators.Required(),
+      new Validators.Pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
+        code: 'invalid_email',
+        detail: 'Please enter a valid email address',
+      }),
+    ],
   }),
 
   // Number field with range validation
   age: new Field({
     value: null,
-    validators: [new Validators.ValueInRange(18, 100)]
+    validators: [new Validators.Required(), new Validators.ValueInRange(18, 100)],
   }),
 
   // Field with allowed values validation
   role: new Field({
     value: '',
-    validators: [new Validators.InAllowedValues(['admin', 'user', 'guest'])]
+    validators: [new Validators.Required(), new Validators.InAllowedValues(roles)],
   }),
 
   // Text field with length validation
   bio: new Field({
     value: '',
-    validators: [new Validators.LengthInRange(10, 200)]
-  })
+    validators: [new Validators.Required(), new Validators.LengthInRange(10, 200)],
+  }),
 });
 
 // group.valid covers the group's own errors and those of every field it holds
@@ -147,10 +132,12 @@ function resetForm() {
 // A value changed action on the group fires whenever what the group holds changes: a field written. The handler
 // stays synchronous: the write that triggers it returns once the chain has run, so nothing
 // awaits a promise it hands back.
-validatedForm.registerAction(new ValueChangedAction((field, supr, newValue, oldValue) => {
-  console.log('Form value has changed');
-  return supr(field, newValue, oldValue);
-}));
+validatedForm.registerAction(
+  new ValueChangedAction((field, supr, newValue, oldValue) => {
+    console.log('Form value has changed');
+    return supr(field, newValue, oldValue);
+  }),
+);
 </script>
 
 <style>

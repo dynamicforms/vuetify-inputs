@@ -3,10 +3,11 @@
 </template>
 
 <script setup lang="ts">
-import { MessagesWidget } from '@dynamicforms/vue-forms';
 import { computed } from 'vue';
 
 import type { DfInputHintProps } from '../dynamicforms-component-props';
+
+import MessagesWidget from './messages-widget.vue';
 
 const props = withDefaults(defineProps<DfInputHintProps>(), {
   errors: '',

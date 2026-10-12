@@ -1,5 +1,7 @@
 import { ref } from 'vue';
 
+import { translateStrings } from '../translations';
+
 import { Action } from './action';
 import { BreakpointNames } from './responsive-render-options';
 
@@ -129,17 +131,17 @@ describe('Action', () => {
     it('exposes defaultConfirm and defaultReject from the value', () => {
       const confirmAction = new Action({ value: { label: 'Save', defaultConfirm: true } });
       expect(confirmAction.defaultConfirm).toBe(true);
-      expect(confirmAction.defaultReject).toBeUndefined();
+      expect(confirmAction.defaultReject).toBe(false);
 
       const rejectAction = new Action({ value: { label: 'Cancel', defaultReject: true } });
       expect(rejectAction.defaultReject).toBe(true);
-      expect(rejectAction.defaultConfirm).toBeUndefined();
+      expect(rejectAction.defaultConfirm).toBe(false);
     });
 
-    it('leaves defaultConfirm/defaultReject undefined when not set', () => {
+    it('answers false for defaultConfirm/defaultReject when not set', () => {
       const action = new Action({ value: { label: 'Neutral' } });
-      expect(action.defaultConfirm).toBeUndefined();
-      expect(action.defaultReject).toBeUndefined();
+      expect(action.defaultConfirm).toBe(false);
+      expect(action.defaultReject).toBe(false);
     });
 
     it('exposes passthroughAttrs from the value', () => {
@@ -178,6 +180,19 @@ describe('Action', () => {
       expect(action.label).toBe('No');
       expect(action.icon).toBe('ion-thumbs-down-outline');
       expect(action.renderAs).toBe('button');
+    });
+
+    it('labels a template action in the current translation', () => {
+      const locale = ref('en');
+      translateStrings((key) => (locale.value === 'sl' && key === 'Close' ? 'Zapri' : key));
+      const action = Action.closeAction();
+      const options = action.getBreakpointValue(ref<BreakpointNames>('xs'));
+
+      locale.value = 'sl';
+
+      expect(action.label).toBe('Zapri');
+      expect(options.value.label).toBe('Zapri');
+      translateStrings((key) => key);
     });
 
     it('template functions accept override data', () => {

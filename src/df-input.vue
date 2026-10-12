@@ -16,6 +16,7 @@
       density="compact"
       control-variant="stacked"
       v-bind="{ ...vuetifyBindings, ...numberInputBindings } as any"
+      @blur="touched = true"
     >
       <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
       <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>

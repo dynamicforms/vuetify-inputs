@@ -1,0 +1,186 @@
+{
+  "en": {
+    "errors": {
+      "required": "Please enter a value",
+      "value_in_range": "Value must be between {minValue} and {maxValue}",
+      "value_in_rangeMd": "Value must be between **{minValue}** and **{maxValue}**",
+      "in_allowed_values": "Must be one of [{allowedAsText}]",
+      "in_allowed_valuesMd": "Must be one of [**{allowedAsText}**]",
+      "length_in_range": "Length must be between {minLength} and {maxLength}",
+      "length_in_rangeMd": "Length must be between **{minLength}** and **{maxLength}**",
+      "invalid_email": "Please enter a valid email address",
+      "invalid_emailMd": "Please enter a valid **email address**",
+      "hex_color": "Please enter a valid hex color code (e.g. #FF0000 or #FF0000FF)",
+      "hex_colorMd": "Please enter a valid **hex color code** (e.g. *#FF0000* or *#FF0000FF*)",
+      "invalid_hex_color": "Not a valid hex string.",
+      "over_budget": "The trip totals {total} €, which is {over} € over the budget.",
+      "over_budgetMd": "The trip totals **{total} €**, which is {over} € over the budget."
+    },
+    "roles": {
+      "admin": "Administrator",
+      "user": "User",
+      "guest": "Guest"
+    }
+  },
+  "sl": {
+    "errors": {
+      "required": "Prosimo, vnesite vrednost",
+      "value_in_range": "Vrednost mora biti med {minValue} in {maxValue}",
+      "value_in_rangeMd": "Vrednost mora biti med **{minValue}** in **{maxValue}**",
+      "in_allowed_values": "Mora biti ena od [{allowedAsText}]",
+      "in_allowed_valuesMd": "Mora biti ena od [**{allowedAsText}**]",
+      "length_in_range": "Dolžina mora biti med {minLength} in {maxLength}",
+      "length_in_rangeMd": "Dolžina mora biti med **{minLength}** in **{maxLength}**",
+      "invalid_email": "Vnesite veljaven e-poštni naslov",
+      "invalid_emailMd": "Vnesite veljaven **e-poštni naslov**",
+      "hex_color": "Vnesite veljavno šestnajstiško kodo barve (npr. #FF0000 ali #FF0000FF)",
+      "hex_colorMd": "Vnesite veljavno **šestnajstiško kodo barve** (npr. *#FF0000* ali *#FF0000FF*)",
+      "invalid_hex_color": "Ni veljaven šestnajstiški niz.",
+      "over_budget": "Potovanje skupaj stane {total} €, kar je {over} € nad proračunom.",
+      "over_budgetMd": "Potovanje skupaj stane **{total} €**, kar je {over} € nad proračunom."
+    },
+    "roles": {
+      "admin": "Skrbnik",
+      "user": "Uporabnik",
+      "guest": "Gost"
+    }
+  },
+  "de": {
+    "errors": {
+      "required": "Bitte geben Sie einen Wert ein",
+      "value_in_range": "Der Wert muss zwischen {minValue} und {maxValue} liegen",
+      "value_in_rangeMd": "Der Wert muss zwischen **{minValue}** und **{maxValue}** liegen",
+      "in_allowed_values": "Muss einer von [{allowedAsText}] sein",
+      "in_allowed_valuesMd": "Muss einer von [**{allowedAsText}**] sein",
+      "length_in_range": "Die Länge muss zwischen {minLength} und {maxLength} liegen",
+      "length_in_rangeMd": "Die Länge muss zwischen **{minLength}** und **{maxLength}** liegen",
+      "invalid_email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "invalid_emailMd": "Bitte geben Sie eine gültige **E-Mail-Adresse** ein",
+      "hex_color": "Bitte geben Sie einen gültigen Hex-Farbcode ein (z. B. #FF0000 oder #FF0000FF)",
+      "hex_colorMd": "Bitte geben Sie einen gültigen **Hex-Farbcode** ein (z. B. *#FF0000* oder *#FF0000FF*)",
+      "invalid_hex_color": "Keine gültige Hex-Zeichenfolge.",
+      "over_budget": "Die Reise kostet insgesamt {total} €, das sind {over} € über dem Budget.",
+      "over_budgetMd": "Die Reise kostet insgesamt **{total} €**, das sind {over} € über dem Budget."
+    },
+    "roles": {
+      "admin": "Administrator",
+      "user": "Benutzer",
+      "guest": "Gast"
+    }
+  },
+  "es": {
+    "errors": {
+      "required": "Introduzca un valor",
+      "value_in_range": "El valor debe estar entre {minValue} y {maxValue}",
+      "value_in_rangeMd": "El valor debe estar entre **{minValue}** y **{maxValue}**",
+      "in_allowed_values": "Debe ser uno de [{allowedAsText}]",
+      "in_allowed_valuesMd": "Debe ser uno de [**{allowedAsText}**]",
+      "length_in_range": "La longitud debe estar entre {minLength} y {maxLength}",
+      "length_in_rangeMd": "La longitud debe estar entre **{minLength}** y **{maxLength}**",
+      "invalid_email": "Introduzca una dirección de correo válida",
+      "invalid_emailMd": "Introduzca una **dirección de correo** válida",
+      "hex_color": "Introduzca un código de color hexadecimal válido (p. ej. #FF0000 o #FF0000FF)",
+      "hex_colorMd": "Introduzca un **código de color hexadecimal** válido (p. ej. *#FF0000* o *#FF0000FF*)",
+      "invalid_hex_color": "No es una cadena hexadecimal válida.",
+      "over_budget": "El viaje suma {total} €, {over} € por encima del presupuesto.",
+      "over_budgetMd": "El viaje suma **{total} €**, {over} € por encima del presupuesto."
+    },
+    "roles": {
+      "admin": "Administrador",
+      "user": "Usuario",
+      "guest": "Invitado"
+    }
+  },
+  "ja": {
+    "errors": {
+      "required": "値を入力してください",
+      "value_in_range": "値は {minValue} から {maxValue} の間でなければなりません",
+      "value_in_rangeMd": "値は **{minValue}** から **{maxValue}** の間でなければなりません",
+      "in_allowed_values": "[{allowedAsText}] のいずれかでなければなりません",
+      "in_allowed_valuesMd": "[**{allowedAsText}**] のいずれかでなければなりません",
+      "length_in_range": "長さは {minLength} から {maxLength} の間でなければなりません",
+      "length_in_rangeMd": "長さは **{minLength}** から **{maxLength}** の間でなければなりません",
+      "invalid_email": "有効なメールアドレスを入力してください",
+      "invalid_emailMd": "有効な**メールアドレス**を入力してください",
+      "hex_color": "有効な16進カラーコードを入力してください（例: #FF0000 または #FF0000FF）",
+      "hex_colorMd": "有効な**16進カラーコード**を入力してください（例: *#FF0000* または *#FF0000FF*）",
+      "invalid_hex_color": "有効な16進文字列ではありません。",
+      "over_budget": "旅行の合計は {total} € で、予算を {over} € 超えています。",
+      "over_budgetMd": "旅行の合計は **{total} €** で、予算を {over} € 超えています。"
+    },
+    "roles": {
+      "admin": "管理者",
+      "user": "ユーザー",
+      "guest": "ゲスト"
+    }
+  },
+  "zh": {
+    "errors": {
+      "required": "请输入一个值",
+      "value_in_range": "值必须介于 {minValue} 和 {maxValue} 之间",
+      "value_in_rangeMd": "值必须介于 **{minValue}** 和 **{maxValue}** 之间",
+      "in_allowed_values": "必须是 [{allowedAsText}] 之一",
+      "in_allowed_valuesMd": "必须是 [**{allowedAsText}**] 之一",
+      "length_in_range": "长度必须介于 {minLength} 和 {maxLength} 之间",
+      "length_in_rangeMd": "长度必须介于 **{minLength}** 和 **{maxLength}** 之间",
+      "invalid_email": "请输入有效的电子邮件地址",
+      "invalid_emailMd": "请输入有效的**电子邮件地址**",
+      "hex_color": "请输入有效的十六进制颜色代码（例如 #FF0000 或 #FF0000FF）",
+      "hex_colorMd": "请输入有效的**十六进制颜色代码**（例如 *#FF0000* 或 *#FF0000FF*）",
+      "invalid_hex_color": "不是有效的十六进制字符串。",
+      "over_budget": "行程总计 {total} €，超出预算 {over} €。",
+      "over_budgetMd": "行程总计 **{total} €**，超出预算 {over} €。"
+    },
+    "roles": {
+      "admin": "管理员",
+      "user": "用户",
+      "guest": "访客"
+    }
+  },
+  "fa": {
+    "errors": {
+      "required": "لطفاً یک مقدار وارد کنید",
+      "value_in_range": "مقدار باید بین {minValue} و {maxValue} باشد",
+      "value_in_rangeMd": "مقدار باید بین **{minValue}** و **{maxValue}** باشد",
+      "in_allowed_values": "باید یکی از ⁨[{allowedAsText}]⁩ باشد",
+      "in_allowed_valuesMd": "باید یکی از ⁨[**{allowedAsText}**]⁩ باشد",
+      "length_in_range": "طول باید بین {minLength} و {maxLength} باشد",
+      "length_in_rangeMd": "طول باید بین **{minLength}** و **{maxLength}** باشد",
+      "invalid_email": "لطفاً یک نشانی ایمیل معتبر وارد کنید",
+      "invalid_emailMd": "لطفاً یک **نشانی ایمیل** معتبر وارد کنید",
+      "hex_color": "لطفاً یک کد رنگ هگز معتبر وارد کنید (مثلاً #FF0000 یا #FF0000FF)",
+      "hex_colorMd": "لطفاً یک **کد رنگ هگز** معتبر وارد کنید (مثلاً *#FF0000* یا *#FF0000FF*)",
+      "invalid_hex_color": "رشتهٔ هگز معتبری نیست.",
+      "over_budget": "مجموع سفر {total} € است که {over} € بیش از بودجه است.",
+      "over_budgetMd": "مجموع سفر **{total} €** است که {over} € بیش از بودجه است."
+    },
+    "roles": {
+      "admin": "مدیر",
+      "user": "کاربر",
+      "guest": "مهمان"
+    }
+  },
+  "bn": {
+    "errors": {
+      "required": "একটি মান লিখুন",
+      "value_in_range": "মান {minValue} থেকে {maxValue} এর মধ্যে হতে হবে",
+      "value_in_rangeMd": "মান **{minValue}** থেকে **{maxValue}** এর মধ্যে হতে হবে",
+      "in_allowed_values": "[{allowedAsText}] এর মধ্যে একটি হতে হবে",
+      "in_allowed_valuesMd": "[**{allowedAsText}**] এর মধ্যে একটি হতে হবে",
+      "length_in_range": "দৈর্ঘ্য {minLength} থেকে {maxLength} এর মধ্যে হতে হবে",
+      "length_in_rangeMd": "দৈর্ঘ্য **{minLength}** থেকে **{maxLength}** এর মধ্যে হতে হবে",
+      "invalid_email": "একটি বৈধ ইমেল ঠিকানা লিখুন",
+      "invalid_emailMd": "একটি বৈধ **ইমেল ঠিকানা** লিখুন",
+      "hex_color": "একটি বৈধ হেক্স রঙের কোড লিখুন (যেমন #FF0000 বা #FF0000FF)",
+      "hex_colorMd": "একটি বৈধ **হেক্স রঙের কোড** লিখুন (যেমন *#FF0000* বা *#FF0000FF*)",
+      "invalid_hex_color": "বৈধ হেক্স স্ট্রিং নয়।",
+      "over_budget": "ভ্রমণের মোট খরচ {total} €, যা বাজেটের চেয়ে {over} € বেশি।",
+      "over_budgetMd": "ভ্রমণের মোট খরচ **{total} €**, যা বাজেটের চেয়ে {over} € বেশি।"
+    },
+    "roles": {
+      "admin": "প্রশাসক",
+      "user": "ব্যবহারকারী",
+      "guest": "অতিথি"
+    }
+  }
+}

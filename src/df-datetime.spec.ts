@@ -1,10 +1,11 @@
-import { Field } from '@dynamicforms/vue-forms';
+import { Field, ValidationError } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 
 import DfDateTime from '@/df-datetime.vue';
+import { viewSettleMs } from '@/helpers/picker-double-click';
 
 describe('DfDateTime', () => {
   let vuetify: any;
@@ -91,6 +92,121 @@ describe('DfDateTime', () => {
       await flushPromises();
       expect(inputs(wrapper)[0]).toBe('15. 01. 26');
       expect(control.value).toBe('2026-01-15');
+    });
+  });
+
+  describe('concluding an edit', () => {
+    const serverError = () => new ValidationError('taken', {}, 'This date is taken.', 'server');
+
+    it('removes a server error when a date picked in the menu is saved', async () => {
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      control.errors = [serverError()];
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      await wrapper.find('input').trigger('click');
+      await flushPromises();
+
+      const confirm = wrapper.findComponent({ name: 'VConfirmEdit' });
+      confirm.vm.$emit('update:modelValue', new Date(2026, 0, 20));
+      confirm.vm.$emit('save', new Date(2026, 0, 20));
+      await flushPromises();
+
+      expect(control.value).toBe('2026-01-20');
+      expect(control.touched).toBe(true);
+      expect(control.errors).toHaveLength(0);
+    });
+
+    it('saves a day on a double-click on it', async () => {
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      await wrapper.find('input').trigger('click');
+      await flushPromises();
+
+      const month = wrapper.findComponent({ name: 'VDatePickerMonth' });
+      const day = month.findAll('.v-date-picker-month__day button').find((button) => button.text() === '20')!;
+      await day.trigger('click');
+      expect(control.value).toBe('2026-01-15');
+      await day.trigger('dblclick');
+      await flushPromises();
+
+      expect(control.value).toBe('2026-01-20');
+      expect(control.touched).toBe(true);
+    });
+
+    it('does not save a day within viewSettleMs of a switch to another month', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      await wrapper.find('input').trigger('click');
+      await flushPromises();
+      const picker = wrapper.findComponent({ name: 'VDatePicker' });
+
+      // a click on a day of the adjacent month chooses it and shows that month
+      picker.vm.$emit('update:modelValue', new Date(2026, 1, 1));
+      picker.vm.$emit('update:month', 1);
+      await flushPromises();
+      const month = wrapper.findComponent({ name: 'VDatePickerMonth' });
+      await month
+        .findAll('.v-date-picker-month__day button')
+        .find((button) => button.text() === '20')!
+        .trigger('dblclick');
+      await flushPromises();
+
+      expect(control.value).toBe('2026-01-15');
+      vi.useRealTimers();
+    });
+
+    describe('a double-click on the clock', () => {
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ['Date'] });
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      async function chooseMinute() {
+        const control = new Field<string | null>({ value: '10:00' });
+        const wrapper = mountDateTime({ control, inputType: 'time' });
+        await wrapper.find('input').trigger('click');
+        await flushPromises();
+        const picker = wrapper.findComponent({ name: 'VTimePicker' });
+        // a click on an hour switches the clock to the minutes
+        picker.vm.$emit('update:viewMode', 'minute');
+        picker.vm.$emit('update:modelValue', '10:30');
+        await flushPromises();
+        return { control, clock: picker.find('.v-time-picker-clock') };
+      }
+
+      it('does not save within viewSettleMs of the switch to the minutes', async () => {
+        const { control, clock } = await chooseMinute();
+
+        vi.advanceTimersByTime(viewSettleMs - 100);
+        await clock.trigger('dblclick');
+        await flushPromises();
+
+        expect(control.value).toBe('10:00');
+      });
+
+      it('saves after viewSettleMs', async () => {
+        const { control, clock } = await chooseMinute();
+
+        vi.advanceTimersByTime(viewSettleMs);
+        await clock.trigger('dblclick');
+        await flushPromises();
+
+        expect(control.value).toBe('10:30');
+      });
+    });
+
+    it('removes a server error when the field is cleared', async () => {
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      control.errors = [serverError()];
+      const wrapper = mountDateTime({ control, inputType: 'date', clearable: true });
+
+      await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
+
+      expect(control.value).toBeNull();
+      expect(control.errors).toHaveLength(0);
     });
   });
 });

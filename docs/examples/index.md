@@ -1,12 +1,11 @@
 # Examples
 
-This section contains a collection of practical examples demonstrating the usage of various components from the 
-`@dynamicforms/vuetify-inputs` library. Each example includes a working demo component and its corresponding code.
+Examples of the components of `@dynamicforms/vuetify-inputs`. Each page has a live demo and its code.
 
 ## Density and Variant demo
 
-This [demo](./density) showcases support for various component variants and densities. It also demonstrates vertical 
-alignment of component parts so that your forms look perfectly aligned in all respects. 
+The [demo](./density) renders every component under every variant and density, and shows the vertical alignment of
+their parts.
 
 ## Configuration
 
@@ -17,8 +16,7 @@ and where a field's density and variant come from.
 
 ### [InputBase](./input-base)
 
-The base component for all input elements. Contains documentation about common props, events, and behavior shared by 
-all input components.
+The base component of all inputs: the props, events and behaviour all input components share.
 
 ### [Responsive options](./responsive-render-options)
 
@@ -57,7 +55,7 @@ A component for general data entry.
 
 ### [df-input-hint](./df-input-hint)
 
-The message row every input renders: errors when there are any, the hint otherwise. Usable on its own for a group's
+The message row every input renders: errors when there are any, the hint otherwise. Also usable without an input, for a group's
 errors.
 
 ### [**df-rtf-editor**](./df-rtf-editor)
@@ -66,7 +64,7 @@ A RTF editor input.
 
 ### [df-select](./df-select)
 
-A component for selecting values from a list. The examples showcase:
+A component for selecting values from a list. The examples show:
 - Basic usage with a static list
 - Advanced features (multiple selection, AJAX loading, icons)
 - Integration with DynamicForms
@@ -79,7 +77,7 @@ A component for multi-line text input.
 
 ### [Using with vue-forms](:vue-forms:)
 
-Examples of integrating Vuetify input fields with the `@dynamicforms/vue-forms` library. 
+The `@dynamicforms/vue-forms` documentation.
 
 ### [Validation](./validators)
 

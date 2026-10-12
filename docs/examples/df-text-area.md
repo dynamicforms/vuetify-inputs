@@ -1,20 +1,20 @@
 # df-text-area Component
 
-The df-text-area component provides a multi-line text input that fully integrates with both Vuetify and DynamicForms.
+`df-text-area` is a multi-line text input.
 
 ## Basic Usage
 
-Below is an example of the df-text-area component used with DynamicForms:
+`df-text-area` bound to a vue-forms field:
 
 <textarea-basic/>
 
 ## Features
 
-- Integration with `@dynamicforms/vue-forms` for state management and validation
+- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Configurable number of rows
 - Auto-growing height with configurable maximum rows
 - Length validation through vue-forms validators on the bound field
-- Customizable labels, hints, and error messages
+- Labels, hints and error messages
 
 ## Props
 
@@ -36,8 +36,7 @@ This component inherits all common props from [InputBase](./input-base), includi
 
 ## Auto-Growing Behavior
 
-The textarea will automatically grow when content exceeds the visible space, but only if `maxRows` is set to a positive
-value. This prevents the textarea from growing indefinitely.
+The textarea grows with its content only when `maxRows` is a positive value; the growth stops at `maxRows`.
 
 When auto-grow is enabled:
 - The textarea starts with the height specified by `rows`

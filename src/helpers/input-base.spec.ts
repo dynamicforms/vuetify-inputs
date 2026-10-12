@@ -1,4 +1,4 @@
-import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import Form, { ValidationError } from '@dynamicforms/vue-forms';
 import { describe, expect, it, vi } from 'vitest';
 import { nextTick, reactive } from 'vue';
 
@@ -247,7 +247,7 @@ describe('input-base', () => {
     describe('errors', () => {
       it('returns control.errors when control is provided', () => {
         const control = new Form.Field({ value: '' });
-        control.errors = [new ValidationErrorRenderContent('Required field')];
+        control.errors = [new ValidationError('required', {}, 'Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -257,15 +257,18 @@ describe('input-base', () => {
         expect(errors.value).toHaveLength(1);
       });
 
-      it('converts props.errors array to ValidationErrorRenderContent when control is not provided', () => {
+      it('converts props.errors to application errors whose detail is the text when control is not provided', () => {
         const props: BaseProps = { errors: ['Error 1', 'Error 2'] };
         const emit = vi.fn();
 
         const { errors } = useInputBase(props, emit);
 
         expect(errors.value).toHaveLength(2);
-        expect(errors.value[0]).toBeInstanceOf(ValidationErrorRenderContent);
-        expect(errors.value[1]).toBeInstanceOf(ValidationErrorRenderContent);
+        expect(errors.value[0]).toBeInstanceOf(ValidationError);
+        expect(errors.value.map((e) => [e.detail, e.origin])).toEqual([
+          ['Error 1', 'application'],
+          ['Error 2', 'application'],
+        ]);
       });
 
       it('returns empty array when no errors and no control', () => {
@@ -279,7 +282,7 @@ describe('input-base', () => {
 
       it('shownErrors holds an error back until the control is touched', async () => {
         const control = new Form.Field({ value: '' });
-        control.errors = [new ValidationErrorRenderContent('Required field')];
+        control.errors = [new ValidationError('required', {}, 'Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -295,7 +298,7 @@ describe('input-base', () => {
 
       it('shownErrors shows an error the server returned at once', () => {
         const control = new Form.Field({ value: '' });
-        control.errors = [new ValidationErrorRenderContent('Taken', '', 'taken', 'server')];
+        control.errors = [new ValidationError('taken', {}, 'Taken', 'server')];
 
         const { shownErrors, touched } = useInputBase({ control }, vi.fn());
 
@@ -306,7 +309,7 @@ describe('input-base', () => {
       it('shownErrors shows nothing for a control that is sent nowhere', () => {
         const control = new Form.Field({ value: '' });
         const section = new Form.Group({ control }, { access: 'disabled-null' });
-        control.errors = [new ValidationErrorRenderContent('Taken', '', 'taken', 'server')];
+        control.errors = [new ValidationError('taken', {}, 'Taken', 'server')];
         control.touched = true;
 
         const { shownErrors } = useInputBase({ control }, vi.fn());
@@ -317,7 +320,7 @@ describe('input-base', () => {
 
       it('anyErrors returns space when touched and has errors', async () => {
         const control = new Form.Field({ value: '' });
-        control.errors = [new ValidationErrorRenderContent('Required field')];
+        control.errors = [new ValidationError('required', {}, 'Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
 

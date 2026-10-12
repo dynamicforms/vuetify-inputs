@@ -3,37 +3,21 @@
     <div class="d-flex align-center justify-space-between mb-4">
       <div class="mb-0">
         <div><strong>Current breakpoint:</strong> {{ currentBreakpoint }}</div>
-        <v-switch
-          v-model="sectionEnabled"
-          label="Section enabled"
-          density="compact"
-          hide-details
-          color="primary"
-        ></v-switch>
+        <df-checkbox v-model="sectionEnabled" label="Section enabled" />
       </div>
       <div class="d-flex align-center">
-        <span class="me-2">Button size:</span>
-        <v-select
+        <df-select
           v-model="selectedSize"
-          :items="sizeOptions"
-          density="compact"
-          variant="outlined"
-          hide-details
-          class="size-select"
+          :choices="sizeOptions"
+          :allow-null="false"
+          label="Button size"
           style="width: 16em"
-        ></v-select>
+        />
       </div>
     </div>
 
-    <div
-      class="actions-container mt-4"
-      :class="{ 'd-inline-block': showAsGroup !== 'no' }"
-    >
-      <df-actions
-        :actions="actions"
-        :button-size="buttonSize"
-        :show-as-group="showAsGroup"
-      />
+    <div class="actions-container mt-4" :class="{ 'd-inline-block': showAsGroup !== 'no' }">
+      <df-actions :actions="actions" :button-size="buttonSize" :show-as-group="showAsGroup" />
     </div>
   </div>
 </template>
@@ -42,7 +26,8 @@
 import { ExecuteAction, Group } from '@dynamicforms/vue-forms';
 import { ref, computed, Ref, watchEffect } from 'vue';
 import { useDisplay } from 'vuetify';
-import { Action, DfActions } from '../../src';
+
+import { Action, DfActions, DfCheckbox, DfSelect } from '../../src';
 
 // Size options
 const sizeOptions = [
@@ -55,8 +40,8 @@ const sizeOptions = [
   'small',
   'default',
   'large',
-  'x-large'
-];
+  'x-large',
+].map((id) => ({ id, text: id }));
 const selectedSize = ref('default');
 const buttonSize = computed(() => {
   const words = selectedSize.value.trim().split(/\s+/);
@@ -71,7 +56,7 @@ const showAsGroup = computed(() => {
 
 const mockFormAction = new ExecuteAction((action, supr, params) => {
   console.log('Action executed', action, params);
-  alert(`Action "${(<Action> action).name}" clicked`);
+  window.alert(`Action "${(<Action>action).name}" clicked`);
   supr(action, params);
 });
 
@@ -79,7 +64,7 @@ const mockFormAction = new ExecuteAction((action, supr, params) => {
 // click cannot start a second run.
 const slowFormAction = new ExecuteAction(async (action, supr, params) => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
-  alert(`Action "${(<Action> action).name}" done`);
+  window.alert(`Action "${(<Action>action).name}" done`);
   return supr(action, params);
 });
 
@@ -94,7 +79,7 @@ const saveAction = new Action({
     showLabel: false,
     defaultConfirm: true,
     md: { showLabel: true, showIcon: false }, // Medium screen and bigger, show label, but not icon
-    lg: { showIcon: true } // Large screen and bigger, show label (carried over from md), and icon
+    lg: { showIcon: true }, // Large screen and bigger, show label (carried over from md), and icon
   },
   actions: [slowFormAction],
 });
@@ -108,7 +93,7 @@ const deleteAction = new Action({
     showIcon: true,
     showLabel: false,
     md: { showLabel: true, showIcon: false }, // Medium screen and bigger, show label, but not icon
-    lg: { showIcon: true, renderAs: 'text' } // On large screens, show as text
+    lg: { showIcon: true, renderAs: 'text' }, // On large screens, show as text
   },
   actions: [mockFormAction],
 });
@@ -123,7 +108,7 @@ const cancelAction = new Action({
     showLabel: false,
     defaultReject: true,
     md: { showLabel: true, showIcon: false }, // On small screens, only show icon
-    lg: { showIcon: true } // Large screen and bigger, show label (carried over from md), and icon
+    lg: { showIcon: true }, // Large screen and bigger, show label (carried over from md), and icon
   },
   actions: [mockFormAction],
 });
@@ -132,7 +117,11 @@ const actions: Ref<Action[]> = ref([saveAction, deleteAction, cancelAction]);
 
 // The buttons follow the enablement of the group holding them: each reads effectiveEnabled, which is false where
 // the action or any container above it is disabled.
-const section = new Group({ save: saveAction, delete: deleteAction, cancel: cancelAction });
+const section = new Group({
+  save: saveAction,
+  delete: deleteAction,
+  cancel: cancelAction,
+});
 const sectionEnabled = ref(true);
 watchEffect(() => {
   section.access = sectionEnabled.value ? 'editable' : 'disabled';
@@ -151,14 +140,14 @@ const currentBreakpoint = computed(() => {
 
 <style scoped>
 .actions-demo {
-  border: .2em solid #ccc;
+  border: 0.2em solid #ccc;
   border-radius: 1em;
 }
 
 .actions-container {
-  border: .1em dashed #ccc;
+  border: 0.1em dashed #ccc;
   padding: 1em;
-  border-radius: .5em;
+  border-radius: 0.5em;
 }
 
 .size-select :deep(.v-field__input) {

@@ -182,6 +182,13 @@
   unlike its 0.8.0 and 0.9.0 sections, it never states that the release also bumps the `@dynamicforms/vue-forms`
   peer range to `^1.0.0` and adds `@dynamicforms/translatable` (`^0.1.0`) as a new required peer dependency.
 
+## Security
+
+- A penetration test of the rendering: `HtmlString`, `SimpleComponentDef` (an element or a registered component by
+  name, with its props), markdown through `vue-markdown-render` with its `options` and `plugins`, the `errorText`
+  setting, labels, `<df-rtf-editor>`'s HTML value and its link and image dialogs, and `<df-file>`/`<df-image>`'s
+  download URLs.
+
 ## Tests
 
 - `df-select` (323 lines) is covered only by the generic visibility matrix: 9/36 functions, 33% statements.

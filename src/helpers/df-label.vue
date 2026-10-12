@@ -5,28 +5,25 @@
       <v-img v-else-if="label.iconComponent === 'v-img'" class="icon" :src="label.icon" />
       <component :is="label.iconComponent" v-else :src="label.icon" />
     </template>
-    <vue-markdown
-      v-if="lbl instanceof MdString"
-      class="markdown"
-      :source="lbl.toString()"
-      :options="lbl.options"
-      :plugins="lbl.plugins"
-    />
-    <template v-else>{{ lbl }}</template>
+    <template v-if="typeof lbl === 'string'">{{ lbl }}</template>
+    <messages-widget v-else :message="[content]" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { MdString } from '@dynamicforms/vue-forms';
 import { computed } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
-import VueMarkdown from 'vue-markdown-render';
 
 import type { DfLabelProps } from '../dynamicforms-component-props';
 
+import MessagesWidget from './messages-widget.vue';
+import { RenderableValue } from './render-content';
+
 const props = defineProps<DfLabelProps>();
 
-const lbl = computed(() => (props.data ? props.data.label : props.label.text));
+// the label's own content: the slot data holds only its text, which Vuetify is given
+const lbl = computed(() => props.label.text || props.data?.label || '');
+const content = computed(() => new RenderableValue(lbl.value));
 </script>
 
 <style>
@@ -46,8 +43,8 @@ const lbl = computed(() => (props.data ? props.data.label : props.label.text));
   width: 1.25em;
 }
 
-.df-label .markdown :first-child,
-.df-label .markdown :last-child {
+.df-label .df-messages-widget-markdown :first-child,
+.df-label .df-messages-widget-markdown :last-child {
   margin-top: 0 !important;
   padding-top: 0 !important;
   margin-bottom: 0 !important;

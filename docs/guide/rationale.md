@@ -2,41 +2,35 @@
 
 ## Why the library exists
 
-A form built from stock Vuetify components drifts. A text field, a select, a checkbox and a date picker each carry
-their own idea of height, of label placement and of the margin below the control, and the row they share ends up
-ragged. Fixing that per component means a wrapper here, a class there, and a design that has to be maintained in as
-many places as there are field types.
+Stock Vuetify components differ in height, label placement and the margin below the control. A row that mixes a text
+field, a select, a checkbox and a date picker is not aligned without per-component wrappers and classes.
 
-This library's premise is that **every field looks and behaves the same regardless of which component it is and
-where it appears**. `df-input`, `df-select`, `df-checkbox`, `df-date-time` and the rest sit on one shared base, so
-mixing them on a single form row produces an aligned result with no per-component tweaking. The price is that the
-library is opinionated: it decides how a field is put together, and a component that wants to look different says so
-through the two axes below rather than through markup of its own.
+In this library **every field has the same layout regardless of its component and where it appears**. `df-input`,
+`df-select`, `df-checkbox`, `df-date-time` and the rest share one base, so fields mixed on one row are aligned without
+per-component adjustments. A component's appearance is set through the two axes below, not through its own markup.
 
-The logic need not be here. [@dynamicforms/vue-forms](:vue-forms:) holds the value, the validation, the enabled and
-visibility state and the event pipeline, and a component handed one of its elements draws what that element holds —
-which is what this library was built for.
+[@dynamicforms/vue-forms](:vue-forms:) holds the value, the validation, the enabled and visibility state and the event
+pipeline. A component bound to one of its elements renders what that element holds.
 
-It is not a condition of using it. A component handed a plain `v-model` keeps the value in the parent, and one
-handed nothing at all keeps it internally; the errors, the enabled state and the visibility are then props like any
-other. Everything on this page other than that binding applies unchanged, so a project that wants aligned fields, a
-density that fits a table cell, or one call that restyles the application has a reason to be here whether or not it
-ever builds a form model. The package is a peer dependency either way — the components render their messages and
-their display modes through it — but nothing asks you to construct a `Field`.
+Binding an element is optional. A component with a `v-model` keeps the value in the parent, and one with neither keeps
+it internally; the errors, the enabled state and the visibility are then props. Everything else on this page applies
+in all three cases: aligned fields, a density for table cells and application-wide styling do not require a form
+model. `@dynamicforms/vue-forms` is a peer dependency in every case, because the components import from it, but no
+`Field` has to be constructed.
 
 ## The two axes
 
-Both are resolved by the same code for every component, so a change to either moves every field at once.
+Both are resolved by the same code for every component; a change to either applies to every field.
 
-- **Density** — the vertical compactness of a field: `default`, `comfortable`, `compact` or `inline`. The first
-  three are Vuetify's. `inline` is this library's own: it strips the outline, the floating label and the padding
-  until a field fits inside a table cell.
-- **Variant** — the visual style: `outlined`, `plain`, `underlined`, `filled`, `solo`, `solo-inverted` or
+- **Density**: the vertical compactness of a field: `default`, `comfortable`, `compact` or `inline`. The first
+  three are Vuetify's. `inline` is this library's own: it removes the outline, the floating label and the padding,
+  so that a field fits inside a table cell.
+- **Variant**: the visual style: `outlined`, `plain`, `underlined`, `filled`, `solo`, `solo-inverted` or
   `solo-filled`.
 
-Each is stated in one of four places, and the most specific wins: the prop on the tag, then the field itself, then a
-`provide` from any ancestor, then the plugin's defaults. Switching a whole application from `underlined` to
-`outlined` is one argument in one call; switching one dialog is one `provide`. See
+Each is set in one of four places; the most specific applies: the prop on the tag, then the field itself, then a
+`provide` from any ancestor, then the plugin's defaults. The whole application is switched from `underlined` to
+`outlined` by one plugin option; one dialog by one `provide`. See
 [configuration](/examples/configuration) for the chain and [density](/examples/density) for what each combination
 looks like.
 
@@ -60,37 +54,38 @@ looks like.
 ### What every field shares
 
 - **A control, a v-model, or neither.** Bind a vue-forms element and it owns the value, the validity, the touched
-  flag, the enabled state and the visibility; bind `v-model` and the component reports changes to the parent; bind
-  neither and it keeps the value itself. [Common props](/examples/input-base)
+  flag, the enabled state and the visibility; with `v-model` the component emits changes to the parent; with neither
+  it keeps the value itself. [Common props](/examples/input-base)
 - **Presentation carried by the field.** `label`, `placeholder`, `helpText`, `hint`, `cssClass`, `density` and
   `variant` are declared on vue-forms' `Extras` augmentation point, so a form declared in code states them where the
-  field is declared and the tag that draws it carries no presentation attributes.
+  field is declared, and the tag that renders it needs no presentation attributes.
   [Presentation on the element](/examples/input-base#presentation-carried-by-the-element)
-- **Errors, hints and help text** in one row, rendered through vue-forms' `MessagesWidget`, so an error may be plain
-  text, markdown, or a component of its own. [df-input-hint](/examples/df-input-hint)
-- **Labels with icons and markdown.** A label is a string, a `Label` carrying an icon, or an `MdString`.
+- **Errors, hints and help text** in one row, rendered through this library's `MessagesWidget`. An error renders as
+  the plain text, markdown or component the application's `errorText` setting returns for its `code` and `params`,
+  and as its `detail` otherwise. [df-input-hint](/examples/df-input-hint)
+- **Labels with icons, markdown, HTML or a component.** A label is a string, an `MdString`, an `HtmlString`, a
+  `SimpleComponentDef`, or a `Label` carrying one of them and an icon.
   [Label](/examples/input-base#label)
-- **Visibility** — `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, taken from the bound element
+- **Visibility**: `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, taken from the bound element
   or from the `visibility` prop. [Display modes](/examples/input-base#display-modes)
-- **Enablement that follows the section.** A field reads `effectiveEnabled`, so the fields of a disabled group are
-  drawn disabled without being disabled one by one. An action button reads the same, and its `busy` besides.
-- **`passthroughAttrs`** — a record merged last over the computed Vuetify bindings, so any prop of the underlying
+- **Enablement from the container.** A field reads `effectiveEnabled`, so the fields of a disabled group render
+  disabled. An action button reads `effectiveEnabled` and `busy`.
+- **`passthroughAttrs`**: a record merged last over the computed Vuetify bindings, so any prop of the underlying
   Vuetify component is reachable without this library declaring it.
   [The escape hatch](/examples/input-base#passthroughattrs)
-- **`useInputBase()` and `InputBase`** — the composable and the component the fields are built from, exported so a
+- **`useInputBase()` and `InputBase`**: the composable and the component the fields are built from, exported so a
   third party can build a field of its own on the same base. [InputBase](/examples/input-base)
 
 ### Actions
 
 - **The `Action` class** extends vue-forms' with render options: a name, a display style, whether the label and the
   icon are shown, and `passthroughAttrs`. [df-actions](/examples/df-actions)
-- **A bare vue-forms `Action` is drawn too.** `<df-actions>` reads what it renders off the action's value, so the
-  subclass is what an action needs to render responsively, as a text link or in a confirm / reject colour - not what
-  it needs to be drawn at all.
+- **A plain vue-forms `Action` is rendered too.** `<df-actions>` reads what it renders from the action's value. The
+  subclass is needed for responsive render options, the text-link style and the confirm / reject colours.
 - **`defaultConfirm` / `defaultReject`** mark the Enter and Escape actions of a set, and colour their buttons.
 - **`closeAction()`, `yesAction()`, `noAction()`** are the three usual ones, ready made and translatable.
 - **Per-breakpoint render options.** Any render-options object states overrides from `xs` to `xl`; a breakpoint
-  states only what it changes and inherits the rest from the smaller ones, so a label drops to an icon on a phone.
+  states only what it changes and inherits the rest from the smaller ones, e.g. an icon without a label on `xs`.
   [Responsive options](/examples/responsive-render-options)
 
 ### Configuration and localisation
@@ -98,8 +93,9 @@ looks like.
 - **One plugin call.** `app.use(DynamicFormsInputs, options)` provides the settings, optionally registers every
   component globally, and optionally registers the Vuetify components the templates use.
   [Configuration](/examples/configuration)
-- **`translateStrings()`** replaces the strings the library produces itself, and **`DateTimeLocaleConfig`** sets the
-  date-fns locale dates are formatted and parsed with. [Localisation](/examples/localisation)
+- **`translateStrings()`** connects the strings the library produces itself to the application's translation
+  function, the **`errorText`** setting converts errors into what the user sees, and **`DateTimeLocaleConfig`** sets
+  the date-fns locale dates are formatted and parsed with. [Localisation](/examples/localisation)
 - **TypeScript throughout.** Every component's props are an exported interface, values and choices are generic, and
   the type definitions ship with the build.
 

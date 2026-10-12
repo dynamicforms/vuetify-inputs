@@ -1,6 +1,6 @@
 import { createTranslatable } from '@dynamicforms/translatable';
 
-export const { strings: translatableStrings, translateStrings } = createTranslatable({
+export const { translate, translateStrings } = createTranslatable({
   Yes: 'Yes',
   No: 'No',
   Close: 'Close',
@@ -62,5 +62,4 @@ export const { strings: translatableStrings, translateStrings } = createTranslat
   MediaEmbed: 'Insert media',
   MediaEmbedUrl: 'Video URL',
   MediaEmbedInsert: 'Insert',
-  InvalidHexColor: 'Not a valid hex string.',
 });

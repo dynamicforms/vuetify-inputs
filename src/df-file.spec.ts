@@ -1,4 +1,4 @@
-import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import Form from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
@@ -135,9 +135,36 @@ describe('DfFile', () => {
 
     expect(control.value).toBeFalsy();
     expect(control.errors).toHaveLength(1);
-    expect((control.errors[0] as ValidationErrorRenderContent).resolvedText).toBe(
-      'The uploaded file is no longer available on the server.',
-    );
+    expect(control.errors[0].detail).toBe('The uploaded file is no longer available on the server.');
+  });
+
+  it('marks a bound field touched when the upload returns', async () => {
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountFile({ control });
+
+    await pickFile(wrapper, pdfFile());
+
+    expect(control.value).toBe('file-id-1');
+    expect(control.touched).toBe(true);
+  });
+
+  it('drops the file_gone error when a new file is uploaded', async () => {
+    comms.touch = vi.fn(async () => {
+      throw new FileGoneError('The uploaded file is no longer available on the server.');
+    });
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountFile({ control, touchInterval: 1_000 });
+    await pickFile(wrapper, pdfFile());
+    await vi.advanceTimersByTimeAsync(1_000);
+    await wrapper.vm.$nextTick();
+    expect(control.errors.map((error) => error.code)).toEqual(['file_gone']);
+
+    comms.touch = vi.fn(async () => undefined);
+    await pickFile(wrapper, pdfFile());
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(control.value).toBeTruthy();
+    expect(control.errors).toHaveLength(0);
   });
 
   it('clears a disabled field when touch reports the file is gone', async () => {

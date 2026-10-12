@@ -1,4 +1,4 @@
-import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import Form, { ValidationError } from '@dynamicforms/vue-forms';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick, ref } from 'vue';
 
@@ -189,7 +189,7 @@ describe('setFileGoneError', () => {
     setFileGoneError(control, 'The file is gone');
 
     expect(control.errors).toHaveLength(1);
-    expect(control.errors[0]).toBeInstanceOf(ValidationErrorRenderContent);
-    expect((control.errors[0] as ValidationErrorRenderContent).resolvedText).toBe('The file is gone');
+    expect(control.errors[0]).toBeInstanceOf(ValidationError);
+    expect(control.errors[0]).toMatchObject({ code: 'file_gone', detail: 'The file is gone', origin: 'server' });
   });
 });

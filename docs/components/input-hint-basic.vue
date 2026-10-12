@@ -4,20 +4,14 @@
       <v-card-title>Inside an input</v-card-title>
       <v-card-text>
         <p class="mb-4">
-          The field carries a hint and two validators. The hint holds the message row until the field is touched and
-          invalid; from then on the row belongs to the errors. Type a few letters and leave the field to see the
-          swap.
+          The field has a hint and two validators. The message row shows the hint until the field is touched and
+          invalid, and the errors after that. Type a few letters and leave the field.
         </p>
 
-        <df-input
-          :control="email"
-          label="Email"
-          hint="We use it for the receipt only"
-        />
+        <df-input :control="email" label="Email" hint="We use it for the receipt only" />
 
         <div class="mt-2">
-          <strong>touched:</strong> {{ email.touched }} &nbsp;
-          <strong>errors:</strong> {{ email.errors.length }}
+          <strong>touched:</strong> {{ email.touched }} &nbsp; <strong>errors:</strong> {{ email.errors.length }}
         </div>
       </v-card-text>
     </v-card>
@@ -36,14 +30,14 @@
         <div class="row-frame">
           <df-input-hint
             :errors="standaloneErrors"
-            message="A message of its own, rendered when no error stands"
+            message="Shown while there is no error"
             message-classes="text-medium-emphasis"
           />
         </div>
 
         <p class="mt-4 mb-0">
-          The middle option feeds the component three spaces. A whitespace-only <code>errors</code> string is no
-          error, so the message comes back.
+          The middle option passes three spaces. An <code>errors</code> string of whitespace only is no error, so the
+          message is shown.
         </p>
       </v-card-text>
     </v-card>
@@ -52,8 +46,9 @@
       <v-card-title>A group's errors</v-card-title>
       <v-card-text>
         <p class="mb-4">
-          The rule spans two fields, so its error sits on the group. One <code>df-input-hint</code> renders it under
-          the pair, with <code>errorClasses</code> naming a colour of its own.
+          The rule spans two fields, so its error sits on the group. One
+          <code>df-input-hint</code> renders it under the pair, with <code>errorClasses</code> naming a colour of its
+          own.
         </p>
 
         <v-row>
@@ -72,15 +67,21 @@
 </template>
 
 <script setup lang="ts">
+import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { computed, ref } from 'vue';
-import { Field, Group, ValidationErrorRenderContent, Validators } from '@dynamicforms/vue-forms';
+
 import { DfInput, DfInputHint, DfSelect } from '../../src';
 
-const email = new Field<string>({ value: '' });
-email.registerAction(new Validators.Required());
-email.registerAction(
-  new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, 'An address of the form name@example.com, please'),
-);
+const email = new Field<string>({
+  value: '',
+  validators: [
+    new Validators.Required(),
+    new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
+      code: 'invalid_email',
+      detail: 'An address of the form name@example.com, please',
+    }),
+  ],
+});
 
 const errorSources = [
   { id: 'none', text: 'An empty string' },
@@ -105,7 +106,7 @@ credentials.registerAction(
   new Validators.Validator(() => {
     const { password, confirmation } = credentials.fields;
     if (!confirmation.value || password.value === confirmation.value) return null;
-    return [new ValidationErrorRenderContent('The two entries do not match')];
+    return [new ValidationError('passwords_differ', {}, 'The two entries do not match')];
   }),
 );
 </script>

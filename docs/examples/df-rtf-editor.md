@@ -1,26 +1,25 @@
 # df-rtf-editor Component
 
-The df-rtf-editor component provides a rich text editor that fully integrates with both Vuetify and DynamicForms. It
-is built on [TipTap](https://tiptap.dev/), with a toolbar assembled from this library's own Vuetify components rather
-than a vendor UI, so it follows the application's theme and translations the same way every other field does.
+`df-rtf-editor` is a rich text editor on [TipTap](https://tiptap.dev/). Its toolbar is built from Vuetify components,
+so it uses the application's theme and this library's translated strings.
 
 ## Basic Usage
 
-Below is an example of the df-rtf-editor component used with DynamicForms:
+`df-rtf-editor` bound to a vue-forms field:
 
 <rtf-editor-basic/>
 
 ## Features
 
-- Integration with `@dynamicforms/vue-forms` for state management and validation
+- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Headings, bold, italic, block quotes, bulleted and numbered lists
 - Images: insert by URL, upload, or paste directly from the clipboard, embedded as base64 `data:` URIs, with
   drag-handle resizing
 - Tables, with row and column insertion/deletion
 - Links, with an optional `download` attribute
-- Pasting a Word or Google Docs selection: formatted text, embedded images and tables come through as structured
-  content rather than raw markup clutter
-- A "Style" dropdown applying named, class-based looks to the current block or selection
+- Pasting a Word or Google Docs selection: formatted text, embedded images and tables are pasted as structured
+  content, without the source application's markup
+- A "Style" dropdown applying named, class-based styles to the current block or selection
 - Media embeds: paste a YouTube or Vimeo URL to insert a responsive player
 
 ## Props
@@ -60,8 +59,8 @@ This component inherits all common props from [InputBase](./input-base), includi
     as a plain link instead
 
 - **Style dropdown**
-  - Applies one of the named looks from [Custom Styles](#custom-styles) to the current block or selection, and
-    removes it again on a second click
+  - Applies one of the named styles from [Custom Styles](#custom-styles) to the current block or selection, and
+    removes it on a second click
   
 - **Alignment**
   - Left, center, right, justify
@@ -69,8 +68,8 @@ This component inherits all common props from [InputBase](./input-base), includi
 - **Utilities**
   - Undo/redo, select all
   - A selection popup with bold, italic, link and list toggles
-  - Pasting from Word or Google Docs: formatting, embedded images and tables come through structured, with the
-    source application's markup clutter stripped
+  - Pasting from Word or Google Docs: formatting, embedded images and tables are pasted as structured content,
+    without the source application's markup
 
 ## Events
 
@@ -79,25 +78,17 @@ This component emits all [common events from InputBase](./input-base):
 
 ## Working with HTML Content
 
-The editor outputs standard HTML, which can be:
-
-- Stored in a database
-- Displayed in web pages
-- Exported to various formats
-
-Remember to sanitize HTML content appropriately when displaying user-generated content to prevent XSS attacks.
+The value is HTML, and the component does not sanitize it. An application that displays HTML entered by users sanitizes it first, to prevent XSS.
 
 List items and table cells save their text wrapped in a paragraph (`<li><p>...</p></li>`, `<td><p>...</p></td>`),
-so a list or a table read back outside this component - a public page, a PDF export, a templated email - needs
-`li p, td p, th p { margin: 0; }` in its own stylesheet, or the browser's default paragraph margin makes every
-list item and cell look double-spaced. `<df-rtf-editor>`'s own editing surface already accounts for this; nothing
-else that renders the saved HTML does automatically. See the
-[migration guide](/guide/migration#list-items-and-table-cells-wrap-their-text-in-a-p-now) for the full rule and
-why it's safe against content saved before this behaviour existed.
+so HTML rendered outside this component (a public page, a PDF export, a templated email) needs
+`li p, td p, th p { margin: 0; }` in its stylesheet; otherwise the browser's default paragraph margin adds space to
+every list item and cell. `<df-rtf-editor>`'s editing surface has this rule. See also the
+[migration guide](/guide/migration#list-items-and-table-cells-wrap-their-text-in-a-p-now).
 
 ## Custom Styles
 
-The editor's stylesheet renders several predefined content classes, applied from the toolbar's Style dropdown:
+The editor's stylesheet styles several predefined content classes, applied from the toolbar's Style dropdown:
 
 | Style | Element | Class |
 |-------|---------|-------|
@@ -111,9 +102,9 @@ The editor's stylesheet renders several predefined content classes, applied from
 | Code (dark) | `pre` | `fancy-code fancy-code-dark` |
 | Code (bright) | `pre` | `fancy-code fancy-code-bright` |
 
-The block-level styles (everything but Marker and Spoiler) both change the current block's element type and set
-its class; Marker and Spoiler toggle over a text selection like bold or italic. Clicking an already-applied style
-again removes it, turning the block back into a plain paragraph (or, for Marker/Spoiler, unwrapping the mark).
+The block-level styles (all but Marker and Spoiler) set the current block's element type and class; Marker and
+Spoiler toggle over a text selection like bold or italic. Clicking an applied style removes it: the block becomes a
+plain paragraph, or, for Marker and Spoiler, the mark is removed.
 
 ## Examples
 
@@ -149,7 +140,7 @@ const content = ref('<h2>Welcome</h2><p>This is a <strong>rich text editor</stro
 </template>
 
 <script setup>
-import { Group, Field, ValidationErrorText, Validators } from '@dynamicforms/vue-forms';
+import { Group, Field, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { DfRtfEditor } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
@@ -157,8 +148,8 @@ const form = new Group({
     value: '<p>Enter a detailed product description here.</p>',
     validators: [
       new Validators.Validator((value) => {
-        if (!value || value === '<p></p>') return [new ValidationErrorText('Description is required')];
-        if (value.length < 20) return [new ValidationErrorText('Description is too short')];
+        if (!value || value === '<p></p>') return [new ValidationError('description_required', {}, 'Description is required')];
+        if (value.length < 20) return [new ValidationError('description_too_short', { minLength: 20 }, 'Description is too short')];
         return null;
       })
     ]

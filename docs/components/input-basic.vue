@@ -5,12 +5,7 @@
       <v-card-text>
         <v-row>
           <v-col cols="12" md="4">
-            <df-select
-              v-model="selectedType"
-              :choices="inputTypes"
-              :allow-null="false"
-              label="Select Input Type"
-            />
+            <df-select v-model="selectedType" :choices="inputTypes" :allow-null="false" label="Select Input Type" />
           </v-col>
           <v-col cols="12" md="8">
             <df-input
@@ -27,12 +22,10 @@
         </v-row>
 
         <div class="mt-4">
-          <v-btn @click="toggleEnabled" color="primary" class="mr-2">
+          <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ inputField.enabled ? 'Disable' : 'Enable' }} Field
           </v-btn>
-          <v-btn @click="resetField" color="secondary">
-            Reset Field
-          </v-btn>
+          <v-btn color="secondary" @click="resetField"> Reset Field </v-btn>
         </div>
 
         <div class="mt-4">
@@ -47,7 +40,7 @@
           </v-chip>
         </div>
 
-        <div class="mt-4" v-if="inputField.errors.length > 0">
+        <div v-if="inputField.errors.length > 0" class="mt-4">
           <strong>Validation errors:</strong>
           <ul>
             <li v-for="(error, index) in inputField.errors" :key="index" class="error-text">
@@ -61,22 +54,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
 import { Field, Validators } from '@dynamicforms/vue-forms';
+import { ref, watch } from 'vue';
+
 import { DfInput, DfSelect, Label } from '../../src';
 
 const inputTypes = [
   { text: 'Text', id: 'text' },
   { text: 'Email', id: 'email' },
   { text: 'Password', id: 'password' },
-  { text: 'URL', id: 'url' }
+  { text: 'URL', id: 'url' },
 ];
 
 const selectedType = ref<'text' | 'password' | 'email' | 'url' | 'number'>('text');
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-const inputField = new Field<string>({ value: '' });
-inputField.registerAction(new Validators.LengthInRange(3, 50));
+function validatorsFor(type: string) {
+  if (type === 'text') return [new Validators.Required(), new Validators.LengthInRange(3, 50)];
+  if (type === 'email') return [new Validators.Required(), new Validators.Pattern(emailPattern)];
+  return [];
+}
+
+const inputField = new Field<string>({
+  value: '',
+  validators: validatorsFor('text'),
+});
 
 watch(selectedType, (newType) => {
   // Reset field when changing input type
@@ -87,13 +89,12 @@ watch(selectedType, (newType) => {
   // Set default value based on type
   if (newType === 'text') {
     inputField.value = 'Sample text';
-    inputField.registerAction(new Validators.LengthInRange(3, 50));
   } else if (newType === 'email') {
     inputField.value = '';
-    inputField.registerAction(new Validators.Pattern(emailPattern));
   } else if (newType === 'url') {
     inputField.value = 'https://';
   }
+  validatorsFor(newType).forEach((validator) => inputField.registerAction(validator));
 });
 
 function toggleEnabled() {
@@ -104,7 +105,7 @@ function resetField() {
   inputField.value = '';
 }
 
-function getHintForType(type) {
+function getHintForType(type: string) {
   switch (type) {
     case 'text':
       return 'Enter any text (3-50 characters)';

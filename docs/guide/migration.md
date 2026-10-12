@@ -8,6 +8,157 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.13.0 (from v0.12.x)
+
+0.13.0 requires `@dynamicforms/vue-forms` 3.0.0. Upgrade the two together, and read the
+[vue-forms migration guide](https://docs.velis.si/dynamicforms/vue-forms/guide/migration) first. vue-forms 3.0 no
+longer renders: an error is a `code`, `params` and an English `detail`, and the rendering vue-forms exported is
+exported by this library. There is a [checklist](#checklist-for-0-13-0) at the end of this section.
+
+```bash
+npm install @dynamicforms/vue-forms@^3.0.0-alpha.1 @dynamicforms/vuetify-inputs@^0.13.0
+```
+
+### Render content is imported from this library
+
+`MessagesWidget`, `MdString`, `RenderableValue`, `SimpleComponentDef`, `ClassType`, `ClassTypes`, the
+`RenderContent` types, `isSimpleComponentDef` and `isCallableFunction` are exported by
+`@dynamicforms/vuetify-inputs`:
+
+```typescript
+// before
+import { MdString, MessagesWidget, RenderableValue } from '@dynamicforms/vue-forms';
+
+// after
+import { MdString, MessagesWidget, RenderableValue } from '@dynamicforms/vuetify-inputs';
+```
+
+`RenderableValue` takes `(content, classes?)` and is not an error: it has no `code`, `origin` or `sameAs()`.
+`getTextType` is `kind`.
+
+`SimpleComponentDef` has no `componentVHtml`, and an `innerHTML` in its `componentProps` is dropped. HTML content is
+an `HtmlString`, rendered as the inner HTML of a `div` and not sanitized:
+
+```typescript
+// before
+new RenderableValue({ componentName: 'div', componentVHtml: html, componentProps: { class: 'note' } });
+
+// after
+new RenderableValue(new HtmlString(html), 'note');
+```
+
+`MessagesWidget` renders markdown with `vue-markdown-render` itself; a globally registered
+`vue-markdown` component is not needed.
+
+### Errors render through the `errorText` setting
+
+A component renders an error as the content the `errorText` setting returns for it, and as its `detail` where the
+setting is not given or returns `undefined`. The setting is given at install and converts every error: those of
+vue-forms' validators, of the application's own validators, of its server and of this library. It returns plain text,
+an `MdString`, an `HtmlString` or a `SimpleComponentDef`:
+
+```typescript
+app.use(DynamicFormsInputs, {
+  errorText: (error) => {
+    const key = `errors.${error.code}`;
+    if (te(`${key}Md`)) return new MdString(t(`${key}Md`, error.params));
+    return te(key) ? t(key, error.params) : undefined;
+  },
+});
+```
+
+An error without a code, and content (a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef`), render as
+written; `errorText` is not called for them.
+
+A validator message given as an `MdString` or a component in vue-forms 2.0 is an `errorText` answer for the
+validator's code. See [Translating errors](/examples/localisation#translating-errors) for the whole recipe and
+[the codes vue-forms raises](https://docs.velis.si/dynamicforms/vue-forms/api/validators#error-codes).
+
+### `translatableStrings` is replaced by `translate`, and `translateStrings` takes `t`
+
+The library's own strings are read through `@dynamicforms/translatable` 0.3, which this release requires.
+`translateStrings` takes the application's translation function and an optional namespace in place of a callback, and
+`translate(key, params?)` replaces reads of `translatableStrings`:
+
+```typescript
+// before
+translateStrings((key, defaultValue) => (te(`df_inputs.${key}`) ? t(`df_inputs.${key}`) : defaultValue));
+const close = translatableStrings.Close;
+
+// after
+translateStrings(i18n.global.t, 'df_inputs');
+const close = translate('Close');
+```
+
+With vue-i18n's `t`, the strings follow a locale switch without another `translateStrings` call.
+
+```bash
+npm install @dynamicforms/translatable@^0.3.0
+```
+
+### `<df-color>` reports an error of code `invalid_hex_color`
+
+Without a `control`, `<df-color>` reports a value that is not a hex color as a `ValidationError` of code
+`invalid_hex_color`, shown once the field is touched and rendered through `errorText`. The `InvalidHexColor` string is
+removed; translate the code with the rest of the errors.
+
+### `<df-color>` writes a picked color when it is confirmed
+
+A color chosen in the picker is written to the field with OK or a double-click on the color area, as a
+date in `<df-date-time>` is. Cancel and closing the menu leave the field as it was. A value typed into the field is
+written as it is typed.
+
+### Action labels follow the locale
+
+`Action.closeAction()`, `yesAction()` and `noAction()` label the action with `() => translate(key)`. An action built
+again on a locale switch to pick up its label can be built once. An application action takes the same form:
+`label: () => t('Save')`. `Action.label` returns the string the label gives now.
+
+### Labels take any content
+
+A label is a string, an `MdString`, an `HtmlString`, a `SimpleComponentDef` or a `Label`, whose `text` takes the same
+four forms. `Label.text` is `RenderContentNonCallable`; code that reads it as a string reads
+`renderContentText(label.text)`. `<df-label>` renders `label.text`, and the slot data's `label` - the text Vuetify
+is given - only where `label.text` is empty.
+
+### An action label is a string, a ref or a function
+
+`ActionRenderOptions.label` is `MaybeRefOrGetter<string>`. `getRenderOptionsForBreakpoint()` returns
+`ResolvedActionRenderOptions`, whose `label` is the string read. Code that reads `action.value.label` as a string
+reads `action.label`, which returns the string.
+
+### `<df-input-hint>`'s `message` takes no errors
+
+`message` takes `string | RenderableValue[]`. An error goes in `errors`.
+
+### Errors the components create
+
+- An error of the `errors` prop is selected as the `ValidationError` of its `toErrorDescription()` - content as
+  `new ValidationError('', {}, text, 'application')`, a description with its own `code`, `params` and `origin` - and
+  rendered as it was given. `useInputBase()`'s `shownErrors` holds it as given, so its type is `ErrorInput[]`.
+- `setFileGoneError()` sets `new ValidationError('file_gone', {}, text, 'server')`.
+
+### `defaultConfirm` and `defaultReject` answer a boolean
+
+`Action.defaultConfirm` and `Action.defaultReject` are vue-forms' getters and answer `false` where the value states
+nothing. They answered `undefined`.
+
+### Checklist for 0.13.0
+
+1. Import `MessagesWidget`, `MdString`, `RenderableValue`, `SimpleComponentDef`, `ClassTypes` and the render
+   content types from `@dynamicforms/vuetify-inputs`.
+2. Replace `getTextType` with `kind`.
+3. Install `@dynamicforms/translatable` 0.3; pass the translation function to `translateStrings(t, namespace)` and
+   replace reads of `translatableStrings` with `translate(key)`.
+4. Give the plugin an `errorText` setting that translates error codes, and return an `MdString` or a component from
+   it where a vue-forms 2.0 validator message was one.
+5. Move a translation of `InvalidHexColor` to the error code `invalid_hex_color`.
+6. Replace `=== undefined` checks of `defaultConfirm` and `defaultReject` with a boolean test.
+7. Replace `componentVHtml` with an `HtmlString`, with the classes as the `RenderableValue`'s second argument.
+8. Move errors passed in `<df-input-hint>`'s `message` to `errors`.
+9. Read `Label.text` through `renderContentText()` where a string is needed, and an action's label through
+   `action.label`.
+
 ## Upgrading to v0.12.1 (from v0.11.x)
 
 0.12.1 requires `@dynamicforms/vue-forms` 2.0.2; 0.12.0 was withdrawn, and a project on it follows this section as

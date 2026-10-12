@@ -1,4 +1,4 @@
-import Form, { ValidationErrorRenderContent } from '@dynamicforms/vue-forms';
+import Form from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
@@ -99,6 +99,17 @@ describe('DfImage', () => {
     expect(comms.upload).toHaveBeenCalledTimes(1);
   });
 
+  it('marks a bound field touched when the upload of a dropped image returns', async () => {
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountImage({ control });
+
+    await wrapper.find('.df-image-wrapper').trigger('drop', { dataTransfer: { files: fileList([pngFile()]) } });
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(control.value).toBe('https://example.com/uploaded.png');
+    expect(control.touched).toBe(true);
+  });
+
   it('rejects a dropped non-image file without uploading', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const wrapper = mountImage();
@@ -157,9 +168,7 @@ describe('DfImage', () => {
 
     expect(control.value).toBeFalsy();
     expect(control.errors).toHaveLength(1);
-    expect((control.errors[0] as ValidationErrorRenderContent).resolvedText).toBe(
-      'The uploaded image is no longer available on the server.',
-    );
+    expect(control.errors[0].detail).toBe('The uploaded image is no longer available on the server.');
     expect(wrapper.findComponent({ name: 'VImg' }).exists()).toBe(false);
   });
 

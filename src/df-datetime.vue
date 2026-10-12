@@ -1,11 +1,5 @@
 <template>
-  <input-base
-    v-bind="props"
-    :class="densityClass"
-    :clearable="clearable"
-    @click:clear="value = null"
-    @blur="touched = true"
-  >
+  <input-base v-bind="props" :class="densityClass" :clearable="clearable" @click:clear="clear" @blur="touched = true">
     <template #default="slotProps">
       <div
         :class="[
@@ -36,14 +30,18 @@
         >
           <template #default>
             <v-menu v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsDate" @cancel="dropdown = ''" @save="dropdown = ''">
-                <template #default="{ model: proxyModel, actions }">
+              <v-confirm-edit v-model="valueAsDate" @cancel="dropdown = ''" @save="concludeEdit">
+                <template #default="{ model: proxyModel, save, actions }">
                   <v-date-picker
                     v-model="proxyModel.value"
                     :hide-header="true"
                     :first-day-of-week="firstDayOfWeek"
                     :show-adjacent-months="true"
                     :show-week="true"
+                    @update:view-mode="viewChanged"
+                    @update:month="viewChanged"
+                    @update:year="viewChanged"
+                    @dblclick="saveOnDoubleClick($event, '.v-date-picker-month__day', save)"
                   >
                     <template #actions><component :is="actions" /></template>
                   </v-date-picker>
@@ -73,9 +71,15 @@
         >
           <template #default>
             <v-menu v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsTimeString" @cancel="dropdown = ''" @save="dropdown = ''">
-                <template #default="{ model: proxyModel, actions }">
-                  <v-time-picker v-model="proxyModel.value" :hide-header="true" format="24hr">
+              <v-confirm-edit v-model="valueAsTimeString" @cancel="dropdown = ''" @save="concludeEdit">
+                <template #default="{ model: proxyModel, save, actions }">
+                  <v-time-picker
+                    v-model="proxyModel.value"
+                    :hide-header="true"
+                    format="24hr"
+                    @update:view-mode="viewChanged"
+                    @dblclick="saveOnDoubleClick($event, '.v-time-picker-clock', save)"
+                  >
                     <template #actions><component :is="actions" /></template>
                   </v-time-picker>
                 </template>
@@ -95,6 +99,7 @@ import { ref, computed, watch, toRefs, unref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
 import { BaseEmits, DateTimeLocaleConfig, defaultBaseProps, InputBase, useInputBase } from './helpers';
+import { usePickerDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {
   ...defaultBaseProps,
@@ -128,6 +133,19 @@ const timeMenuShown = computed({
     dropdown.value = newValue ? 'time' : '';
   },
 });
+
+// a value picked in the menu or cleared concludes the edit: the field may hold no focus to lose
+function concludeEdit() {
+  dropdown.value = '';
+  touched.value = true;
+}
+
+const { viewChanged, saveOnDoubleClick } = usePickerDoubleClick();
+
+function clear() {
+  value.value = null;
+  touched.value = true;
+}
 
 const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, 'HH:mm')}:00`;
 

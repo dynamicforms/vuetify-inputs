@@ -3,7 +3,7 @@ import { vi } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 
-import { translatableStrings } from '../translations';
+import { translate } from '../translations';
 
 import EditorCore from './editor-core.vue';
 
@@ -53,7 +53,7 @@ describe('EditorCore bubble menu link prompt', () => {
 
     (wrapper.vm as unknown as { toggleBubbleLink: () => void }).toggleBubbleLink();
 
-    expect(promptSpy).toHaveBeenCalledWith(translatableStrings.LinkUrl);
+    expect(promptSpy).toHaveBeenCalledWith(translate('LinkUrl'));
 
     promptSpy.mockRestore();
   });

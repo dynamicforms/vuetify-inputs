@@ -4,15 +4,13 @@
       <v-card-title class="d-flex align-center justify-space-between">
         RTF Editor Example
         <div class="d-flex align-center">
-          <span class="me-2 text-body-2">Toolbar button size:</span>
-          <v-select
+          <df-select
             v-model="toolbarButtonSize"
-            :items="toolbarButtonSizeOptions"
-            density="compact"
-            variant="outlined"
-            hide-details
-            style="width: 10em"
-          ></v-select>
+            :choices="toolbarButtonSizeOptions"
+            :allow-null="false"
+            label="Toolbar button size"
+            style="width: 12em"
+          />
         </div>
       </v-card-title>
       <v-card-text>
@@ -24,12 +22,10 @@
         />
 
         <div class="mt-4">
-          <v-btn @click="toggleEnabled" color="primary" class="mr-2">
+          <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ contentField.enabled ? 'Disable' : 'Enable' }} Editor
           </v-btn>
-          <v-btn @click="resetField" color="secondary">
-            Reset Content
-          </v-btn>
+          <v-btn color="secondary" @click="resetField"> Reset Content </v-btn>
         </div>
 
         <div class="mt-4">
@@ -44,16 +40,18 @@
 <script setup>
 import { Field } from '@dynamicforms/vue-forms';
 import { ref } from 'vue';
-import { DfRtfEditor } from '../../src';
 
-const toolbarButtonSizeOptions = ['x-small', 'small', 'default', 'large', 'x-large'];
+import { DfRtfEditor, DfSelect } from '../../src';
+
+const toolbarButtonSizeOptions = ['x-small', 'small', 'default', 'large', 'x-large'].map((id) => ({ id, text: id }));
 const toolbarButtonSize = ref('small');
 
 const contentField = new Field({
-  value: '<h2>Welcome to RTF Editor</h2><p>This is a <strong>rich text editor</strong> component built on ' +
+  value:
+    '<h2>Welcome to RTF Editor</h2><p>This is a <strong>rich text editor</strong> component built on ' +
     '<a href="https://tiptap.dev/">TipTap</a>.</p><p>You can:</p><ul><li>Format text with ' +
     '<strong>bold</strong>, <em>italic</em>, and headings</li><li>Insert links, images, and tables</li>' +
-    '<li>Create bulleted and numbered lists</li><li>And much more...</li></ul>'
+    '<li>Create bulleted and numbered lists</li><li>And much more...</li></ul>',
 });
 
 function toggleEnabled() {

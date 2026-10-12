@@ -6,7 +6,7 @@
         <df-image :control="imageField" :comms="imageComms" label="Profile picture" hint="PNG or JPG, max 5MB" />
 
         <div class="mt-4">
-          <v-btn @click="toggleEnabled" color="primary" class="mr-2">
+          <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ imageField.enabled ? 'Disable' : 'Enable' }} Field
           </v-btn>
         </div>
@@ -29,11 +29,12 @@ import { DfImage } from '../../src';
 // directly-usable URL for a freshly uploaded image to preview and download the same way.
 const existingImage =
   'data:image/svg+xml;base64,' +
-  btoa(
+  globalThis.btoa(
     '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
       '<rect width="200" height="200" fill="#1976d2"/>' +
-      '<text x="50%" y="50%" fill="white" font-size="20" text-anchor="middle" dominant-baseline="middle">Profile</text>' +
-      '</svg>'
+      '<text x="50%" y="50%" fill="white" font-size="20" text-anchor="middle" dominant-baseline="middle">' +
+      'Profile</text>' +
+      '</svg>',
   );
 
 const imageField = new Field({ value: existingImage });

@@ -1,39 +1,33 @@
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
-import { translatableStrings, translateStrings } from './translations';
+import { translate, translateStrings } from './translations';
 
 describe('translations', () => {
   afterEach(() => {
-    translateStrings(() => undefined);
+    translateStrings((key) => key);
   });
 
-  it('should start out equal to the English defaults', () => {
-    expect(translatableStrings.Yes).toBe('Yes');
-    expect(translatableStrings.Bold).toBe('Bold');
+  it('should answer the English defaults before translateStrings is called', () => {
+    expect(translate('Yes')).toBe('Yes');
+    expect(translate('Bold')).toBe('Bold');
   });
 
-  it('should replace an entry with what the callback returns for it', () => {
-    const translations: Partial<Record<keyof typeof translatableStrings, string>> = { Bold: 'Krepko' };
-    translateStrings((key) => translations[key]);
+  it('should answer the translation function, with the key under the namespace', () => {
+    const catalogue: Record<string, string> = { 'df_inputs.Bold': 'Krepko' };
+    translateStrings((key) => catalogue[key] ?? key, 'df_inputs');
 
-    expect(translatableStrings.Bold).toBe('Krepko');
+    expect(translate('Bold')).toBe('Krepko');
+    expect(translate('Italic')).toBe('Italic');
   });
 
-  it('should update a computed built over the table when translateStrings replaces an entry', () => {
-    const bold = computed(() => translatableStrings.Bold);
-    const translations: Partial<Record<keyof typeof translatableStrings, string>> = { Bold: 'Krepko' };
+  it('should update a computed over translate when the state the translation function reads changes', () => {
+    const locale = ref('en');
+    translateStrings((key) => (locale.value === 'sl' && key === 'Bold' ? 'Krepko' : key));
+    const bold = computed(() => translate('Bold'));
+    expect(bold.value).toBe('Bold');
 
-    translateStrings((key) => translations[key]);
+    locale.value = 'sl';
 
     expect(bold.value).toBe('Krepko');
-  });
-
-  it('should reset a key to its English default on a later call that no longer covers it', () => {
-    const translations: Partial<Record<keyof typeof translatableStrings, string>> = { Bold: 'Krepko' };
-    translateStrings((key) => translations[key]);
-    expect(translatableStrings.Bold).toBe('Krepko');
-
-    translateStrings(() => undefined);
-    expect(translatableStrings.Bold).toBe('Bold');
   });
 });

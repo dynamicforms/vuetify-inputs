@@ -49,9 +49,14 @@
         </label>
         <label v-else :for="fileInputId" class="df-image-placeholder">
           <cached-icon name="mdi-tray-arrow-up" />
-          <span>{{ t.ImageDropHint }}</span>
+          <span>{{ t('ImageDropHint') }}</span>
         </label>
-        <label v-if="previewUrl && !isDisabled" :for="fileInputId" class="df-image-replace-btn" :title="t.ImageReplace">
+        <label
+          v-if="previewUrl && !isDisabled"
+          :for="fileInputId"
+          class="df-image-replace-btn"
+          :title="t('ImageReplace')"
+        >
           <cached-icon name="mdi-pencil" />
         </label>
         <a
@@ -61,8 +66,8 @@
           target="_blank"
           rel="noopener"
           class="df-image-download-btn"
-          :title="t.ImageDownload"
-          :aria-label="t.ImageDownload"
+          :title="t('ImageDownload')"
+          :aria-label="t('ImageDownload')"
         >
           <cached-icon name="mdi-download" />
         </a>
@@ -81,7 +86,7 @@ import {
   defaultBaseProps,
   InputBase,
   setFileGoneError,
-  translatableStrings,
+  translate,
   useFileTouchKeepAlive,
   useInputBase,
 } from './helpers';
@@ -92,7 +97,7 @@ interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
-const t = translatableStrings;
+const t = translate;
 const fileInputId = useId();
 
 // State
@@ -143,6 +148,7 @@ async function removeFile() {
   }
 
   resetFileState();
+  touched.value = true;
 }
 
 async function upload(file: File) {
@@ -156,6 +162,8 @@ async function upload(file: File) {
       progress.value = Math.round((loaded * 100) / total);
     });
     progress.value = 100;
+    // a picked file concludes the edit: the file dialog and a drop have no blur of the field
+    touched.value = true;
     setupTouchInterval();
   } catch (err) {
     progress.value = 0;

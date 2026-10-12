@@ -32,49 +32,37 @@
 
         <div class="mt-4">
           <v-btn-group>
-            <v-btn @click="increaseQuantity" color="primary" class="mr-2">
-              Increase Quantity
-            </v-btn>
-            <v-btn @click="decreaseQuantity" color="secondary" :disabled="quantityField.value <= 1">
+            <v-btn color="primary" class="mr-2" @click="increaseQuantity"> Increase Quantity </v-btn>
+            <v-btn color="secondary" :disabled="quantityField.value <= 1" @click="decreaseQuantity">
               Decrease Quantity
             </v-btn>
           </v-btn-group>
         </div>
 
         <div class="mt-4">
-          <v-checkbox v-model="allowNull" label="Allow null values" />
+          <df-checkbox v-model="allowNull" label="Allow null values" />
         </div>
 
-        <div class="mt-4">
-          <strong>Total:</strong> {{ calculateTotal() }}
-        </div>
+        <div class="mt-4"><strong>Total:</strong> {{ calculateTotal() }}</div>
 
         <div class="values-display mt-4">
           <h3>Current Values:</h3>
           <div class="value-item">
             <strong>Quantity:</strong> {{ quantityField.value }}
-            <v-chip
-              :color="quantityField.valid ? 'success' : 'error'"
-              size="small"
-              class="ml-2"
-            >
+            <v-chip :color="quantityField.valid ? 'success' : 'error'" size="small" class="ml-2">
               {{ quantityField.valid ? 'Valid' : 'Invalid' }}
             </v-chip>
           </div>
 
           <div class="value-item">
             <strong>Price:</strong> {{ priceField.value }}
-            <v-chip
-              :color="priceField.valid ? 'success' : 'error'"
-              size="small"
-              class="ml-2"
-            >
+            <v-chip :color="priceField.valid ? 'success' : 'error'" size="small" class="ml-2">
               {{ priceField.valid ? 'Valid' : 'Invalid' }}
             </v-chip>
           </div>
         </div>
 
-        <div class="mt-4" v-if="quantityField.errors.length > 0 || priceField.errors.length > 0">
+        <div v-if="quantityField.errors.length > 0 || priceField.errors.length > 0" class="mt-4">
           <strong>Validation errors:</strong>
           <ul>
             <li v-for="(error, index) in quantityField.errors" :key="`q-${index}`" class="error-text">
@@ -91,9 +79,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { Field } from '@dynamicforms/vue-forms';
-import { DfInput } from '../../src';
+import { ref } from 'vue';
+
+import { DfCheckbox, DfInput } from '../../src';
 
 const allowNull = ref(false);
 

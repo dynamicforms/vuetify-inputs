@@ -1,11 +1,10 @@
 # df-actions Component
 
-The `df-actions` component provides a clean and responsive way to display action buttons or links, with support for
-responsive behavior across different screen sizes.
+`df-actions` renders a row of actions as buttons or text links, with render options per screen-size breakpoint.
 
 ## Basic Example
 
-Here's a simple example of the `df-actions` component in action:
+A row of actions:
 
 <ActionsDemo />
 
@@ -13,10 +12,10 @@ Here's a simple example of the `df-actions` component in action:
 
 - Renders actions as buttons or text links
 - Supports responsive display based on screen size
-- Automatic icon and label handling
-- Grouping options for button layouts
-- Integration with DynamicForms action system
-- `defaultConfirm` / `defaultReject` actions are automatically colored `primary` / `secondary`
+- Icon and label shown per `showIcon` / `showLabel`
+- Grouped button layouts
+- Renders `@dynamicforms/vue-forms` actions
+- `defaultConfirm` / `defaultReject` actions are colored `primary` / `secondary`
 
 ## Props
 
@@ -33,7 +32,7 @@ The component expects an array of `Action` objects created with `new Action()` w
 ```typescript
 interface ActionBreakpointOptions {
   name?: string;                    // Unique identifier for the action
-  label?: string;                   // Display text
+  label?: MaybeRefOrGetter<string>; // Display text: a string, a ref or a function returning one
   icon?: string;                    // Icon name, resolved by vue-cached-icon (e.g. ion-save-outline, mdi-content-save)
   renderAs?: ActionDisplayStyle;    // 'button' or 'text'
   showIcon?: boolean;               // Whether to show the icon
@@ -50,23 +49,20 @@ interface ActionBreakpointOptions {
 }
 ```
 
-A breakpoint states how the action is drawn at that width: `renderAs`, `label`, `icon`, `showLabel`, `showIcon` and
-`passthroughAttrs`. `name`, `defaultConfirm` and `defaultReject` are not among them - which key a modal resolves with,
-and which key fires the action, are properties of the action itself and do not depend on the width of the screen. They
-are stated once, in the base options, and `ActionBreakpointRenderOptions` is `ActionRenderOptions` without them.
+A breakpoint sets how the action is rendered at that width: `renderAs`, `label`, `icon`, `showLabel`, `showIcon` and
+`passthroughAttrs`. `name`, `defaultConfirm` and `defaultReject` do not depend on the screen width and are set only in
+the base options; `ActionBreakpointRenderOptions` is `ActionRenderOptions` without them.
 
-`passthroughAttrs` cascades key by key, like any plain object: a breakpoint restating `color` leaves the `density`
-below it standing.
+`passthroughAttrs` merges key by key: a breakpoint that sets `color` keeps the `density` of the smaller breakpoint.
 
-The `Action` object is the core component that defines how actions behave in the `df-actions` component. It extends the
-`Action` class of `@dynamicforms/vue-forms` to provide responsive behavior and visual configuration.
+This library's `Action` extends the `Action` class of `@dynamicforms/vue-forms` with the render options above.
 
 ### Actions declared in `@dynamicforms/vue-forms`
 
-The component reads what it draws off the action's value rather than through this subclass's accessors, so an action
-declared as the `Action` of `@dynamicforms/vue-forms` - which states a `label` and an `icon` and nothing else - is
-rendered as well: as a button showing whichever of the two it carries. What the value does not state comes out as the
-default, and a `label` or `icon` that is not a string is not drawn, since this library renders both as text.
+The component reads its render options from the action's value, not through this subclass's accessors. An `Action` of
+`@dynamicforms/vue-forms`, whose value holds only a `label` and an `icon`, therefore renders as a button showing the
+ones it has. Options the value does not hold take their defaults. A `label` that is a ref or a function is read while
+the action renders. A `label` or `icon` that is not a string after that is not rendered.
 
 ```typescript
 import { Action } from '@dynamicforms/vue-forms';
@@ -74,12 +70,12 @@ import { Action } from '@dynamicforms/vue-forms';
 const cancel = new Action({ value: { label: 'Cancel' }, actions: [cancelHandler] });
 ```
 
-The subclass earns its keep where an action is to render responsively, as a text link, or in a color the confirm /
-reject flags pick: those members live in `ActionRenderOptions`, which only it declares. An action that renders as a
-plain button needs none of them.
+The subclass is needed for breakpoint options, the text-link style and the confirm / reject colors; they are members
+of `ActionRenderOptions`, which only it declares.
 
-The read itself is exported: `getRenderOptionsForBreakpoint(value, breakpoint)` answers the `ActionRenderOptions` a
-value renders as at one breakpoint, defaults filled in and `label` / `icon` filtered by their flags.
+`getRenderOptionsForBreakpoint(value, breakpoint)` returns the `ResolvedActionRenderOptions` a value renders as at one
+breakpoint: `ActionRenderOptions` with the label read, defaults filled in and `label` / `icon` filtered by their
+flags.
 `Action.getBreakpointValue(breakpointRef)` is a `computed()` over the same call.
 
 ### Creating Actions
@@ -110,7 +106,7 @@ The `value` object defines the visual appearance and behavior:
 | Property | Type | Description |
 |----------|------|-------------|
 | `name` | `string` | Unique identifier for the action |
-| `label` | `string` | Display text |
+| `label` | `MaybeRefOrGetter<string>` | Display text. A ref or a function is read while the action renders, so `() => t('Save')` follows the locale |
 | `icon` | `string` | Icon name, resolved by `vue-cached-icon`; both `ion-` and `mdi-` prefixed names work |
 | `renderAs` | `ActionDisplayStyle` | How to render: `'button'` or `'text'` |
 | `showIcon` | `boolean` | Whether to display the icon |
@@ -121,20 +117,22 @@ The `value` object defines the visual appearance and behavior:
 
 Every one of these but `name`, `defaultConfirm` and `defaultReject` can also be stated per breakpoint.
 
-`label` and `icon` are `@dynamicforms/vue-forms`' own accessors: each reads the member of the same name off the
-value and each takes a write, which is an ordinary value change. `renderedLabel` and `renderedIcon` are this
-subclass's, and answer what the action draws — the text where `showLabel` states it is shown, the icon name where
-`showIcon` does, and `undefined` otherwise. `showLabel` and `showIcon` answer `false` where the text they govern is
-missing or empty, whatever the value holds. The breakpoint-resolved options `<df-actions>` renders from are
-filtered the same way, which is why the component reads none of these accessors.
+`icon` is an accessor of `@dynamicforms/vue-forms`: it reads the member of the same name from the value, and a write
+to it is a value change. `label` is this subclass's accessor over the same member: it returns the string the member
+gives now, reading a ref or calling a function, and a write to it is a value change. `defaultConfirm` and `defaultReject` are read-only accessors of vue-forms: each
+reads the member of the same name from the value and returns `false` where it is unset. `renderedLabel` and
+`renderedIcon` are this subclass's: the text where `showLabel` is true, the icon name where `showIcon` is true, and
+`undefined` otherwise. `showLabel` and `showIcon` return `false` where the label or icon is missing or empty,
+regardless of the value. The breakpoint-resolved options `<df-actions>` renders from are filtered the same way; the
+component reads none of these accessors.
 
 `access`, `busy` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` members
-of `@dynamicforms/vue-forms` (`access` and `visibility` settable at the top level of the `new Action()` parameters,
-or via `action.access` / `action.visibility` directly; `busy` is a read) - but `<df-actions>` reacts to them too:
+of `@dynamicforms/vue-forms` (`access` and `visibility` are set at the top level of the `new Action()` parameters or
+through `action.access` / `action.visibility`; `busy` is read-only). `<df-actions>` applies them:
 
-- an `access` other than `'editable'` disables the button (`<v-btn disabled>`), and so does a container above the
-  action that is not editable: what the button binds is `effectiveEnabled`.
-- `busy` disables the button and draws it `loading` for as long as a run of the action has yet to settle.
+- an `access` other than `'editable'`, on the action or a container above it, disables the button
+  (`<v-btn disabled>`); the button binds `effectiveEnabled`.
+- `busy` disables the button and renders it `loading` until every run of the action has settled.
 - `visibility: 'invisible'` keeps the button in the layout with an `invisible` class (`visibility: hidden`).
 - `visibility: 'hidden'` keeps the button in the DOM with a `d-none` class.
 - `visibility: 'suppress'` removes the button from the rendered list entirely.
@@ -143,11 +141,11 @@ or via `action.access` / `action.visibility` directly; `busy` is a read) - but `
 
 `ActionDisplayStyle` is `'button' | 'text'`:
 
-- **`'button'`**: Renders as a Material Design button with background (the default, `defaultDisplayStyle`)
-- **`'text'`**: Renders as a text link without background
+- **`'button'`**: a Vuetify button with a background (the default, `defaultDisplayStyle`)
+- **`'text'`**: a text link without a background
 
 Any other `renderAs` throws an `Error` naming the value when the action is rendered. `isActionDisplayStyle(value)`
-answers whether a value is one of the two, and `actionDisplayStyles` lists them.
+returns whether a value is one of the two, and `actionDisplayStyles` lists them.
 
 ### Responsive Breakpoints
 
@@ -183,15 +181,14 @@ const responsiveAction = new Action({
 });
 ```
 
-**Breakpoint inheritance**: Values cascade from smaller to larger breakpoints. If `lg` doesn't specify `showIcon`, it 
-inherits the value from `md` (or the closest smaller breakpoint that defines it). Note that the "original values" 
-(without breakpoint) represent the smallest breakpoint size.
+**Breakpoint inheritance**: values are inherited from smaller to larger breakpoints. If `lg` does not set `showIcon`,
+it takes the value of `md`, or of the closest smaller breakpoint that sets it. The base values (outside any
+breakpoint) apply to the smallest breakpoint.
 
-All of an action's options but one are single values, and a breakpoint restating one replaces it.
-`passthroughAttrs` is an object and merges key by key instead, so a breakpoint states the attrs it changes and
-inherits the rest. The class behind the cascade, `ResponsiveRenderOptions`, also carries options that are lists,
-for the subclasses that need them - see [responsive options](/examples/responsive-render-options) if you are
-writing one.
+Every option except `passthroughAttrs` is a single value, which a breakpoint replaces. `passthroughAttrs` is an object
+and merges key by key, so a breakpoint sets the attrs it changes and inherits the rest. The class behind the
+inheritance, `ResponsiveRenderOptions`, also supports list options for subclasses; see
+[responsive options](/examples/responsive-render-options).
 
 ### Action Execution
 
@@ -216,10 +213,9 @@ const saveAction = new Action({
 
 #### Awaiting a run
 
-`action.execute(params?)` runs the `ExecuteAction` chain and answers a promise carrying what the chain returned. The
-chain is entered synchronously - a handler has already run by the time `execute()` returns - but a handler that
-throws rejects that promise rather than throwing out of the call, so the failure is reported to whoever awaits the
-answer:
+`action.execute(params?)` runs the `ExecuteAction` chain and returns a promise of the chain's result. The chain is
+entered synchronously: a handler has run by the time `execute()` returns. A handler that throws rejects the promise;
+`execute()` itself does not throw:
 
 ```typescript
 try {
@@ -230,31 +226,28 @@ try {
 }
 ```
 
-A call that neither awaits the answer nor attaches a `.catch()` leaves the rejection unhandled: it surfaces through
-the runtime rather than through the form, and the action carries no trace of it. A handler rendered through
-`<df-actions>` needs no change on that count - the component calls `execute(event)` from a template event handler,
-and Vue attaches its own catch to the promise such a handler answers with, so the rejection goes to Vue's error
-handling instead of nowhere. Where the user has to be told what failed, catch it in the `ExecuteAction` handler.
+A call that neither awaits the promise nor attaches a `.catch()` leaves the rejection unhandled; the action records
+nothing of it. `<df-actions>` calls `execute(event)` from a template event handler, and Vue catches the promise such a
+handler returns, so the rejection goes to Vue's error handling. To show the user what failed, catch it in the
+`ExecuteAction` handler.
 
-See [handling a failed run](:vue-forms:/api/actions.html#handling-a-failed-run) for the whole contract.
+See [handling a failed run](:vue-forms:/api/action.html#handling-a-failed-run) for the whole contract.
 
 #### Reporting a run in flight
 
-`action.busy` is `true` from the call to `execute()` until the run it started settles, whether it resolves or
-rejects; overlapping runs are counted, so it stands until the last of them is done. `<df-actions>` binds it: the
-button is disabled and drawn `loading` while it stands, so a second click cannot start a second run of a handler
-that has yet to settle, and the wait is visible where the handler is slow.
+`action.busy` is `true` from the call to `execute()` until the run settles, whether it resolves or rejects;
+overlapping runs are counted, so it stays `true` until the last of them settles. `<df-actions>` binds it: the button is
+disabled and rendered `loading` while it is `true`, so a click cannot start a second run.
 
-`execute()` itself consults neither `enabled` nor `busy`, so this stops the click rather than the call: a
-programmatic `execute()` runs whatever either says, and an action that is to refuse an overlapping run refuses it in
-its own handler.
+`execute()` reads neither `enabled` nor `busy`, so only the click is prevented: a programmatic `execute()` runs
+regardless, and an action that refuses an overlapping run does so in its own handler.
 
 ### Predefined Actions
 
-The library provides common action templates:
+Predefined actions:
 
 ```typescript
-// Close action with default "Close" label and close icon
+// Close action with the "Close" label in the current translation and the close icon
 const closeAction = Action.closeAction();
 
 // Yes/No actions for confirmation dialogs
@@ -272,32 +265,28 @@ const customCloseAction = Action.closeAction({
 
 ### Default Confirm / Reject Actions
 
-`defaultConfirm` and `defaultReject` mark which action in a set represents "confirm" (e.g. Save, Yes, OK) versus
-"reject/dismiss" (e.g. Cancel, No). `<df-actions>` uses these flags to pick a sensible default button color -
-`primary` for `defaultConfirm`, `secondary` for `defaultReject` - so the important action in a set stands out
-without you having to set `color` by hand on every action:
+`defaultConfirm` and `defaultReject` mark the "confirm" action of a set (e.g. Save, Yes, OK) and the "reject/dismiss"
+one (e.g. Cancel, No). `<df-actions>` colors them `primary` and `secondary` by default:
 
 ```typescript
 const yes = Action.yesAction({ value: { defaultConfirm: true } });   // colored primary
 const no = Action.noAction({ value: { defaultReject: true } });      // colored secondary
 
-// A single close action can be both, e.g. when there's only one way to close
+// A single close action can be both
 const close = Action.closeAction({ value: { defaultConfirm: true, defaultReject: true } });
 ```
 
 At most one action in a given set should set `defaultConfirm`, and at most one should set `defaultReject`.
 
-> **Side note:** if you're using [`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:), its
-> [`<df-modal>`](:vuetify-modal-form-kit:/api/df-modal.html#keyboard-shortcuts) component also reads these same flags
-> off the actions passed to its `actions` prop, to decide which action Enter / Escape should trigger. Since
-> `<df-modal>`'s `actions` slot is normally rendered via `<df-actions>` too, the two concerns - keyboard shortcut
-> and default button color - line up for free.
+> [`<df-modal>`](:vuetify-modal-form-kit:/api/df-modal.html#keyboard-shortcuts) of
+> [`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:) reads the same flags from the actions in its
+> `actions` prop to select the actions of Enter and Escape. Its `actions` slot renders through `<df-actions>`, so the
+> keyboard shortcut and the button color are set by the same flag.
 
 ### Passthrough Attributes
 
-`passthroughAttrs` forwards arbitrary props straight to the rendered `<v-btn>`, taking precedence over
-`<df-actions>`'s own computed props (`variant`, `color`, `disabled`, `loading`). Use it for anything `<v-btn>` supports that
-isn't already modeled by `ActionRenderOptions`:
+`passthroughAttrs` passes props to the rendered `<v-btn>` and takes precedence over `<df-actions>`'s computed props
+(`variant`, `color`, `disabled`, `loading`). It covers any `<v-btn>` prop that `ActionRenderOptions` does not:
 
 ```typescript
 const deleteAction = new Action({
@@ -350,16 +339,14 @@ const submitAction = new Action({
 });
 ```
 
-`form` here is a `Group`: it hands out what it sends through the `value` property, or what it holds through
-`fullValue` where disabled members have to be in the payload. Each member's `access` decides what `value` carries
-for it; `visibility` changes neither.
+`form` here is a `Group`: `value` is what it sends, and `fullValue` what it holds, disabled members included. Each
+member's `access` sets what `value` contains for it; `visibility` affects neither.
 
-This approach separates visual presentation (the `Action` and its render options) from business logic (the
-`ExecuteAction` handlers), and lets each screen size get the presentation that fits it.
+The presentation (the `Action` and its render options) is separate from the logic (the `ExecuteAction` handlers).
 
 ## Responsive Behavior
 
-The component automatically adapts to different screen sizes based on the breakpoint configuration:
+The component applies the options of the current breakpoint:
 
 ```javascript
 const saveAction = new Action({
@@ -384,7 +371,7 @@ With this configuration:
 
 ## Button Grouping
 
-The `showAsGroup` property allows you to control the visual grouping of buttons:
+`showAsGroup` sets the grouping of buttons:
 
 - `'no'`: Buttons are displayed as separate elements
 - `'grouped'`: Buttons are grouped with borders

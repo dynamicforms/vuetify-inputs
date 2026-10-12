@@ -1,22 +1,27 @@
 # df-color Component
 
-The df-color component provides a color selection field that integrates with both Vuetify and DynamicForms. It offers 
-a visual color picker interface with hex color input support.
+`df-color` is a hex color field with a swatch and Vuetify's color picker.
 
 ## Basic Usage
 
-Below is an example of the df-color component used with DynamicForms:
+`df-color` bound to a vue-forms field:
 
 <color-basic/>
 
 ## Features
 
-- Integration with `@dynamicforms/vue-forms` for state management and validation
-- Visual color picker interface based on Vuetify's color picker
-- Support for hex color input
-- Visual color indicator preview
-- Built-in hex format check for the uncontrolled (v-model) case
-- Support for clearing the color value
+- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
+- Vuetify's color picker in a menu
+- Hex color input
+- A swatch of the current color
+- Built-in hex format check for the uncontrolled (v-model) case, reported as an `invalid_hex_color` error
+- Clearing the value under `allowNull`
+
+## Picking a value
+
+A color chosen in the picker is written to the field when it is confirmed: with OK, or with a double-click on the
+color area. Cancel and closing the menu leave the field as it was. A confirmed color marks the field
+touched. A value typed into the field is written as it is typed.
 
 ## Props
 
@@ -42,23 +47,21 @@ alpha channel (e.g., `#FF0000FF`).
 
 ## Validation
 
-The component carries one built-in rule, and it applies only when no `control` is bound: with a bound field the rule
-passes unconditionally, and the field's own validators decide whether the value is acceptable.
+Without a `control`, the component checks the format of the value itself. It accepts a string of 3, 4, 6 or 8
+hexadecimal digits with an optional leading `#`: `#f00`, `f00`, `#ff0000`, `#ff0000ff` and `ff0000ff` all pass. An
+empty value passes only when `allowNull` is set. Any other value gets an error of code `invalid_hex_color` with the
+detail `Not a valid hex string.`, shown once the field is touched and rendered like any other error
+(see [Translating errors](/examples/localisation#translating-errors)).
 
-Uncontrolled, the rule accepts a string of 3, 4, 6 or 8 hexadecimal digits with an optional leading `#` - `#f00`,
-`f00`, `#ff0000`, `#ff0000ff` and `ff0000ff` all pass. An empty value passes only when `allowNull` is set. Anything
-else reports `Not a valid hex string.`
-
-A bound field validates through the DynamicForms Field:
+With a bound `control`, the component does not check the value; the field's validators do:
 
 ```javascript
 const colorField = new Field({
   value: '#FF0000',
   validators: [
     new Validators.Validator((value) => {
-      // Your custom validation logic
       if (value && !value.startsWith('#')) {
-        return [new ValidationErrorText('Color must start with #')];
+        return [new ValidationError('hash_prefix', {}, 'Color must start with #')];
       }
       return null; // Return null for valid values
     })
@@ -83,7 +86,7 @@ This component emits all [common events from InputBase](./input-base):
 </template>
 
 <script setup>
-import { Field, ValidationErrorText, Validators } from '@dynamicforms/vue-forms';
+import { Field, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { DfColor } from '@dynamicforms/vuetify-inputs';
 
 // Valid brand colors
@@ -95,7 +98,7 @@ const colorField = new Field({
     new Validators.Validator((value) => {
       if (!value) return null;
       if (!brandColors.includes(value)) {
-        return [new ValidationErrorText('Please select a color from the brand palette')];
+        return [new ValidationError('not_brand_color', { allowedValues: brandColors }, 'Please select a color from the brand palette')];
       }
       return null;
     })

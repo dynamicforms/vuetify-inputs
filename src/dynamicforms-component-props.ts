@@ -1,12 +1,15 @@
-import { Action, ClassTypes, MdString, ValidationError } from '@dynamicforms/vue-forms';
+import { Action } from '@dynamicforms/vue-forms';
 import { type Locale } from 'date-fns';
 import { MaybeRef } from 'vue';
 import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
 
 import {
   BaseProps,
+  type ClassTypes,
+  type ErrorInput,
   FileComms,
   Label,
+  type RenderableValue,
   SelectChoice,
   SelectFetchChoices,
   VuetifyButtonSize,
@@ -67,11 +70,20 @@ export interface DfInputProps extends BaseProps {
   max?: number;
 }
 
+export interface MessagesWidgetProps {
+  /** A plain text, or the items to render, each in its own element: a `RenderableValue` as its content, an error
+   * as `errorText()` gives it. */
+  message: string | readonly (RenderableValue | ErrorInput)[];
+  /** Classes for every rendered item, beside the item's own `extraClasses`. */
+  classes?: ClassTypes;
+}
+
 export interface DfInputHintProps {
-  /** The errors to render. Rendered in place of {@link message} whenever there is one. */
-  errors?: string | ValidationError[];
+  /** The errors to render, in place of {@link message} whenever there is one. A string is text in the user's
+   * language; an error description may lack any member. */
+  errors?: string | readonly (RenderableValue | ErrorInput)[];
   /** The message to render, shown while there is no error. */
-  message?: string | ValidationError[];
+  message?: string | RenderableValue[];
   /** Classes for the rendered errors. Defaults to `text-error`. */
   errorClasses?: ClassTypes;
   /** Classes for the rendered message. Defaults to no class. */
@@ -79,9 +91,10 @@ export interface DfInputHintProps {
 }
 
 export interface DfLabelProps {
-  /** The slot data Vuetify hands a `#label` slot. Where it is given, its `label` is what is rendered. */
-  data?: DefaultInputSlot & { label?: string | MdString };
-  /** The label to render where no {@link data} is given: its text, and the icon it carries. */
+  /** The slot data Vuetify hands a `#label` slot. Its `label`, the label's text, is rendered where {@link label} has
+   * no content. */
+  data?: DefaultInputSlot & { label?: string };
+  /** The label to render: its content in any of the four forms, and the icon it carries. */
   label: Label;
   /** Whether the label wraps over several lines. It is rendered on one line by default. */
   allowWrap?: boolean;

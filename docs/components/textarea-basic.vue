@@ -12,12 +12,10 @@
         />
 
         <div class="mt-4">
-          <v-btn @click="toggleEnabled" color="primary" class="mr-2">
+          <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ descriptionField.enabled ? 'Disable' : 'Enable' }} Field
           </v-btn>
-          <v-btn @click="resetField" color="secondary">
-            Reset Field
-          </v-btn>
+          <v-btn color="secondary" @click="resetField"> Reset Field </v-btn>
         </div>
 
         <div class="mt-4">
@@ -31,6 +29,7 @@
 
 <script setup>
 import { Field } from '@dynamicforms/vue-forms';
+
 import { DfTextArea } from '../../src';
 
 const descriptionField = new Field({

@@ -6,33 +6,15 @@
         <v-form @submit.prevent>
           <v-row>
             <v-col cols="12" md="4">
-              <df-input
-                :control="form.fields.flights"
-                input-type="number"
-                label="Flights"
-                :min="0"
-                :step="50"
-              />
+              <df-input :control="form.fields.flights" input-type="number" label="Flights" :min="0" :step="50" />
             </v-col>
 
             <v-col cols="12" md="4">
-              <df-input
-                :control="form.fields.hotel"
-                input-type="number"
-                label="Hotel"
-                :min="0"
-                :step="50"
-              />
+              <df-input :control="form.fields.hotel" input-type="number" label="Hotel" :min="0" :step="50" />
             </v-col>
 
             <v-col cols="12" md="4">
-              <df-input
-                :control="form.fields.extras"
-                input-type="number"
-                label="Extras"
-                :min="0"
-                :step="50"
-              />
+              <df-input :control="form.fields.extras" input-type="number" label="Extras" :min="0" :step="50" />
             </v-col>
           </v-row>
 
@@ -42,46 +24,28 @@
             hint="Reveals the section below"
           />
 
-          <!-- The whole section follows the visibility of the traveller group -->
-          <v-card
-            v-if="traveller.visibility !== 'suppress'"
-            variant="outlined"
-            class="pa-4 mt-2"
-          >
+          <!-- The section is rendered by the visibility of the traveller group -->
+          <v-card v-if="traveller.visibility !== 'suppress'" variant="outlined" class="pa-4 mt-2">
             <div class="text-subtitle-1 mb-2">Second traveller</div>
             <v-row>
               <v-col cols="12" md="6">
-                <df-input
-                  :control="traveller.fields.name"
-                  label="Full name"
-                />
+                <df-input :control="traveller.fields.name" label="Full name" />
               </v-col>
 
               <v-col cols="12" md="6">
-                <df-input
-                  :control="traveller.fields.ticket"
-                  input-type="number"
-                  label="Ticket"
-                  :min="0"
-                  :step="50"
-                />
+                <df-input :control="traveller.fields.ticket" input-type="number" label="Ticket" :min="0" :step="50" />
               </v-col>
             </v-row>
           </v-card>
 
           <div class="mt-4">
             <strong>Total:</strong> {{ total }} € of {{ budgetLimit }} €
-            <v-chip
-              :color="form.valid ? 'success' : 'error'"
-              size="small"
-              class="ml-2"
-            >
+            <v-chip :color="form.valid ? 'success' : 'error'" size="small" class="ml-2">
               {{ form.valid ? 'Within budget' : 'Over budget' }}
             </v-chip>
           </div>
 
-          <!-- The group-level validator writes here, so the message belongs to the form, not to any single field. It is
-               shown by the rule the inputs follow: once a field of the form has been touched -->
+          <!-- The group-level validator's errors, shown once a field of the form is touched -->
           <div class="mt-1">
             <df-input-hint :errors="formErrors" />
           </div>
@@ -99,37 +63,36 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
 import {
   ConditionalAccessAction,
   ConditionalVisibilityAction,
   Field,
   Group,
-  MdString,
   Operator,
   Statement,
-  ValidationErrorRenderContent,
+  ValidationError,
   Validators,
 } from '@dynamicforms/vue-forms';
-import { DfCheckbox, DfInput, DfInputHint, useShownErrors } from '../../src'
+import { computed } from 'vue';
+
+import { DfCheckbox, DfInput, DfInputHint, useShownErrors } from '../../src';
 
 const budgetLimit = 2000;
 
 // The checkbox that decides whether the second traveller section is on the form
 const addTraveller = new Field({ value: false });
 
-// A nested group: its fields are addressed as traveller.fields.name, and while it is sent its value is a member of
-// form.value
-const traveller = new Group({
-  name: new Field({ value: '' }),
-  ticket: new Field({ value: 400 }),
-});
-
-// Two actions on the group, over one statement: visibility decides whether the template draws the section, access
-// whether the form sends it - and validates it
 const travelling = new Statement(addTraveller, Operator.EQUALS, true);
-traveller.registerAction(new ConditionalVisibilityAction(travelling));
-traveller.registerAction(new ConditionalAccessAction(travelling));
+
+// A nested group: its fields are addressed as traveller.fields.name, and while it is sent its value is a member of
+// form.value. Two actions on it, over one statement: visibility decides whether the template draws the section,
+// access whether the form sends it - and validates it
+const traveller = new Group(
+  { name: new Field({ value: '' }), ticket: new Field({ value: 400 }) },
+  {
+    actions: [new ConditionalVisibilityAction(travelling), new ConditionalAccessAction(travelling)],
+  },
+);
 
 const form = new Group({
   flights: new Field({ value: 900 }),
@@ -149,15 +112,20 @@ function tripTotal() {
 }
 
 // A validator on the group itself: the rule spans several fields, so the error belongs to the group
-form.registerAction(new Validators.Validator(() => {
-  const total = tripTotal();
-  if (total <= budgetLimit) return null;
-  return [
-    new ValidationErrorRenderContent(
-      new MdString(`The trip totals **${total} €**, which is ${total - budgetLimit} € over the budget.`),
-    ),
-  ];
-}));
+form.registerAction(
+  new Validators.Validator(() => {
+    const total = tripTotal();
+    if (total <= budgetLimit) return null;
+    const over = total - budgetLimit;
+    return [
+      new ValidationError(
+        'over_budget',
+        { total, over },
+        `The trip totals ${total} €, which is ${over} € over the budget.`,
+      ),
+    ];
+  }),
+);
 
 // group.value is reactive, so both the total and the JSON dump follow every keystroke
 const total = computed(() => tripTotal());
