@@ -22,11 +22,14 @@ non-whitespace character, and `message` otherwise. A whitespace-only string is n
 to keep a Vuetify message slot rendered shows the hint. The classes are `errorClasses` while the row renders errors and
 `messageClasses` while it renders the message.
 
-`ErrorInput` is `string | MdString | Partial<ErrorDescription>`. `ErrorDescription` is vue-forms' read-only shape of
-an error (`code`, `params`, `detail`, `origin`), which every `ValidationError` implements. A string and an `MdString`
-are text in the user's language; an `MdString` renders as markdown. An error description may lack any member: `toErrorDescription(error)` sets a missing `code` to `''`,
-`params` to `{}`, `detail` to `''` and `origin` to `'application'`. `ClassTypes` is `ClassType | ClassType[]`, where a `ClassType` is a class name, an array
-of class names, or a `Record<string, boolean>` of conditional classes. Both `ClassTypes` and `RenderableValue` are
+`ErrorInput` is `RenderContentNonCallable | Partial<ErrorDescription>`. Content in any of the four forms - a string,
+an `MdString`, an `HtmlString` or a `SimpleComponentDef` - is an error already in the user's language and renders as
+it is. `ErrorDescription` is vue-forms' read-only shape of an error (`code`, `params`, `detail`, `origin`), which every
+`ValidationError` implements. An error description may lack any member: `toErrorDescription(error)` sets a missing
+`code` to `''`, `params` to `{}`, `detail` to `''` and `origin` to `'application'`.
+
+`ClassTypes` is `ClassType | ClassType[]`, where a `ClassType` is a class name, an array of class names, or a
+`Record<string, boolean>` of conditional classes. Both `ClassTypes` and `RenderableValue` are
 exported by this library; see [Render content](#render-content).
 
 ## Rendering
@@ -35,7 +38,7 @@ exported by this library; see [Render content](#render-content).
 
 - a `string` renders as a single `<span>`
 - an array renders one node per item
-- a string item renders as written, an `MdString` item as markdown
+- a content item - a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef` - renders as it is
 - an error without a code renders as its `detail`
 - an error with a code renders as the content the `errorText` setting returns for it, and as its `detail` where that
   setting is not given or returns `undefined` (see [Translating errors](/examples/localisation#translating-errors))
@@ -82,7 +85,9 @@ class RenderableValue {
 | `SimpleComponentDef` | the component named by `componentName`, with `componentProps` as its props. A common HTML element name renders as that element; any other name is resolved as a globally registered component. An `innerHTML` prop is dropped |
 
 A `RenderableValue` reads a ref or a function on every render, so a changed content is rendered without constructing a
-new value. `isSimpleComponentDef(content)` and `isCallableFunction(content)` tell the forms apart.
+new value. `isRenderContent(value)`, `isSimpleComponentDef(content)` and `isCallableFunction(content)` tell the forms
+apart. `renderContentText(content)` returns the text of content where only text is taken: a string and an `MdString`
+as written, an `HtmlString` without its tags, a component as `''`.
 
 `MessagesWidget` takes two props:
 

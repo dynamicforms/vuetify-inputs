@@ -127,6 +127,14 @@ describe('MessagesWidget', () => {
       expect(wrapper.find('strong').text()).toBe('Already');
     });
 
+    it('renders HtmlString and component items as they are, without asking errorText', () => {
+      const message = [new HtmlString('<em>HTML</em>'), { componentName: 'span', componentProps: { class: 'custom' } }];
+      const wrapper = buildWrapper({ message }, { errorText });
+
+      expect(wrapper.find('em').text()).toBe('HTML');
+      expect(wrapper.find('span.custom').exists()).toBe(true);
+    });
+
     it('renders an error without a code as its detail, without asking errorText', () => {
       const divs = buildWrapper({ message: [{ detail: 'Only a detail' }] }, { errorText }).findAll('div');
 

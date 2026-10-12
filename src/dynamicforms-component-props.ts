@@ -9,7 +9,6 @@ import {
   type ErrorInput,
   FileComms,
   Label,
-  type MdString,
   type RenderableValue,
   SelectChoice,
   SelectFetchChoices,
@@ -92,9 +91,10 @@ export interface DfInputHintProps {
 }
 
 export interface DfLabelProps {
-  /** The slot data Vuetify hands a `#label` slot. Where it is given, its `label` is what is rendered. */
-  data?: DefaultInputSlot & { label?: string | MdString };
-  /** The label to render where no {@link data} is given: its text, and the icon it carries. */
+  /** The slot data Vuetify hands a `#label` slot. Its `label`, the label's text, is rendered where {@link label} has
+   * no content. */
+  data?: DefaultInputSlot & { label?: string };
+  /** The label to render: its content in any of the four forms, and the icon it carries. */
   label: Label;
   /** Whether the label wraps over several lines. It is rendered on one line by default. */
   allowWrap?: boolean;

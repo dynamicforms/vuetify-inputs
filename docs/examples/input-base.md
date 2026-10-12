@@ -12,11 +12,11 @@ All input components inherit the following properties:
 |------------------|-------------------------------|----------------|----------------------------------------------------------------------------------------------------|
 | control          | `FieldBase<T>`                | `undefined`    | [vue-forms](:vue-forms:) field object for state management integration                             |
 | modelValue       | `T`                           | `undefined`    | The field value (v-model) when used without control                                                |
-| label            | `string \| Label \| MdString` | `undefined`    | Input field label. supports icons by creating a Label class (see below)                            |
+| label            | `RenderContentNonCallable \| Label` | `undefined`    | The label: a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef`, or a `Label`, which adds an icon (see [Label](#label)) |
 | hint             | `string`                      | `undefined`    | Hint text displayed below the input field                                                          |
 | helpText         | `string`                      | `undefined`    | Placed in `vuetifyBindings.helpText`, which no component renders; `df-select` reads its presence to set `aria-describedby` |
 | placeholder      | `string`                      | `undefined`    | Placeholder text displayed when the input is empty                                                 |
-| errors           | `string[]`                    | `undefined`    | List of errors (used only without control)                                                         |
+| errors           | `ErrorInput[]`                | `undefined`    | The errors, used only without a control: content in any of the four forms or error descriptions (see [df-input-hint](/examples/df-input-hint#props)) |
 | enabled          | `boolean`                     | `undefined`    | The input is enabled unless the prop is `false` (used only without control)                        |
 | visibility       | `Visibility`                  | `undefined`    | `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, see [Display Modes](#display-modes)           |
 | cssClass         | `string`                      | `undefined`    | Additional CSS classes                                                                             |
@@ -157,8 +157,9 @@ once. The errors a component displays are a subset of them, `shownErrors`, selec
 - every other error (a validator's, or one the application wrote) once the field is touched. `form.touched = true`
   sets every member touched, which shows all errors, e.g. on a submit attempt.
 
-Without a control, the errors come from the `errors` prop and are shown once the component is touched. Each string
-becomes a `ValidationError` with an empty `code`, the string as its `detail` and the origin `'application'`.
+Without a control, the errors come from the `errors` prop and are shown once the component is touched. Each is
+selected as the `ValidationError` `toErrorDescription()` gives for it - content as an error without a code, its text
+as the `detail` - and rendered as it was given.
 
 What a shown error renders as is selected by its `code`; see
 [df-input-hint](/examples/df-input-hint#rendering).
@@ -209,16 +210,19 @@ case of `df-date-time` - both the date and the time text field.
 
 ## Label
 
-A label is a string, as in Vuetify, or a `Label` instance, which adds an icon: `new Label('my label text',
-'mdi-abacus')` renders the `mdi-abacus` icon next to the text.
+A label is content in any of the four forms - a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef`
+(see [Render content](/examples/df-input-hint#render-content)) - or a `Label` instance, which adds an icon:
+`new Label('my label text', 'mdi-abacus')` renders the `mdi-abacus` icon next to the text. Vuetify is given the
+label's text (`renderContentText`): a string and an `MdString` as written, an `HtmlString` without its tags, a
+component as `''`.
 
 Declaration of the `Label` class:
 ```typescript
 export class Label {
   constructor(
-    public text: string, 
-    public icon?: string, 
-    public iconComponent: string = 'v-icon'
+    public text: RenderContentNonCallable,
+    public icon?: string,
+    public iconComponent: string = 'v-icon',
   ) {}
 }
 ```
@@ -374,7 +378,7 @@ const { value, shownErrors } = useInputBase<string>(props, emits, () =>
 | value | `WritableComputedRef<T>` | The value. Reads from the control, or from `modelValue`, or from an internal ref when neither is given. Writing writes the control, keeps the internal ref in step and emits `update:modelValue` with the value the control ended up holding |
 | valid | `ComputedRef<boolean>` | `control.valid`, or `true` when there is no control |
 | errors | `ComputedRef<ValidationError[]>` | `control.errors`, or the `errors` prop with each string wrapped in `new ValidationError('', {}, text, 'application')` |
-| shownErrors | `ComputedRef<ValidationError[]>` | The errors to show now, see [Shown errors](#shown-errors). This is what gets bound to `DfInputHint` |
+| shownErrors | `ComputedRef<ErrorInput[]>` | The errors to show now, see [Shown errors](#shown-errors): the control's errors, or the `errors` prop's as they were given. This is what gets bound to `DfInputHint` |
 | enabled | `ComputedRef<boolean>` | `control.effectiveEnabled` — `false` where the element or any container above it is disabled — or `props.enabled !== false` when there is no control |
 | visibility | `ComputedRef<Visibility>` | The resolved visibility, see [Display Modes](#display-modes) |
 | isRendered | `ComputedRef<boolean>` | `false` only for `'suppress'`; it is the `v-if` on the component's root element |

@@ -45,6 +45,20 @@ export function isSimpleComponentDef(content?: RenderContentRef): content is Sim
   return typeof value === 'object' && value !== null && 'componentName' in value;
 }
 
+/** True where `value` is content in one of the four forms: a string, an `MdString`, an `HtmlString` or a component. */
+export function isRenderContent(value: unknown): value is RenderContentNonCallable {
+  return typeof value === 'string' || value instanceof String || isSimpleComponentDef(value as RenderContentRef);
+}
+
+/**
+ * The text of `content` where only text is taken, such as an `aria-label`: a string and an `MdString` as written, an
+ * `HtmlString` without its tags, and a component as `''`.
+ */
+export function renderContentText(content: RenderContentNonCallable): string {
+  if (content instanceof HtmlString) return content.toString().replace(/<[^>]*>/g, '');
+  return isSimpleComponentDef(content) ? '' : content.toString();
+}
+
 /** True where `content` is a function answering the content. */
 export function isCallableFunction(content?: RenderContentRef): content is RenderContentCallable {
   return typeof unref(content) === 'function';

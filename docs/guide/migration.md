@@ -91,7 +91,8 @@ With vue-i18n's `t`, the strings follow a locale switch without another `transla
 npm install @dynamicforms/translatable@^0.3.0
 ```
 
-An error without a code, and a string, render as written; `errorText` is not called for them.
+An error without a code, and content (a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef`), render as
+written; `errorText` is not called for them.
 
 ### `<df-color>` reports an error of code `invalid_hex_color`
 
@@ -117,7 +118,8 @@ again on a locale switch to pick up its label can be built once. An application 
 
 ### Errors the components create
 
-- A string of the `errors` prop is `new ValidationError('', {}, text, 'application')`.
+- An error of the `errors` prop is selected as `new ValidationError('', {}, text, 'application')` and rendered as it
+  was given. `useInputBase()`'s `shownErrors` holds it as given, so its type is `ErrorInput[]`.
 - `setFileGoneError()` sets `new ValidationError('file_gone', {}, text, 'server')`.
 
 ### `defaultConfirm` and `defaultReject` answer a boolean

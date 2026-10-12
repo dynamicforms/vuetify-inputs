@@ -1,14 +1,16 @@
 import Form, { ValidationError } from '@dynamicforms/vue-forms';
-import { isEmpty, isString } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 import { computed, inject, nextTick, ref, shallowRef, toRaw } from 'vue';
 
-import type { MdString } from './render-content';
+import { type ErrorInput, toErrorDescription } from './error-text';
+import { type RenderContentNonCallable, renderContentText } from './render-content';
 import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 import { selectShownErrors } from './shown-errors';
 
+/** A field's label: its content, and an icon shown before it. */
 export class Label {
   constructor(
-    public text: string,
+    public text: RenderContentNonCallable,
     public icon?: string,
     public iconComponent: string = 'v-icon',
   ) {}
@@ -36,7 +38,7 @@ export type VuetifyButtonSize = 'x-small' | 'small' | 'default' | 'large' | 'x-l
  */
 declare module '@dynamicforms/vue-forms' {
   interface Extras {
-    label?: string | Label | MdString;
+    label?: RenderContentNonCallable | Label;
     placeholder?: string;
     helpText?: string;
     hint?: string;
@@ -49,8 +51,8 @@ declare module '@dynamicforms/vue-forms' {
 export interface BaseProps<T = any> {
   control?: Form.FieldBase<T>;
   modelValue?: T;
-  label?: string | Label | MdString;
-  errors?: string[];
+  label?: RenderContentNonCallable | Label;
+  errors?: ErrorInput[];
   placeholder?: string;
   helpText?: string;
   hint?: string;
@@ -133,16 +135,24 @@ export function useInputBase<T = any>(
   });
   const touched = props.control ? controlTouch : ref(false);
   const valid = computed(() => (props.control ? props.control.valid : true));
+  // an error of the errors prop is selected as a ValidationError and rendered as it was given
+  const givenErrors = computed(() => {
+    const given = new Map<ValidationError, ErrorInput>();
+    (props.errors ?? []).forEach((input) => {
+      const { code, params, detail, origin } = toErrorDescription(input);
+      given.set(new ValidationError(code, params, detail, origin), input);
+    });
+    return given;
+  });
   const errors = computed(() =>
-    props.control
-      ? props.control.errors
-      : [
-          ...(props.errors || []).map((error) => new ValidationError('', {}, error, 'application')),
-          ...(componentErrors?.() ?? []),
-        ],
+    props.control ? props.control.errors : [...givenErrors.value.keys(), ...(componentErrors?.() ?? [])],
   );
   // what the user is shown, by the rule selectShownErrors states and the application's shownErrors setting
-  const shownErrors = computed(() => selectShownErrors(errors.value, props.control, touched.value, settings));
+  const shownErrors = computed((): ErrorInput[] =>
+    selectShownErrors(errors.value, props.control, touched.value, settings).map(
+      (error) => givenErrors.value.get(error) ?? error,
+    ),
+  );
   const anyErrors = computed(() => (shownErrors.value.length > 0 ? ' ' : undefined));
   // a field inside a disabled section is drawn disabled: effectiveEnabled is false where the element or any
   // container above it is disabled, which is the question a rendered input asks
@@ -167,7 +177,7 @@ export function useInputBase<T = any>(
 
   const label = computed((): Label => {
     const stated = props.label ?? extra.value.label;
-    return isString(stated || '') ? new Label(<string>stated || '') : <Label>stated;
+    return stated instanceof Label ? stated : new Label(stated ?? '');
   });
   const placeholder = computed(() => props.placeholder ?? extra.value.placeholder ?? '');
   const helpText = computed(() => props.helpText ?? extra.value.helpText ?? '');
@@ -204,7 +214,7 @@ export function useInputBase<T = any>(
       density: boundDensity.value,
       variant: variant.value,
 
-      label: label.value.text,
+      label: renderContentText(label.value.text),
       errorMessages: anyErrors.value,
       // 'error-count': errors?.value.length || 0,
       readonly: !enabled.value,
