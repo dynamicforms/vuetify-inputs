@@ -39,7 +39,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | inputType         | `'datetime'` \| `'date'` \| `'time'` | `'datetime'` | Input type - date and time, date only, or time only  |
 | displayFormatDate | `string` | `'P'`        | Date display format (date-fns format)              |
 | displayFormatTime | `string` | `'p'`        | Time display format (date-fns format)              |
-| locale            | `Locale` | `undefined`  | date-fns locale object for formatting and parsing. Falls back to global `DateTimeLocaleConfig` if not provided |
+| locale            | `Locale` | `undefined`  | date-fns locale object for formatting and parsing. Without it, the `dateTimeLocale` setting applies, and without that `DateTimeLocaleConfig` |
 
 ### Inherited Props
 
@@ -83,7 +83,8 @@ The locale is a date-fns locale object, set in one of two ways:
 
 ### 1. Global Locale Configuration
 
-`DateTimeLocaleConfig` sets the locale of all `df-date-time` components:
+`DateTimeLocaleConfig` sets the locale of every `df-date-time` component whose app gives no `dateTimeLocale` setting
+(see [Configuration](/examples/configuration)) and that has no `locale` prop:
 
 ```vue
 <script setup>

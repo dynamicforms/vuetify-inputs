@@ -2,7 +2,7 @@
   <div class="editor-container">
     <rtf-toolbar v-if="clientRendered" :ref="setToolbar" :editor="editor" :button-size="toolbarButtonSize" />
     <editor-content v-if="clientRendered" class="editor-container__editor" :editor="editor" />
-    <!-- on the server and until the editor is created, the value's text -->
+    <!-- on the server, and until it renders in the browser, the value's text -->
     <div v-else class="editor-container__editor">{{ valueText }}</div>
     <bubble-menu v-if="editor" :editor="editor" :should-show="bubbleShouldShow">
       <div class="rtf-bubble-menu">
@@ -44,7 +44,7 @@ import { CachedIcon } from 'vue-cached-icon';
 import { useClientRendered } from '../client-rendered';
 import { VuetifyButtonSize } from '../input-base';
 import { HtmlString, renderContentText } from '../render-content';
-import { translate } from '../translations';
+import { useTranslate } from '../translations';
 
 import { ClassAttribute, Marker, Spoiler } from './block-styles';
 import { createImagePasteHandler } from './image-paste';
@@ -82,7 +82,8 @@ function setToolbar(el: unknown) {
   toolbarRef.value = el as ComponentPublicInstance | null;
 }
 const clientRendered = useClientRendered();
-const valueText = computed(() => renderContentText(new HtmlString(props.modelValue)));
+const valueText = computed(() => renderContentText(new HtmlString(props.modelValue ?? '')));
+const t = useTranslate();
 let toolbarResizeObserver: ResizeObserver | undefined;
 
 // the toolbar is rendered once the component renders in the browser, at mount or after it
@@ -197,7 +198,7 @@ function toggleBubbleLink() {
     return;
   }
 
-  const href = window.prompt(translate('LinkUrl'));
+  const href = window.prompt(t('LinkUrl'));
   if (href) instance.chain().focus().extendMarkRange('link').setLink({ href }).run();
 }
 </script>

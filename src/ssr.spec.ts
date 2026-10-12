@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { Field } from '@dynamicforms/vue-forms';
+import { Field, ValidationError } from '@dynamicforms/vue-forms';
 import { renderToString } from '@vue/server-renderer';
 import { de } from 'date-fns/locale/de';
 import { describe, expect, it, vi } from 'vitest';
@@ -47,6 +47,21 @@ describe('server-side rendering', () => {
     const html = await render(DfRtfEditor, { label: 'Body', modelValue: '<p>Hello <b>world</b></p>' });
 
     expect(html).toContain('Hello world');
+  });
+
+  it('renders an empty rich-text value as no text', async () => {
+    const html = await render(DfRtfEditor, { label: 'Body', control: new Field<string | null>({ value: null }) });
+
+    expect(html).not.toContain('>null<');
+  });
+
+  it("renders a select's errors", async () => {
+    const control = new Field({ value: 1 });
+    control.errors = [new ValidationError('taken', {}, 'This number is taken', 'server')];
+
+    const html = await render(DfSelect, { label: 'Number', choices: [{ id: 1, text: 'One' }], control });
+
+    expect(html).toContain('This number is taken');
   });
 
   it('formats a date with the dateTimeLocale setting of the app', async () => {

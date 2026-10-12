@@ -108,6 +108,13 @@ A color chosen in the picker is written to the field with OK or a double-click o
 date in `<df-date-time>` is. Cancel and closing the menu leave the field as it was. A value typed into the field is
 written as it is typed.
 
+### The pickers' buttons are the library's strings
+
+The Cancel and OK of `<df-date-time>`'s and `<df-color>`'s pickers are the library's strings `Cancel` and `Ok`, in
+place of Vuetify's `$vuetify.confirmEdit.cancel` and `$vuetify.confirmEdit.ok`. An application that translated them
+through Vuetify's locale adds the two keys to the translations it gives the library (see
+[Localisation](/examples/localisation#the-strings-the-library-owns)); until then they render in English.
+
 ### Action labels follow the locale
 
 `Action.closeAction()`, `yesAction()` and `noAction()` label the action with `() => translate(key)`. An action built
@@ -158,6 +165,8 @@ nothing. They answered `undefined`.
 8. Move errors passed in `<df-input-hint>`'s `message` to `errors`.
 9. Read `Label.text` through `renderContentText()` where a string is needed, and an action's label through
    `action.label`.
+10. Add `Cancel` and `Ok` to the library's translations where the pickers' buttons were translated through Vuetify.
+11. Install `vue-cached-icon` 3.2.
 
 ## Upgrading to v0.12.1 (from v0.11.x)
 

@@ -110,6 +110,12 @@ describe('MessagesWidget', () => {
       expect(wrapper.find('span').classes()).toEqual(['text-error', 'own']);
     });
 
+    it('separates the blocks of an HtmlString by a space', () => {
+      expect(renderContentText(new HtmlString('<h1>Title</h1><p>One<br>two <b>bo</b>ld</p>'))).toBe(
+        'Title One two bold',
+      );
+    });
+
     it('reads the text of an HtmlString without tags and with its entities read', () => {
       expect(renderContentText(new HtmlString('<b>a &amp; b &lt;c&gt;</b>&amp;lt;'))).toBe('a & b <c>&lt;');
     });

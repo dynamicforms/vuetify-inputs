@@ -81,19 +81,24 @@ translateStrings(i18n.global.t, 'df_inputs');
 ```
 
 The library calls `t` every time it reads a string, so with vue-i18n the strings follow a locale switch without
-another call.
+another call. A translation function over non-reactive translations is set again with `translateStrings` after the
+translations change. The resolution order and the formatting of values are described in the
+[`@dynamicforms/translatable` readme](https://github.com/dynamicforms/translatable#readme).
 
 `translateStrings` sets the function for the whole process. The `translate` and `translateNamespace` settings set it
-for one app, and take precedence in that app: a string read while a component of the app renders is translated with
-them. Under server-side rendering, where an app is created per request, the settings give each request its own
-translation; see [Server-side rendering](/guide/ssr).
+for one app, and take precedence where they are given: a string read while a component sets up or renders is
+translated with the settings that component reads. Under server-side rendering, where an app is created per
+request, the settings give each request its own translation; see [Server-side rendering](/guide/ssr). The function
+a setting gives is fixed for the app; it follows a locale switch through the reactive state it reads, as vue-i18n's
+`t` does.
 
 ```typescript
 app.use(DynamicFormsInputs, { translate: i18n.global.t, translateNamespace: 'df_inputs' });
 ```
- A translation function over non-reactive translations is set again with `translateStrings` after the
-translations change. The resolution order and the formatting of values are described in the
-[`@dynamicforms/translatable` readme](https://github.com/dynamicforms/translatable#readme).
+
+`translate(key, params?)` reads the settings of the component that is setting up or rendering. An event handler or
+a timer runs outside both and reads `useTranslate()`, called in the component's setup, which returns `translate`
+bound to that component's settings.
 
 ### When it takes effect
 
@@ -206,7 +211,7 @@ picker come from Vuetify's own locale configuration.
 ### Per-component override
 
 Every `<df-date-time>` accepts a `locale` prop of the same date-fns `Locale` type. When it is set the component uses
-it and ignores `DateTimeLocaleConfig`; when it is not, the global setting applies. One form can thereby show one field
+it; when it is not, the `dateTimeLocale` setting of the app applies, and without that `DateTimeLocaleConfig`. One form can thereby show one field
 in the application's locale and another in a fixed one.
 
 <datetime-multilingual/>
@@ -251,9 +256,10 @@ export function useDfLocale() {
 }
 ```
 
-Under server-side rendering the date-fns locale is the `dateTimeLocale` setting, given per app, in place of
-`DateTimeLocaleConfig`, which is one for the process: `app.use(DynamicFormsInputs, { dateTimeLocale })`, with
-`dateTimeLocale` a computed over the locale.
+The `dateTimeLocale` setting gives the date-fns locale per app, in place of `DateTimeLocaleConfig`, which is one for
+the process: `app.use(DynamicFormsInputs, { dateTimeLocale })`, with `dateTimeLocale` a computed over the locale.
+Under server-side rendering, where an app is created per request, it is the setting that gives each request its own
+locale.
 
 The strings and the errors are connected once, when the application is set up:
 
@@ -276,7 +282,7 @@ table above:
 const messages = {
   de: {
     df_inputs: {
-      Yes: 'Ja', No: 'Nein', Close: 'Schließen', Cancel: 'Abbrechen',
+      Yes: 'Ja', No: 'Nein', Close: 'Schließen', Cancel: 'Abbrechen', Ok: 'OK',
       Paragraph: 'Absatz',
       Heading1: 'Überschrift 1', Heading2: 'Überschrift 2', /* ...Heading3-6 */
       Bold: 'Fett', Italic: 'Kursiv',
