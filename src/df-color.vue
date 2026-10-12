@@ -26,7 +26,7 @@
                 mode="hexa"
                 @dblclick="saveOnDoubleClick($event, colorChoices, save)"
               />
-              <v-card-actions><component :is="actions" /></v-card-actions>
+              <v-card-actions class="justify-end"><component :is="actions" /></v-card-actions>
             </v-card>
           </template>
         </v-confirm-edit>
