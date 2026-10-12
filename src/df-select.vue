@@ -13,7 +13,13 @@
     v-else-if="isRendered"
     ref="dfSelectRef"
     v-model="selected"
-    :class="[cssClass, densityClass, visibilityClass, { 'df-select-multirow': isMultiline }]"
+    :class="[
+      cssClass,
+      densityClass,
+      visibilityClass,
+      { 'df-select-multirow': isMultiline, 'df-select-single': !multiple },
+    ]"
+    :style="{ '--df-select-search-width': `${(searchText?.length ?? 0) + 1}ch` }"
     :items="options"
     :return-object="false"
     chips
@@ -386,6 +392,13 @@ watch(
 </script>
 
 <style scoped>
+/* Vuetify gives the focused search input a minimum width of 64px, which wraps it under a long chip of a single
+   select before anything is typed. The input's minimum width is the text typed into it, up to the width of the
+   field: it stays beside the chip while the text fits there, and wraps to a line of its own when it does not */
+.df-select-single :deep(.v-field__input > input) {
+  min-width: min(var(--df-select-search-width), 100%);
+}
+
 .df-select-multirow :deep(.v-field__clearable) {
   position: absolute;
 }
