@@ -158,7 +158,7 @@ renders `message`, so a form within the budget shows nothing. An error renders a
 [`errorText` setting](/examples/localisation#translating-errors) returns for it, which may be plain text, an `MdString`
 for markdown or a component definition, and otherwise as its `detail`. The budget error carries `total` and `over` in
 its `params`; the docs' `errorText` renders `over_budget` from them, as markdown while the
-[validators demo](/examples/validators)'s markdown setting is on.
+[validation and i18n demo](/examples/validators)'s markdown setting is on.
 
 ## Writing a group-level validator
 

@@ -1,4 +1,4 @@
-# Validators Example
+# Validation and i18n
 
 The validators of `@dynamicforms/vue-forms` on this library's components.
 

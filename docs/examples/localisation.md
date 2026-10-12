@@ -106,6 +106,9 @@ translations change. The resolution order and the formatting of values are descr
 
 ## Translating errors
 
+The [validation and i18n demo](/examples/validators#demo) renders the errors of a form in eight languages, as plain
+text or as markdown, through the `errorText` setting shown there.
+
 An error is data: a `code`, `params` and an English `detail`. The application converts it into what the user sees,
 as described in vue-forms' [Error messages and translation](:vue-forms:/api/validators.html#error-messages-and-translation),
 which also lists every code vue-forms raises with its params.

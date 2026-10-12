@@ -55,7 +55,7 @@ export default defineConfig({
           text: 'API with Examples',
           items: [
             { text: 'input base', link: '/examples/input-base' },
-            { text: 'validation', link: '/examples/validators' },
+            { text: 'validation and i18n', link: '/examples/validators' },
             { text: 'groups', link: '/examples/groups' },
             { text: 'density', link: '/examples/density' },
             { text: 'configuration', link: '/examples/configuration' },
