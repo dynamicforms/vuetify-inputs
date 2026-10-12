@@ -392,31 +392,11 @@ watch(
 </script>
 
 <style scoped>
-/* a single select keeps its chip and the search input on one line: Vuetify gives the focused input a minimum width
-   of 64px, which wraps it under a long chip. The input is as wide as the text typed into it, at least the width that
-   is left, and the chip gives up its width as the text grows, its own text cut */
-.df-select-single :deep(.v-field__input) {
-  flex-wrap: nowrap;
-}
-
+/* Vuetify gives the focused search input a minimum width of 64px, which wraps it under a long chip of a single
+   select before anything is typed. The input's minimum width is the text typed into it, up to the width of the
+   field: it stays beside the chip while the text fits there, and wraps to a line of its own when it does not */
 .df-select-single :deep(.v-field__input > input) {
-  min-width: var(--df-select-search-width);
-}
-
-.df-select-single :deep(.v-autocomplete__selection),
-.df-select-single :deep(.v-combobox__selection) {
-  min-width: 0;
-  flex-shrink: 1;
-}
-
-.df-select-single :deep(.v-chip) {
-  max-width: 100%;
-}
-
-.df-select-single :deep(.v-chip__content) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: min(var(--df-select-search-width), 100%);
 }
 
 .df-select-multirow :deep(.v-field__clearable) {
