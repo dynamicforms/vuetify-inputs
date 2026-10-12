@@ -47,6 +47,9 @@ new RenderableValue({ componentName: 'div', componentVHtml: html, componentProps
 new RenderableValue(new HtmlString(html), 'note');
 ```
 
+The content of an element or a component is its `children`, rendered as an element's children or a component's
+default slot (see [Render content](/examples/df-input-hint#render-content)).
+
 `MessagesWidget` renders markdown with `vue-markdown-render` itself; a globally registered
 `vue-markdown` component is not needed.
 
@@ -136,7 +139,8 @@ reads `action.label`, which returns the string.
 
 ### `<df-input-hint>`'s `message` takes no errors
 
-`message` takes `string | RenderableValue[]`. An error goes in `errors`.
+`message` takes `RenderContentRef | RenderableValue[]`: content in any of its forms, or an array of
+`RenderableValue`s. An error goes in `errors`.
 
 ### Errors the components create
 

@@ -3,13 +3,13 @@
 </template>
 
 <script setup lang="ts">
-import { h, inject, resolveComponent } from 'vue';
+import { h, inject, resolveComponent, type VNodeChild } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
 
 import type { MessagesWidgetProps } from '../dynamicforms-component-props';
 
 import { type ErrorInput, errorText } from './error-text';
-import { RenderableValue } from './render-content';
+import { RenderableValue, type RenderContentNonCallable } from './render-content';
 import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
 const props = defineProps<MessagesWidgetProps>();
@@ -77,6 +77,31 @@ function asRenderable(msg: RenderableValue | ErrorInput): RenderableValue {
   return msg instanceof RenderableValue ? msg : new RenderableValue(errorText(msg, settings));
 }
 
+function renderComponent(name: string, bindings: Record<string, any>, children: readonly RenderContentNonCallable[]) {
+  const childNodes = () => children.map(renderChild);
+  // a common html element is rendered as itself, with the children as its own; any other name is resolved as a
+  // registered component, with the children as its default slot
+  if (htmlElements.has(name.toLowerCase())) return h(name, bindings, childNodes());
+  return h(resolveComponent(name), bindings, children.length ? { default: childNodes } : undefined);
+}
+
+// a child of a component: text as a text node, an HtmlString in a span, so that it fits in an inline element
+function renderChild(child: RenderContentNonCallable): VNodeChild {
+  const msg = new RenderableValue(child);
+  switch (msg.componentName) {
+    case 'template':
+      return msg.componentBody;
+    case 'html':
+      return h('span', { innerHTML: msg.componentBody });
+    case 'vue-markdown': {
+      const { source, options, plugins } = msg.componentBindings;
+      return h(VueMarkdown, { class: 'df-messages-widget-markdown', source, options, plugins });
+    }
+    default:
+      return renderComponent(msg.componentName, msg.componentBindings, msg.componentChildren);
+  }
+}
+
 const render = () => {
   if (typeof props.message === 'string') return h('span', { class: props.classes }, props.message);
   return props.message.map((item) => {
@@ -92,10 +117,10 @@ const render = () => {
         return h(VueMarkdown, { class: [...classes, 'df-messages-widget-markdown'], source, options, plugins });
       }
       default:
-        return h(
-          // a common html element is rendered as itself; any other name is resolved as a registered component
-          htmlElements.has(msg.componentName.toLowerCase()) ? msg.componentName : resolveComponent(msg.componentName),
+        return renderComponent(
+          msg.componentName,
           { ...msg.componentBindings, class: [classes, msg.componentBindings.class] },
+          msg.componentChildren,
         );
     }
   });

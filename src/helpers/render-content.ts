@@ -19,13 +19,16 @@ export class MdString extends String {
 export class HtmlString extends String {}
 
 /**
- * A component to render content with: an HTML element or a registered component by its name, with its props. It has
- * no HTML content; HTML is an `HtmlString`.
+ * A component to render content with: an HTML element or a registered component by its name, with its props and its
+ * children. It has no HTML content of its own; HTML is an `HtmlString`.
  */
 export interface SimpleComponentDef {
   componentName: string;
-  /** The props of the component. `innerHTML` is not one: the component drops it. */
+  /** The props of the component. A listener is a prop named `on` and the event, e.g. `onClick`. `innerHTML` is not
+   * one: the component drops it. */
   componentProps?: Record<string, unknown> & { innerHTML?: never };
+  /** The children of an HTML element, or the default slot of a component. A string renders as text. */
+  children?: RenderContentNonCallable | readonly RenderContentNonCallable[];
 }
 
 export type ClassType = string | string[] | Record<string, boolean>;
@@ -82,32 +85,50 @@ const blockTags = [
 ];
 const blockBoundary = new RegExp(`</?(?:${blockTags.join('|')})\\b[^>]*>`, 'gi');
 
+// an `&nbsp;` until the text is complete: whitespace is collapsed and trimmed around it, never out of it
+const nbspMark = '\uE000';
+
 // read last for '&amp;', so '&amp;lt;' reads as '&lt;'
 const htmlEntities: Record<string, string> = {
   '&lt;': '<',
   '&gt;': '>',
   '&quot;': '"',
   '&#39;': "'",
-  '&nbsp;': ' ',
+  '&nbsp;': nbspMark,
   '&amp;': '&',
 };
 
-/**
- * The text of `content` where only text is taken, such as an `aria-label`: a string and an `MdString` as written, an
- * `HtmlString` without its tags, its blocks separated by a space, whitespace collapsed, and with `&amp;`, `&lt;`,
- * `&gt;`, `&quot;`, `&#39;` and `&nbsp;` read, and a component as `''`.
- */
-export function renderContentText(content: RenderContentNonCallable): string {
+// the text of content, an HtmlString's whitespace collapsed but not trimmed, so that it keeps the space that separates
+// it from the content next to it, and its `&nbsp;` as nbspMark
+function contentText(content: RenderContentNonCallable): string {
   if (content instanceof HtmlString) {
     const text = content
       .toString()
       .replace(blockBoundary, ' ')
       .replace(/<[^>]*>/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
+      .replace(/\s+/g, ' ');
     return Object.entries(htmlEntities).reduce((result, [entity, char]) => result.replaceAll(entity, char), text);
   }
-  return isSimpleComponentDef(content) ? '' : content.toString();
+  if (isSimpleComponentDef(content)) return childrenOf(content).map(contentText).join('');
+  return content.toString();
+}
+
+/**
+ * The text of `content` where only text is taken, such as an `aria-label`: a string and an `MdString` as written, an
+ * `HtmlString` without its tags, its blocks separated by a space, whitespace collapsed and trimmed, and with `&amp;`,
+ * `&lt;`, `&gt;`, `&quot;`, `&#39;` and `&nbsp;` read, and a component as the text of its children joined, whitespace
+ * collapsed and trimmed. An `&nbsp;` reads as a space that is neither collapsed nor trimmed.
+ */
+export function renderContentText(content: RenderContentNonCallable): string {
+  if (!(content instanceof HtmlString) && !isSimpleComponentDef(content)) return content.toString();
+  return contentText(content).replace(/\s+/g, ' ').trim().replaceAll(nbspMark, ' ');
+}
+
+// the children of a component as an array, empty where it has none
+function childrenOf(content: SimpleComponentDef): readonly RenderContentNonCallable[] {
+  const { children } = content;
+  if (children === undefined) return [];
+  return Array.isArray(children) ? children : [children as RenderContentNonCallable];
 }
 
 /** True where `content` is a function answering the content. */
@@ -120,11 +141,11 @@ export type RenderContentKind = 'string' | 'md' | 'html' | 'component';
 
 /**
  * Content with the CSS classes it is rendered with, described as what renders it: `componentName`, its
- * `componentBindings`, its `componentBody` and its `extraClasses`. `componentName` is `'template'` for plain text,
- * `'vue-markdown'` for markdown, `'html'` for an `HtmlString` and the component's name for a `SimpleComponentDef`;
- * `componentBody` is the text of plain text and the HTML of an `HtmlString`.
+ * `componentBindings`, its `componentChildren`, its `componentBody` and its `extraClasses`. `componentName` is
+ * `'template'` for plain text, `'vue-markdown'` for markdown, `'html'` for an `HtmlString` and the component's name
+ * for a `SimpleComponentDef`; `componentBody` is the text of plain text and the HTML of an `HtmlString`.
  *
- * `MessagesWidget` renders it, and so does any component that reads those four members. A reference or a function as
+ * `MessagesWidget` renders it, and so does any component that reads those five members. A reference or a function as
  * the content is read on every render, so what it answers reaches the screen without the value being built again.
  */
 export class RenderableValue {
@@ -184,6 +205,11 @@ export class RenderableValue {
       default:
         return {};
     }
+  }
+
+  /** The children of a component; empty for the other forms. */
+  get componentChildren(): readonly RenderContentNonCallable[] {
+    return this.kind === 'component' ? childrenOf(this.resolvedText as SimpleComponentDef) : [];
   }
 
   get componentBody(): string {

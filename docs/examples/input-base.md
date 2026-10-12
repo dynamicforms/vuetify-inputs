@@ -214,7 +214,7 @@ A label is content in any of the four forms - a string, an `MdString`, an `HtmlS
 (see [Render content](/examples/df-input-hint#render-content)) - or a `Label` instance, which adds an icon:
 `new Label('my label text', 'mdi-abacus')` renders the `mdi-abacus` icon next to the text. Vuetify is given the
 label's text (`renderContentText`): a string and an `MdString` as written, an `HtmlString` without its tags, a
-component as `''`.
+component as the text of its children.
 
 Declaration of the `Label` class:
 ```typescript

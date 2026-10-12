@@ -9,6 +9,7 @@ import {
   FileComms,
   Label,
   type RenderableValue,
+  type RenderContentRef,
   SelectChoice,
   SelectFetchChoices,
   VuetifyButtonSize,
@@ -81,8 +82,8 @@ export interface DfInputHintProps {
   /** The errors to render, in place of {@link message} whenever there is one. A string is text in the user's
    * language; an error description may lack any member. */
   errors?: string | readonly (RenderableValue | ErrorInput)[];
-  /** The message to render, shown while there is no error. */
-  message?: string | RenderableValue[];
+  /** The message to render, shown while there is no error: content in any of its forms, or the items to render. */
+  message?: RenderContentRef | readonly RenderableValue[];
   /** Classes for the rendered errors. Defaults to `text-error`. */
   errorClasses?: ClassTypes;
   /** Classes for the rendered message. Defaults to no class. */

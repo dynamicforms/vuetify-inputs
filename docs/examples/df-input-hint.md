@@ -13,7 +13,7 @@ input, e.g. a group's errors, a section caption or a table row.
 | Prop           | Type                                               | Default        | Description                                                       |
 |----------------|----------------------------------------------------|----------------|-------------------------------------------------------------------|
 | errors         | `string \| (RenderableValue \| ErrorInput)[]` | `''`           | The errors to render. When not empty, rendered instead of `message` |
-| message        | `string \| RenderableValue[]`                      | `''`           | Rendered while there is no error, typically the field's hint    |
+| message        | `RenderContentRef \| RenderableValue[]`            | `''`           | Rendered while there is no error, typically the field's hint    |
 | errorClasses   | `ClassTypes`                                       | `'text-error'` | Classes of each rendered message while there are errors           |
 | messageClasses | `ClassTypes`                                       | `''`           | Classes of each rendered message while there are none             |
 
@@ -21,6 +21,10 @@ The component renders one row. It renders `errors` when `errors` is a non-empty 
 non-whitespace character, and `message` otherwise. A whitespace-only string is not an error, so a blank string passed
 to keep a Vuetify message slot rendered shows the hint. The classes are `errorClasses` while the row renders errors and
 `messageClasses` while it renders the message.
+
+`message` is content in any of its forms (see [Render content](#render-content)) or an array of `RenderableValue`s. A
+string is passed to `MessagesWidget` as it is; any other content is passed as a single `RenderableValue`, so a ref or a
+function is read on every render.
 
 `ErrorInput` is `RenderContentNonCallable | Partial<ErrorDescription>`. Content in any of the four forms - a string,
 an `MdString`, an `HtmlString` or a `SimpleComponentDef` - is an error already in the user's language and renders as
@@ -66,6 +70,7 @@ class HtmlString extends String {}
 interface SimpleComponentDef {
   componentName: string;
   componentProps?: Record<string, unknown> & { innerHTML?: never };
+  children?: RenderContentNonCallable | readonly RenderContentNonCallable[];
 }
 
 type RenderContentNonCallable = string | MdString | HtmlString | SimpleComponentDef;
@@ -82,12 +87,24 @@ class RenderableValue {
 | `string` | a `<div>` holding the text |
 | `MdString` | markdown, through `vue-markdown-render` with the string's `options` and `plugins` |
 | `HtmlString` | a `<div>` with the string as its inner HTML. The string is not sanitized: text from a user or a server is escaped or sanitized before it is wrapped |
-| `SimpleComponentDef` | the component named by `componentName`, with `componentProps` as its props. A common HTML element name renders as that element; any other name is resolved as a globally registered component. An `innerHTML` prop is dropped |
+| `SimpleComponentDef` | the component named by `componentName`, with `componentProps` as its props and `children` as its content. A common HTML element name renders as that element; any other name is resolved as a globally registered component. An `innerHTML` prop is dropped |
+
+A listener of a `SimpleComponentDef` is a prop named `on` and the event: `{ componentName: 'v-btn', componentProps:
+{ text: 'Retry', onClick: retry } }`. `children` are an element's children, or a component's default slot. Each child
+is content in any of the four forms: a string renders as text, escaped; an `MdString` as markdown; an `HtmlString` as
+the inner HTML of a `span`; a `SimpleComponentDef` as its component, with its own children:
+
+```typescript
+new RenderableValue({
+  componentName: 'span',
+  children: ['See ', { componentName: 'a', componentProps: { href: '/terms' }, children: 'the terms' }, '.'],
+});
+```
 
 A `RenderableValue` reads a ref or a function on every render, so a changed content is rendered without constructing a
 new value. `isRenderContent(value)`, `isSimpleComponentDef(content)` and `isCallableFunction(content)` tell the forms
 apart. `renderContentText(content)` returns the text of content where only text is taken: a string and an `MdString`
-as written, an `HtmlString` without its tags, a component as `''`.
+as written, an `HtmlString` without its tags, a component as the text of its children, joined.
 
 `MessagesWidget` takes two props:
 
@@ -126,12 +143,15 @@ error state and keeps the message row rendered; the text in the row is rendered 
   <!-- A plain string, with classes of its own -->
   <df-input-hint message="Amounts are in euro" message-classes="text-medium-emphasis text-caption" />
 
+  <!-- Markdown -->
+  <df-input-hint :message="new MdString('Amounts are in **euro**')" />
+
   <!-- The message, or the error while serverError is not empty -->
   <df-input-hint :errors="serverError" message="Saved" error-classes="text-warning font-weight-bold" />
 </template>
 
 <script setup>
-import { DfInputHint } from '@dynamicforms/vuetify-inputs';
+import { DfInputHint, MdString } from '@dynamicforms/vuetify-inputs';
 </script>
 ```
 
