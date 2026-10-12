@@ -23,8 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   error descriptions with members missing; a missing `code` is `''`, `params` `{}`, `detail` `''` and `origin`
   `'application'`.
 - An action's `label` may be a ref or a function returning a string, read while the action renders.
-- A double-click on a day in `<df-date-time>`'s date picker, on a minute of its clock, or on the color area or a
-  swatch of `<df-color>`'s picker selects the choice and confirms it.
+- A double-click on a day in `<df-date-time>`'s date picker, on its clock, or on the color area or a swatch of
+  `<df-color>`'s picker selects the choice and confirms it. For 600 ms after a picker changes its view, a double-click
+  does not confirm.
 
 ### Changed
 

@@ -5,6 +5,7 @@ import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 
 import DfDateTime from '@/df-datetime.vue';
+import { viewSettleMs } from '@/helpers/picker-double-click';
 
 describe('DfDateTime', () => {
   let vuetify: any;
@@ -132,45 +133,45 @@ describe('DfDateTime', () => {
     });
 
     describe('a double-click on the clock', () => {
-      async function openClock() {
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ['Date'] });
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      async function chooseMinute() {
         const control = new Field<string | null>({ value: '10:00' });
         const wrapper = mountDateTime({ control, inputType: 'time' });
         await wrapper.find('input').trigger('click');
         await flushPromises();
         const picker = wrapper.findComponent({ name: 'VTimePicker' });
-        const clock = picker.find('.v-time-picker-clock');
-        const press = async (view: 'hour' | 'minute') => {
-          picker.vm.$emit('update:viewMode', view);
-          await flushPromises();
-          await clock.trigger('pointerdown');
-        };
-        return { control, picker, clock, press };
-      }
-
-      it('saves where both presses are on the minutes', async () => {
-        const { control, picker, clock, press } = await openClock();
-
-        await press('minute');
-        await press('minute');
+        // a click on an hour switches the clock to the minutes
+        picker.vm.$emit('update:viewMode', 'minute');
         picker.vm.$emit('update:modelValue', '10:30');
         await flushPromises();
-        await clock.trigger('dblclick');
-        await flushPromises();
+        return { control, clock: picker.find('.v-time-picker-clock') };
+      }
 
-        expect(control.value).toBe('10:30');
-      });
+      it('does not save within viewSettleMs of the switch to the minutes', async () => {
+        const { control, clock } = await chooseMinute();
 
-      it('does not save where the first press chose an hour', async () => {
-        const { control, picker, clock, press } = await openClock();
-
-        await press('hour');
-        await press('minute');
-        picker.vm.$emit('update:modelValue', '11:00');
-        await flushPromises();
+        vi.advanceTimersByTime(viewSettleMs - 100);
         await clock.trigger('dblclick');
         await flushPromises();
 
         expect(control.value).toBe('10:00');
+      });
+
+      it('saves after viewSettleMs', async () => {
+        const { control, clock } = await chooseMinute();
+
+        vi.advanceTimersByTime(viewSettleMs);
+        await clock.trigger('dblclick');
+        await flushPromises();
+
+        expect(control.value).toBe('10:30');
       });
     });
 

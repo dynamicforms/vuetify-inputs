@@ -41,7 +41,7 @@ import { ref } from 'vue';
 
 import { DfColorProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
-import { saveOnDoubleClick } from './helpers/picker-double-click';
+import { usePickerDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfColorProps>(), { ...defaultBaseProps, allowNull: false });
 
@@ -66,6 +66,7 @@ const { densityClass, isRendered, label, shownErrors, touched, value, visibility
 );
 const dropdownShown = ref(false);
 const colorChoices = '.v-color-picker-canvas, .v-color-picker-swatches__color';
+const { saveOnDoubleClick } = usePickerDoubleClick();
 
 // a value confirmed in the picker concludes the edit: the field may hold no focus to lose
 function concludeEdit() {
