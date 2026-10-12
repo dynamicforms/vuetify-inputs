@@ -6,9 +6,7 @@
         <v-row>
           <v-col cols="12" md="4">
             <v-card variant="outlined" class="pa-4">
-              <div class="text-subtitle-1 mb-2">
-                Binary Checkbox (allowNull: false)
-              </div>
+              <div class="text-subtitle-1 mb-2">Binary Checkbox (allowNull: false)</div>
               <df-checkbox
                 :control="form.fields.binaryField"
                 :label="new Label('Binary checkbox', 'mdi-abacus')"
@@ -16,35 +14,20 @@
               />
 
               <div class="mt-4">
-                <v-btn
-                  @click="toggleBinary"
-                  color="primary"
-                  size="small"
-                  class="mr-2"
-                >
-                  Toggle Value
-                </v-btn>
-                <v-btn
-                  @click="toggleEnabled(form.fields.binaryField)"
-                  color="secondary"
-                  size="small"
-                >
-                  {{ form.fields.binaryField.enabled ? "Disable" : "Enable" }}
+                <v-btn color="primary" size="small" class="mr-2" @click="toggleBinary"> Toggle Value </v-btn>
+                <v-btn color="secondary" size="small" @click="toggleEnabled(form.fields.binaryField)">
+                  {{ form.fields.binaryField.enabled ? 'Disable' : 'Enable' }}
                   Field
                 </v-btn>
               </div>
 
-              <div class="mt-4">
-                <strong>Value:</strong> {{ form.fields.binaryField.value }}
-              </div>
+              <div class="mt-4"><strong>Value:</strong> {{ form.fields.binaryField.value }}</div>
             </v-card>
           </v-col>
 
           <v-col cols="12" md="4">
             <v-card variant="outlined" class="pa-4">
-              <div class="text-subtitle-1 mb-2">
-                Ternary Checkbox (allowNull: true)
-              </div>
+              <div class="text-subtitle-1 mb-2">Ternary Checkbox (allowNull: true)</div>
               <df-checkbox
                 :control="form.fields.ternaryField"
                 :allow-null="true"
@@ -53,31 +36,18 @@
               />
 
               <div class="mt-4">
-                <v-btn
-                  @click="form.fields.ternaryField.value = null"
-                  color="primary"
-                  size="small"
-                  class="mr-2"
-                >
+                <v-btn color="primary" size="small" class="mr-2" @click="form.fields.ternaryField.value = null">
                   Set to Null
                 </v-btn>
-                <v-btn
-                  @click="toggleEnabled(form.fields.ternaryField)"
-                  color="secondary"
-                  size="small"
-                >
-                  {{ form.fields.ternaryField.enabled ? "Disable" : "Enable" }}
+                <v-btn color="secondary" size="small" @click="toggleEnabled(form.fields.ternaryField)">
+                  {{ form.fields.ternaryField.enabled ? 'Disable' : 'Enable' }}
                   Field
                 </v-btn>
               </div>
 
               <div class="mt-4">
                 <strong>Value:</strong>
-                {{
-                  form.fields.ternaryField.value === null
-                    ? "null"
-                    : form.fields.ternaryField.value
-                }}
+                {{ form.fields.ternaryField.value === null ? 'null' : form.fields.ternaryField.value }}
               </div>
             </v-card>
           </v-col>
@@ -92,14 +62,12 @@
               />
 
               <div class="mt-4">
-                <v-btn @click="toggleAutoSwitch" color="primary" size="small">
-                  {{ autoSwitchActive ? "Stop" : "Start" }} Auto Toggle
+                <v-btn color="primary" size="small" @click="toggleAutoSwitch">
+                  {{ autoSwitchActive ? 'Stop' : 'Start' }} Auto Toggle
                 </v-btn>
               </div>
 
-              <div class="mt-4">
-                <strong>Value:</strong> {{ form.fields.autoToggleField.value }}
-              </div>
+              <div class="mt-4"><strong>Value:</strong> {{ form.fields.autoToggleField.value }}</div>
             </v-card>
           </v-col>
         </v-row>
@@ -109,9 +77,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { Group, Field } from "@dynamicforms/vue-forms";
-import { DfCheckbox, Label, MdString } from "../../src";
+import { Group, Field } from '@dynamicforms/vue-forms';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+
+import { DfCheckbox, Label, MdString } from '../../src';
 
 const form = new Group({
   binaryField: new Field({ value: false }),
@@ -128,7 +97,7 @@ function toggleBinary() {
 }
 
 function toggleEnabled(field) {
-  field.access = field.enabled ? "disabled" : "editable";
+  field.access = field.enabled ? 'disabled' : 'editable';
 }
 
 function toggleAutoSwitch() {

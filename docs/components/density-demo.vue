@@ -14,7 +14,7 @@
           </v-col>
           <v-col cols="6" class="d-flex justify-center">
             <v-btn color="primary" @click="fullscreen = !fullscreen">
-              {{ fullscreen ? "Return" : "stretch demo to browser" }}
+              {{ fullscreen ? 'Return' : 'stretch demo to browser' }}
             </v-btn>
           </v-col>
         </v-row>
@@ -23,12 +23,8 @@
           <div class="demo-grid">
             <!-- Header row -->
             <div class="grid-header">
-              <div class="density-label"></div>
-              <div
-                v-for="component in components"
-                :key="component.name"
-                class="component-header"
-              >
+              <div class="density-label" />
+              <div v-for="component in components" :key="component.name" class="component-header">
                 {{ component.label }}
               </div>
             </div>
@@ -37,11 +33,7 @@
             <template v-for="density in densityOptions" :key="density">
               <div class="grid-row">
                 <div class="density-label">{{ density }}</div>
-                <div
-                  v-for="component in components"
-                  :key="`${density}-${component.name}`"
-                  class="component-cell"
-                >
+                <div v-for="component in components" :key="`${density}-${component.name}`" class="component-cell">
                   <component
                     :is="component.component"
                     v-model="formData[component.model]"
@@ -62,46 +54,39 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import {
-  DfInput,
-  DfSelect,
-  DfCheckbox,
-  DfDateTime,
-  DfFile,
-  DfTextArea,
-  DfColor,
-} from "../../src";
+import { ref } from 'vue';
 
-const selectedVariant = ref("outlined");
+import { DfInput, DfSelect, DfCheckbox, DfDateTime, DfFile, DfTextArea, DfColor } from '../../src';
+
+const selectedVariant = ref('outlined');
 const fullscreen = ref(false);
 
 const variantOptions = [
-  { text: "Outlined", id: "outlined" },
-  { text: "Filled", id: "filled" },
-  { text: "Underlined", id: "underlined" },
-  { text: "Plain", id: "plain" },
-  { text: "Solo", id: "solo" },
-  { text: "Solo Inverted", id: "solo-inverted" },
-  { text: "Solo Filled", id: "solo-filled" },
+  { text: 'Outlined', id: 'outlined' },
+  { text: 'Filled', id: 'filled' },
+  { text: 'Underlined', id: 'underlined' },
+  { text: 'Plain', id: 'plain' },
+  { text: 'Solo', id: 'solo' },
+  { text: 'Solo Inverted', id: 'solo-inverted' },
+  { text: 'Solo Filled', id: 'solo-filled' },
 ];
 
-const densityOptions = ["default", "compact", "comfortable", "inline"];
+const densityOptions = ['default', 'compact', 'comfortable', 'inline'];
 
 const formData = ref({
-  input: "Sample text",
-  select: "option1",
+  input: 'Sample text',
+  select: 'option1',
   checkbox: true,
-  datetime: new Date().toISOString().split("T")[0],
+  datetime: new Date().toISOString().split('T')[0],
   file: null,
-  textarea: "Sample text area content",
-  color: "#1976d2",
+  textarea: 'Sample text area content',
+  color: '#1976d2',
 });
 
 const selectChoices = [
-  { id: "option1", text: "Option 1" },
-  { id: "option2", text: "Option 2" },
-  { id: "option3", text: "Option 3" },
+  { id: 'option1', text: 'Option 1' },
+  { id: 'option2', text: 'Option 2' },
+  { id: 'option3', text: 'Option 3' },
 ];
 
 // Mock file communications for df-file component
@@ -115,61 +100,61 @@ const mockFileComms = {
     return `file-${Date.now()}`;
   },
   delete: async (fileId) => {
-    console.log("Delete file:", fileId);
+    console.log('Delete file:', fileId);
   },
   touch: async (fileId) => {
-    console.log("Touch file:", fileId);
+    console.log('Touch file:', fileId);
   },
 };
 
 const components = [
   {
-    name: "input",
-    label: "df-input",
+    name: 'input',
+    label: 'df-input',
     component: DfInput,
-    model: "input",
+    model: 'input',
     props: {},
   },
   {
-    name: "select",
-    label: "df-select",
+    name: 'select',
+    label: 'df-select',
     component: DfSelect,
-    model: "select",
+    model: 'select',
     props: { choices: selectChoices },
   },
   {
-    name: "checkbox",
-    label: "df-checkbox",
+    name: 'checkbox',
+    label: 'df-checkbox',
     component: DfCheckbox,
-    model: "checkbox",
+    model: 'checkbox',
     props: {},
   },
   {
-    name: "datetime",
-    label: "df-date-time",
+    name: 'datetime',
+    label: 'df-date-time',
     component: DfDateTime,
-    model: "datetime",
-    props: { inputType: "date" },
+    model: 'datetime',
+    props: { inputType: 'date' },
   },
   {
-    name: "file",
-    label: "df-file",
+    name: 'file',
+    label: 'df-file',
     component: DfFile,
-    model: "file",
+    model: 'file',
     props: { comms: mockFileComms },
   },
   {
-    name: "textarea",
-    label: "df-text-area",
+    name: 'textarea',
+    label: 'df-text-area',
     component: DfTextArea,
-    model: "textarea",
+    model: 'textarea',
     props: { rows: 1 },
   },
   {
-    name: "color",
-    label: "df-color",
+    name: 'color',
+    label: 'df-color',
     component: DfColor,
-    model: "color",
+    model: 'color',
     props: {},
   },
 ];

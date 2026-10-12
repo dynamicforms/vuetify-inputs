@@ -3,22 +3,17 @@
     <v-card>
       <v-card-title>Image Upload Example</v-card-title>
       <v-card-text>
-        <df-image
-          :control="imageField"
-          :comms="imageComms"
-          label="Profile picture"
-          hint="PNG or JPG, max 5MB"
-        />
+        <df-image :control="imageField" :comms="imageComms" label="Profile picture" hint="PNG or JPG, max 5MB" />
 
         <div class="mt-4">
-          <v-btn @click="toggleEnabled" color="primary" class="mr-2">
-            {{ imageField.enabled ? "Disable" : "Enable" }} Field
+          <v-btn color="primary" class="mr-2" @click="toggleEnabled">
+            {{ imageField.enabled ? 'Disable' : 'Enable' }} Field
           </v-btn>
         </div>
 
         <div class="mt-4">
           <strong>Field value (image URL):</strong>
-          <pre>{{ imageField.value || "No image uploaded" }}</pre>
+          <pre>{{ imageField.value || 'No image uploaded' }}</pre>
         </div>
       </v-card-text>
     </v-card>
@@ -26,19 +21,20 @@
 </template>
 
 <script setup>
-import { Field } from "@dynamicforms/vue-forms";
+import { Field } from '@dynamicforms/vue-forms';
 
-import { DfImage } from "../../src";
+import { DfImage } from '../../src';
 
 // Stands in for an image already stored on the backend - comms.upload() must resolve to the same kind of
 // directly-usable URL for a freshly uploaded image to preview and download the same way.
 const existingImage =
-  "data:image/svg+xml;base64," +
-  btoa(
+  'data:image/svg+xml;base64,' +
+  globalThis.btoa(
     '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
       '<rect width="200" height="200" fill="#1976d2"/>' +
-      '<text x="50%" y="50%" fill="white" font-size="20" text-anchor="middle" dominant-baseline="middle">Profile</text>' +
-      "</svg>",
+      '<text x="50%" y="50%" fill="white" font-size="20" text-anchor="middle" dominant-baseline="middle">' +
+      'Profile</text>' +
+      '</svg>',
   );
 
 const imageField = new Field({ value: existingImage });
@@ -60,18 +56,18 @@ const imageComms = {
   },
 
   delete: async (fileIdentifier) => {
-    console.log("Deleting image:", fileIdentifier);
+    console.log('Deleting image:', fileIdentifier);
     return Promise.resolve();
   },
 
   touch: async (fileIdentifier) => {
-    console.log("Touching image:", fileIdentifier);
+    console.log('Touching image:', fileIdentifier);
     return Promise.resolve();
   },
 };
 
 function toggleEnabled() {
-  imageField.access = imageField.enabled ? "disabled" : "editable";
+  imageField.access = imageField.enabled ? 'disabled' : 'editable';
 }
 </script>
 

@@ -6,33 +6,15 @@
         <v-form @submit.prevent>
           <v-row>
             <v-col cols="12" md="4">
-              <df-input
-                :control="form.fields.flights"
-                input-type="number"
-                label="Flights"
-                :min="0"
-                :step="50"
-              />
+              <df-input :control="form.fields.flights" input-type="number" label="Flights" :min="0" :step="50" />
             </v-col>
 
             <v-col cols="12" md="4">
-              <df-input
-                :control="form.fields.hotel"
-                input-type="number"
-                label="Hotel"
-                :min="0"
-                :step="50"
-              />
+              <df-input :control="form.fields.hotel" input-type="number" label="Hotel" :min="0" :step="50" />
             </v-col>
 
             <v-col cols="12" md="4">
-              <df-input
-                :control="form.fields.extras"
-                input-type="number"
-                label="Extras"
-                :min="0"
-                :step="50"
-              />
+              <df-input :control="form.fields.extras" input-type="number" label="Extras" :min="0" :step="50" />
             </v-col>
           </v-row>
 
@@ -43,11 +25,7 @@
           />
 
           <!-- The section is rendered by the visibility of the traveller group -->
-          <v-card
-            v-if="traveller.visibility !== 'suppress'"
-            variant="outlined"
-            class="pa-4 mt-2"
-          >
+          <v-card v-if="traveller.visibility !== 'suppress'" variant="outlined" class="pa-4 mt-2">
             <div class="text-subtitle-1 mb-2">Second traveller</div>
             <v-row>
               <v-col cols="12" md="6">
@@ -55,29 +33,19 @@
               </v-col>
 
               <v-col cols="12" md="6">
-                <df-input
-                  :control="traveller.fields.ticket"
-                  input-type="number"
-                  label="Ticket"
-                  :min="0"
-                  :step="50"
-                />
+                <df-input :control="traveller.fields.ticket" input-type="number" label="Ticket" :min="0" :step="50" />
               </v-col>
             </v-row>
           </v-card>
 
           <div class="mt-4">
             <strong>Total:</strong> {{ total }} € of {{ budgetLimit }} €
-            <v-chip
-              :color="form.valid ? 'success' : 'error'"
-              size="small"
-              class="ml-2"
-            >
-              {{ form.valid ? "Within budget" : "Over budget" }}
+            <v-chip :color="form.valid ? 'success' : 'error'" size="small" class="ml-2">
+              {{ form.valid ? 'Within budget' : 'Over budget' }}
             </v-chip>
           </div>
 
-          <!-- The group-level validator's errors, shown by the rule of the inputs: once a field of the form is touched -->
+          <!-- The group-level validator's errors, shown once a field of the form is touched -->
           <div class="mt-1">
             <df-input-hint :errors="formErrors" />
           </div>
@@ -95,7 +63,6 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
 import {
   ConditionalAccessAction,
   ConditionalVisibilityAction,
@@ -105,8 +72,10 @@ import {
   Statement,
   ValidationError,
   Validators,
-} from "@dynamicforms/vue-forms";
-import { DfCheckbox, DfInput, DfInputHint, useShownErrors } from "../../src";
+} from '@dynamicforms/vue-forms';
+import { computed } from 'vue';
+
+import { DfCheckbox, DfInput, DfInputHint, useShownErrors } from '../../src';
 
 const budgetLimit = 2000;
 
@@ -119,12 +88,9 @@ const travelling = new Statement(addTraveller, Operator.EQUALS, true);
 // form.value. Two actions on it, over one statement: visibility decides whether the template draws the section,
 // access whether the form sends it - and validates it
 const traveller = new Group(
-  { name: new Field({ value: "" }), ticket: new Field({ value: 400 }) },
+  { name: new Field({ value: '' }), ticket: new Field({ value: 400 }) },
   {
-    actions: [
-      new ConditionalVisibilityAction(travelling),
-      new ConditionalAccessAction(travelling),
-    ],
+    actions: [new ConditionalVisibilityAction(travelling), new ConditionalAccessAction(travelling)],
   },
 );
 
@@ -141,13 +107,8 @@ function amount(field) {
 }
 
 function tripTotal() {
-  const total =
-    amount(form.fields.flights) +
-    amount(form.fields.hotel) +
-    amount(form.fields.extras);
-  return form.fields.addTraveller.value
-    ? total + amount(traveller.fields.ticket)
-    : total;
+  const total = amount(form.fields.flights) + amount(form.fields.hotel) + amount(form.fields.extras);
+  return form.fields.addTraveller.value ? total + amount(traveller.fields.ticket) : total;
 }
 
 // A validator on the group itself: the rule spans several fields, so the error belongs to the group
@@ -158,7 +119,7 @@ form.registerAction(
     const over = total - budgetLimit;
     return [
       new ValidationError(
-        "over_budget",
+        'over_budget',
         { total, over },
         `The trip totals ${total} €, which is ${over} € over the budget.`,
       ),

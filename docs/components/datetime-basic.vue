@@ -10,17 +10,15 @@
         />
 
         <div class="mt-4">
-          <v-btn @click="toggleEnabled" color="primary" class="mr-2">
-            {{ dateTimeField.enabled ? "Disable" : "Enable" }} field
+          <v-btn color="primary" class="mr-2" @click="toggleEnabled">
+            {{ dateTimeField.enabled ? 'Disable' : 'Enable' }} field
           </v-btn>
-          <v-btn @click="resetField" color="secondary"> Reset field </v-btn>
+          <v-btn color="secondary" @click="resetField"> Reset field </v-btn>
         </div>
 
         <div class="mt-4">
           <strong>Field value:</strong>
-          <pre>{{
-            dateTimeField.value == null ? "null" : dateTimeField.value
-          }}</pre>
+          <pre>{{ dateTimeField.value == null ? 'null' : dateTimeField.value }}</pre>
         </div>
       </v-card-text>
     </v-card>
@@ -37,7 +35,7 @@
         />
         <div class="mt-4">
           <strong>Field value:</strong>
-          <pre>{{ dateField.value == null ? "null" : dateField.value }}</pre>
+          <pre>{{ dateField.value == null ? 'null' : dateField.value }}</pre>
         </div>
       </v-card-text>
     </v-card>
@@ -55,7 +53,7 @@
 
         <div class="mt-4">
           <strong>Field value:</strong>
-          <pre>{{ timeField.value == null ? "null" : timeField.value }}</pre>
+          <pre>{{ timeField.value == null ? 'null' : timeField.value }}</pre>
         </div>
       </v-card-text>
     </v-card>
@@ -70,9 +68,11 @@
 </template>
 
 <script setup>
-import { Field, Validators } from "@dynamicforms/vue-forms";
-import { DfDateTime, Label } from "../../src";
-import DatetimeMultilingual from "./datetime-multilingual.vue";
+import { Field, Validators } from '@dynamicforms/vue-forms';
+
+import { DfDateTime, Label } from '../../src';
+
+import DatetimeMultilingual from './datetime-multilingual.vue';
 
 const dateTimeField = new Field({
   value: null,
@@ -80,15 +80,15 @@ const dateTimeField = new Field({
 });
 
 const dateField = new Field({
-  value: new Date().toISOString().split("T")[0],
+  value: new Date().toISOString().split('T')[0],
 });
 
 const timeField = new Field({
-  value: new Date().toISOString().split("T")[1].split(".")[0],
+  value: new Date().toISOString().split('T')[1].split('.')[0],
 });
 
 function toggleEnabled() {
-  dateTimeField.access = dateTimeField.enabled ? "disabled" : "editable";
+  dateTimeField.access = dateTimeField.enabled ? 'disabled' : 'editable';
 }
 
 function resetField() {

@@ -11,14 +11,14 @@
         />
 
         <div class="mt-4">
-          <v-btn @click="toggleEnabled" color="primary" class="mr-2">
-            {{ fileField.enabled ? "Disable" : "Enable" }} Field
+          <v-btn color="primary" class="mr-2" @click="toggleEnabled">
+            {{ fileField.enabled ? 'Disable' : 'Enable' }} Field
           </v-btn>
         </div>
 
         <div class="mt-4">
           <strong>Field value (file ID):</strong>
-          <pre>{{ fileField.value || "No file uploaded" }}</pre>
+          <pre>{{ fileField.value || 'No file uploaded' }}</pre>
         </div>
 
         <div v-if="uploadedFiles.length > 0" class="mt-4">
@@ -36,14 +36,14 @@
 </template>
 
 <script setup>
-import { Field } from "@dynamicforms/vue-forms";
-import { ref } from "vue";
-import { CachedIcon } from "vue-cached-icon";
+import { Field } from '@dynamicforms/vue-forms';
+import { ref } from 'vue';
+import { CachedIcon } from 'vue-cached-icon';
 
-import { DfFile } from "../../src";
+import { DfFile } from '../../src';
 
 const fileField = new Field({
-  value: "contracts/existing-agreement.pdf",
+  value: 'contracts/existing-agreement.pdf',
 });
 
 const uploadedFiles = ref([]);
@@ -73,7 +73,7 @@ const fileComms = {
 
   delete: async (fileIdentifier) => {
     // In a real implementation, this would call an API to delete the file
-    console.log("Deleting file:", fileIdentifier);
+    console.log('Deleting file:', fileIdentifier);
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // For demo purposes, we'll just clear our local array
@@ -84,36 +84,31 @@ const fileComms = {
 
   touch: async (fileIdentifier) => {
     // In a real implementation, this would call an API to "touch" the file
-    console.log("Touching file:", fileIdentifier);
+    console.log('Touching file:', fileIdentifier);
     return Promise.resolve();
   },
 
   getDownloadUrl: async (fileIdentifier) => {
     // In a real implementation, this would resolve to a signed URL or a same-origin download path
-    const blob = new Blob(
-      [
-        `Hello world!\n\nThis is a mock download standing in for: ${fileIdentifier}`,
-      ],
-      {
-        type: "text/plain",
-      },
-    );
+    const blob = new Blob([`Hello world!\n\nThis is a mock download standing in for: ${fileIdentifier}`], {
+      type: 'text/plain',
+    });
     return URL.createObjectURL(blob);
   },
 };
 
 function toggleEnabled() {
-  fileField.access = fileField.enabled ? "disabled" : "editable";
+  fileField.access = fileField.enabled ? 'disabled' : 'editable';
 }
 
 function formatFileSize(bytes) {
-  if (bytes === 0) return "0 Bytes";
+  if (bytes === 0) return '0 Bytes';
 
   const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 </script>
 

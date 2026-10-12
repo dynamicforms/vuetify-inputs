@@ -20,9 +20,7 @@
 
     <div class="mt-4">
       <strong>{{ infoLabels[selectedLocaleIndex] }}:</strong>
-      <pre>{{
-        dateTimeField.value == null ? "null" : dateTimeField.value
-      }}</pre>
+      <pre>{{ dateTimeField.value == null ? 'null' : dateTimeField.value }}</pre>
     </div>
 
     <div class="mt-2">
@@ -34,49 +32,43 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { sl, enUS, de, fr, ja, zhCN } from "date-fns/locale";
-import { Field, Validators } from "@dynamicforms/vue-forms";
-import { DfDateTime, Label } from "../../src";
+import { Field, Validators } from '@dynamicforms/vue-forms';
+import { sl, enUS, de, fr, ja, zhCN } from 'date-fns/locale';
+import { ref } from 'vue';
+
+import { DfDateTime, Label } from '../../src';
 
 const selectedLocaleIndex = ref(0);
 
 const locales = [sl, enUS, de, fr, ja, zhCN];
 
 const labels = [
-  "Izberite datum in čas",
-  "Select date and time",
-  "Datum und Zeit auswählen",
-  "Sélectionner date et heure",
-  "日時を選択",
-  "选择日期和时间",
+  'Izberite datum in čas',
+  'Select date and time',
+  'Datum und Zeit auswählen',
+  'Sélectionner date et heure',
+  '日時を選択',
+  '选择日期和时间',
 ];
 
 const hints = [
-  "Datum se prikaže v izbrani lokali",
-  "Date displays in selected locale",
-  "Datum wird in gewählter Sprache angezeigt",
+  'Datum se prikaže v izbrani lokali',
+  'Date displays in selected locale',
+  'Datum wird in gewählter Sprache angezeigt',
   "La date s'affiche dans la langue sélectionnée",
-  "選択したロケールで日付が表示されます",
-  "日期以所选区域设置显示",
+  '選択したロケールで日付が表示されます',
+  '日期以所选区域设置显示',
 ];
 
-const infoLabels = [
-  "Vrednost polja",
-  "Field value",
-  "Feldwert",
-  "Valeur du champ",
-  "フィールド値",
-  "字段值",
-];
+const infoLabels = ['Vrednost polja', 'Field value', 'Feldwert', 'Valeur du champ', 'フィールド値', '字段值'];
 
 const localeInfos = [
-  "Slovenska lokala: teden se začne v ponedeljek, format dd. mm. llll",
-  "US English locale: week starts on Sunday, format MM/dd/yyyy",
-  "Deutsche Lokale: Woche beginnt am Montag, Format dd.MM.yyyy",
-  "Locale française: semaine commence lundi, format dd/MM/yyyy",
-  "日本語ロケール: 週は日曜日から始まり、yyyy年M月d日形式",
-  "中文区域设置: 周从周一开始，yyyy年M月d日格式",
+  'Slovenska lokala: teden se začne v ponedeljek, format dd. mm. llll',
+  'US English locale: week starts on Sunday, format MM/dd/yyyy',
+  'Deutsche Lokale: Woche beginnt am Montag, Format dd.MM.yyyy',
+  'Locale française: semaine commence lundi, format dd/MM/yyyy',
+  '日本語ロケール: 週は日曜日から始まり、yyyy年M月d日形式',
+  '中文区域设置: 周从周一开始，yyyy年M月d日格式',
 ];
 
 const dateTimeField = new Field({

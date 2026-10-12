@@ -127,7 +127,7 @@ const formErrors = useShownErrors(form);
       </v-chip>
     </div>
 
-    <!-- The group-level validator's errors, shown by the rule of the inputs: once a field of the form is touched -->
+    <!-- The group-level validator's errors, shown once a field of the form is touched -->
     <df-input-hint :errors="formErrors" />
 
     <pre>{{ JSON.stringify(form.value, null, 2) }}</pre>
