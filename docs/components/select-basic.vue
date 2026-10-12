@@ -19,17 +19,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
-import { DfSelect } from '../../src';
+import { DfSelect } from "../../src";
 
-const selectedFruit = ref('cherry');
+const selectedFruit = ref("cherry");
 const fruits = [
-  { id: 'apple', text: 'Apple' },
-  { id: 'banana', text: 'Banana' },
-  { id: 'cherry', text: 'Cherry' },
-  { id: 'durian', text: 'Durian' },
-  { id: 'elder', text: 'Elderflower' }
+  { id: "apple", text: "Apple" },
+  { id: "banana", text: "Banana" },
+  { id: "cherry", text: "Cherry" },
+  { id: "durian", text: "Durian" },
+  { id: "elder", text: "Elderflower" },
 ];
 </script>
 

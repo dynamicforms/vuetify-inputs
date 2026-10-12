@@ -51,10 +51,7 @@
             <div class="text-subtitle-1 mb-2">Second traveller</div>
             <v-row>
               <v-col cols="12" md="6">
-                <df-input
-                  :control="traveller.fields.name"
-                  label="Full name"
-                />
+                <df-input :control="traveller.fields.name" label="Full name" />
               </v-col>
 
               <v-col cols="12" md="6">
@@ -76,7 +73,7 @@
               size="small"
               class="ml-2"
             >
-              {{ form.valid ? 'Within budget' : 'Over budget' }}
+              {{ form.valid ? "Within budget" : "Over budget" }}
             </v-chip>
           </div>
 
@@ -99,7 +96,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 import {
   ConditionalAccessAction,
   ConditionalVisibilityAction,
@@ -109,13 +106,8 @@ import {
   Statement,
   ValidationError,
   Validators,
-} from '@dynamicforms/vue-forms';
-import {
-  DfCheckbox,
-  DfInput,
-  DfInputHint,
-  useShownErrors,
-} from '../../src';
+} from "@dynamicforms/vue-forms";
+import { DfCheckbox, DfInput, DfInputHint, useShownErrors } from "../../src";
 
 const budgetLimit = 2000;
 
@@ -128,8 +120,13 @@ const travelling = new Statement(addTraveller, Operator.EQUALS, true);
 // form.value. Two actions on it, over one statement: visibility decides whether the template draws the section,
 // access whether the form sends it - and validates it
 const traveller = new Group(
-  { name: new Field({ value: '' }), ticket: new Field({ value: 400 }) },
-  { actions: [new ConditionalVisibilityAction(travelling), new ConditionalAccessAction(travelling)] },
+  { name: new Field({ value: "" }), ticket: new Field({ value: 400 }) },
+  {
+    actions: [
+      new ConditionalVisibilityAction(travelling),
+      new ConditionalAccessAction(travelling),
+    ],
+  },
 );
 
 const form = new Group({
@@ -145,19 +142,30 @@ function amount(field) {
 }
 
 function tripTotal() {
-  const total = amount(form.fields.flights) + amount(form.fields.hotel) + amount(form.fields.extras);
-  return form.fields.addTraveller.value ? total + amount(traveller.fields.ticket) : total;
+  const total =
+    amount(form.fields.flights) +
+    amount(form.fields.hotel) +
+    amount(form.fields.extras);
+  return form.fields.addTraveller.value
+    ? total + amount(traveller.fields.ticket)
+    : total;
 }
 
 // A validator on the group itself: the rule spans several fields, so the error belongs to the group
-form.registerAction(new Validators.Validator(() => {
-  const total = tripTotal();
-  if (total <= budgetLimit) return null;
-  const over = total - budgetLimit;
-  return [
-    new ValidationError('over_budget', { total, over }, `The trip totals ${total} €, which is ${over} € over the budget.`),
-  ];
-}));
+form.registerAction(
+  new Validators.Validator(() => {
+    const total = tripTotal();
+    if (total <= budgetLimit) return null;
+    const over = total - budgetLimit;
+    return [
+      new ValidationError(
+        "over_budget",
+        { total, over },
+        `The trip totals ${total} €, which is ${over} € over the budget.`,
+      ),
+    ];
+  }),
+);
 
 // group.value is reactive, so both the total and the JSON dump follow every keystroke
 const total = computed(() => tripTotal());

@@ -35,7 +35,11 @@
             <v-btn @click="increaseQuantity" color="primary" class="mr-2">
               Increase Quantity
             </v-btn>
-            <v-btn @click="decreaseQuantity" color="secondary" :disabled="quantityField.value <= 1">
+            <v-btn
+              @click="decreaseQuantity"
+              color="secondary"
+              :disabled="quantityField.value <= 1"
+            >
               Decrease Quantity
             </v-btn>
           </v-btn-group>
@@ -45,9 +49,7 @@
           <v-checkbox v-model="allowNull" label="Allow null values" />
         </div>
 
-        <div class="mt-4">
-          <strong>Total:</strong> {{ calculateTotal() }}
-        </div>
+        <div class="mt-4"><strong>Total:</strong> {{ calculateTotal() }}</div>
 
         <div class="values-display mt-4">
           <h3>Current Values:</h3>
@@ -58,7 +60,7 @@
               size="small"
               class="ml-2"
             >
-              {{ quantityField.valid ? 'Valid' : 'Invalid' }}
+              {{ quantityField.valid ? "Valid" : "Invalid" }}
             </v-chip>
           </div>
 
@@ -69,18 +71,29 @@
               size="small"
               class="ml-2"
             >
-              {{ priceField.valid ? 'Valid' : 'Invalid' }}
+              {{ priceField.valid ? "Valid" : "Invalid" }}
             </v-chip>
           </div>
         </div>
 
-        <div class="mt-4" v-if="quantityField.errors.length > 0 || priceField.errors.length > 0">
+        <div
+          class="mt-4"
+          v-if="quantityField.errors.length > 0 || priceField.errors.length > 0"
+        >
           <strong>Validation errors:</strong>
           <ul>
-            <li v-for="(error, index) in quantityField.errors" :key="`q-${index}`" class="error-text">
+            <li
+              v-for="(error, index) in quantityField.errors"
+              :key="`q-${index}`"
+              class="error-text"
+            >
               Quantity: {{ error }}
             </li>
-            <li v-for="(error, index) in priceField.errors" :key="`p-${index}`" class="error-text">
+            <li
+              v-for="(error, index) in priceField.errors"
+              :key="`p-${index}`"
+              class="error-text"
+            >
               Price: {{ error }}
             </li>
           </ul>
@@ -91,9 +104,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Field } from '@dynamicforms/vue-forms';
-import { DfInput } from '../../src';
+import { ref } from "vue";
+import { Field } from "@dynamicforms/vue-forms";
+import { DfInput } from "../../src";
 
 const allowNull = ref(false);
 
@@ -118,7 +131,7 @@ function decreaseQuantity() {
 
 function calculateTotal() {
   if (quantityField.value === null || priceField.value === null) {
-    return 'N/A';
+    return "N/A";
   }
 
   const total = quantityField.value * priceField.value;

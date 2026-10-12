@@ -27,8 +27,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import { DfSelect, Label } from '../../src';
+import { ref, watch } from "vue";
+import { DfSelect, Label } from "../../src";
 
 const multiple = ref(false);
 const allowNull = ref(true);
@@ -41,16 +41,16 @@ watch(multiple, (newValue) => {
 });
 
 const programmingLanguages = [
-  { id: 'js', text: 'JavaScript', icon: 'mdi-language-javascript' },
-  { id: 'ts', text: 'TypeScript', icon: 'mdi-language-typescript' },
-  { id: 'py', text: 'Python', icon: 'mdi-language-python' },
-  { id: 'java', text: 'Java', icon: 'mdi-language-java' },
-  { id: 'csharp', text: 'C#', icon: 'mdi-language-csharp' },
-  { id: 'cpp', text: 'C++', icon: 'mdi-language-cpp' },
-  { id: 'go', text: 'Go', icon: 'mdi-language-go' },
-  { id: 'ruby', text: 'Ruby', icon: 'mdi-language-ruby' },
-  { id: 'php', text: 'PHP', icon: 'mdi-language-php' },
-  { id: 'swift', text: 'Swift', icon: 'mdi-language-swift' }
+  { id: "js", text: "JavaScript", icon: "mdi-language-javascript" },
+  { id: "ts", text: "TypeScript", icon: "mdi-language-typescript" },
+  { id: "py", text: "Python", icon: "mdi-language-python" },
+  { id: "java", text: "Java", icon: "mdi-language-java" },
+  { id: "csharp", text: "C#", icon: "mdi-language-csharp" },
+  { id: "cpp", text: "C++", icon: "mdi-language-cpp" },
+  { id: "go", text: "Go", icon: "mdi-language-go" },
+  { id: "ruby", text: "Ruby", icon: "mdi-language-ruby" },
+  { id: "php", text: "PHP", icon: "mdi-language-php" },
+  { id: "swift", text: "Swift", icon: "mdi-language-swift" },
 ];
 
 // Simulate AJAX loading
@@ -58,12 +58,12 @@ const fetchLanguages = async (query) => {
   // console.log('Search query:', query);
 
   // Simulate server delay
-  await new Promise(resolve => setTimeout(resolve, 3000));
+  await new Promise((resolve) => setTimeout(resolve, 3000));
 
   if (!query) return programmingLanguages;
 
-  return programmingLanguages.filter(lang =>
-    lang.text.toLowerCase().includes(query.toLowerCase())
+  return programmingLanguages.filter((lang) =>
+    lang.text.toLowerCase().includes(query.toLowerCase()),
   );
 };
 </script>

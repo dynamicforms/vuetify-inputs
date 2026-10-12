@@ -6,7 +6,9 @@
         <v-row>
           <v-col cols="12" md="4">
             <v-card variant="outlined" class="pa-4">
-              <div class="text-subtitle-1 mb-2">Binary Checkbox (allowNull: false)</div>
+              <div class="text-subtitle-1 mb-2">
+                Binary Checkbox (allowNull: false)
+              </div>
               <df-checkbox
                 :control="form.fields.binaryField"
                 :label="new Label('Binary checkbox', 'mdi-abacus')"
@@ -27,7 +29,10 @@
                   color="secondary"
                   size="small"
                 >
-                  {{ form.fields.binaryField.enabled ? 'Disable' : 'Enable' }} Field
+                  {{
+                    form.fields.binaryField.enabled ? "Disable" : "Enable"
+                  }}
+                  Field
                 </v-btn>
               </div>
 
@@ -39,7 +44,9 @@
 
           <v-col cols="12" md="4">
             <v-card variant="outlined" class="pa-4">
-              <div class="text-subtitle-1 mb-2">Ternary Checkbox (allowNull: true)</div>
+              <div class="text-subtitle-1 mb-2">
+                Ternary Checkbox (allowNull: true)
+              </div>
               <df-checkbox
                 :control="form.fields.ternaryField"
                 :allow-null="true"
@@ -61,12 +68,20 @@
                   color="secondary"
                   size="small"
                 >
-                  {{ form.fields.ternaryField.enabled ? 'Disable' : 'Enable' }} Field
+                  {{
+                    form.fields.ternaryField.enabled ? "Disable" : "Enable"
+                  }}
+                  Field
                 </v-btn>
               </div>
 
               <div class="mt-4">
-                <strong>Value:</strong> {{ form.fields.ternaryField.value === null ? 'null' : form.fields.ternaryField.value }}
+                <strong>Value:</strong>
+                {{
+                  form.fields.ternaryField.value === null
+                    ? "null"
+                    : form.fields.ternaryField.value
+                }}
               </div>
             </v-card>
           </v-col>
@@ -81,12 +96,8 @@
               />
 
               <div class="mt-4">
-                <v-btn
-                  @click="toggleAutoSwitch"
-                  color="primary"
-                  size="small"
-                >
-                  {{ autoSwitchActive ? 'Stop' : 'Start' }} Auto Toggle
+                <v-btn @click="toggleAutoSwitch" color="primary" size="small">
+                  {{ autoSwitchActive ? "Stop" : "Start" }} Auto Toggle
                 </v-btn>
               </div>
 
@@ -102,9 +113,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { Group, Field } from '@dynamicforms/vue-forms';
-import { DfCheckbox, Label, MdString } from '../../src';
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { Group, Field } from "@dynamicforms/vue-forms";
+import { DfCheckbox, Label, MdString } from "../../src";
 
 const form = new Group({
   binaryField: new Field({ value: false }),
@@ -121,7 +132,7 @@ function toggleBinary() {
 }
 
 function toggleEnabled(field) {
-  field.access = field.enabled ? 'disabled' : 'editable';
+  field.access = field.enabled ? "disabled" : "editable";
 }
 
 function toggleAutoSwitch() {
@@ -129,9 +140,9 @@ function toggleAutoSwitch() {
 
   if (autoSwitchActive.value) {
     // Start auto-toggling every second
-    intervalId = window.setInterval(
-      () => { form.fields.autoToggleField.value = !form.fields.autoToggleField.value; }, 1000,
-    );
+    intervalId = window.setInterval(() => {
+      form.fields.autoToggleField.value = !form.fields.autoToggleField.value;
+    }, 1000);
   } else {
     // Stop auto-toggling
     if (intervalId) {

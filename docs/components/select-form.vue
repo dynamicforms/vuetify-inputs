@@ -63,16 +63,23 @@
       <v-card-actions>
         <v-btn-group>
           <v-btn @click="toggleField('firstName')" color="primary">
-            {{ personForm.fields.firstName.enabled ? 'Disable' : 'Enable' }} First Name
+            {{
+              personForm.fields.firstName.enabled ? "Disable" : "Enable"
+            }}
+            First Name
           </v-btn>
           <v-btn @click="toggleField('lastName')" color="primary">
-            {{ personForm.fields.lastName.enabled ? 'Disable' : 'Enable' }} Last Name
+            {{ personForm.fields.lastName.enabled ? "Disable" : "Enable" }} Last
+            Name
           </v-btn>
           <v-btn @click="toggleField('age')" color="primary">
-            {{ personForm.fields.age.enabled ? 'Disable' : 'Enable' }} Age
+            {{ personForm.fields.age.enabled ? "Disable" : "Enable" }} Age
           </v-btn>
           <v-btn @click="toggleField('country')" color="primary">
-            {{ personForm.fields.country.enabled ? 'Disable' : 'Enable' }} Country
+            {{
+              personForm.fields.country.enabled ? "Disable" : "Enable"
+            }}
+            Country
           </v-btn>
         </v-btn-group>
       </v-card-actions>
@@ -88,34 +95,42 @@
 </template>
 
 <script setup>
-import { Group, Field, Validators, ValueChangedAction } from '@dynamicforms/vue-forms';
+import {
+  Group,
+  Field,
+  Validators,
+  ValueChangedAction,
+} from "@dynamicforms/vue-forms";
 import { DfSelect } from "../../src"; //from '@dynamicforms/vue-forms'
-import { getAllCountries } from 'countries-and-timezones';
+import { getAllCountries } from "countries-and-timezones";
 
 // Create a form group with fields
 const personForm = new Group({
-  firstName: new Field({ value: 'John' }),
-  lastName: new Field({ value: 'Doe' }),
+  firstName: new Field({ value: "John" }),
+  lastName: new Field({ value: "Doe" }),
   age: new Field({ value: 30 }),
   active: new Field({ value: true }),
-  country: new Field({ value: 'si', validators: [new Validators.Required()] }),
+  country: new Field({ value: "si", validators: [new Validators.Required()] }),
 });
 
-const countries = Object.values(getAllCountries()).map(
-  (country) => ({ id: country.id.toLowerCase(), text: country.name }),
-);
+const countries = Object.values(getAllCountries()).map((country) => ({
+  id: country.id.toLowerCase(),
+  text: country.name,
+}));
 // Function to toggle field enabled state
 const toggleField = (fieldName) => {
   const field = personForm.fields[fieldName];
   if (field) {
-    field.access = field.enabled ? 'disabled' : 'editable';
+    field.access = field.enabled ? "disabled" : "editable";
   }
 };
 
 // A value changed action on the group fires whenever what the group holds changes: a field written
-personForm.registerAction(new ValueChangedAction(async (field, supr, newValue, oldValue) => {
-  return supr(field, newValue, oldValue);
-}));
+personForm.registerAction(
+  new ValueChangedAction(async (field, supr, newValue, oldValue) => {
+    return supr(field, newValue, oldValue);
+  }),
+);
 </script>
 
 <style scoped>

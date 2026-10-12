@@ -1,36 +1,40 @@
-import { formatParams, interpolate } from '@dynamicforms/translatable';
-import { ref } from 'vue';
+import { formatParams, interpolate } from "@dynamicforms/translatable";
+import { ref } from "vue";
 
-import { type ErrorText, MdString } from '../../src';
+import { type ErrorText, MdString } from "../../src";
 
-import messages from './demo-error-messages.json';
+import messages from "./demo-error-messages.json";
 
 type Language = keyof typeof messages;
 
 export const languages: { value: Language; title: string }[] = [
-  { value: 'en', title: '🇬🇧 English' },
-  { value: 'sl', title: '🇸🇮 Slovenščina' },
-  { value: 'de', title: '🇩🇪 Deutsch' },
-  { value: 'es', title: '🇪🇸 Español' },
-  { value: 'ja', title: '🇯🇵 日本語' },
-  { value: 'zh', title: '🇨🇳 中文' },
-  { value: 'fa', title: '🇮🇷 فارسی' },
-  { value: 'bn', title: '🇧🇩 বাংলা' },
+  { value: "en", title: "🇬🇧 English" },
+  { value: "sl", title: "🇸🇮 Slovenščina" },
+  { value: "de", title: "🇩🇪 Deutsch" },
+  { value: "es", title: "🇪🇸 Español" },
+  { value: "ja", title: "🇯🇵 日本語" },
+  { value: "zh", title: "🇨🇳 中文" },
+  { value: "fa", title: "🇮🇷 فارسی" },
+  { value: "bn", title: "🇧🇩 বাংলা" },
 ];
 
 // the language and the markdown setting every demo's errors are rendered in
-export const errorLanguage = ref<Language>('en');
+export const errorLanguage = ref<Language>("en");
 export const markdownErrors = ref(true);
 
 // the message for a key in the current language with the params substituted, or the key where there is none
 const t = (key: string, params: Record<string, unknown>) => {
-  const template = (messages[errorLanguage.value].errors as Record<string, string>)[key];
+  const template = (
+    messages[errorLanguage.value].errors as Record<string, string>
+  )[key];
   return template === undefined ? key : interpolate(template, params);
 };
 
 // numbers in the language's digits
 const tf = formatParams(t, (value) =>
-  typeof value === 'number' ? new Intl.NumberFormat(errorLanguage.value).format(value) : value,
+  typeof value === "number"
+    ? new Intl.NumberFormat(errorLanguage.value).format(value)
+    : value,
 );
 
 // a role is stored as its code and shown by its name in the current language
@@ -43,8 +47,12 @@ export const roleName = (role: string) =>
  */
 export const errorText: ErrorText = (error) => {
   const params =
-    error.code === 'in_allowed_values'
-      ? { allowedAsText: (error.params.allowedValues as string[]).map(roleName).join(', ') }
+    error.code === "in_allowed_values"
+      ? {
+          allowedAsText: (error.params.allowedValues as string[])
+            .map(roleName)
+            .join(", "),
+        }
       : error.params;
   if (markdownErrors.value) {
     const markdown = tf(`${error.code}Md`, params);

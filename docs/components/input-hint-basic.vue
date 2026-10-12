@@ -4,9 +4,10 @@
       <v-card-title>Inside an input</v-card-title>
       <v-card-text>
         <p class="mb-4">
-          The field carries a hint and two validators. The hint holds the message row until the field is touched and
-          invalid; from then on the row belongs to the errors. Type a few letters and leave the field to see the
-          swap.
+          The field carries a hint and two validators. The hint holds the
+          message row until the field is touched and invalid; from then on the
+          row belongs to the errors. Type a few letters and leave the field to
+          see the swap.
         </p>
 
         <df-input
@@ -42,8 +43,8 @@
         </div>
 
         <p class="mt-4 mb-0">
-          The middle option feeds the component three spaces. A whitespace-only <code>errors</code> string is no
-          error, so the message comes back.
+          The middle option feeds the component three spaces. A whitespace-only
+          <code>errors</code> string is no error, so the message comes back.
         </p>
       </v-card-text>
     </v-card>
@@ -52,65 +53,90 @@
       <v-card-title>A group's errors</v-card-title>
       <v-card-text>
         <p class="mb-4">
-          The rule spans two fields, so its error sits on the group. One <code>df-input-hint</code> renders it under
-          the pair, with <code>errorClasses</code> naming a colour of its own.
+          The rule spans two fields, so its error sits on the group. One
+          <code>df-input-hint</code> renders it under the pair, with
+          <code>errorClasses</code> naming a colour of its own.
         </p>
 
         <v-row>
           <v-col cols="12" md="6">
-            <df-input :control="credentials.fields.password" input-type="password" label="Password" />
+            <df-input
+              :control="credentials.fields.password"
+              input-type="password"
+              label="Password"
+            />
           </v-col>
           <v-col cols="12" md="6">
-            <df-input :control="credentials.fields.confirmation" input-type="password" label="Repeat password" />
+            <df-input
+              :control="credentials.fields.confirmation"
+              input-type="password"
+              label="Repeat password"
+            />
           </v-col>
         </v-row>
 
-        <df-input-hint :errors="credentials.errors" error-classes="text-warning font-weight-bold" />
+        <df-input-hint
+          :errors="credentials.errors"
+          error-classes="text-warning font-weight-bold"
+        />
       </v-card-text>
     </v-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
-import { DfInput, DfInputHint, DfSelect } from '../../src';
+import { computed, ref } from "vue";
+import {
+  Field,
+  Group,
+  ValidationError,
+  Validators,
+} from "@dynamicforms/vue-forms";
+import { DfInput, DfInputHint, DfSelect } from "../../src";
 
 const email = new Field<string>({
-  value: '',
+  value: "",
   validators: [
     new Validators.Required(),
     new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
-      code: 'invalid_email',
-      detail: 'An address of the form name@example.com, please',
+      code: "invalid_email",
+      detail: "An address of the form name@example.com, please",
     }),
   ],
 });
 
 const errorSources = [
-  { id: 'none', text: 'An empty string' },
-  { id: 'blank', text: 'Three spaces' },
-  { id: 'text', text: 'An error message' },
+  { id: "none", text: "An empty string" },
+  { id: "blank", text: "Three spaces" },
+  { id: "text", text: "An error message" },
 ];
 
-const errorSource = ref<'none' | 'blank' | 'text'>('none');
+const errorSource = ref<"none" | "blank" | "text">("none");
 
 const standaloneErrors = computed(() => {
-  if (errorSource.value === 'blank') return '   ';
-  if (errorSource.value === 'text') return 'The value is not one of the allowed ones';
-  return '';
+  if (errorSource.value === "blank") return "   ";
+  if (errorSource.value === "text")
+    return "The value is not one of the allowed ones";
+  return "";
 });
 
 const credentials = new Group({
-  password: new Field<string>({ value: '' }),
-  confirmation: new Field<string>({ value: '' }),
+  password: new Field<string>({ value: "" }),
+  confirmation: new Field<string>({ value: "" }),
 });
 
 credentials.registerAction(
   new Validators.Validator(() => {
     const { password, confirmation } = credentials.fields;
-    if (!confirmation.value || password.value === confirmation.value) return null;
-    return [new ValidationError('passwords_differ', {}, 'The two entries do not match')];
+    if (!confirmation.value || password.value === confirmation.value)
+      return null;
+    return [
+      new ValidationError(
+        "passwords_differ",
+        {},
+        "The two entries do not match",
+      ),
+    ];
   }),
 );
 </script>

@@ -25,11 +25,9 @@
 
         <div class="mt-4">
           <v-btn @click="toggleEnabled" color="primary" class="mr-2">
-            {{ contentField.enabled ? 'Disable' : 'Enable' }} Editor
+            {{ contentField.enabled ? "Disable" : "Enable" }} Editor
           </v-btn>
-          <v-btn @click="resetField" color="secondary">
-            Reset Content
-          </v-btn>
+          <v-btn @click="resetField" color="secondary"> Reset Content </v-btn>
         </div>
 
         <div class="mt-4">
@@ -42,26 +40,33 @@
 </template>
 
 <script setup>
-import { Field } from '@dynamicforms/vue-forms';
-import { ref } from 'vue';
-import { DfRtfEditor } from '../../src';
+import { Field } from "@dynamicforms/vue-forms";
+import { ref } from "vue";
+import { DfRtfEditor } from "../../src";
 
-const toolbarButtonSizeOptions = ['x-small', 'small', 'default', 'large', 'x-large'];
-const toolbarButtonSize = ref('small');
+const toolbarButtonSizeOptions = [
+  "x-small",
+  "small",
+  "default",
+  "large",
+  "x-large",
+];
+const toolbarButtonSize = ref("small");
 
 const contentField = new Field({
-  value: '<h2>Welcome to RTF Editor</h2><p>This is a <strong>rich text editor</strong> component built on ' +
+  value:
+    "<h2>Welcome to RTF Editor</h2><p>This is a <strong>rich text editor</strong> component built on " +
     '<a href="https://tiptap.dev/">TipTap</a>.</p><p>You can:</p><ul><li>Format text with ' +
-    '<strong>bold</strong>, <em>italic</em>, and headings</li><li>Insert links, images, and tables</li>' +
-    '<li>Create bulleted and numbered lists</li><li>And much more...</li></ul>'
+    "<strong>bold</strong>, <em>italic</em>, and headings</li><li>Insert links, images, and tables</li>" +
+    "<li>Create bulleted and numbered lists</li><li>And much more...</li></ul>",
 });
 
 function toggleEnabled() {
-  contentField.access = contentField.enabled ? 'disabled' : 'editable';
+  contentField.access = contentField.enabled ? "disabled" : "editable";
 }
 
 function resetField() {
-  contentField.value = '<p>Content has been reset.</p>';
+  contentField.value = "<p>Content has been reset.</p>";
 }
 </script>
 

@@ -12,7 +12,12 @@
             hide-details
             style="max-width: 220px"
           />
-          <v-checkbox v-model="markdownErrors" label="Markdown in errors" density="compact" hide-details />
+          <v-checkbox
+            v-model="markdownErrors"
+            label="Markdown in errors"
+            density="compact"
+            hide-details
+          />
         </div>
         <v-form @submit.prevent>
           <!-- Username field (Required) -->
@@ -62,84 +67,97 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn
-          color="primary"
-          :disabled="!formValid"
-        >
-          Submit
-        </v-btn>
-        <v-btn
-          color="secondary"
-          @click="resetForm"
-          class="ml-2"
-        >
-          Reset
-        </v-btn>
+        <v-btn color="primary" :disabled="!formValid"> Submit </v-btn>
+        <v-btn color="secondary" @click="resetForm" class="ml-2"> Reset </v-btn>
       </v-card-actions>
     </v-card>
 
     <v-card>
       <v-card-title>Form Validation Status</v-card-title>
       <v-card-text>
-        <v-alert
-          :type="formValid ? 'success' : 'error'"
-          class="mb-3"
-        >
-          Form is {{ formValid ? 'valid' : 'invalid' }}
+        <v-alert :type="formValid ? 'success' : 'error'" class="mb-3">
+          Form is {{ formValid ? "valid" : "invalid" }}
         </v-alert>
-        <pre class="output">{{ JSON.stringify(validatedForm.value, null, 2) }}</pre>
+        <pre class="output">{{
+          JSON.stringify(validatedForm.value, null, 2)
+        }}</pre>
       </v-card-text>
     </v-card>
   </v-locale-provider>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { Group, Field, transaction, ValueChangedAction, Validators } from '@dynamicforms/vue-forms';
-import { DfInput, DfSelect, DfTextArea } from '../../src';
-import { errorLanguage, languages, markdownErrors, roleName } from './demo-error-text';
+import { computed } from "vue";
+import {
+  Group,
+  Field,
+  transaction,
+  ValueChangedAction,
+  Validators,
+} from "@dynamicforms/vue-forms";
+import { DfInput, DfSelect, DfTextArea } from "../../src";
+import {
+  errorLanguage,
+  languages,
+  markdownErrors,
+  roleName,
+} from "./demo-error-text";
 
 // a role is stored as its code and shown by its name in the language of the errors
-const roles = ['admin', 'user', 'guest'];
-const roleChoices = computed(() => roles.map((id) => ({ id, text: roleName(id) })));
+const roles = ["admin", "user", "guest"];
+const roleChoices = computed(() =>
+  roles.map((id) => ({ id, text: roleName(id) })),
+);
 
 // Create a form group with validated fields
 const validatedForm = new Group({
   // Required field - cannot be empty, and a value of spaces alone is empty too
   username: new Field({
-    value: '',
-    validators: [new Validators.Required()]
+    value: "",
+    validators: [new Validators.Required()],
   }),
 
   // Email field with pattern validation
   email: new Field({
-    value: '',
+    value: "",
     validators: [
       new Validators.Required(),
-      new Validators.Pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
-        code: 'invalid_email',
-        detail: 'Please enter a valid email address',
-      }),
-    ]
+      new Validators.Pattern(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        {
+          code: "invalid_email",
+          detail: "Please enter a valid email address",
+        },
+      ),
+    ],
   }),
 
   // Number field with range validation
   age: new Field({
     value: null,
-    validators: [new Validators.Required(), new Validators.ValueInRange(18, 100)]
+    validators: [
+      new Validators.Required(),
+      new Validators.ValueInRange(18, 100),
+    ],
   }),
 
   // Field with allowed values validation
   role: new Field({
-    value: '',
-    validators: [new Validators.Required(), new Validators.InAllowedValues(roles)]
+    value: "",
+    validators: [
+      new Validators.Required(),
+      new Validators.InAllowedValues(roles),
+    ],
   }),
 
   // Text field with length validation
   bio: new Field({
-    value: '',
-    validators: [new Validators.Required(), new Validators.LengthInRange(10, 200)]
-  })
+    value: "",
+    validators: [
+      new Validators.Required(),
+      new Validators.LengthInRange(10, 200),
+    ],
+  }),
 });
 
 // group.valid covers the group's own errors and those of every field it holds
@@ -149,21 +167,23 @@ const formValid = computed(() => validatedForm.valid);
 // five, and a handler that throws leaves the form as it was.
 function resetForm() {
   transaction(() => {
-    validatedForm.fields.username.value = '';
-    validatedForm.fields.email.value = '';
+    validatedForm.fields.username.value = "";
+    validatedForm.fields.email.value = "";
     validatedForm.fields.age.value = null;
-    validatedForm.fields.role.value = '';
-    validatedForm.fields.bio.value = '';
+    validatedForm.fields.role.value = "";
+    validatedForm.fields.bio.value = "";
   });
 }
 
 // A value changed action on the group fires whenever what the group holds changes: a field written. The handler
 // stays synchronous: the write that triggers it returns once the chain has run, so nothing
 // awaits a promise it hands back.
-validatedForm.registerAction(new ValueChangedAction((field, supr, newValue, oldValue) => {
-  console.log('Form value has changed');
-  return supr(field, newValue, oldValue);
-}));
+validatedForm.registerAction(
+  new ValueChangedAction((field, supr, newValue, oldValue) => {
+    console.log("Form value has changed");
+    return supr(field, newValue, oldValue);
+  }),
+);
 </script>
 
 <style>

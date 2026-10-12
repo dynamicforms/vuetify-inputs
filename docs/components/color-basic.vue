@@ -23,7 +23,7 @@
 
         <div class="mt-4">
           <v-btn @click="toggleEnabled" color="primary" class="mr-2">
-            {{ colorField.enabled ? 'Disable' : 'Enable' }} Field
+            {{ colorField.enabled ? "Disable" : "Enable" }} Field
           </v-btn>
           <v-btn @click="resetField" color="secondary" class="mr-2">
             Reset Field
@@ -36,11 +36,13 @@
         </div>
 
         <div class="mt-4">
-          <strong>Field value:</strong> {{ colorField.value || 'No color selected' }}
+          <strong>Field value:</strong>
+          {{ colorField.value || "No color selected" }}
         </div>
 
         <div class="mt-4">
-          <strong>Direct v-model value:</strong> {{ directColor || 'No color selected' }}
+          <strong>Direct v-model value:</strong>
+          {{ directColor || "No color selected" }}
         </div>
       </v-card-text>
     </v-card>
@@ -48,28 +50,29 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Field, Validators } from '@dynamicforms/vue-forms';
-import { DfColor, MdString } from '../../src';
+import { ref } from "vue";
+import { Field, Validators } from "@dynamicforms/vue-forms";
+import { DfColor, MdString } from "../../src";
 
 const colorField = new Field({
-  value: '#42A5F5',
+  value: "#42A5F5",
   validators: [
     new Validators.Pattern(/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/, {
-      code: 'hex_color',
-      detail: 'Please enter a valid hex color code (e.g., #FF0000 or #FF0000FF)',
+      code: "hex_color",
+      detail:
+        "Please enter a valid hex color code (e.g., #FF0000 or #FF0000FF)",
     }),
-  ]
+  ],
 });
 
-const directColor = ref('#81C784');
+const directColor = ref("#81C784");
 
 function toggleEnabled() {
-  colorField.access = colorField.enabled ? 'disabled' : 'editable';
+  colorField.access = colorField.enabled ? "disabled" : "editable";
 }
 
 function resetField() {
-  colorField.value = '#42A5F5';
+  colorField.value = "#42A5F5";
 }
 
 function setColor(color) {
