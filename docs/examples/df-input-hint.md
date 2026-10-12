@@ -13,7 +13,7 @@ input, e.g. a group's errors, a section caption or a table row.
 | Prop           | Type                                               | Default        | Description                                                       |
 |----------------|----------------------------------------------------|----------------|-------------------------------------------------------------------|
 | errors         | `string \| (RenderableValue \| ErrorInput)[]` | `''`           | The errors to render. When not empty, rendered instead of `message` |
-| message        | `string \| RenderableValue[]`                      | `''`           | Rendered while there is no error, typically the field's hint    |
+| message        | `RenderContentRef \| RenderableValue[]`            | `''`           | Rendered while there is no error, typically the field's hint    |
 | errorClasses   | `ClassTypes`                                       | `'text-error'` | Classes of each rendered message while there are errors           |
 | messageClasses | `ClassTypes`                                       | `''`           | Classes of each rendered message while there are none             |
 
@@ -21,6 +21,10 @@ The component renders one row. It renders `errors` when `errors` is a non-empty 
 non-whitespace character, and `message` otherwise. A whitespace-only string is not an error, so a blank string passed
 to keep a Vuetify message slot rendered shows the hint. The classes are `errorClasses` while the row renders errors and
 `messageClasses` while it renders the message.
+
+`message` is content in any of its forms (see [Render content](#render-content)) or an array of `RenderableValue`s. A
+string is passed to `MessagesWidget` as it is; any other content is passed as a single `RenderableValue`, so a ref or a
+function is read on every render.
 
 `ErrorInput` is `RenderContentNonCallable | Partial<ErrorDescription>`. Content in any of the four forms - a string,
 an `MdString`, an `HtmlString` or a `SimpleComponentDef` - is an error already in the user's language and renders as
@@ -126,12 +130,15 @@ error state and keeps the message row rendered; the text in the row is rendered 
   <!-- A plain string, with classes of its own -->
   <df-input-hint message="Amounts are in euro" message-classes="text-medium-emphasis text-caption" />
 
+  <!-- Markdown -->
+  <df-input-hint :message="new MdString('Amounts are in **euro**')" />
+
   <!-- The message, or the error while serverError is not empty -->
   <df-input-hint :errors="serverError" message="Saved" error-classes="text-warning font-weight-bold" />
 </template>
 
 <script setup>
-import { DfInputHint } from '@dynamicforms/vuetify-inputs';
+import { DfInputHint, MdString } from '@dynamicforms/vuetify-inputs';
 </script>
 ```
 

@@ -136,7 +136,8 @@ reads `action.label`, which returns the string.
 
 ### `<df-input-hint>`'s `message` takes no errors
 
-`message` takes `string | RenderableValue[]`. An error goes in `errors`.
+`message` takes `RenderContentRef | RenderableValue[]`: content in any of its forms, or an array of
+`RenderableValue`s. An error goes in `errors`.
 
 ### Errors the components create
 

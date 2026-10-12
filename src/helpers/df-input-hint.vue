@@ -8,6 +8,7 @@ import { computed } from 'vue';
 import type { DfInputHintProps } from '../dynamicforms-component-props';
 
 import MessagesWidget from './messages-widget.vue';
+import { RenderableValue } from './render-content';
 
 const props = withDefaults(defineProps<DfInputHintProps>(), {
   errors: '',
@@ -27,7 +28,10 @@ const isError = computed(() => {
 });
 
 const widgetMessage = computed(() => {
-  return isError.value ? props.errors : props.message;
+  if (isError.value) return props.errors;
+  const message = props.message;
+  if (typeof message === 'string' || Array.isArray(message)) return message;
+  return [new RenderableValue(message as Exclude<typeof message, readonly RenderableValue[]>)];
 });
 
 const widgetClasses = computed(() => {

@@ -1,10 +1,11 @@
 import { ValidationError } from '@dynamicforms/vue-forms';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
+import { ref } from 'vue';
 
 import DfInputHint from './df-input-hint.vue';
 import MessagesWidget from './messages-widget.vue';
-import { MdString, RenderableValue } from './render-content';
+import { HtmlString, MdString, RenderableValue, type RenderContentRef } from './render-content';
 
 const messagesWidgetStub = {
   template: '<div class="messages-widget">{{ message }}</div>',
@@ -126,5 +127,36 @@ describe('DfInputHint', () => {
     const message = [new RenderableValue(new MdString('**Helper** text'))];
     const wrapper = createWrapper({ message, errors: [] });
     expectMessagesWidget(wrapper, message, '');
+  });
+
+  it.each<[string, RenderContentRef, unknown]>([
+    ['an MdString', new MdString('**Helper** text'), new MdString('**Helper** text')],
+    ['an HtmlString', new HtmlString('<b>Helper</b> text'), new HtmlString('<b>Helper</b> text')],
+    ['a SimpleComponentDef', { componentName: 'em', componentProps: {} }, { componentName: 'em', componentProps: {} }],
+    ['a function', () => 'Helper text', 'Helper text'],
+    ['a ref', ref('Helper text'), 'Helper text'],
+  ])('passes %s message to MessagesWidget as a single RenderableValue', (_, message, resolved) => {
+    const wrapper = createWrapper({ message });
+    const widgetMessage = wrapper.findComponent(MessagesWidget).props('message') as RenderableValue[];
+    expect(widgetMessage).toHaveLength(1);
+    expect(widgetMessage[0]).toBeInstanceOf(RenderableValue);
+    expect(widgetMessage[0].resolvedText).toEqual(resolved);
+  });
+
+  it('renders an MdString message as markdown', () => {
+    const wrapper = mount(DfInputHint, { props: { message: new MdString('**Helper** text') } });
+    expect(wrapper.find('.df-messages-widget-markdown strong').text()).toBe('Helper');
+  });
+
+  it('renders a SimpleComponentDef message as its element', () => {
+    const wrapper = mount(DfInputHint, {
+      props: { message: { componentName: 'em', componentProps: { class: 'hint-em' } } },
+    });
+    expect(wrapper.find('em.hint-em').exists()).toBe(true);
+  });
+
+  it('renders the errors in place of a content message', () => {
+    const wrapper = createWrapper({ message: new MdString('**Helper** text'), errors: 'Field is required' });
+    expectMessagesWidget(wrapper, 'Field is required', 'text-error');
   });
 });

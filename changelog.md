@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.13.0] - Unreleased
+## [0.13.0] - 2026-10-12
 
 ### Added
 
@@ -62,7 +62,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   as the other strings are, in place of Vuetify's `$vuetify.confirmEdit.cancel` and `$vuetify.confirmEdit.ok`.
 - **Breaking:** `SimpleComponentDef` has no `componentVHtml`, and an `innerHTML` in its `componentProps` is dropped.
   HTML content is an `HtmlString`.
-- **Breaking:** `<df-input-hint>`'s `message` takes `string | RenderableValue[]`; an error goes in `errors`.
+- **Breaking:** `<df-input-hint>`'s `message` takes `RenderContentRef | RenderableValue[]`: a string, an `MdString`,
+  an `HtmlString`, a `SimpleComponentDef`, a function or a ref, or an array of `RenderableValue`s. An error goes in
+  `errors`.
 - **Breaking:** `useInputBase()`'s `shownErrors` is `ComputedRef<ErrorInput[]>`: an error of the `errors` prop is
   shown as it was given. `DfLabelProps.data.label` is a string; `<df-label>` renders `label.text`, and `data.label`
   where `label.text` is empty.
