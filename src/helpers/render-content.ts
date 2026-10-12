@@ -12,19 +12,28 @@ export class MdString extends String {
   }
 }
 
-/** A component to render content with: its name, its props and an optional body set as its inner HTML. */
+/**
+ * A string rendered as HTML: it is set as the `innerHTML` of a `div`. It is not sanitized, so a string holding text
+ * from a user or a server is escaped or sanitized before it is wrapped.
+ */
+export class HtmlString extends String {}
+
+/**
+ * A component to render content with: an HTML element or a registered component by its name, with its props. It has
+ * no HTML content; HTML is an `HtmlString`.
+ */
 export interface SimpleComponentDef {
   componentName: string;
-  componentProps?: Record<any, any>;
-  componentVHtml?: string;
+  /** The props of the component. `innerHTML` is not one: the component drops it. */
+  componentProps?: Record<string, unknown> & { innerHTML?: never };
 }
 
 export type ClassType = string | string[] | Record<string, boolean>;
 export type ClassTypes = ClassType | ClassType[];
 
-export type RenderContentNonCallable = string | MdString | SimpleComponentDef;
+export type RenderContentNonCallable = string | MdString | HtmlString | SimpleComponentDef;
 export type RenderContentCallable = () => RenderContentNonCallable;
-/** Content in one of three forms - plain text, markdown or a component - or a function answering one. */
+/** Content in one of four forms - plain text, markdown, HTML or a component - or a function answering one. */
 export type RenderContent = RenderContentNonCallable | RenderContentCallable;
 /** `RenderContent`, or a reference to it. */
 export type RenderContentRef = RenderContent | Ref<RenderContent>;
@@ -41,14 +50,17 @@ export function isCallableFunction(content?: RenderContentRef): content is Rende
   return typeof unref(content) === 'function';
 }
 
-/** Which of the three forms content takes. */
-export type RenderContentKind = 'string' | 'md' | 'component';
+/** Which of the four forms content takes. */
+export type RenderContentKind = 'string' | 'md' | 'html' | 'component';
 
 /**
  * Content with the CSS classes it is rendered with, described as what renders it: `componentName`, its
- * `componentBindings`, its `componentBody` and its `extraClasses`. `MessagesWidget` renders it, and so does any
- * component that reads those four members. A reference or a function as the content is read on every render, so what
- * it answers reaches the screen without the value being built again.
+ * `componentBindings`, its `componentBody` and its `extraClasses`. `componentName` is `'template'` for plain text,
+ * `'vue-markdown'` for markdown, `'html'` for an `HtmlString` and the component's name for a `SimpleComponentDef`;
+ * `componentBody` is the text of plain text and the HTML of an `HtmlString`.
+ *
+ * `MessagesWidget` renders it, and so does any component that reads those four members. A reference or a function as
+ * the content is read on every render, so what it answers reaches the screen without the value being built again.
  */
 export class RenderableValue {
   // an ordinary property rather than a #private one: an error is read through the reactive proxy of the array that
@@ -62,6 +74,7 @@ export class RenderableValue {
     this.kindRef = computed(() => {
       const resolved = this.resolvedText;
       if (resolved instanceof MdString) return 'md';
+      if (resolved instanceof HtmlString) return 'html';
       if (isSimpleComponentDef(resolved)) return 'component';
       return 'string';
     });
@@ -73,7 +86,7 @@ export class RenderableValue {
     return isCallableFunction(content) ? content() : content;
   }
 
-  /** Which of the three forms the content takes now. */
+  /** Which of the four forms the content takes now. */
   get kind(): RenderContentKind {
     return unref(this.kindRef);
   }
@@ -82,6 +95,8 @@ export class RenderableValue {
     switch (this.kind) {
       case 'md':
         return 'vue-markdown';
+      case 'html':
+        return 'html';
       case 'component':
         return (this.resolvedText as SimpleComponentDef).componentName;
       default:
@@ -95,8 +110,12 @@ export class RenderableValue {
         const text = this.resolvedText as MdString;
         return { source: text.toString(), options: text.options, plugins: text.plugins };
       }
-      case 'component':
-        return (this.resolvedText as SimpleComponentDef).componentProps || {};
+      case 'component': {
+        // the props never set inner HTML: HTML content is an HtmlString
+        const props: Record<string, unknown> = { ...(this.resolvedText as SimpleComponentDef).componentProps };
+        delete props.innerHTML;
+        return props;
+      }
       default:
         return {};
     }
@@ -105,11 +124,10 @@ export class RenderableValue {
   get componentBody(): string {
     switch (this.kind) {
       case 'md':
-        return '';
       case 'component':
-        return (this.resolvedText as SimpleComponentDef).componentVHtml || '';
+        return '';
       default:
-        return (this.resolvedText as string) || '';
+        return this.resolvedText.toString();
     }
   }
 

@@ -85,6 +85,8 @@ const render = () => {
     switch (msg.componentName) {
       case 'template':
         return h('div', { class: classes }, msg.componentBody);
+      case 'html':
+        return h('div', { class: classes, innerHTML: msg.componentBody });
       case 'vue-markdown': {
         const { source, options, plugins } = msg.componentBindings;
         return h(VueMarkdown, { class: [...classes, 'df-messages-widget-markdown'], source, options, plugins });
@@ -93,11 +95,7 @@ const render = () => {
         return h(
           // a common html element is rendered as itself; any other name is resolved as a registered component
           htmlElements.has(msg.componentName.toLowerCase()) ? msg.componentName : resolveComponent(msg.componentName),
-          {
-            class: classes,
-            ...msg.componentBindings,
-            ...(msg.componentBody ? { innerHTML: msg.componentBody } : {}),
-          },
+          { class: classes, ...msg.componentBindings },
         );
     }
   });

@@ -42,7 +42,7 @@ exported by this library; see [Render content](#render-content).
 - a `RenderableValue` renders its own content: plain text, markdown or a component
 
 An error carries no markdown or component of its own. An error renders as markdown or as a component when the
-`errorText` setting returns an `MdString` or a `SimpleComponentDef` for its code. The classes given here
+`errorText` setting returns an `MdString`, an `HtmlString` or a `SimpleComponentDef` for its code. The classes given here
 are merged with each `RenderableValue`'s own `classes`.
 
 Markdown renders through `vue-markdown-render`, which `MessagesWidget` imports itself; the library's stylesheet
@@ -50,7 +50,7 @@ removes the outer margins of a markdown message.
 
 ## Render content
 
-`MessagesWidget`, `RenderableValue`, `MdString` and the render-content types are exported from
+`MessagesWidget`, `RenderableValue`, `MdString`, `HtmlString` and the render-content types are exported from
 `@dynamicforms/vuetify-inputs`.
 
 ```typescript
@@ -58,13 +58,14 @@ class MdString extends String {
   constructor(value: string, options?: any, plugins?: any[]);
 }
 
+class HtmlString extends String {}
+
 interface SimpleComponentDef {
   componentName: string;
-  componentProps?: Record<any, any>;
-  componentVHtml?: string;
+  componentProps?: Record<string, unknown> & { innerHTML?: never };
 }
 
-type RenderContentNonCallable = string | MdString | SimpleComponentDef;
+type RenderContentNonCallable = string | MdString | HtmlString | SimpleComponentDef;
 type RenderContent = RenderContentNonCallable | (() => RenderContentNonCallable);
 type RenderContentRef = RenderContent | Ref<RenderContent>;
 
@@ -77,7 +78,8 @@ class RenderableValue {
 |---|---|
 | `string` | a `<div>` holding the text |
 | `MdString` | markdown, through `vue-markdown-render` with the string's `options` and `plugins` |
-| `SimpleComponentDef` | the component named by `componentName`, with `componentProps` as its props and `componentVHtml` as its inner HTML. A common HTML element name renders as that element; any other name is resolved as a globally registered component |
+| `HtmlString` | a `<div>` with the string as its inner HTML. The string is not sanitized: text from a user or a server is escaped or sanitized before it is wrapped |
+| `SimpleComponentDef` | the component named by `componentName`, with `componentProps` as its props. A common HTML element name renders as that element; any other name is resolved as a globally registered component. An `innerHTML` prop is dropped |
 
 A `RenderableValue` reads a ref or a function on every render, so a changed content is rendered without constructing a
 new value. `isSimpleComponentDef(content)` and `isCallableFunction(content)` tell the forms apart.

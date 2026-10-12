@@ -4,7 +4,7 @@ import MarkdownItAttrs from 'markdown-it-attrs';
 import { describe, expect, it } from 'vitest';
 
 import MessagesWidget from './messages-widget.vue';
-import { MdString, RenderableValue } from './render-content';
+import { HtmlString, MdString, RenderableValue } from './render-content';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings';
 
 const MockCustomAlert = {
@@ -87,6 +87,29 @@ describe('MessagesWidget', () => {
     const field = new Field({ value: 'x', validators: [new Validators.InAllowedValues(['a', 'b'])] });
 
     expect(buildWrapper({ message: field.errors }).text()).toBe('Must be one of [a, b]');
+  });
+
+  describe('HTML', () => {
+    it('renders an HtmlString as the inner HTML of a div', () => {
+      const wrapper = buildWrapper({ message: [new RenderableValue(new HtmlString('<b>bold</b>'))] });
+
+      expect(wrapper.find('div b').text()).toBe('bold');
+    });
+
+    it('renders a plain string as text', () => {
+      const wrapper = buildWrapper({ message: [new RenderableValue('<b>bold</b>')] });
+
+      expect(wrapper.find('b').exists()).toBe(false);
+      expect(wrapper.text()).toBe('<b>bold</b>');
+    });
+
+    it('drops innerHTML from the props of a component definition', () => {
+      const content = { componentName: 'div', componentProps: { innerHTML: '<b>bold</b>', title: 't' } } as any;
+      const wrapper = buildWrapper({ message: [new RenderableValue(content)] });
+
+      expect(wrapper.find('b').exists()).toBe(false);
+      expect(wrapper.find('div').attributes('title')).toBe('t');
+    });
   });
 
   describe('errors as strings and partial descriptions', () => {

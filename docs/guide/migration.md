@@ -34,7 +34,18 @@ import { MdString, MessagesWidget, RenderableValue } from '@dynamicforms/vuetify
 ```
 
 `RenderableValue` takes `(content, classes?)` and is not an error: it has no `code`, `origin` or `sameAs()`.
-`getTextType` is `kind`. `MessagesWidget` renders markdown with `vue-markdown-render` itself; a globally registered
+`getTextType` is `kind`.
+
+`SimpleComponentDef` has no `componentVHtml`, and an `innerHTML` in its `componentProps` is dropped. HTML content is
+an `HtmlString`, rendered as the inner HTML of a `div` and not sanitized:
+
+```typescript
+// before
+new RenderableValue({ componentName: 'div', componentVHtml: html, componentProps: { class: 'note' } });
+
+// after
+new RenderableValue(new HtmlString(html), 'note');
+``` `MessagesWidget` renders markdown with `vue-markdown-render` itself; a globally registered
 `vue-markdown` component is not needed.
 
 ### Errors render through the `errorText` setting
@@ -80,11 +91,29 @@ With vue-i18n's `t`, the strings follow a locale switch without another `transla
 npm install @dynamicforms/translatable@^0.3.0
 ```
 
+An error without a code, and a string, render as written; `errorText` is not called for them.
+
 ### `<df-color>` reports an error of code `invalid_hex_color`
 
 Without a `control`, `<df-color>` reports a value that is not a hex color as a `ValidationError` of code
 `invalid_hex_color`, shown once the field is touched and rendered through `errorText`. The `InvalidHexColor` string is
 removed; translate the code with the rest of the errors.
+
+### `<df-color>` writes a picked color when it is confirmed
+
+A color chosen in the picker is written to the field with OK or a double-click on the color area or a swatch, as a
+date in `<df-date-time>` is. Cancel and closing the menu leave the field as it was. A value typed into the field is
+written as it is typed.
+
+### Action labels follow the locale
+
+`Action.closeAction()`, `yesAction()` and `noAction()` label the action with `() => translate(key)`. An action built
+again on a locale switch to pick up its label can be built once. An application action takes the same form:
+`label: () => t('Save')`. `Action.label` returns the string the label gives now.
+
+### `<df-input-hint>`'s `message` takes no errors
+
+`message` takes `string | RenderableValue[]`. An error goes in `errors`.
 
 ### Errors the components create
 
@@ -107,6 +136,8 @@ nothing. They answered `undefined`.
    it where a vue-forms 2.0 validator message was one.
 5. Move a translation of `InvalidHexColor` to the error code `invalid_hex_color`.
 6. Replace `=== undefined` checks of `defaultConfirm` and `defaultReject` with a boolean test.
+7. Replace `componentVHtml` with an `HtmlString`, with the classes as the `RenderableValue`'s second argument.
+8. Move errors passed in `<df-input-hint>`'s `message` to `errors`.
 
 ## Upgrading to v0.12.1 (from v0.11.x)
 

@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `SimpleComponentDef`. An error renders as its `detail` where the setting is not given or returns `undefined`.
 - `translate(key, params?)`, the current translation of one of the library's strings.
 - `useInputBase()` takes the errors a component finds in the value itself, reported where no `control` is bound.
+- `HtmlString`: content rendered as the inner HTML of a `div`, not sanitized.
+- `ErrorInput` (`string | Partial<ErrorDescription>`) and `toErrorDescription(error)`. `<df-input-hint>`'s `errors` and
+  `MessagesWidget`'s `message` take strings and error descriptions with members missing; a missing `code` is `''`,
+  `params` `{}`, `detail` `''` and `origin` `'application'`.
+- An action's `label` may be a ref or a function returning a string, read while the action renders.
+- A double-click on a day in `<df-date-time>`'s date picker, on a minute of its clock, or on the color area or a
+  swatch of `<df-color>`'s picker selects the choice and confirms it.
 
 ### Changed
 
@@ -27,14 +34,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** `<df-color>` without a `control` reports a value that is not a hex color as a `ValidationError` of
   code `invalid_hex_color`, shown once the field is touched, in place of a Vuetify rule message.
 - A string of the `errors` prop is a `ValidationError` with the code `''`, the string as its detail and the origin
-  `'application'`. `setFileGoneError()` sets an error with the code `file_gone` and the origin `'server'`.
+  `'application'`. An error without a code renders as its `detail`, without a call to `errorText`. `setFileGoneError()` sets an error with the code `file_gone` and the origin `'server'`.
 - `Action.defaultConfirm` and `defaultReject` are vue-forms' getters and answer `false` where the value states
   nothing.
-
+- `Action.closeAction()`, `yesAction()` and `noAction()` label the action with `() => translate(key)`, so an action
+  that exists follows a locale switch. `Action.label` returns the string the label gives now.
+- **Breaking:** `<df-color>` writes a color chosen in its picker when OK or a double-click confirms it, as
+  `<df-date-time>` does; Cancel and closing the menu leave the field as it was.
+- **Breaking:** `SimpleComponentDef` has no `componentVHtml`, and an `innerHTML` in its `componentProps` is dropped.
+  HTML content is an `HtmlString`.
+- **Breaking:** `<df-input-hint>`'s `message` takes `string | RenderableValue[]`; an error goes in `errors`.
 - `<df-file>` and `<df-image>` mark the field touched when an upload returns and when the field is cleared,
   `<df-date-time>` when a value picked in its menu is saved and when the field is cleared, and `<df-color>` when a
-  color picked in its menu is saved. vue-forms' default `ErrorPolicy` removes an error of origin `'server'` when the field is marked
-  touched with a changed value.
+  color picked in its menu is saved. vue-forms' default `ErrorPolicy` removes an error of origin `'server'` when the
+  field is marked touched with a changed value.
 
 ### Fixed
 

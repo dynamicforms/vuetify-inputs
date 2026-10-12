@@ -4,9 +4,9 @@ import { FieldDensity, type FieldVariant } from '@/helpers/input-base';
 import type { RenderContentNonCallable } from '@/helpers/render-content';
 
 /**
- * Converts an error to the content it renders as: plain text, an `MdString` for markdown or a `SimpleComponentDef`
- * for a component. `undefined` renders the error's `detail`. It runs while the errors are rendered, so the reactive
- * state it reads, such as the locale, is tracked.
+ * Converts an error to the content it renders as: plain text, an `MdString` for markdown, an `HtmlString` for HTML
+ * or a `SimpleComponentDef` for a component. `undefined` renders the error's `detail`. It is called for an error with
+ * a code. It runs while the errors are rendered, so the reactive state it reads, such as the locale, is tracked.
  */
 export type ErrorText = (error: ErrorDescription) => RenderContentNonCallable | undefined;
 
