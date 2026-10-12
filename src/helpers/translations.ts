@@ -7,6 +7,8 @@ const defaults = {
   Yes: 'Yes',
   No: 'No',
   Close: 'Close',
+  Cancel: 'Cancel',
+  Ok: 'OK',
   Paragraph: 'Paragraph',
   Heading1: 'Heading 1',
   Heading2: 'Heading 2',

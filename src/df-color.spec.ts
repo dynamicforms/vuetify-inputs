@@ -6,6 +6,7 @@ import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './helpers/settings';
+import { translateStrings } from './helpers/translations';
 
 import DfColor from '@/df-color.vue';
 
@@ -111,6 +112,16 @@ describe('DfColor', () => {
       wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ff00');
       await flushPromises();
       expect(button('OK')[0].props('disabled')).toBe(false);
+      wrapper.unmount();
+    });
+
+    it("labels the buttons with the library's strings", async () => {
+      translateStrings((key) => ({ Cancel: 'Prekliči', Ok: 'Potrdi' })[key] ?? key);
+      const wrapper = await openPicker(new Field<string>({ value: '#f00' }));
+
+      const labels = wrapper.findAllComponents({ name: 'VBtn' }).map((b) => b.text());
+      expect(labels).toEqual(expect.arrayContaining(['Prekliči', 'Potrdi']));
+      translateStrings((key) => key);
       wrapper.unmount();
     });
 
