@@ -85,18 +85,21 @@ const blockTags = [
 ];
 const blockBoundary = new RegExp(`</?(?:${blockTags.join('|')})\\b[^>]*>`, 'gi');
 
+// an `&nbsp;` until the text is complete: whitespace is collapsed and trimmed around it, never out of it
+const nbspMark = '\uE000';
+
 // read last for '&amp;', so '&amp;lt;' reads as '&lt;'
 const htmlEntities: Record<string, string> = {
   '&lt;': '<',
   '&gt;': '>',
   '&quot;': '"',
   '&#39;': "'",
-  '&nbsp;': ' ',
+  '&nbsp;': nbspMark,
   '&amp;': '&',
 };
 
 // the text of content, an HtmlString's whitespace collapsed but not trimmed, so that it keeps the space that separates
-// it from the content next to it
+// it from the content next to it, and its `&nbsp;` as nbspMark
 function contentText(content: RenderContentNonCallable): string {
   if (content instanceof HtmlString) {
     const text = content
@@ -114,13 +117,11 @@ function contentText(content: RenderContentNonCallable): string {
  * The text of `content` where only text is taken, such as an `aria-label`: a string and an `MdString` as written, an
  * `HtmlString` without its tags, its blocks separated by a space, whitespace collapsed and trimmed, and with `&amp;`,
  * `&lt;`, `&gt;`, `&quot;`, `&#39;` and `&nbsp;` read, and a component as the text of its children joined, whitespace
- * collapsed and trimmed.
+ * collapsed and trimmed. An `&nbsp;` reads as a space that is neither collapsed nor trimmed.
  */
 export function renderContentText(content: RenderContentNonCallable): string {
-  const text = contentText(content);
-  if (content instanceof HtmlString) return text.trim();
-  if (isSimpleComponentDef(content)) return text.replace(/\s+/g, ' ').trim();
-  return text;
+  if (!(content instanceof HtmlString) && !isSimpleComponentDef(content)) return content.toString();
+  return contentText(content).replace(/\s+/g, ' ').trim().replaceAll(nbspMark, ' ');
 }
 
 // the children of a component as an array, empty where it has none

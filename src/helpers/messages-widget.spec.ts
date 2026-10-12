@@ -127,6 +127,7 @@ describe('MessagesWidget', () => {
       };
 
       expect(renderContentText(content)).toBe('Read the docs first');
+      expect(renderContentText({ componentName: 'p', children: [new HtmlString('&nbsp;x'), ' y '] })).toBe(' x y');
       expect(renderContentText({ componentName: 'v-icon' })).toBe('');
     });
   });
@@ -186,6 +187,11 @@ describe('MessagesWidget', () => {
       expect(renderContentText(new HtmlString('<h1>Title</h1><p>One<br>two <b>bo</b>ld</p>'))).toBe(
         'Title One two bold',
       );
+    });
+
+    it('reads an &nbsp; of an HtmlString as a space that is neither collapsed nor trimmed', () => {
+      expect(renderContentText(new HtmlString('&nbsp;x'))).toBe(' x');
+      expect(renderContentText(new HtmlString(' a&nbsp;&nbsp;b&nbsp; '))).toBe('a  b ');
     });
 
     it('reads the text of an HtmlString without tags and with its entities read', () => {
