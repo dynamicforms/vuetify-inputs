@@ -1,6 +1,6 @@
 <template>
   <div class="editor-container">
-    <rtf-toolbar ref="toolbarRef" :editor="editor" :button-size="toolbarButtonSize" />
+    <rtf-toolbar :ref="setToolbar" :editor="editor" :button-size="toolbarButtonSize" />
     <editor-content class="editor-container__editor" :editor="editor" />
     <bubble-menu v-if="editor" :editor="editor" :should-show="bubbleShouldShow">
       <div class="rtf-bubble-menu">
@@ -36,7 +36,7 @@ import { NodeSelection } from '@tiptap/pm/state';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { type ComponentPublicInstance, computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { VuetifyButtonSize } from '../input-base';
@@ -72,7 +72,11 @@ const emit = defineEmits<{
 // shared `.v-field` ancestor lets that `translate()` read a real value instead of guessing one - it still needs
 // to reach up past this component's own root to a DOM node it doesn't otherwise touch, which is what the
 // `.closest()` below is for.
-const toolbarRef = ref<InstanceType<typeof RtfToolbar>>();
+// a function ref: a template ref by name would put the toolbar's types into the declarations this component emits
+const toolbarRef = ref<ComponentPublicInstance | null>(null);
+function setToolbar(el: unknown) {
+  toolbarRef.value = el as ComponentPublicInstance | null;
+}
 let toolbarResizeObserver: ResizeObserver | undefined;
 
 onMounted(() => {
