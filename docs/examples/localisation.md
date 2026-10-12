@@ -86,9 +86,9 @@ translations change. The resolution order and the formatting of values are descr
 
 ### When it takes effect
 
-- **Actions.** `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()` copy the string into the action's
-  `label` when the factory runs. An action that already exists keeps the label it was built with: assign
-  `action.label` to change it, or build the action again.
+- **Actions.** The label of `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()` is
+  `() => translate(key)`, read while the action renders, so an action that already exists follows a locale switch.
+  An action of the application's own does the same with a function as its `label`: `label: () => t('Save')`.
 - **The RTF editor.** `<df-rtf-editor>`'s toolbar, the heading dropdown included, reads its strings while it renders,
   so a toolbar that is already mounted follows a locale switch.
 - **`<df-image>` and `<df-file>`.** Their prompts are read while they render, like the toolbar's.
@@ -276,8 +276,7 @@ const messages = {
 };
 ```
 
-An action does not re-read its label once built, so it is rebuilt on a locale change, e.g. inside a `computed` that
-reads the locale:
+The actions follow the locale without being rebuilt:
 
 ```vue
 <template>
@@ -286,19 +285,12 @@ reads the locale:
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { Action, DfActions, DfRtfEditor } from '@dynamicforms/vuetify-inputs';
 
-const { locale } = useI18n();
-
-const dialogActions = computed(() => {
-  void locale.value; // rebuild the actions after the strings change
-  return [
-    Action.noAction({ value: { defaultReject: true } }),
-    Action.yesAction({ value: { defaultConfirm: true } }),
-  ];
-});
+const dialogActions = [
+  Action.noAction({ value: { defaultReject: true } }),
+  Action.yesAction({ value: { defaultConfirm: true } }),
+];
 </script>
 ```
 

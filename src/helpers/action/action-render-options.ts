@@ -1,5 +1,6 @@
 import { ActionValue } from '@dynamicforms/vue-forms';
 import { isBoolean, isEmpty, isObjectLike, isPlainObject, isString } from 'lodash-es';
+import { type MaybeRefOrGetter, toValue } from 'vue';
 
 import {
   type ActionDisplayStyle,
@@ -11,8 +12,10 @@ import { BreakpointNames, BreakpointsJSON, ResponsiveRenderOptions } from './res
 
 export interface ActionRenderOptions extends ActionValue {
   /** The text of the action, rendered when {@link showLabel} is set and the text is not empty. `ActionValue`
-   * types this `unknown`, leaving what a label is to the rendering library; here it is a string. */
-  label?: string;
+   * types this `unknown`, leaving what a label is to the rendering library; here it is a string, a ref to one or a
+   * function returning one. A ref or a function is read while the action renders, so a label that follows the
+   * locale is `() => t('Save')`. */
+  label?: MaybeRefOrGetter<string>;
   /** The icon of the action, a name `vue-cached-icon` resolves, rendered when {@link showIcon} is set and the
    * name is not empty. Typed here for the same reason `label` is. */
   icon?: string;
@@ -74,7 +77,8 @@ export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<Actio
         }
         result.renderAs = bp.renderAs;
       }
-      if (isString(bp.label)) result.label = bp.label;
+      const label = toValue(bp.label);
+      if (isString(label)) result.label = label;
       if (isString(bp.icon)) result.icon = bp.icon;
       if (isBoolean(bp.showLabel)) result.showLabel = bp.showLabel;
       if (isBoolean(bp.showIcon)) result.showIcon = bp.showIcon;
@@ -90,6 +94,9 @@ export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<Actio
   }
 }
 
+/** `ActionRenderOptions` with the label read: a string. */
+export type ResolvedActionRenderOptions = Omit<ActionRenderOptions, 'label'> & { label?: string };
+
 /**
  * What one action renders as at `breakpoint`, read off the value of any `Action`. The members
  * `ActionRenderOptions` adds over `ActionValue` are taken where the value carries them and defaulted where it does
@@ -99,15 +106,20 @@ export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<Actio
  * `label` and `icon` come back only where the matching flag says they are shown, and the flags come back false
  * where there is no text or name to show, so a caller renders each member on its own flag and never on emptiness.
  */
-export function getRenderOptionsForBreakpoint(value: ActionValue, breakpoint: BreakpointNames): ActionRenderOptions {
+export function getRenderOptionsForBreakpoint(
+  value: ActionValue,
+  breakpoint: BreakpointNames,
+): ResolvedActionRenderOptions {
   const options = new ResponsiveActionRenderOptions(value as ActionBreakpointOptions);
   const partial = options.getOptionsForBreakpoint(breakpoint);
+  // cleanBreakpoint stored the label read
+  const label = partial.label as string | undefined;
   return {
     name: partial.name,
-    label: partial.showLabel ? partial.label : undefined,
+    label: partial.showLabel ? label : undefined,
     icon: partial.showIcon ? partial.icon : undefined,
     renderAs: partial.renderAs,
-    showLabel: isString(partial.label) && !isEmpty(partial.label) ? partial.showLabel : false,
+    showLabel: isString(label) && !isEmpty(label) ? partial.showLabel : false,
     showIcon: isString(partial.icon) && !isEmpty(partial.icon) ? partial.showIcon : false,
     defaultConfirm: partial.defaultConfirm,
     defaultReject: partial.defaultReject,

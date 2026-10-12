@@ -32,7 +32,7 @@ The component expects an array of `Action` objects created with `new Action()` w
 ```typescript
 interface ActionBreakpointOptions {
   name?: string;                    // Unique identifier for the action
-  label?: string;                   // Display text
+  label?: MaybeRefOrGetter<string>; // Display text: a string, a ref or a function returning one
   icon?: string;                    // Icon name, resolved by vue-cached-icon (e.g. ion-save-outline, mdi-content-save)
   renderAs?: ActionDisplayStyle;    // 'button' or 'text'
   showIcon?: boolean;               // Whether to show the icon
@@ -61,8 +61,8 @@ This library's `Action` extends the `Action` class of `@dynamicforms/vue-forms` 
 
 The component reads its render options from the action's value, not through this subclass's accessors. An `Action` of
 `@dynamicforms/vue-forms`, whose value holds only a `label` and an `icon`, therefore renders as a button showing the
-ones it has. Options the value does not hold take their defaults. A `label` or `icon` that is not a string is not
-rendered.
+ones it has. Options the value does not hold take their defaults. A `label` that is a ref or a function is read while
+the action renders. A `label` or `icon` that is not a string after that is not rendered.
 
 ```typescript
 import { Action } from '@dynamicforms/vue-forms';
@@ -105,7 +105,7 @@ The `value` object defines the visual appearance and behavior:
 | Property | Type | Description |
 |----------|------|-------------|
 | `name` | `string` | Unique identifier for the action |
-| `label` | `string` | Display text |
+| `label` | `MaybeRefOrGetter<string>` | Display text. A ref or a function is read while the action renders, so `() => t('Save')` follows the locale |
 | `icon` | `string` | Icon name, resolved by `vue-cached-icon`; both `ion-` and `mdi-` prefixed names work |
 | `renderAs` | `ActionDisplayStyle` | How to render: `'button'` or `'text'` |
 | `showIcon` | `boolean` | Whether to display the icon |
@@ -116,8 +116,9 @@ The `value` object defines the visual appearance and behavior:
 
 Every one of these but `name`, `defaultConfirm` and `defaultReject` can also be stated per breakpoint.
 
-`label` and `icon` are accessors of `@dynamicforms/vue-forms`: each reads the member of the same name from the value,
-and a write to it is a value change. `defaultConfirm` and `defaultReject` are read-only accessors of vue-forms: each
+`icon` is an accessor of `@dynamicforms/vue-forms`: it reads the member of the same name from the value, and a write
+to it is a value change. `label` is this subclass's accessor over the same member: it returns the string the member
+gives now, reading a ref or calling a function, and a write to it is a value change. `defaultConfirm` and `defaultReject` are read-only accessors of vue-forms: each
 reads the member of the same name from the value and returns `false` where it is unset. `renderedLabel` and
 `renderedIcon` are this subclass's: the text where `showLabel` is true, the icon name where `showIcon` is true, and
 `undefined` otherwise. `showLabel` and `showIcon` return `false` where the label or icon is missing or empty,
@@ -245,7 +246,7 @@ regardless, and an action that refuses an overlapping run does so in its own han
 Predefined actions:
 
 ```typescript
-// Close action with default "Close" label and close icon
+// Close action with the "Close" label in the current translation and the close icon
 const closeAction = Action.closeAction();
 
 // Yes/No actions for confirmation dialogs
