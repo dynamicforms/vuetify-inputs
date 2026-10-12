@@ -72,7 +72,7 @@ const localeInfos = [
 ];
 
 const dateTimeField = new Field({
-  value: new Date().toISOString(),
+  value: '2026-03-15T09:30:00',
   validators: [new Validators.Required()],
 });
 </script>

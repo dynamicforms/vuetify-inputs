@@ -17,7 +17,7 @@
       />
     </template>
     <template #default>
-      <v-menu v-model="dropdownShown" :close-on-content-click="false" activator="parent">
+      <v-menu v-if="clientRendered" v-model="dropdownShown" :close-on-content-click="false" activator="parent">
         <v-confirm-edit v-model="value" @cancel="dropdownShown = false" @save="concludeEdit">
           <template #default="{ model: proxyModel, save, actions }">
             <v-card>
@@ -41,6 +41,7 @@ import { ref } from 'vue';
 
 import { DfColorProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
+import { useClientRendered } from './helpers/client-rendered';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfColorProps>(), { ...defaultBaseProps, allowNull: false });
@@ -65,6 +66,7 @@ const { densityClass, isRendered, label, shownErrors, touched, value, visibility
   hexColorErrors,
 );
 const dropdownShown = ref(false);
+const clientRendered = useClientRendered();
 const colorChoices = '.v-color-picker-canvas';
 const { saveOnDoubleClick } = usePickerDoubleClick();
 

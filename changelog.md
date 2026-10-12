@@ -28,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its text.
 - `isRenderContent(value)` and `renderContentText(content)`.
 - `InputBaseSlotProps`, the props of `InputBase`'s default slot.
+- Server-side rendering: `df-select` renders a read-only text field with the chosen choices' text, `df-date-time`
+  and `df-color` render without their pickers, and `df-rtf-editor` renders the value's text without the toolbar, on
+  the server and, with Vuetify created with `ssr: true`, until mounted. The [Server-side rendering](/guide/ssr) guide.
+- The `translate`, `translateNamespace` and `dateTimeLocale` settings: per app, in place of `translateStrings` and
+  `DateTimeLocaleConfig`, which are per process. `translate()` called while a component renders uses its app's.
 - `ResolvedActionRenderOptions`, what `getRenderOptionsForBreakpoint()` returns: `ActionRenderOptions` with the
   label read.
 - A double-click on a day in `<df-date-time>`'s date picker, on its clock, or on the color area of `<df-color>`'s
@@ -68,6 +73,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   field is marked touched with a changed value.
 
 ### Fixed
+
+- `df-select` calls `fetchChoices` in the browser only; a rejected call is logged with `console.error` in place of
+  an unhandled rejection, which ended a server process.
+- Requires `vue-cached-icon` 3.2 (`peerDependencies` `^3.2.0`), which fetches no icon on the server.
 
 - `<df-input>` with `input-type="number"` marks its control touched on blur, so its validators' errors are shown.
 - `vitepress-plugin-crosslinks` is a dev dependency of the documentation, not a peer dependency of the package.

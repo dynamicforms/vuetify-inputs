@@ -74,7 +74,7 @@
     "date-fns": "^4.1.0",
     "lodash-es": "^4.17.12",
     "vue": "^3.5.2",
-    "vue-cached-icon": "^3.0.3",
+    "vue-cached-icon": "^3.2.0",
     "vue-markdown-render": "^2.2.1",
     "vuetify": "^3.9"
   },

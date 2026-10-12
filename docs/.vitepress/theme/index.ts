@@ -15,7 +15,9 @@ import { errorText } from '../../components/demo-error-text';
 export default {
   extends: DefaultTheme,
   enhanceApp({ app }) {
+    // VitePress renders the pages on the server and hydrates them
     const vuetify = createVuetify({
+      ssr: true,
       components,
       directives,
       theme: {

@@ -80,7 +80,17 @@ translateStrings(i18n.global.t, 'df_inputs');
 ```
 
 The library calls `t` every time it reads a string, so with vue-i18n the strings follow a locale switch without
-another call. A translation function over non-reactive translations is set again with `translateStrings` after the
+another call.
+
+`translateStrings` sets the function for the whole process. The `translate` and `translateNamespace` settings set it
+for one app, and take precedence in that app: a string read while a component of the app renders is translated with
+them. Under server-side rendering, where an app is created per request, the settings give each request its own
+translation; see [Server-side rendering](/guide/ssr).
+
+```typescript
+app.use(DynamicFormsInputs, { translate: i18n.global.t, translateNamespace: 'df_inputs' });
+```
+ A translation function over non-reactive translations is set again with `translateStrings` after the
 translations change. The resolution order and the formatting of values are described in the
 [`@dynamicforms/translatable` readme](https://github.com/dynamicforms/translatable#readme).
 
@@ -236,6 +246,10 @@ export function useDfLocale() {
   watch(locale, (code) => DateTimeLocaleConfig.setDateTimeLocale(dateFnsLocales[code] ?? enUS), { immediate: true });
 }
 ```
+
+Under server-side rendering the date-fns locale is the `dateTimeLocale` setting, given per app, in place of
+`DateTimeLocaleConfig`, which is one for the process: `app.use(DynamicFormsInputs, { dateTimeLocale })`, with
+`dateTimeLocale` a computed over the locale.
 
 The strings and the errors are connected once, when the application is set up:
 

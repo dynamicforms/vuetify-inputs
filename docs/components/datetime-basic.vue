@@ -80,11 +80,11 @@ const dateTimeField = new Field({
 });
 
 const dateField = new Field({
-  value: new Date().toISOString().split('T')[0],
+  value: '2026-03-15',
 });
 
 const timeField = new Field({
-  value: new Date().toISOString().split('T')[1].split('.')[0],
+  value: '09:30:00',
 });
 
 function toggleEnabled() {

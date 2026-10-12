@@ -80,7 +80,8 @@ The value depends on `multiple`:
 
 When using the `fetchChoices` prop instead of static `choices`, the component:
 
-1. Calls the function while the component is being set up, before it is mounted
+1. Calls the function while the component is being set up, before it is mounted, in the browser only (see
+   [Server-side rendering](/guide/ssr))
 2. Calls the function when the user types in the search field
 3. Uses the search text as the query parameter
 4. Uses the ids of the value that no loaded choice covers as the idValue parameter - an array when `multiple` is set,
@@ -89,7 +90,8 @@ When using the `fetchChoices` prop instead of static `choices`, the component:
    itself (`null`) as idValue and expects the unfiltered choices back.
 
 Until that call resolves, the value is unchanged, and no chip shows the ids. Once it has resolved, the value is reconciled against the loaded choices as with static `choices`: an id the call returned no
-choice for is dropped from the value (unless `allowTags` is set).
+choice for is dropped from the value (unless `allowTags` is set). A call that rejects is logged with `console.error`
+and leaves the loaded choices as they are.
 
 ```typescript
 const fetchChoices = async (query?: string, idValue?: any): Promise<SelectChoice[]> => {

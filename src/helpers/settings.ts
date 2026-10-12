@@ -1,4 +1,7 @@
+import type { TranslateFunction } from '@dynamicforms/translatable';
 import type { ErrorDescription, FieldBase, ValidationError } from '@dynamicforms/vue-forms';
+import type { Locale } from 'date-fns';
+import type { MaybeRef } from 'vue';
 
 import { FieldDensity, type FieldVariant } from '@/helpers/input-base';
 import type { RenderContentNonCallable } from '@/helpers/render-content';
@@ -27,6 +30,19 @@ export interface VuetifyInputsSettings {
    * The content an error renders as; see `ErrorText`. Without it, an error renders as its `detail`.
    */
   errorText?: ErrorText;
+  /**
+   * The translation function of the library's strings for this app, shaped like vue-i18n's `t`. Where it is given,
+   * `translate()` called while a component of this app renders uses it in place of the one `translateStrings` set
+   * for the process. Under server-side rendering, an app per request gives each request its own.
+   */
+  translate?: TranslateFunction;
+  /** The namespace `translate` looks the library's keys up under: `${translateNamespace}.${key}`. */
+  translateNamespace?: string;
+  /**
+   * The date-fns locale `<df-date-time>` formats and parses with in this app, in place of
+   * `DateTimeLocaleConfig.dateTimeLocale`. A component's `locale` prop takes precedence.
+   */
+  dateTimeLocale?: MaybeRef<Locale>;
 }
 
 export const vuetifyInputsSettingsKey = Symbol('vuetifyInputsSettingsKey');

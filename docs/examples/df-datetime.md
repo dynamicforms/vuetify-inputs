@@ -196,7 +196,7 @@ import { DfDateTime } from '@dynamicforms/vuetify-inputs';
 
 const form = new Group({
   meetingTime: new Field({ 
-    value: new Date().toISOString()
+    value: '2026-03-15T09:30:00'
   })
 });
 </script>
