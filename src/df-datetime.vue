@@ -29,7 +29,7 @@
           @blur="slotProps.blur()"
         >
           <template #default>
-            <v-menu v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
+            <v-menu v-if="clientRendered" v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
               <v-confirm-edit v-model="valueAsDate" @cancel="dropdown = ''" @save="concludeEdit">
                 <template #default="{ model: proxyModel, save, actions }">
                   <v-date-picker
@@ -70,7 +70,7 @@
           @blur="slotProps.blur()"
         >
           <template #default>
-            <v-menu v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
+            <v-menu v-if="clientRendered" v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
               <v-confirm-edit v-model="valueAsTimeString" @cancel="dropdown = ''" @save="concludeEdit">
                 <template #default="{ model: proxyModel, save, actions }">
                   <v-time-picker
@@ -95,10 +95,19 @@
 <script setup lang="ts">
 import { format, parse, parseISO } from 'date-fns';
 import { toNumber, isNaN } from 'lodash-es';
-import { ref, computed, watch, toRefs, unref } from 'vue';
+import { ref, computed, inject, watch, toRefs, unref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
-import { BaseEmits, DateTimeLocaleConfig, defaultBaseProps, InputBase, useInputBase } from './helpers';
+import {
+  BaseEmits,
+  DateTimeLocaleConfig,
+  defaultBaseProps,
+  InputBase,
+  useInputBase,
+  type VuetifyInputsSettings,
+  vuetifyInputsSettingsKey,
+} from './helpers';
+import { useClientRendered } from './helpers/client-rendered';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {
@@ -111,12 +120,16 @@ const props = withDefaults(defineProps<DfDateTimeProps>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const currentLocale = computed(() => props.locale ?? unref(DateTimeLocaleConfig.dateTimeLocale));
+const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+const currentLocale = computed(
+  () => props.locale ?? unref(settings.dateTimeLocale) ?? unref(DateTimeLocaleConfig.dateTimeLocale),
+);
 const firstDayOfWeek = computed(() => currentLocale.value.options?.weekStartsOn ?? 1);
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 const dropdown = ref('');
+const clientRendered = useClientRendered();
 const dateMenuShown = computed({
   get() {
     return unref(dropdown) === 'date';

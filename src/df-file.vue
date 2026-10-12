@@ -78,7 +78,6 @@ const t = translate;
 // State
 const currentFile = ref<File | null>(null);
 const progress = ref(0);
-const fileInputKey = ref(Math.round(Math.random() * 1000));
 const selectedFile = ref<File | null>();
 const loading = computed(() => currentFile.value && progress.value < 100);
 
@@ -105,7 +104,6 @@ async function downloadFile() {
 function resetFileState() {
   value.value = null;
   progress.value = 0;
-  fileInputKey.value = Math.round(Math.random() * 1000);
   currentFile.value = null;
   selectedFile.value = null;
   clearTouchInterval();
@@ -147,7 +145,6 @@ async function upload(file: File) {
   } catch (err) {
     progress.value = 0;
     currentFile.value = null;
-    fileInputKey.value = Math.round(Math.random() * 1000);
     selectedFile.value = null;
     throw err;
   }

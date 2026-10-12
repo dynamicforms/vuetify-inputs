@@ -255,4 +255,14 @@ describe('DfSelect', () => {
       expect(wrapper.findComponent(VAutocomplete).props('modelValue')).toEqual([1]);
     });
   });
+
+  it('renders the autocomplete once mounted where Vuetify is created for server-side rendering', async () => {
+    const ssrVuetify = createVuetify({ ssr: true, components });
+    const choices = [{ id: 1, text: 'One' }];
+    const wrapper = mount(DfSelect, { props: { choices, modelValue: 1 }, global: { plugins: [ssrVuetify] } });
+
+    await flushPromises();
+
+    expect(wrapper.findComponent(VAutocomplete).exists()).toBe(true);
+  });
 });

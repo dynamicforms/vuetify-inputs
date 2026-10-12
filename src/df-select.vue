@@ -1,7 +1,16 @@
 <template>
+  <v-text-field
+    v-if="isRendered && !clientRendered"
+    :class="[cssClass, densityClass, visibilityClass]"
+    :model-value="chosenText"
+    v-bind="vuetifyBindings"
+    readonly
+  >
+    <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+  </v-text-field>
   <component
     :is="taggable ? 'v-combobox' : 'v-autocomplete'"
-    v-if="isRendered"
+    v-else-if="isRendered"
     ref="dfSelectRef"
     v-model="selected"
     :class="[cssClass, densityClass, visibilityClass, { 'df-select-multirow': isMultiline }]"
@@ -73,6 +82,7 @@ import { VAutocomplete, VCombobox } from 'vuetify/components';
 
 import { DfSelectProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, SelectChoice, useInputBase } from './helpers';
+import { useClientRendered } from './helpers/client-rendered';
 import {
   convertItems,
   getSelectedChoices,
@@ -114,12 +124,20 @@ const {
   vuetifyBindings,
 } = useInputBase(propsWithDefaults, emits);
 
+// on the server and until it renders in the browser, the select is a text field holding the chosen choices' text:
+// Vuetify's autocomplete keeps its menu in memory after a server render
+const clientRendered = useClientRendered();
 const selected = ref<any>(null);
 const takeLoaded = ref(false);
 const loaded = ref<SelectChoice[]>([]);
 const loadedChoices = computed<SelectChoice[]>(() => (unref(takeLoaded) ? unref(loaded) : unref(choices) || []));
 
 const options = computed(() => convertItems(loadedChoices.value));
+const chosenText = computed(() =>
+  getSelectedChoices(loadedChoices.value, multipleCompliantValue(resultingValue.value, multiple.value))
+    .map((choice) => choice.text)
+    .join(', '),
+);
 const searchText = ref<string | null>(null);
 const fetchCounterGlobal = ref(0);
 const isMultiline = ref(false);
@@ -291,6 +309,9 @@ async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
     );
     loaded.value = unionBy([...selectedChoices, ...newChoices], 'id');
     takeLoaded.value = true;
+  } catch (error) {
+    // a failed fetch leaves the choices as they are; a rejection out of here would be unhandled
+    console.error(error);
   } finally {
     searching.value--;
   }
@@ -313,6 +334,8 @@ function resolveValueChoices(mcVal: any): Promise<void> | null {
       const newChoices = await fetchChoices(undefined, multiple.value ? unresolved : unresolved[0]);
       loaded.value = unionBy([...loadedChoices.value, ...newChoices], 'id');
       takeLoaded.value = true;
+    } catch (error) {
+      console.error(error);
     } finally {
       resolvingValue.value--;
     }
@@ -337,14 +360,17 @@ function initialValueCheck() {
 
 // Starting settings: with fetchChoices, a value is first resolved into its choices and only then reconciled against
 // them. Anything else - an empty value, a taggable select - goes through queryOptions() with the value as idValue.
+// On the server nothing is fetched, and a value is not reconciled against choices it has not loaded: the server
+// does not wait for a fetch, so its result would not reach the HTML.
+const inBrowser = typeof window !== 'undefined';
 let initialLoad: Promise<void> | null = null;
-if (propsWithDefaults.fetchChoices !== undefined) {
+if (propsWithDefaults.fetchChoices !== undefined && inBrowser) {
   initialLoad =
     resolveValueChoices(multipleCompliantValue(resultingValue.value, multiple.value)) ??
     queryOptions(undefined, resultingValue.value);
 }
 
-initialValueCheck();
+if (inBrowser || propsWithDefaults.fetchChoices === undefined) initialValueCheck();
 
 initialLoad?.then(() => {
   initialValueCheck();

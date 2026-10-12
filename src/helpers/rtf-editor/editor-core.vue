@@ -1,7 +1,9 @@
 <template>
   <div class="editor-container">
-    <rtf-toolbar :ref="setToolbar" :editor="editor" :button-size="toolbarButtonSize" />
-    <editor-content class="editor-container__editor" :editor="editor" />
+    <rtf-toolbar v-if="clientRendered" :ref="setToolbar" :editor="editor" :button-size="toolbarButtonSize" />
+    <editor-content v-if="clientRendered" class="editor-container__editor" :editor="editor" />
+    <!-- on the server and until the editor is created, the value's text -->
+    <div v-else class="editor-container__editor">{{ valueText }}</div>
     <bubble-menu v-if="editor" :editor="editor" :should-show="bubbleShouldShow">
       <div class="rtf-bubble-menu">
         <v-btn v-bind="bubbleButtonProps" :active="bubbleState.bold" @click="toggle('toggleBold')">
@@ -36,10 +38,12 @@ import { NodeSelection } from '@tiptap/pm/state';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, useEditor } from '@tiptap/vue-3';
 import { BubbleMenu } from '@tiptap/vue-3/menus';
-import { type ComponentPublicInstance, computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { type ComponentPublicInstance, computed, onBeforeUnmount, ref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
+import { useClientRendered } from '../client-rendered';
 import { VuetifyButtonSize } from '../input-base';
+import { HtmlString, renderContentText } from '../render-content';
 import { translate } from '../translations';
 
 import { ClassAttribute, Marker, Spoiler } from './block-styles';
@@ -77,17 +81,25 @@ const toolbarRef = ref<ComponentPublicInstance | null>(null);
 function setToolbar(el: unknown) {
   toolbarRef.value = el as ComponentPublicInstance | null;
 }
+const clientRendered = useClientRendered();
+const valueText = computed(() => renderContentText(new HtmlString(props.modelValue)));
 let toolbarResizeObserver: ResizeObserver | undefined;
 
-onMounted(() => {
-  const toolbarEl = toolbarRef.value?.$el as HTMLElement | undefined;
-  const fieldEl = toolbarEl?.closest<HTMLElement>('.v-field');
-  if (!toolbarEl || !fieldEl) return;
-  toolbarResizeObserver = new ResizeObserver(([entry]) => {
-    fieldEl.style.setProperty('--rtf-toolbar-height', `${entry.contentRect.height}px`);
-  });
-  toolbarResizeObserver.observe(toolbarEl);
-});
+// the toolbar is rendered once the component renders in the browser, at mount or after it
+watch(
+  toolbarRef,
+  (toolbar) => {
+    toolbarResizeObserver?.disconnect();
+    const toolbarEl = toolbar?.$el as HTMLElement | undefined;
+    const fieldEl = toolbarEl?.closest<HTMLElement>('.v-field');
+    if (!toolbarEl || !fieldEl) return;
+    toolbarResizeObserver = new ResizeObserver(([entry]) => {
+      fieldEl.style.setProperty('--rtf-toolbar-height', `${entry.contentRect.height}px`);
+    });
+    toolbarResizeObserver.observe(toolbarEl);
+  },
+  { flush: 'post' },
+);
 onBeforeUnmount(() => toolbarResizeObserver?.disconnect());
 
 const editor = useEditor({

@@ -33,6 +33,9 @@ settings) plus the two registration flags.
 | `defaultVariant` | `FieldVariant` | unset, so `'underlined'` applies | Application-wide variant for all fields |
 | `defaultTouchInterval` | `number` | unset, so `60000` applies | Milliseconds between `<df-file>`/`<df-image>` keep-alive touches, application-wide |
 | `shownErrors` | `(error, control, shownByDefault) => boolean` | unset, so the default rule applies | Whether a component shows an error. Called for each error with the default rule's result; its return value is used. See [Shown errors](/examples/input-base#shown-errors) |
+| `translate` | `TranslateFunction` | unset, so the function `translateStrings` set applies | The translation function of the library's strings in this app, shaped like vue-i18n's `t`. See [Localisation](/examples/localisation#translatestrings) |
+| `translateNamespace` | `string` | unset | The namespace `translate` looks the library's keys up under |
+| `dateTimeLocale` | `MaybeRef<Locale>` | unset, so `DateTimeLocaleConfig.dateTimeLocale` applies | The date-fns locale `<df-date-time>` formats and parses with in this app; a component's `locale` prop takes precedence |
 | `errorText` | `ErrorText`: `(error: ErrorDescription) => RenderContentNonCallable \| undefined` | unset | The content an error renders as: a string, an `MdString` for markdown, an `HtmlString` for HTML or a `SimpleComponentDef` for a component. `undefined` renders the error's `detail`. It runs while the errors are rendered, and what it reads reactively is tracked. See [Translating errors](/examples/localisation#translating-errors) |
 
 `FieldDensity` is `'default' | 'comfortable' | 'compact' | 'inline'`, `FieldVariant` is
