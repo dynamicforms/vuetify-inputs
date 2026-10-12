@@ -66,10 +66,10 @@
           <strong>Validation errors:</strong>
           <ul>
             <li v-for="(error, index) in quantityField.errors" :key="`q-${index}`" class="error-text">
-              Quantity: {{ error }}
+              Quantity: {{ error.detail }}
             </li>
             <li v-for="(error, index) in priceField.errors" :key="`p-${index}`" class="error-text">
-              Price: {{ error }}
+              Price: {{ error.detail }}
             </li>
           </ul>
         </div>
@@ -79,8 +79,8 @@
 </template>
 
 <script setup>
-import { Field } from '@dynamicforms/vue-forms';
-import { ref } from 'vue';
+import { Field, Validators } from '@dynamicforms/vue-forms';
+import { ref, watch } from 'vue';
 
 import { DfCheckbox, DfInput } from '../../src';
 
@@ -88,6 +88,22 @@ const allowNull = ref(false);
 
 const quantityField = new Field({ value: 1 });
 const priceField = new Field({ value: 10.99 });
+
+// the range the inputs' min and max state, and an empty value refused unless null values are allowed
+function setValidators(field, min, max) {
+  field.clearValidators();
+  if (!allowNull.value) field.registerAction(new Validators.Required());
+  field.registerAction(new Validators.ValueInRange(min, max));
+}
+
+watch(
+  allowNull,
+  () => {
+    setValidators(quantityField, 1, 100);
+    setValidators(priceField, 0, 1000);
+  },
+  { immediate: true },
+);
 
 function increaseQuantity() {
   if (quantityField.value === null) {

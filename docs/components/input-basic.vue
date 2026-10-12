@@ -44,7 +44,7 @@
           <strong>Validation errors:</strong>
           <ul>
             <li v-for="(error, index) in inputField.errors" :key="index" class="error-text">
-              {{ error }}
+              {{ error.detail }}
             </li>
           </ul>
         </div>
