@@ -48,6 +48,10 @@ When `inputType` is set to 'number', the component:
 1. Renders Vuetify's `v-number-input` with `min`, `max`, `precision` and `step`
 2. Marks the field touched on blur
 
+`v-number-input` keeps the value within `min` and `max`: a typed value outside them shows Vuetify's error state and
+is not written while the user types, and is set to the nearest bound on blur. The field receives the value after
+that. `min` and `max` are no validation of the field; a range the field refuses is a `ValueInRange` validator.
+
 The number input supports:
 - Integer and decimal values
 - Step controls for incrementing/decrementing
