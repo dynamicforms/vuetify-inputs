@@ -132,6 +132,29 @@ describe('DfDateTime', () => {
       expect(control.touched).toBe(true);
     });
 
+    it('does not save a day within viewSettleMs of a switch to another month', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      await wrapper.find('input').trigger('click');
+      await flushPromises();
+      const picker = wrapper.findComponent({ name: 'VDatePicker' });
+
+      // a click on a day of the adjacent month chooses it and shows that month
+      picker.vm.$emit('update:modelValue', new Date(2026, 1, 1));
+      picker.vm.$emit('update:month', 1);
+      await flushPromises();
+      const month = wrapper.findComponent({ name: 'VDatePickerMonth' });
+      await month
+        .findAll('.v-date-picker-month__day button')
+        .find((button) => button.text() === '20')!
+        .trigger('dblclick');
+      await flushPromises();
+
+      expect(control.value).toBe('2026-01-15');
+      vi.useRealTimers();
+    });
+
     describe('a double-click on the clock', () => {
       beforeEach(() => {
         vi.useFakeTimers({ toFake: ['Date'] });

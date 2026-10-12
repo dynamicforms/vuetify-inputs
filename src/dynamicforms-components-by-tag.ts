@@ -17,8 +17,7 @@ import {
  * Every component this library draws with, keyed by the tag a layout names it by.
  *
  * A rendering layer that resolves a component by name out of a map - `@dynamicforms/vuetify-modal-form-kit`'s
- * `<component-render>` is one - is handed this instead of keeping a list of its own, which would have to be
- * extended whenever this package gains a component and would silently render nothing until it was.
+ * `<component-render>` is one - takes it from here, so a component this package adds is in the map.
  *
  * The keys are the kebab-case of the export names, so a tag names the same component whether it is looked up
  * here or left to Vue's own resolver after `DynamicFormsInputs` has registered the components globally.

@@ -63,7 +63,8 @@ looks like.
 - **Errors, hints and help text** in one row, rendered through this library's `MessagesWidget`. An error renders as
   the plain text, markdown or component the application's `errorText` setting returns for its `code` and `params`,
   and as its `detail` otherwise. [df-input-hint](/examples/df-input-hint)
-- **Labels with icons and markdown.** A label is a string, a `Label` carrying an icon, or an `MdString`.
+- **Labels with icons, markdown, HTML or a component.** A label is a string, an `MdString`, an `HtmlString`, a
+  `SimpleComponentDef`, or a `Label` carrying one of them and an icon.
   [Label](/examples/input-base#label)
 - **Visibility**: `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, taken from the bound element
   or from the `visibility` prop. [Display modes](/examples/input-base#display-modes)

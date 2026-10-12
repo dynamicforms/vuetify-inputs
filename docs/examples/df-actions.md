@@ -73,8 +73,9 @@ const cancel = new Action({ value: { label: 'Cancel' }, actions: [cancelHandler]
 The subclass is needed for breakpoint options, the text-link style and the confirm / reject colors; they are members
 of `ActionRenderOptions`, which only it declares.
 
-`getRenderOptionsForBreakpoint(value, breakpoint)` returns the `ActionRenderOptions` a value renders as at one
-breakpoint, defaults filled in and `label` / `icon` filtered by their flags.
+`getRenderOptionsForBreakpoint(value, breakpoint)` returns the `ResolvedActionRenderOptions` a value renders as at one
+breakpoint: `ActionRenderOptions` with the label read, defaults filled in and `label` / `icon` filtered by their
+flags.
 `Action.getBreakpointValue(breakpointRef)` is a `computed()` over the same call.
 
 ### Creating Actions

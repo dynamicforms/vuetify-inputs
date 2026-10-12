@@ -39,6 +39,8 @@
                     :show-adjacent-months="true"
                     :show-week="true"
                     @update:view-mode="viewChanged"
+                    @update:month="viewChanged"
+                    @update:year="viewChanged"
                     @dblclick="saveOnDoubleClick($event, '.v-date-picker-month__day', save)"
                   >
                     <template #actions><component :is="actions" /></template>

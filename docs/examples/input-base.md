@@ -157,9 +157,9 @@ once. The errors a component displays are a subset of them, `shownErrors`, selec
 - every other error (a validator's, or one the application wrote) once the field is touched. `form.touched = true`
   sets every member touched, which shows all errors, e.g. on a submit attempt.
 
-Without a control, the errors come from the `errors` prop and are shown once the component is touched. Each is
-selected as the `ValidationError` `toErrorDescription()` gives for it - content as an error without a code, its text
-as the `detail` - and rendered as it was given.
+Without a control, the errors come from the `errors` prop, by the same rule. Each is selected as the
+`ValidationError` `toErrorDescription()` gives for it - content as an error without a code, its text as the `detail`;
+a description with its own `code`, `params` and `origin` - and rendered as it was given.
 
 What a shown error renders as is selected by its `code`; see
 [df-input-hint](/examples/df-input-hint#rendering).
@@ -377,13 +377,13 @@ const { value, shownErrors } = useInputBase<string>(props, emits, () =>
 |--------|------|-------------|
 | value | `WritableComputedRef<T>` | The value. Reads from the control, or from `modelValue`, or from an internal ref when neither is given. Writing writes the control, keeps the internal ref in step and emits `update:modelValue` with the value the control ended up holding |
 | valid | `ComputedRef<boolean>` | `control.valid`, or `true` when there is no control |
-| errors | `ComputedRef<ValidationError[]>` | `control.errors`, or the `errors` prop with each string wrapped in `new ValidationError('', {}, text, 'application')` |
+| errors | `ComputedRef<ValidationError[]>` | `control.errors`, or the `ValidationError` `toErrorDescription()` gives for each error of the `errors` prop, followed by the result of `componentErrors` |
 | shownErrors | `ComputedRef<ErrorInput[]>` | The errors to show now, see [Shown errors](#shown-errors): the control's errors, or the `errors` prop's as they were given. This is what gets bound to `DfInputHint` |
 | enabled | `ComputedRef<boolean>` | `control.effectiveEnabled` — `false` where the element or any container above it is disabled — or `props.enabled !== false` when there is no control |
 | visibility | `ComputedRef<Visibility>` | The resolved visibility, see [Display Modes](#display-modes) |
 | isRendered | `ComputedRef<boolean>` | `false` only for `'suppress'`; it is the `v-if` on the component's root element |
 | visibilityClass | `ComputedRef<{ 'd-none': boolean, invisible: boolean }>` | The class object for `'hidden'` and `'invisible'`, to bind on the root element |
-| label | `ComputedRef<Label>` | The label as a `Label` instance: a `string` or `MdString` is wrapped, a `Label` is passed through |
+| label | `ComputedRef<Label>` | The label as a `Label` instance: content in any of the four forms is wrapped, a `Label` is passed through |
 | touched | `WritableComputedRef<boolean> \| Ref<boolean>` | Bound to `control.touched` when there is a control, a standalone ref otherwise. Components write `true` to it on blur, and on an edit that ends without a blur: `df-file` and `df-image` when an upload returns or the field is cleared, `df-date-time` when a value picked in its menu is saved or the field is cleared, `df-color` when a color picked in its menu is saved |
 | density | `ComputedRef<FieldDensity>` | The `density` prop, then the control's `extra.density`, then the injected `field-density`, then the plugin's `defaultDensity`, then `'default'` |
 | densityClass | `ComputedRef<string>` | `` `df-density-${density}` ``, to bind on the root element |
@@ -405,7 +405,7 @@ value the field holds.
 | class | The `cssClass` prop |
 | density | The resolved density, with `inline` mapped to `default` - `inline` is carried by `densityClass` instead |
 | variant | The resolved variant |
-| label | `label.text` |
+| label | `renderContentText(label.text)` |
 | errorMessages | A single space when the field is touched and has errors, `undefined` otherwise |
 | readonly | `!enabled` |
 | disabled | `!enabled` |
@@ -418,7 +418,7 @@ value the field holds.
 
 `errorMessages` is a single space, not the messages: it puts the Vuetify control into its error state, and
 `DfInputHint` renders the messages from `shownErrors`. An error therefore renders as the content the
-[`errorText` setting](/examples/configuration) returns for its `code`: plain text, markdown or a component.
+[`errorText` setting](/examples/configuration) returns for its `code`: plain text, markdown, HTML or a component.
 
 `passthroughAttrs` is spread into this object last and replaces any key above; see
 [passthroughAttrs](#passthroughattrs).

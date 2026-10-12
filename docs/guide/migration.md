@@ -45,7 +45,9 @@ new RenderableValue({ componentName: 'div', componentVHtml: html, componentProps
 
 // after
 new RenderableValue(new HtmlString(html), 'note');
-``` `MessagesWidget` renders markdown with `vue-markdown-render` itself; a globally registered
+```
+
+`MessagesWidget` renders markdown with `vue-markdown-render` itself; a globally registered
 `vue-markdown` component is not needed.
 
 ### Errors render through the `errorText` setting
@@ -53,7 +55,7 @@ new RenderableValue(new HtmlString(html), 'note');
 A component renders an error as the content the `errorText` setting returns for it, and as its `detail` where the
 setting is not given or returns `undefined`. The setting is given at install and converts every error: those of
 vue-forms' validators, of the application's own validators, of its server and of this library. It returns plain text,
-an `MdString` or a `SimpleComponentDef`:
+an `MdString`, an `HtmlString` or a `SimpleComponentDef`:
 
 ```typescript
 app.use(DynamicFormsInputs, {
@@ -64,6 +66,9 @@ app.use(DynamicFormsInputs, {
   },
 });
 ```
+
+An error without a code, and content (a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef`), render as
+written; `errorText` is not called for them.
 
 A validator message given as an `MdString` or a component in vue-forms 2.0 is an `errorText` answer for the
 validator's code. See [Translating errors](/examples/localisation#translating-errors) for the whole recipe and
@@ -91,9 +96,6 @@ With vue-i18n's `t`, the strings follow a locale switch without another `transla
 npm install @dynamicforms/translatable@^0.3.0
 ```
 
-An error without a code, and content (a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef`), render as
-written; `errorText` is not called for them.
-
 ### `<df-color>` reports an error of code `invalid_hex_color`
 
 Without a `control`, `<df-color>` reports a value that is not a hex color as a `ValidationError` of code
@@ -102,7 +104,7 @@ removed; translate the code with the rest of the errors.
 
 ### `<df-color>` writes a picked color when it is confirmed
 
-A color chosen in the picker is written to the field with OK or a double-click on the color area or a swatch, as a
+A color chosen in the picker is written to the field with OK or a double-click on the color area, as a
 date in `<df-date-time>` is. Cancel and closing the menu leave the field as it was. A value typed into the field is
 written as it is typed.
 
@@ -112,14 +114,28 @@ written as it is typed.
 again on a locale switch to pick up its label can be built once. An application action takes the same form:
 `label: () => t('Save')`. `Action.label` returns the string the label gives now.
 
+### Labels take any content
+
+A label is a string, an `MdString`, an `HtmlString`, a `SimpleComponentDef` or a `Label`, whose `text` takes the same
+four forms. `Label.text` is `RenderContentNonCallable`; code that reads it as a string reads
+`renderContentText(label.text)`. `<df-label>` renders `label.text`, and the slot data's `label` - the text Vuetify
+is given - only where `label.text` is empty.
+
+### An action label is a string, a ref or a function
+
+`ActionRenderOptions.label` is `MaybeRefOrGetter<string>`. `getRenderOptionsForBreakpoint()` returns
+`ResolvedActionRenderOptions`, whose `label` is the string read. Code that reads `action.value.label` as a string
+reads `action.label`, which returns the string.
+
 ### `<df-input-hint>`'s `message` takes no errors
 
 `message` takes `string | RenderableValue[]`. An error goes in `errors`.
 
 ### Errors the components create
 
-- An error of the `errors` prop is selected as `new ValidationError('', {}, text, 'application')` and rendered as it
-  was given. `useInputBase()`'s `shownErrors` holds it as given, so its type is `ErrorInput[]`.
+- An error of the `errors` prop is selected as the `ValidationError` of its `toErrorDescription()` - content as
+  `new ValidationError('', {}, text, 'application')`, a description with its own `code`, `params` and `origin` - and
+  rendered as it was given. `useInputBase()`'s `shownErrors` holds it as given, so its type is `ErrorInput[]`.
 - `setFileGoneError()` sets `new ValidationError('file_gone', {}, text, 'server')`.
 
 ### `defaultConfirm` and `defaultReject` answer a boolean
@@ -140,6 +156,8 @@ nothing. They answered `undefined`.
 6. Replace `=== undefined` checks of `defaultConfirm` and `defaultReject` with a boolean test.
 7. Replace `componentVHtml` with an `HtmlString`, with the classes as the `RenderableValue`'s second argument.
 8. Move errors passed in `<df-input-hint>`'s `message` to `errors`.
+9. Read `Label.text` through `renderContentText()` where a string is needed, and an action's label through
+   `action.label`.
 
 ## Upgrading to v0.12.1 (from v0.11.x)
 

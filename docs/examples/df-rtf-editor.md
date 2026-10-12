@@ -83,9 +83,8 @@ The value is HTML, and the component does not sanitize it. An application that d
 List items and table cells save their text wrapped in a paragraph (`<li><p>...</p></li>`, `<td><p>...</p></td>`),
 so HTML rendered outside this component (a public page, a PDF export, a templated email) needs
 `li p, td p, th p { margin: 0; }` in its stylesheet; otherwise the browser's default paragraph margin adds space to
-every list item and cell. `<df-rtf-editor>`'s editing surface has this rule. The
-[migration guide](/guide/migration#list-items-and-table-cells-wrap-their-text-in-a-p-now) covers content saved by
-earlier versions.
+every list item and cell. `<df-rtf-editor>`'s editing surface has this rule. See also the
+[migration guide](/guide/migration#list-items-and-table-cells-wrap-their-text-in-a-p-now).
 
 ## Custom Styles
 

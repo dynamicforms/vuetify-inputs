@@ -8,11 +8,9 @@ Vuetify input components with guaranteed visual consistency across all form fiel
 every other.
 
 Hand a component an element of [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms) and that element
-owns the value, the validation, the enabled state and the visibility, and the component draws what it holds. That is
-what the library was built for, and it is not what it requires: every component works just as well with a plain
-`v-model`, or with no binding at all. The visual consistency, the density and variant system and the inline mode for
-table cells are the same either way, so the components are worth reaching for whether or not you want a form model
-behind them.
+owns the value, the validation, the enabled state and the visibility, and the component renders what it holds. Every
+component also works with a plain `v-model`, or with no binding. The density and variant system and the inline mode
+for table cells are the same in all three cases.
 
 ## Design Goals
 
@@ -59,7 +57,8 @@ consistent appearance.
   renders as the plain text, markdown or component the application's `errorText` setting returns for its code and
   params, or as its English `detail`, and is shown by one rule an application can replace — the server's at once,
   every other once the field is touched
-- **Labels with icons and markdown**, through the `Label` class and `MdString`
+- **Labels with icons, markdown, HTML or a component**, through the `Label` class, `MdString`, `HtmlString` and
+  `SimpleComponentDef`
 - **Visibility** — `'full'`, `'invisible'`, `'hidden'`, `'suppress'` — and enablement that follows the
   containing section
 - **`passthroughAttrs`**: any prop of the underlying Vuetify component, without this library declaring it
@@ -164,7 +163,8 @@ Detailed documentation is available at [https://docs.velis.si/dynamicforms/vueti
 ## Available Components
 
 - **InputBase**: The base component for all input elements
-- **DfLabel**: Renders a label - plain text, markdown or an icon - the way every input renders its own
+- **DfLabel**: Renders a label - plain text, markdown, HTML or a component, with an icon - the way every input renders
+  its own
 - **df-actions**: An actions group.
 - **df-checkbox**: A checkbox component.
 - **df-color**: A color input.

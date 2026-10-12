@@ -41,7 +41,7 @@ export type RenderContentRef = RenderContent | Ref<RenderContent>;
 /** True where `content` names a component to render it with. */
 export function isSimpleComponentDef(content?: RenderContentRef): content is SimpleComponentDef {
   const value = unref(content);
-  // typeof null is 'object', and `in` refuses null: the answer for it is that it defines no component
+  // typeof null is 'object', and `in` throws on null
   return typeof value === 'object' && value !== null && 'componentName' in value;
 }
 
@@ -50,12 +50,28 @@ export function isRenderContent(value: unknown): value is RenderContentNonCallab
   return typeof value === 'string' || value instanceof String || isSimpleComponentDef(value as RenderContentRef);
 }
 
+// read last for '&amp;', so '&amp;lt;' reads as '&lt;'
+const htmlEntities: Record<string, string> = {
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&nbsp;': ' ',
+  '&amp;': '&',
+};
+
 /**
  * The text of `content` where only text is taken, such as an `aria-label`: a string and an `MdString` as written, an
- * `HtmlString` without its tags, and a component as `''`.
+ * `HtmlString` without its tags and with `&amp;`, `&lt;`, `&gt;`, `&quot;`, `&#39;` and `&nbsp;` read, and a
+ * component as `''`.
  */
 export function renderContentText(content: RenderContentNonCallable): string {
-  if (content instanceof HtmlString) return content.toString().replace(/<[^>]*>/g, '');
+  if (content instanceof HtmlString) {
+    return Object.entries(htmlEntities).reduce(
+      (text, [entity, char]) => text.replaceAll(entity, char),
+      content.toString().replace(/<[^>]*>/g, ''),
+    );
+  }
   return isSimpleComponentDef(content) ? '' : content.toString();
 }
 
@@ -77,8 +93,8 @@ export type RenderContentKind = 'string' | 'md' | 'html' | 'component';
  * the content is read on every render, so what it answers reaches the screen without the value being built again.
  */
 export class RenderableValue {
-  // an ordinary property rather than a #private one: an error is read through the reactive proxy of the array that
-  // holds it, and a #private member read through a proxy throws. The proxy also unwraps the ref, hence unref on read
+  // an ordinary property rather than a #private one: a value held in reactive state is read through its proxy, and a
+  // #private member read through a proxy throws. The proxy also unwraps the ref, hence unref on read
   private readonly kindRef: ComputedRef<RenderContentKind>;
 
   constructor(

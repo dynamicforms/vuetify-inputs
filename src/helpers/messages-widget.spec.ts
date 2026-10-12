@@ -4,7 +4,7 @@ import MarkdownItAttrs from 'markdown-it-attrs';
 import { describe, expect, it } from 'vitest';
 
 import MessagesWidget from './messages-widget.vue';
-import { HtmlString, MdString, RenderableValue } from './render-content';
+import { HtmlString, MdString, RenderableValue, renderContentText } from './render-content';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings';
 
 const MockCustomAlert = {
@@ -101,6 +101,17 @@ describe('MessagesWidget', () => {
 
       expect(wrapper.find('b').exists()).toBe(false);
       expect(wrapper.text()).toBe('<b>bold</b>');
+    });
+
+    it('keeps the widget classes beside a class in the props of a component definition', () => {
+      const content = { componentName: 'span', componentProps: { class: 'own' } };
+      const wrapper = buildWrapper({ message: [new RenderableValue(content)], classes: 'text-error' });
+
+      expect(wrapper.find('span').classes()).toEqual(['text-error', 'own']);
+    });
+
+    it('reads the text of an HtmlString without tags and with its entities read', () => {
+      expect(renderContentText(new HtmlString('<b>a &amp; b &lt;c&gt;</b>&amp;lt;'))).toBe('a & b <c>&lt;');
     });
 
     it('drops innerHTML from the props of a component definition', () => {

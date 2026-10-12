@@ -95,7 +95,7 @@ const render = () => {
         return h(
           // a common html element is rendered as itself; any other name is resolved as a registered component
           htmlElements.has(msg.componentName.toLowerCase()) ? msg.componentName : resolveComponent(msg.componentName),
-          { class: classes, ...msg.componentBindings },
+          { ...msg.componentBindings, class: [classes, msg.componentBindings.class] },
         );
     }
   });
@@ -110,6 +110,6 @@ const render = () => {
   padding-top: 0 !important;
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
-  line-height: 1.35em !important; /* inspired by vitepress' aggressive settings */
+  line-height: 1.35em !important;
 }
 </style>

@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   longer exports. `RenderableValue` takes `(content, classes?)`, and `kind` names the form of its content.
   `MessagesWidget` renders markdown with `vue-markdown-render` without a global registration.
 - The `errorText` setting and its type `ErrorText`: the content an error renders as, plain text, an `MdString`, an
-  `HtmlString` or a `SimpleComponentDef`. An error renders as its `detail` where the setting is not given or returns `undefined`.
+  `HtmlString` or a `SimpleComponentDef`. An error renders as its `detail` where the setting is not given or returns
+  `undefined`. `errorText(error, settings)` returns what a component renders for an error.
 - `translate(key, params?)`, the current translation of one of the library's strings.
 - `useInputBase()` takes the errors a component finds in the value itself, reported where no `control` is bound.
 - `HtmlString`: content rendered as the inner HTML of a `div`, not sanitized.
@@ -23,13 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   forms (a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef`), which renders as it is, and error
   descriptions with members missing; a missing `code` is `''`, `params` `{}`, `detail` `''` and `origin`
   `'application'`.
-- A label - the `label` prop, an element's `extra.label` and `Label.text` - is content in any of the four forms.
-  Vuetify is given its text.
+- A label - the `label` prop and an element's `extra.label` - is content in any of the four forms. Vuetify is given
+  its text.
 - `isRenderContent(value)` and `renderContentText(content)`.
-- An action's `label` may be a ref or a function returning a string, read while the action renders.
-- A double-click on a day in `<df-date-time>`'s date picker, on its clock, or on the color area or a swatch of
-  `<df-color>`'s picker selects the choice and confirms it. For 600 ms after a picker changes its view, a double-click
-  does not confirm.
+- `ResolvedActionRenderOptions`, what `getRenderOptionsForBreakpoint()` returns: `ActionRenderOptions` with the
+  label read.
+- A double-click on a day in `<df-date-time>`'s date picker, on its clock, or on the color area of `<df-color>`'s
+  picker selects the choice and confirms it. For 600 ms after a picker changes what it shows - its view, or the
+  month of the date picker - a double-click does not confirm.
 
 ### Changed
 
@@ -39,8 +41,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reactive state `t` reads, such as vue-i18n's locale.
 - **Breaking:** `<df-color>` without a `control` reports a value that is not a hex color as a `ValidationError` of
   code `invalid_hex_color`, shown once the field is touched, in place of a Vuetify rule message.
-- An error of the `errors` prop is selected as a `ValidationError` without a code, origin `'application'`, and renders
-  as it was given. An error without a code renders as its `detail`, without a call to `errorText`. `setFileGoneError()` sets an error with the code `file_gone` and the origin `'server'`.
+- An error of the `errors` prop is selected as the `ValidationError` of its `toErrorDescription()` and renders as it
+  was given. An error without a code renders as its `detail`, without a call to `errorText`. `setFileGoneError()`
+  sets an error with the code `file_gone` and the origin `'server'`.
 - `Action.defaultConfirm` and `defaultReject` are vue-forms' getters and answer `false` where the value states
   nothing.
 - `Action.closeAction()`, `yesAction()` and `noAction()` label the action with `() => translate(key)`, so an action
@@ -51,7 +54,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   HTML content is an `HtmlString`.
 - **Breaking:** `<df-input-hint>`'s `message` takes `string | RenderableValue[]`; an error goes in `errors`.
 - **Breaking:** `useInputBase()`'s `shownErrors` is `ComputedRef<ErrorInput[]>`: an error of the `errors` prop is
-  shown as it was given. `DfLabelProps.data.label` is a string; `<df-label>` renders `label.text`.
+  shown as it was given. `DfLabelProps.data.label` is a string; `<df-label>` renders `label.text`, and `data.label`
+  where `label.text` is empty.
+- **Breaking:** `Label.text` is `RenderContentNonCallable`. Code that reads it as a string reads
+  `renderContentText(label.text)`.
+- **Breaking:** `ActionRenderOptions.label` is `MaybeRefOrGetter<string>`: a string, a ref or a function, read while
+  the action renders. `getRenderOptionsForBreakpoint()` returns `ResolvedActionRenderOptions`, whose `label` is a
+  string.
 - `<df-file>` and `<df-image>` mark the field touched when an upload returns and when the field is cleared,
   `<df-date-time>` when a value picked in its menu is saved and when the field is cleared, and `<df-color>` when a
   color picked in its menu is saved. vue-forms' default `ErrorPolicy` removes an error of origin `'server'` when the

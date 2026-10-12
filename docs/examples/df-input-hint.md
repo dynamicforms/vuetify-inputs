@@ -42,11 +42,11 @@ exported by this library; see [Render content](#render-content).
 - an error without a code renders as its `detail`
 - an error with a code renders as the content the `errorText` setting returns for it, and as its `detail` where that
   setting is not given or returns `undefined` (see [Translating errors](/examples/localisation#translating-errors))
-- a `RenderableValue` renders its own content: plain text, markdown or a component
+- a `RenderableValue` renders its own content: plain text, markdown, HTML or a component
 
-An error carries no markdown or component of its own. An error renders as markdown or as a component when the
-`errorText` setting returns an `MdString`, an `HtmlString` or a `SimpleComponentDef` for its code. The classes given here
-are merged with each `RenderableValue`'s own `classes`.
+An error description carries no markdown, HTML or component of its own. It renders as one when the `errorText` setting
+returns an `MdString`, an `HtmlString` or a `SimpleComponentDef` for its code. The classes given here are merged with
+each `RenderableValue`'s own `classes`.
 
 Markdown renders through `vue-markdown-render`, which `MessagesWidget` imports itself; the library's stylesheet
 removes the outer margins of a markdown message.
@@ -108,14 +108,11 @@ Every input component in the library overrides the Vuetify `#message` slot of th
 `hide-details="auto"`, so the row is rendered when it has content and removed otherwise. `shownErrors` is the subset of
 the field's errors that is shown now (see [Shown errors](/examples/input-base#shown-errors)): an error of origin
 `'server'` immediately, every other once the field is touched. The field's errors are `control.errors` when a control is
-bound, and otherwise the `errors` prop, each string wrapped in a `ValidationError` with an empty `code` and the string
-as its `detail`. While `shownErrors` is empty, the row shows the hint. `helpText` is not part of this row.
+bound, and otherwise the `errors` prop, each error as it was given. While `shownErrors` is empty, the row shows the
+hint. `helpText` is not part of this row.
 
 While a touched field is invalid, the inputs also pass a single blank error message to Vuetify. It sets the control's
 error state and keeps the message row rendered; the text in the row is rendered by `DfInputHint`.
-
-The hint is therefore visible from the start, and once the user leaves an invalid field the errors replace it on the
-same line, in `text-error`.
 
 ## Standalone use
 

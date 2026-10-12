@@ -53,8 +53,10 @@ resolves those names in kebab-case as well, which is how the examples in this do
 | `DfColor` | `<df-color>` | [df-color](/examples/df-color) |
 | `DfDateTime` | `<df-date-time>` | [df-date-time](/examples/df-datetime) |
 | `DfFile` | `<df-file>` | [df-file](/examples/df-file) |
+| `DfImage` | `<df-image>` | [df-image](/examples/df-image) |
 | `DfInput` | `<df-input>` | [df-input](/examples/df-input) |
 | `DfInputHint` | `<df-input-hint>` | [df-input-hint](/examples/df-input-hint) |
+| `DfLabel` | `<df-label>` | [input base: Label](/examples/input-base#label) |
 | `DfRtfEditor` | `<df-rtf-editor>` | [df-rtf-editor](/examples/df-rtf-editor) |
 | `DfSelect` | `<df-select>` | [df-select](/examples/df-select) |
 | `DfTextArea` | `<df-text-area>` | [df-text-area](/examples/df-text-area) |
@@ -72,9 +74,10 @@ resolved against globally registered components at runtime. An application that 
 component set has them registered. One that registers Vuetify components selectively sets
 `registerVuetifyComponents: true`, and the plugin registers the set the library uses:
 
-`VAutocomplete`, `VBtn`, `VCheckbox`, `VChip`, `VCol`, `VColorPicker`, `VCombobox`, `VConfirmEdit`, `VDatePicker`,
-`VField`, `VFileInput`, `VIcon`, `VImg`, `VInput`, `VListItem`, `VMenu`, `VNumberInput`, `VProgressLinear`, `VRow`,
-`VSelect`, `VSwitch`, `VTextarea`, `VTextField`, `VTimePicker`.
+`VAutocomplete`, `VBtn`, `VBtnGroup`, `VBtnToggle`, `VCard`, `VCardActions`, `VCheckbox`, `VChip`, `VCol`,
+`VColorPicker`, `VCombobox`, `VConfirmEdit`, `VDatePicker`, `VDivider`, `VField`, `VFileInput`, `VIcon`, `VImg`,
+`VInput`, `VList`, `VListItem`, `VListItemTitle`, `VMenu`, `VNumberInput`, `VProgressLinear`, `VRow`, `VSelect`,
+`VSwitch`, `VTextarea`, `VTextField`, `VTimePicker`.
 
 The same set is exported as `VuetifyComponents`, for registering it under names of the application's choice:
 

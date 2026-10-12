@@ -65,7 +65,7 @@ const { densityClass, isRendered, label, shownErrors, touched, value, visibility
   hexColorErrors,
 );
 const dropdownShown = ref(false);
-const colorChoices = '.v-color-picker-canvas, .v-color-picker-swatches__color';
+const colorChoices = '.v-color-picker-canvas';
 const { saveOnDoubleClick } = usePickerDoubleClick();
 
 // a value confirmed in the picker concludes the edit: the field may hold no focus to lose

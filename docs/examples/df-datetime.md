@@ -20,7 +20,8 @@
 
 A choice in a picker is written to the field when it is confirmed: with OK, or with a double-click on a day or on the
 clock. Cancel and closing the menu leave the field as it was. For 600 ms after the picker changes its view - a chosen
-hour switches the clock to the minutes, a chosen month or year switches to the days - a double-click does not confirm,
+hour switches the clock to the minutes, a chosen month or year switches to the days, a day of an adjacent month
+switches the calendar to that month - a double-click does not confirm,
 so the second click of a double-click that changed the view does not confirm a choice it landed on. A confirmed
 choice and a clear mark the field touched.
 

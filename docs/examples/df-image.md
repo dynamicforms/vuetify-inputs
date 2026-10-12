@@ -74,8 +74,8 @@ interface FileComms {
 
   /**
    * Called periodically to keep the image active. Throw FileGoneError if the backend reports the identifier
-   * no longer exists — the component then clears the field and, where a `control` is bound, shows the
-   * error's `errorText`. Any other thrown error is treated as transient and left to the consumer.
+   * no longer exists — the component then clears the field and, where a `control` is bound, reports an error
+   * of code `file_gone` with the error's `errorText` as its detail. Any other thrown error is treated as transient and left to the consumer.
    * @param fileIdentifier The URL that was returned by upload
    */
   touch: (fileIdentifier: string) => Promise<void>;
@@ -102,9 +102,12 @@ During an upload the component shows a progress bar from the values passed to `p
 After an image has been uploaded to the backend, it is touched every `touchInterval` milliseconds (60 seconds by
 default), so the backend keeps it. If a touch rejects with a `FileGoneError`, the field and preview are cleared, a
 disabled field as well, and, where a `control` is bound, its errors are replaced with one
-`ValidationError` of code `file_gone` and origin `'server'`, whose `detail` is the error's `errorText`. Under
+`ValidationError` of code `file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the
+[`errorText` setting](/examples/localisation#translating-errors) can render another text for the code. Under
 vue-forms' default [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy) the field drops the error when a
 new image is uploaded. Any other rejection is ignored by the component and left to the application.
+
+An upload that returns and a clear of the field mark the field touched.
 
 ## Non-image Files
 
