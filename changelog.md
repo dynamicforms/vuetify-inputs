@@ -13,14 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `RenderContent` types, `isSimpleComponentDef` and `isCallableFunction`, which `@dynamicforms/vue-forms` 3.0 no
   longer exports. `RenderableValue` takes `(content, classes?)`, and `kind` names the form of its content.
   `MessagesWidget` renders markdown with `vue-markdown-render` without a global registration.
-- The `errorText` setting and its type `ErrorText`: the content an error renders as, plain text, an `MdString` or a
-  `SimpleComponentDef`. An error renders as its `detail` where the setting is not given or returns `undefined`.
+- The `errorText` setting and its type `ErrorText`: the content an error renders as, plain text, an `MdString`, an
+  `HtmlString` or a `SimpleComponentDef`. An error renders as its `detail` where the setting is not given or returns `undefined`.
 - `translate(key, params?)`, the current translation of one of the library's strings.
 - `useInputBase()` takes the errors a component finds in the value itself, reported where no `control` is bound.
 - `HtmlString`: content rendered as the inner HTML of a `div`, not sanitized.
-- `ErrorInput` (`string | Partial<ErrorDescription>`) and `toErrorDescription(error)`. `<df-input-hint>`'s `errors` and
-  `MessagesWidget`'s `message` take strings and error descriptions with members missing; a missing `code` is `''`,
-  `params` `{}`, `detail` `''` and `origin` `'application'`.
+- `ErrorInput` (`string | MdString | Partial<ErrorDescription>`) and `toErrorDescription(error)`.
+  `<df-input-hint>`'s `errors` and `MessagesWidget`'s `message` take strings, `MdString`s (rendered as markdown) and
+  error descriptions with members missing; a missing `code` is `''`, `params` `{}`, `detail` `''` and `origin`
+  `'application'`.
 - An action's `label` may be a ref or a function returning a string, read while the action renders.
 - A double-click on a day in `<df-date-time>`'s date picker, on a minute of its clock, or on the color area or a
   swatch of `<df-color>`'s picker selects the choice and confirms it.

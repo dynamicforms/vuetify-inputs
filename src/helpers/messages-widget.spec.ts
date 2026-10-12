@@ -121,6 +121,12 @@ describe('MessagesWidget', () => {
       expect(divs.map((d) => d.text())).toEqual(['Already translated']);
     });
 
+    it('renders an MdString item as markdown, without asking errorText', () => {
+      const wrapper = buildWrapper({ message: [new MdString('**Already** translated')] }, { errorText });
+
+      expect(wrapper.find('strong').text()).toBe('Already');
+    });
+
     it('renders an error without a code as its detail, without asking errorText', () => {
       const divs = buildWrapper({ message: [{ detail: 'Only a detail' }] }, { errorText }).findAll('div');
 
