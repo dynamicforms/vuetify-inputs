@@ -31,6 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Action.defaultConfirm` and `defaultReject` are vue-forms' getters and answer `false` where the value states
   nothing.
 
+- `<df-file>` and `<df-image>` mark the field touched when an upload returns and when the field is cleared,
+  `<df-date-time>` when a value picked in its menu is saved and when the field is cleared, and `<df-color>` when its
+  picker closes. vue-forms' default `ErrorPolicy` removes an error of origin `'server'` when the field is marked
+  touched with a changed value.
+
 ### Fixed
 
 - `<df-input>` with `input-type="number"` marks its control touched on blur, so its validators' errors are shown.

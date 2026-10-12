@@ -129,6 +129,7 @@ async function removeFile() {
   }
 
   resetFileState();
+  touched.value = true;
 }
 
 async function upload(file: File) {
@@ -140,6 +141,8 @@ async function upload(file: File) {
       progress.value = Math.round((loaded * 100) / total);
     });
     progress.value = 100;
+    // a picked file concludes the edit: the file dialog and a drop have no blur of the field
+    touched.value = true;
     setupTouchInterval();
   } catch (err) {
     progress.value = 0;

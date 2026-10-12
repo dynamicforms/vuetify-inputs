@@ -161,8 +161,9 @@ rule:
 
 - nothing where the bound element is sent nowhere (its `effectiveAccess` is `'disabled'`);
 - an error whose [origin](https://docs.velis.si/dynamicforms/vue-forms/api/validators#origin) is `'server'` at once —
-  the server answered something the user did, so nothing has to be marked touched for it to appear. vue-forms
-  removes it when the field's value changes;
+  the server answered something the user did, so nothing has to be marked touched for it to appear. Under
+  vue-forms' default [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy), the field drops it when it is
+  marked touched holding a value other than the one it held when the error was written;
 - every other error — a validator's, or one the application wrote — once the field is touched. A submit attempt that
   should reveal every error assigns `form.touched = true`, which reaches every member.
 
@@ -380,7 +381,7 @@ then, so a control of the wrong kind fails at mount rather than misbehaving late
 | isRendered | `ComputedRef<boolean>` | `false` only for `'suppress'`; it is the `v-if` on the component's root element |
 | visibilityClass | `ComputedRef<{ 'd-none': boolean, invisible: boolean }>` | The class object for `'hidden'` and `'invisible'`, to bind on the root element |
 | label | `ComputedRef<Label>` | The label as a `Label` instance: a `string` or `MdString` is wrapped, a `Label` is passed through |
-| touched | `WritableComputedRef<boolean> \| Ref<boolean>` | Bound to `control.touched` when there is a control, a standalone ref otherwise. Components write `true` to it on blur |
+| touched | `WritableComputedRef<boolean> \| Ref<boolean>` | Bound to `control.touched` when there is a control, a standalone ref otherwise. Components write `true` to it on blur, and on an edit that ends without a blur: `df-file` and `df-image` when an upload returns or the field is cleared, `df-date-time` when a value picked in its menu is saved or the field is cleared, `df-color` when its picker closes |
 | density | `ComputedRef<FieldDensity>` | The `density` prop, then the control's `extra.density`, then the injected `field-density`, then the plugin's `defaultDensity`, then `'default'` |
 | densityClass | `ComputedRef<string>` | `` `df-density-${density}` ``, to bind on the root element |
 | vuetifyBindings | `ComputedRef<Record<string, any>>` | Everything to `v-bind` on the Vuetify input, see below |

@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { ValidationError } from '@dynamicforms/vue-forms';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 import { DfColorProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
@@ -53,4 +53,8 @@ const { densityClass, isRendered, label, shownErrors, touched, value, visibility
   hexColorErrors,
 );
 const dropdownShown = ref(false);
+// closing the picker concludes the edit: the field may hold no focus to lose
+watch(dropdownShown, (shown) => {
+  if (!shown) touched.value = true;
+});
 </script>

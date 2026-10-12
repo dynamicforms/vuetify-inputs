@@ -1,4 +1,4 @@
-import { Field } from '@dynamicforms/vue-forms';
+import { Field, ValidationError } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
@@ -91,6 +91,38 @@ describe('DfDateTime', () => {
       await flushPromises();
       expect(inputs(wrapper)[0]).toBe('15. 01. 26');
       expect(control.value).toBe('2026-01-15');
+    });
+  });
+
+  describe('concluding an edit', () => {
+    const serverError = () => new ValidationError('taken', {}, 'This date is taken.', 'server');
+
+    it('removes a server error when a date picked in the menu is saved', async () => {
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      control.errors = [serverError()];
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      await wrapper.find('input').trigger('click');
+      await flushPromises();
+
+      const confirm = wrapper.findComponent({ name: 'VConfirmEdit' });
+      confirm.vm.$emit('update:modelValue', new Date(2026, 0, 20));
+      confirm.vm.$emit('save', new Date(2026, 0, 20));
+      await flushPromises();
+
+      expect(control.value).toBe('2026-01-20');
+      expect(control.touched).toBe(true);
+      expect(control.errors).toHaveLength(0);
+    });
+
+    it('removes a server error when the field is cleared', async () => {
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      control.errors = [serverError()];
+      const wrapper = mountDateTime({ control, inputType: 'date', clearable: true });
+
+      await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
+
+      expect(control.value).toBeNull();
+      expect(control.errors).toHaveLength(0);
     });
   });
 });

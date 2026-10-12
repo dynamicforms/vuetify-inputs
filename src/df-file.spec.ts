@@ -138,6 +138,16 @@ describe('DfFile', () => {
     expect(control.errors[0].detail).toBe('The uploaded file is no longer available on the server.');
   });
 
+  it('marks a bound field touched when the upload returns', async () => {
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountFile({ control });
+
+    await pickFile(wrapper, pdfFile());
+
+    expect(control.value).toBe('file-id-1');
+    expect(control.touched).toBe(true);
+  });
+
   it('drops the file_gone error when a new file is uploaded', async () => {
     comms.touch = vi.fn(async () => {
       throw new FileGoneError('The uploaded file is no longer available on the server.');

@@ -105,8 +105,9 @@ The component displays a progress bar during file upload, using the values provi
 After a file has been uploaded to the backend, it is touched every `touchInterval` milliseconds (60 seconds by
 default) to let the backend know that it's still relevant. If a touch rejects with a `FileGoneError`, the field is
 cleared - a disabled one as well - and, where a `control` is bound, its errors are replaced with one
-`ValidationError` of code `file_gone` and origin `'server'`, whose `detail` is the error's `errorText`. The
-field drops the error when its value next changes. Any other rejection is treated as a transient failure and left to the consumer.
+`ValidationError` of code `file_gone` and origin `'server'`, whose `detail` is the error's `errorText`. Under
+vue-forms' default [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy) the field drops the error when a
+new file is uploaded. Any other rejection is treated as a transient failure and left to the consumer.
 
 ## Events
 

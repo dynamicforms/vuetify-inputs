@@ -1,11 +1,5 @@
 <template>
-  <input-base
-    v-bind="props"
-    :class="densityClass"
-    :clearable="clearable"
-    @click:clear="value = null"
-    @blur="touched = true"
-  >
+  <input-base v-bind="props" :class="densityClass" :clearable="clearable" @click:clear="clear" @blur="touched = true">
     <template #default="slotProps">
       <div
         :class="[
@@ -36,7 +30,7 @@
         >
           <template #default>
             <v-menu v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsDate" @cancel="dropdown = ''" @save="dropdown = ''">
+              <v-confirm-edit v-model="valueAsDate" @cancel="dropdown = ''" @save="concludeEdit">
                 <template #default="{ model: proxyModel, actions }">
                   <v-date-picker
                     v-model="proxyModel.value"
@@ -73,7 +67,7 @@
         >
           <template #default>
             <v-menu v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsTimeString" @cancel="dropdown = ''" @save="dropdown = ''">
+              <v-confirm-edit v-model="valueAsTimeString" @cancel="dropdown = ''" @save="concludeEdit">
                 <template #default="{ model: proxyModel, actions }">
                   <v-time-picker v-model="proxyModel.value" :hide-header="true" format="24hr">
                     <template #actions><component :is="actions" /></template>
@@ -128,6 +122,17 @@ const timeMenuShown = computed({
     dropdown.value = newValue ? 'time' : '';
   },
 });
+
+// a value picked in the menu or cleared concludes the edit: the field may hold no focus to lose
+function concludeEdit() {
+  dropdown.value = '';
+  touched.value = true;
+}
+
+function clear() {
+  value.value = null;
+  touched.value = true;
+}
 
 const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, 'HH:mm')}:00`;
 

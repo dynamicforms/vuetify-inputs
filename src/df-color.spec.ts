@@ -62,4 +62,20 @@ describe('DfColor', () => {
 
     expect(wrapper.text()).not.toContain('Not a valid hex string.');
   });
+
+  it('marks a bound field touched when the picker closes', async () => {
+    const control = new Field<string>({ value: '#f00' });
+    // jsdom has no canvas for the picker the open menu renders
+    const wrapper = mount(DfColor, {
+      props: { control },
+      global: { plugins: [vuetify], stubs: { VColorPicker: true } },
+    });
+    const menu = wrapper.findComponent({ name: 'VMenu' });
+
+    await menu.vm.$emit('update:modelValue', true);
+    expect(control.touched).toBe(false);
+    await menu.vm.$emit('update:modelValue', false);
+
+    expect(control.touched).toBe(true);
+  });
 });
