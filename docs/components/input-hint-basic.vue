@@ -76,14 +76,16 @@ import { computed, ref } from 'vue';
 import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { DfInput, DfInputHint, DfSelect } from '../../src';
 
-const email = new Field<string>({ value: '' });
-email.registerAction(new Validators.Required());
-email.registerAction(
-  new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
-    code: 'invalid_email',
-    detail: 'An address of the form name@example.com, please',
-  }),
-);
+const email = new Field<string>({
+  value: '',
+  validators: [
+    new Validators.Required(),
+    new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
+      code: 'invalid_email',
+      detail: 'An address of the form name@example.com, please',
+    }),
+  ],
+});
 
 const errorSources = [
   { id: 'none', text: 'An empty string' },

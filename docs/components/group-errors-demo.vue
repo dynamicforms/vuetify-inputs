@@ -122,18 +122,15 @@ const budgetLimit = 2000;
 // The checkbox that decides whether the second traveller section is on the form
 const addTraveller = new Field({ value: false });
 
-// A nested group: its fields are addressed as traveller.fields.name, and while it is sent its value is a member of
-// form.value
-const traveller = new Group({
-  name: new Field({ value: '' }),
-  ticket: new Field({ value: 400 }),
-});
-
-// Two actions on the group, over one statement: visibility decides whether the template draws the section, access
-// whether the form sends it - and validates it
 const travelling = new Statement(addTraveller, Operator.EQUALS, true);
-traveller.registerAction(new ConditionalVisibilityAction(travelling));
-traveller.registerAction(new ConditionalAccessAction(travelling));
+
+// A nested group: its fields are addressed as traveller.fields.name, and while it is sent its value is a member of
+// form.value. Two actions on it, over one statement: visibility decides whether the template draws the section,
+// access whether the form sends it - and validates it
+const traveller = new Group(
+  { name: new Field({ value: '' }), ticket: new Field({ value: 400 }) },
+  { actions: [new ConditionalVisibilityAction(travelling), new ConditionalAccessAction(travelling)] },
+);
 
 const form = new Group({
   flights: new Field({ value: 900 }),
