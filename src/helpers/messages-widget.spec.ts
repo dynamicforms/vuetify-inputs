@@ -4,7 +4,7 @@ import MarkdownItAttrs from 'markdown-it-attrs';
 import { describe, expect, it } from 'vitest';
 
 import MessagesWidget from './messages-widget.vue';
-import { HtmlString, MdString, RenderableValue, renderContentText } from './render-content';
+import { HtmlString, MdString, RenderableValue, renderContentText, type SimpleComponentDef } from './render-content';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings';
 
 const MockCustomAlert = {
@@ -57,6 +57,78 @@ describe('MessagesWidget', () => {
 
     expect(alert.attributes('type')).toBe('warning');
     expect(alert.element.innerHTML).toBe('');
+  });
+
+  describe('component children', () => {
+    const MockCustomCard = { name: 'CustomCard', template: '<section class="custom-card-mock"><slot /></section>' };
+
+    function buildChildrenWrapper(content: SimpleComponentDef) {
+      return mount(MessagesWidget, {
+        props: { message: [new RenderableValue(content)] },
+        global: { components: { CustomCard: MockCustomCard }, provide: { [vuetifyInputsSettingsKey]: {} } },
+      });
+    }
+
+    it('renders a string child of an element as escaped text', () => {
+      const wrapper = buildChildrenWrapper({
+        componentName: 'a',
+        componentProps: { href: '/details' },
+        children: '<b>Details</b>',
+      });
+
+      expect(wrapper.find('a[href="/details"]').text()).toBe('<b>Details</b>');
+      expect(wrapper.find('a b').exists()).toBe(false);
+    });
+
+    it('renders an array of children in order, each in its own form', () => {
+      const wrapper = buildChildrenWrapper({
+        componentName: 'p',
+        children: [
+          'Read ',
+          { componentName: 'a', componentProps: { href: '/docs' }, children: 'the docs' },
+          new HtmlString(' <i>first</i>'),
+          new MdString('**now**'),
+        ],
+      });
+
+      const p = wrapper.find('p');
+      expect(p.find('a[href="/docs"]').text()).toBe('the docs');
+      expect(p.find('span > i').text()).toBe('first');
+      expect(p.find('.df-messages-widget-markdown strong').text()).toBe('now');
+      expect(p.text().startsWith('Read the docs')).toBe(true);
+    });
+
+    it('renders the children of a registered component as its default slot', () => {
+      const wrapper = buildChildrenWrapper({
+        componentName: 'custom-card',
+        children: { componentName: 'em', children: 'Hi' },
+      });
+
+      expect(wrapper.find('.custom-card-mock > em').text()).toBe('Hi');
+    });
+
+    it('passes a listener prop to the element', async () => {
+      let clicks = 0;
+      const wrapper = buildChildrenWrapper({
+        componentName: 'button',
+        componentProps: { onClick: () => (clicks += 1) },
+        children: 'Retry',
+      });
+
+      await wrapper.find('button').trigger('click');
+
+      expect(clicks).toBe(1);
+    });
+
+    it('reads the text of a component as the text of its children', () => {
+      const content: SimpleComponentDef = {
+        componentName: 'p',
+        children: ['Read ', { componentName: 'a', children: 'the docs' }, new HtmlString(' <i>first</i>')],
+      };
+
+      expect(renderContentText(content)).toBe('Read the docs first');
+      expect(renderContentText({ componentName: 'v-icon' })).toBe('');
+    });
   });
 
   it('renders a validator error as its detail', () => {

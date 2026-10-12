@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A label - the `label` prop and an element's `extra.label` - is content in any of the four forms. Vuetify is given
   its text.
 - `isRenderContent(value)` and `renderContentText(content)`.
+- `SimpleComponentDef.children`: content in any of the four forms, or an array of it, rendered as an element's
+  children or a component's default slot. A string child renders as text. `RenderableValue.componentChildren` returns
+  them as an array.
 - `InputBaseSlotProps`, the props of `InputBase`'s default slot.
 - Server-side rendering: `df-select` renders a read-only text field with the chosen choices' text, `df-date-time`
   and `df-color` render without their pickers, and `df-rtf-editor` renders the value's text without the toolbar, on

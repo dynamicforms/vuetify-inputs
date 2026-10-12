@@ -47,6 +47,9 @@ new RenderableValue({ componentName: 'div', componentVHtml: html, componentProps
 new RenderableValue(new HtmlString(html), 'note');
 ```
 
+The content of an element or a component is its `children`, rendered as an element's children or a component's
+default slot (see [Render content](/examples/df-input-hint#render-content)).
+
 `MessagesWidget` renders markdown with `vue-markdown-render` itself; a globally registered
 `vue-markdown` component is not needed.
 
