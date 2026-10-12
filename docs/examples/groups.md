@@ -1,27 +1,23 @@
 # Groups Example
 
-This example demonstrates two things a `Group` does for a form as a whole: it carries validation
-errors that belong to no single field, and it carries actions that govern all of its fields at once.
+This example shows two uses of a `Group`: validation errors that belong to no single field, and actions that apply
+to all of its fields.
 
-A field validator answers a question about one value. A **group-level validator** answers a question
-that spans several values: a total that must stay under a limit, two fields that must agree, a date
-range whose end must follow its start. Registering it on the `Group` puts the resulting error in
-`group.errors`, where it renders once, next to the section it describes, instead of being repeated
-on every field that took part in the rule. `group.valid` is false while that error stands, even when
-every individual field is valid.
+A field validator checks one value. A **group-level validator** checks several values: a total under a limit, two
+fields that must match, a date range whose end follows its start. Registered on the `Group`, it puts its error in
+`group.errors`, which renders once next to the section, not on every field of the rule. `group.valid` is `false`
+while that error is present, even when every field is valid.
 
-A **conditional group** is the right tool when a whole section of the form appears and disappears
-together. A single `ConditionalVisibilityAction` on the group that holds the section keeps the
-condition in one place: the section renders under one `v-if`, its caption and its layout included,
-and adding a field to the section later needs no change to the condition.
+A **conditional group** shows and hides a whole section. One `ConditionalVisibilityAction` on the group holds the
+condition: the section, its caption and layout included, renders under one `v-if`, and a field added to the section
+needs no change to the condition.
 
 ## Demo
 
 <GroupErrorsDemo />
 
-The trip starts at 1750 € of a 2000 € budget. Raise any of the three amounts, or tick the checkbox to
-add a second traveller, and the group-level message appears under the totals as soon as the sum
-crosses the limit.
+The trip starts at 1750 € of a 2000 € budget. When the sum exceeds the limit, by raising any of the three amounts or
+by adding a second traveller with the checkbox, the group-level message appears under the totals.
 
 ## Source Code
 
@@ -116,7 +112,7 @@ const formErrors = useShownErrors(form);
 
     <df-checkbox :control="form.fields.addTraveller" label="Book a second traveller" />
 
-    <!-- The whole section follows the visibility of the traveller group -->
+    <!-- The section is rendered by the visibility of the traveller group -->
     <v-card v-if="traveller.visibility !== 'suppress'" variant="outlined" class="pa-4 mt-2">
       <div class="text-subtitle-1 mb-2">Second traveller</div>
       <df-input :control="traveller.fields.name" label="Full name" />
@@ -131,8 +127,7 @@ const formErrors = useShownErrors(form);
       </v-chip>
     </div>
 
-    <!-- The group-level validator writes here, so the message belongs to the form, not to any single field. It is
-         shown by the rule the inputs follow: once a field of the form has been touched -->
+    <!-- The group-level validator's errors, shown by the rule of the inputs: once a field of the form is touched -->
     <df-input-hint :errors="formErrors" />
 
     <pre>{{ JSON.stringify(form.value, null, 2) }}</pre>
@@ -142,10 +137,10 @@ const formErrors = useShownErrors(form);
 
 ## Rendering group errors
 
-`group.errors` is a `ValidationError[]`, the same type a field exposes, so `DfInputHint` renders it without any
-conversion. The inputs show their errors by one rule — once the user has touched the field, or at once where the
-server returned them — and [`useShownErrors(form)`](/examples/input-base#shown-errors) applies the same rule to the
-group's own errors, so the budget message appears once a field of the form has been touched, as the inputs' do:
+`group.errors` is a `ValidationError[]`, the same type as a field's, and `DfInputHint` renders it without conversion.
+The inputs show an error once the field is touched, or immediately if its origin is `'server'`.
+[`useShownErrors(form)`](/examples/input-base#shown-errors) applies the same rule to the group's own errors, so the
+budget message appears once a field of the form is touched:
 
 ```js
 const formErrors = useShownErrors(form);
@@ -155,12 +150,11 @@ const formErrors = useShownErrors(form);
 <df-input-hint :errors="formErrors" />
 ```
 
-Binding `form.errors` itself shows the message the moment the total passes the limit, before the user has done
-anything — out of step with the inputs.
+Binding `form.errors` directly shows the message whenever the total exceeds the limit, including before any field is
+touched.
 
-`DfInputHint` treats a non-empty `errors` value as an error and applies `errorClasses`
-(`text-error` by default); with an empty array it falls back to `message`, so a form that satisfies
-the rule shows nothing. An error renders as the content the
+`DfInputHint` renders a non-empty `errors` value with `errorClasses` (`text-error` by default); for an empty array it
+renders `message`, so a form within the budget shows nothing. An error renders as the content the
 [`errorText` setting](/examples/localisation#translating-errors) returns for it, which may be plain text, an `MdString`
 for markdown or a component definition, and otherwise as its `detail`. The budget error carries `total` and `over` in
 its `params`; the docs' `errorText` renders `over_budget` from them, as markdown while the
@@ -170,8 +164,7 @@ its `params`; the docs' `errorText` renders `over_budget` from them, as markdown
 
 A `Validators.Validator` takes a function that returns either `null` (the rule holds) or an array of
 `ValidationError` objects. On a group, it runs whenever the value of any field in the group changes,
-including fields of nested groups, and it runs once at registration so the form opens in a correct
-state. The function reads the fields it needs through `group.fields`:
+including fields of nested groups, and once at registration, so the errors are current when the form opens. The function reads the fields it needs through `group.fields`:
 
 ```js
 form.registerAction(new Validators.Validator((newValue, oldValue, group) => {
@@ -181,8 +174,8 @@ form.registerAction(new Validators.Validator((newValue, oldValue, group) => {
 }));
 ```
 
-The validator owns the errors it produces: when the values change so that it returns `null`, its
-error is removed from `group.errors` and no other validator's errors are touched.
+When the validator returns `null`, its own errors are removed from `group.errors`; other validators' errors are
+unchanged.
 
 ## Conditions on a group
 
@@ -200,17 +193,16 @@ discounts.registerAction(new ConditionalVisibilityAction(showStatement));
 ```
 
 The action watches every field the statement mentions and sets the group's `visibility` to
-`'full'` or `'suppress'` as the statement's result changes. `visibility` is a
-property of the group alone, so the template consumes it once: render the section under
-`v-if="group.visibility !== 'suppress'"` and the whole section, its fields included, leaves
-the DOM. A field whose own control carries the action needs no `v-if`: the input component bound to
-that field reads its control's visibility itself.
+`'full'` or `'suppress'` as the statement's result changes. `visibility` is a property of the group only, so the
+template reads it once: under `v-if="group.visibility !== 'suppress'"` the whole section, its fields included, is
+removed from the DOM. A field whose own control has the action needs no `v-if`: the input component bound to that
+field reads its control's visibility.
 
-`visibility` is presentation alone: a suppressed section is not drawn, and it is still sent and validated. What the
-section contributes to the form's data is its `access`, which `ConditionalAccessAction` sets from the same statement —
-`'editable'` while it holds and `'disabled'` otherwise, or the two accesses you pass. A `'disabled'` group is left out
-of `form.value` and none of its fields is validated; `'disabled-null'` sends it as `null`. The group keeps what its
-fields hold either way, so switching the section back on brings the values back.
+`visibility` is presentation only: a suppressed section is not rendered, and it is still sent and validated. Whether
+the section is part of the form's data is set by its `access`, which `ConditionalAccessAction` sets from the same
+statement: `'editable'` while it holds and `'disabled'` otherwise, or the two given accesses. A `'disabled'` group is left out
+of `form.value` and none of its fields is validated; `'disabled-null'` sends it as `null`. The group keeps its fields'
+values in both cases, so they are sent again when the section is enabled.
 `ConditionalValueAction` takes a statement and the value to assign,
 `new ConditionalValueAction(statement, valueWhenTrue)`; it writes that value while the statement
 holds and leaves the field alone otherwise.
@@ -227,12 +219,12 @@ holds and leaves the field alone otherwise.
 
 ## Try It Yourself
 
-Experiment with the demo by:
-1. Raising the flights amount until the total crosses 2000 €
-2. Lowering it again to watch the group message disappear
-3. Ticking the checkbox to reveal the second traveller and add the ticket to the total
-4. Editing the traveller's ticket price and following the total
-5. Unticking the checkbox to see the section leave the form
+In the demo:
+1. Raise the flights amount until the total exceeds 2000 €
+2. Lower it again; the group message disappears
+3. Tick the checkbox; the second traveller is shown and the ticket is added to the total
+4. Edit the traveller's ticket price; the total follows
+5. Untick the checkbox; the section is removed from the form and from its value
 
 <script setup>
 import GroupErrorsDemo from '../components/group-errors-demo.vue';

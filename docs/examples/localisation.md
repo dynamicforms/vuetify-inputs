@@ -2,12 +2,12 @@
 
 The library renders three kinds of text that depend on the language:
 
-- **Its own strings**: the labels of the three predefined actions, every tooltip, dropdown entry and dialog label the
-  RTF editor's toolbar draws, and the upload and download prompts on `<df-image>` and `<df-file>`. They are
+- **Its own strings**: the labels of the three predefined actions, every tooltip, dropdown entry and dialog label of
+  the RTF editor's toolbar, and the upload and download prompts on `<df-image>` and `<df-file>`. They are
   translated through [`translateStrings`](#translatestrings).
 - **Errors**: every error carries a `code`, `params` and an English `detail`, and the application converts it into
   what the user sees through the `errorText` setting. See [Translating errors](#translating-errors).
-- **Dates and times**: driven by a date-fns locale rather than by a string table. See
+- **Dates and times**: set by a date-fns locale, not by a string table. See
   [Dates and times](#dates-and-times).
 
 The three mechanisms are independent. The [worked example](#wiring-it-to-vue-i18n) below connects all of them to
@@ -19,7 +19,7 @@ Each string has a key and an English default. The library reads a string with `t
 so a template, a `computed` or a `watchEffect` that reads it follows the reactive state the application's
 translation function reads, such as the locale.
 
-| Key | English default | Where it surfaces |
+| Key | English default | Where it is rendered |
 |-----|-----------------|-------------------|
 | `Yes` | `Yes` | Label of the action returned by `Action.yesAction()` |
 | `No` | `No` | Label of the action returned by `Action.noAction()` |
@@ -60,7 +60,7 @@ translation function reads, such as the locale.
 | `MediaEmbedInsert` | `Insert` | `<df-rtf-editor>` media-embed menu, the insert button |
 
 The style-preset entries name CSS classes that are fixed and not affected by a translation, so the saved HTML is the
-same whatever language the toolbar speaks.
+same in every language of the toolbar.
 
 ## translateStrings
 
@@ -168,8 +168,8 @@ export const DateTimeLocaleConfig = {
 ```
 
 The default is Slovenian (`sl`). `setDateTimeLocale` accepts either a locale or a ref to one. Given a plain locale it
-writes into the existing ref, so components that already read it update; given a ref it adopts that ref as the source,
-and every later change to the ref you passed reaches the components as well.
+writes into the existing ref, so components that already read it update; given a ref it uses that ref as the source,
+and the components follow every later change to it.
 
 ```typescript
 import { DateTimeLocaleConfig } from '@dynamicforms/vuetify-inputs';
@@ -178,7 +178,7 @@ import { enUS } from 'date-fns/locale';
 DateTimeLocaleConfig.setDateTimeLocale(enUS);
 ```
 
-The locale governs three things in `<df-date-time>`:
+The locale sets three things in `<df-date-time>`:
 
 - **Formatting.** The text fields are rendered with date-fns `format()` using `displayFormatDate` (default `'P'`) and
   `displayFormatTime` (default `'p'`), both of which resolve against the locale.
@@ -186,14 +186,14 @@ The locale governs three things in `<df-date-time>`:
 - **First day of week.** The date picker takes `locale.options.weekStartsOn`, falling back to `1` (Monday) for a
   locale that does not state one.
 
-Two things it does not govern: the time picker is always in 24-hour mode, and the month and weekday names inside the
-picker come from Vuetify, which carries its own locale configuration.
+It does not set the following: the time picker is always in 24-hour mode, and the month and weekday names inside the
+picker come from Vuetify's own locale configuration.
 
 ### Per-component override
 
 Every `<df-date-time>` accepts a `locale` prop of the same date-fns `Locale` type. When it is set the component uses
-it and ignores `DateTimeLocaleConfig` entirely; when it is not, the global setting applies. This is what makes a
-single form able to show one field in the application's locale and another in a fixed one.
+it and ignores `DateTimeLocaleConfig`; when it is not, the global setting applies. One form can thereby show one field
+in the application's locale and another in a fixed one.
 
 <datetime-multilingual/>
 
@@ -217,9 +217,9 @@ See [df-date-time](/examples/df-datetime) for the display format patterns and th
 
 ## Wiring it to vue-i18n
 
-The library's strings and the errors follow vue-i18n's locale on their own, because the library calls `t` on every
-read. The date-fns locale is set on every locale change. A composable called once, high in the component tree,
-carries the date part:
+The library's strings and the errors follow vue-i18n's locale without further code, because the library calls `t` on
+every read. The date-fns locale is set on every locale change, by a composable called once near the root of the
+component tree:
 
 ```typescript
 // use-df-locale.ts
@@ -276,8 +276,8 @@ const messages = {
 };
 ```
 
-An action does not re-read its label once built, so it is rebuilt on a locale change. Building the actions inside a
-`computed` on the locale is enough:
+An action does not re-read its label once built, so it is rebuilt on a locale change, e.g. inside a `computed` that
+reads the locale:
 
 ```vue
 <template>
@@ -304,10 +304,10 @@ const dialogActions = computed(() => {
 
 ## What this library does not translate
 
-- **Labels, hints and placeholders.** Every one of them is a prop you pass, so their language is the application's
-  concern. `label` accepts a `Label` object and `hint` a string; feed either from your own catalogue.
-- **Vuetify's own strings**, including the month and weekday names in the date picker. Configure them through
-  Vuetify's `locale` option when you create the Vuetify instance.
+- **Labels, hints and placeholders.** They are props or extended properties the application sets, translated by the
+  application. `label` accepts a `Label` object and `hint` a string.
+- **Vuetify's own strings**, including the month and weekday names in the date picker. They are configured through
+  Vuetify's `locale` option when the Vuetify instance is created.
 - **The RTF editor's resize-handle hint** ("Hold Shift to keep the aspect ratio"), which is plain CSS `content`, not
   a string `translateStrings` can reach.
 

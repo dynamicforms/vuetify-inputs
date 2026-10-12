@@ -1,21 +1,20 @@
 # df-checkbox Component
 
-The df-checkbox component provides a checkbox input field that integrates with both Vuetify and DynamicForms. It offers 
-support for both binary (true/false) and ternary (true/false/null) states.
+`df-checkbox` is a Vuetify checkbox with a binary (true/false) or ternary (true/false/null) value.
 
 ## Basic Usage
 
-Below is an example demonstrating different configurations of the df-checkbox component:
+`df-checkbox` in different configurations:
 
 <checkbox-basic/>
 
 ## Features
 
-- Integration with `@dynamicforms/vue-forms` for state management and validation
-- Support for both binary (true/false) and ternary (true/false/null) states
-- Automatic normalization of input values
-- Clear visual indication of indeterminate (null) state
-- Customizable labels and hints
+- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
+- Binary (true/false) and ternary (true/false/null) values
+- Normalization of input values
+- The indeterminate state renders `null`
+- Labels and hints
 
 ## Props
 

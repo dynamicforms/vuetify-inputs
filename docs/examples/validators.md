@@ -1,12 +1,12 @@
 # Validators Example
 
-This example demonstrates how to use the validators of `@dynamicforms/vue-forms` with this library's components.
+The validators of `@dynamicforms/vue-forms` on this library's components.
 
 ## Demo
 
 A form using various validators. The errors are rendered by the docs' [`errorText` setting](/examples/localisation#translating-errors):
-translated into eight languages and, with the checkbox on, as markdown. The errors already on the fields follow
-either choice without revalidating.
+translated into eight languages and, with the checkbox on, as markdown. Changing either setting re-renders the errors
+already on the fields without revalidating.
 
 <ValidatorsFormDemo />
 
@@ -60,7 +60,7 @@ validator's own code (`required`, `value_in_range`, …); the email pattern is g
 
 - **Required Validator**: Fails on an empty value - a zero-length string, an empty array, an empty plain object,
   `null` or `undefined`. A string is measured after it is trimmed, so a field holding nothing but spaces is empty
-  and invalid; `new Validators.Required({ trim: false })` measures the string as it stands. Only strings are
+  and invalid; `new Validators.Required({ trim: false })` measures the string untrimmed. Only strings are
   trimmed - an array, an object or any other value is measured as it is
 - **Pattern Validator**: Tests `String(value)` against a regular expression (email format here)
 - **ValueInRange Validator**: Fails when the value is below the minimum or above the maximum, or cannot be compared
@@ -72,17 +72,17 @@ validator's own code (`required`, `value_in_range`, …); the email pattern is g
 - **Empty values**: every validator except `Required` passes `null`, `undefined`, `''`, `[]` and `{}`, so each
   field that must be filled also carries `Required`
 - **Form-level Validation**: `group.valid` covers the group's own errors and those of every field it holds
-- **Error Display**: Showing validation errors to the user
+- **Error display**: the shown errors of each field, rendered by `errorText`
 
 ## Try It Yourself
 
-Experiment with the validators by:
-1. Leaving the username empty, or typing nothing but spaces into it
-2. Entering an invalid email address
-3. Setting age outside the valid range
-4. Selecting different role values
-5. Entering text that's too short or too long in the bio field
-6. Switching the language or the markdown setting while errors are showing
+In the demo:
+1. Leave the username empty, or enter only spaces
+2. Enter an invalid email address
+3. Set the age outside the valid range
+4. Select different roles
+5. Enter a bio that is too short or too long
+6. Switch the language or the markdown setting while errors are shown
 
 <script setup>
 import ValidatorsFormDemo from '../components/validators-demo.vue';

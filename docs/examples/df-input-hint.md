@@ -1,8 +1,8 @@
 # df-input-hint Component
 
-`DfInputHint` is the message row of a field: one line under the input that carries the errors when there are any and
-the hint when there are none. Every input component in the library renders it, and it is exported on its own for the
-places that need a message row without an input — a group's errors, a section caption, a row of a table.
+`DfInputHint` is the message row of a field: one line under the input that shows the errors when there are any and the
+hint otherwise. Every input component in the library renders it. It is also exported for a message row without an
+input, e.g. a group's errors, a section caption or a table row.
 
 ## Basic Usage
 
@@ -12,15 +12,15 @@ places that need a message row without an input — a group's errors, a section 
 
 | Prop           | Type                                               | Default        | Description                                                       |
 |----------------|----------------------------------------------------|----------------|-------------------------------------------------------------------|
-| errors         | `string \| (RenderableValue \| ErrorDescription)[]` | `''`           | The errors to render. Anything non-empty here wins over `message` |
-| message        | `string \| RenderableValue[]`                      | `''`           | What renders while no error stands, typically the field's hint    |
-| errorClasses   | `ClassTypes`                                       | `'text-error'` | Classes applied to each rendered message while an error stands    |
-| messageClasses | `ClassTypes`                                       | `''`           | Classes applied to each rendered message while none does          |
+| errors         | `string \| (RenderableValue \| ErrorDescription)[]` | `''`           | The errors to render. When not empty, rendered instead of `message` |
+| message        | `string \| RenderableValue[]`                      | `''`           | Rendered while there is no error, typically the field's hint    |
+| errorClasses   | `ClassTypes`                                       | `'text-error'` | Classes of each rendered message while there are errors           |
+| messageClasses | `ClassTypes`                                       | `''`           | Classes of each rendered message while there are none             |
 
-The component renders one row, never two. `errors` decides which of the two values that row carries: a non-empty
-array, or a string with at least one non-whitespace character. A string of spaces alone is no error, so a caller that
-keeps a Vuetify message slot alive with a blank string still gets the hint. The same choice picks the classes:
-`errorClasses` while the row holds errors, `messageClasses` while it holds the message.
+The component renders one row. It renders `errors` when `errors` is a non-empty array or a string with at least one
+non-whitespace character, and `message` otherwise. A whitespace-only string is not an error, so a blank string passed
+to keep a Vuetify message slot rendered shows the hint. The classes are `errorClasses` while the row renders errors and
+`messageClasses` while it renders the message.
 
 `ErrorDescription` is vue-forms' read-only shape of an error (`code`, `params`, `detail`, `origin`), which every
 `ValidationError` implements. `ClassTypes` is `ClassType | ClassType[]`, where a `ClassType` is a class name, an array
@@ -29,8 +29,7 @@ exported by this library; see [Render content](#render-content).
 
 ## Rendering
 
-`DfInputHint` does not render the text itself. It hands the chosen value and the chosen classes to `MessagesWidget`,
-which draws each message:
+`DfInputHint` passes the selected value and classes to `MessagesWidget`, which renders each message:
 
 - a `string` renders as a single `<span>`
 - an array renders one node per item
@@ -38,8 +37,8 @@ which draws each message:
   not given or returns `undefined` (see [Translating errors](/examples/localisation#translating-errors))
 - a `RenderableValue` renders its own content: plain text, markdown or a component
 
-An error carries no markdown or component of its own. The `errorText` setting is what renders an error as markdown or
-as a component: it answers an `MdString` or a `SimpleComponentDef` for the codes that need one. The classes given here
+An error carries no markdown or component of its own. An error renders as markdown or as a component when the
+`errorText` setting returns an `MdString` or a `SimpleComponentDef` for its code. The classes given here
 are merged with each `RenderableValue`'s own `classes`.
 
 Markdown renders through `vue-markdown-render`, which `MessagesWidget` imports itself; the library's stylesheet
@@ -76,8 +75,8 @@ class RenderableValue {
 | `MdString` | markdown, through `vue-markdown-render` with the string's `options` and `plugins` |
 | `SimpleComponentDef` | the component named by `componentName`, with `componentProps` as its props and `componentVHtml` as its inner HTML. A common HTML element name renders as that element; any other name is resolved as a globally registered component |
 
-A `RenderableValue` reads a ref or a function on every render, so the content it answers reaches the screen without
-the value being built again. `isSimpleComponentDef(content)` and `isCallableFunction(content)` tell the forms apart.
+A `RenderableValue` reads a ref or a function on every render, so a changed content is rendered without constructing a
+new value. `isSimpleComponentDef(content)` and `isCallableFunction(content)` tell the forms apart.
 
 `MessagesWidget` takes two props:
 
@@ -94,23 +93,22 @@ Every input component in the library overrides the Vuetify `#message` slot of th
 <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
 ```
 
-`message` is what Vuetify hands the slot, which is the `hint` prop: the inputs bind `persistent-hint` always and
-`hide-details="auto"`, so the row is there whenever there is something to put in it and gone otherwise. `shownErrors` is
-the field's errors — `control.errors` when a control is bound, and the `errors` prop when the component is used with
-`v-model`, each string wrapped in a `ValidationError` with an empty `code` and the string as its `detail` — as far as
-they are to be shown now: an error
-the server returned at once, every other once the field is touched (see
-[Shown errors](/examples/input-base#shown-errors)). While it is empty the hint holds the row. `helpText` is not part of this row.
+`message` is what Vuetify passes to the slot, the `hint` prop. The inputs bind `persistent-hint` and
+`hide-details="auto"`, so the row is rendered when it has content and removed otherwise. `shownErrors` is the subset of
+the field's errors that is shown now (see [Shown errors](/examples/input-base#shown-errors)): an error of origin
+`'server'` immediately, every other once the field is touched. The field's errors are `control.errors` when a control is
+bound, and otherwise the `errors` prop, each string wrapped in a `ValidationError` with an empty `code` and the string
+as its `detail`. While `shownErrors` is empty, the row shows the hint. `helpText` is not part of this row.
 
-The inputs also report a single blank error message to Vuetify while a touched field is invalid. That is what paints
-the control's error state and keeps the message row on screen; the text in the row is `DfInputHint`'s.
+While a touched field is invalid, the inputs also pass a single blank error message to Vuetify. It sets the control's
+error state and keeps the message row rendered; the text in the row is rendered by `DfInputHint`.
 
-The result is the behaviour every field in the library shares: the hint is visible from the start, and the moment the
-user leaves an invalid field the errors take the same line, in `text-error`.
+The hint is therefore visible from the start, and once the user leaves an invalid field the errors replace it on the
+same line, in `text-error`.
 
 ## Standalone use
 
-`DfInputHint` is a first-class export, so anything that produces messages can have a row of its own:
+`DfInputHint` is exported and renders any messages on a row of its own:
 
 ```vue
 <template>
@@ -120,7 +118,7 @@ user leaves an invalid field the errors take the same line, in `text-error`.
   <!-- A plain string, with classes of its own -->
   <df-input-hint message="Amounts are in euro" message-classes="text-medium-emphasis text-caption" />
 
-  <!-- A message that turns into an error under a condition the form decides -->
+  <!-- The message, or the error while serverError is not empty -->
   <df-input-hint :errors="serverError" message="Saved" error-classes="text-warning font-weight-bold" />
 </template>
 
@@ -129,8 +127,8 @@ import { DfInputHint } from '@dynamicforms/vuetify-inputs';
 </script>
 ```
 
-`group.errors` is the same `ValidationError[]` a field exposes, so no conversion is needed between a group-level
-validator and the row that renders it. See [Groups](/examples/groups) for the validator side of that pairing.
+`group.errors` is a `ValidationError[]`, as a field's is, and is passed without conversion. See
+[Groups](/examples/groups) for group-level validators.
 
 The plugin registers the component globally when it is installed with `registerComponents: true`, under the name
 `DfInputHint`, which templates address as `<df-input-hint>`. Without that option, import it where it is used.
@@ -185,10 +183,10 @@ credentials.registerAction(
 
 ```vue
 <template>
-  <!-- The hint holds the row until the field is touched and invalid -->
+  <!-- The hint is shown until the field is touched and invalid -->
   <df-input :control="email" label="Email" hint="We use it for the receipt only" />
 
-  <!-- Standalone, fed a plain string on each of the two props -->
+  <!-- Standalone, with a plain string in each of the two props -->
   <df-input-hint
     :errors="standaloneErrors"
     message="A message of its own, rendered when no error stands"

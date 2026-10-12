@@ -1,26 +1,24 @@
 # df-input Component
 
-The df-input component provides a versatile text input field that integrates with both Vuetify and DynamicForms. It 
-supports various input types including text, email, password, URL, and number.
+`df-input` is a single-line input of type text, email, password, URL or number.
 
 ## Basic Usage
 
-Below is an example of the df-input component with different text input types:
+`df-input` with different input types:
 
 <input-basic/>
 
 ## Number Input
 
-The df-input component provides specialized handling for number inputs, automatically switching to Vuetify's 
-v-number-input component:
+With `input-type="number"`, `df-input` renders Vuetify's `v-number-input`:
 
 <input-number/>
 
 ## Features
 
-- Integration with `@dynamicforms/vue-forms` for state management and validation
-- Support for multiple input types: text, email, password, URL, and number
-- Automatic use of specialized Vuetify number input for numerical fields
+- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
+- Input types text, email, password, URL and number
+- `v-number-input` for the number type
 
 ## Props
 
@@ -66,7 +64,7 @@ This component emits all [common events from InputBase](./input-base):
 ### Text Input
 
 Length and format constraints are validators on the bound field, not props of the component: df-input accepts only
-the props listed above, and anything else lands on the wrapper element as a plain attribute.
+the props listed above, and any other attribute is set on the wrapper element.
 
 ```vue
 <template>
@@ -95,8 +93,8 @@ const form = new Group({
 </script>
 ```
 
-Native DOM attributes that the input element itself should carry - `autocomplete`, `inputmode`, `maxlength` - go
-through `passthroughAttrs`, which is forwarded to the Vuetify component.
+Native DOM attributes of the input element (`autocomplete`, `inputmode`, `maxlength`) are passed through
+`passthroughAttrs`, which is forwarded to the Vuetify component.
 
 ### Number Input with DynamicForms
 

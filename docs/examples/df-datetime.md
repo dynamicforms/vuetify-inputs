@@ -1,21 +1,20 @@
 # df-date-time Component
 
-The df-date-time component enables date and time selection with a visual interface based on Vuetify's date and time 
-picker components.
+`df-date-time` selects a date, a time or both, with Vuetify's date and time pickers.
 
 ## Basic Usage
 
-Below is an example of the df-date-time component used with DynamicForms:
+`df-date-time` bound to a vue-forms field:
 
 <datetime-basic/>
 
 ## Features
 
-- Integration with `@dynamicforms/vue-forms` for state management and validation
-- Support for selecting date only, time only, or both
-- Customizable display formats using date-fns patterns
-- Interactive visual picker interface
-- Support for easy value clearing
+- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
+- Date only, time only, or both
+- Display formats as date-fns patterns
+- Date and time pickers in a menu
+- Clearing the value
 
 ::: warning
 Keyboard support is minimal. `<space>` triggers the picker, but keyboard navigation within the picker is not fully 
@@ -47,18 +46,18 @@ This component inherits all common props from [InputBase](./input-base), includi
 The component accepts and outputs values in the following formats:
 
 - **datetime** mode: ISO 8601 format (`YYYY-MM-DDTHH:mm:ssXXX`). The value written carries the offset of the user's
-  local time zone in force on that date, so in a zone with daylight saving time a January value carries the winter
-  offset whatever the date of editing.
+  local time zone in force on that date; in a zone with daylight saving time a January value carries the winter
+  offset regardless of the date of editing.
 - **date** mode: ISO 8601 date format (`YYYY-MM-DD`). A date without a time is read as that day in local time.
 - **time** mode: 24-hour time format (`HH:mm:ss`)
 
-The component writes a value only when the user edits the date or the time. A value the field is bound with is shown
-in the user's local time and stays in the field as it was given - with its own offset, `Z` included - so displaying a
-record neither changes the field nor marks it as changed.
+The component writes a value only when the user edits the date or the time. A bound value is shown in the user's
+local time and kept in the field as given, with its own offset (`Z` included), so displaying a record neither changes
+the field nor marks it as changed.
 
 ## Display Format
 
-The component uses [date-fns format patterns](https://date-fns.org/v2.29.3/docs/format) for displaying dates and times:
+Dates and times are displayed with [date-fns format patterns](https://date-fns.org/v2.29.3/docs/format):
 
 - Default date format: `'P'` (locale-specific date representation)
 - Default time format: `'p'` (locale-specific time representation)
@@ -71,11 +70,11 @@ Common format strings:
 
 ## Locale Configuration
 
-The component supports internationalization through date-fns locale objects. You can configure locales in two ways:
+The locale is a date-fns locale object, set in one of two ways:
 
 ### 1. Global Locale Configuration
 
-Use `DateTimeLocaleConfig` to set a global locale for all df-date-time components:
+`DateTimeLocaleConfig` sets the locale of all `df-date-time` components:
 
 ```vue
 <script setup>
@@ -97,7 +96,7 @@ currentLocale.value = fr;
 
 ### 2. Component-specific Locale
 
-Override the global locale for specific components using the `locale` prop:
+The `locale` prop overrides the global locale for one component:
 
 ```vue
 <template>
@@ -121,7 +120,7 @@ const selectedDate = ref('2023-04-17');
 
 ### Available Locales
 
-You can import any date-fns locale:
+Any date-fns locale can be used:
 
 ```typescript
 import { 
@@ -140,9 +139,8 @@ The date-fns locale affects:
 - Parsing (how manual input is interpreted)
 - First day of week in date picker
 
-The month and weekday names inside the picker are not among them: the component passes no locale to
-`<v-date-picker>`, so those come from Vuetify's own locale configuration. See
-[Localisation](/examples/localisation) for the full split.
+The month and weekday names inside the picker are not: the component passes no locale to `<v-date-picker>`, so they
+come from Vuetify's locale configuration. See [Localisation](/examples/localisation).
 
 ## Events
 

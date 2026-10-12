@@ -1,22 +1,21 @@
 # df-color Component
 
-The df-color component provides a color selection field that integrates with both Vuetify and DynamicForms. It offers 
-a visual color picker interface with hex color input support.
+`df-color` is a hex color field with a swatch and Vuetify's color picker.
 
 ## Basic Usage
 
-Below is an example of the df-color component used with DynamicForms:
+`df-color` bound to a vue-forms field:
 
 <color-basic/>
 
 ## Features
 
-- Integration with `@dynamicforms/vue-forms` for state management and validation
-- Visual color picker interface based on Vuetify's color picker
-- Support for hex color input
-- Visual color indicator preview
+- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
+- Vuetify's color picker in a menu
+- Hex color input
+- A swatch of the current color
 - Built-in hex format check for the uncontrolled (v-model) case, reported as an `invalid_hex_color` error
-- Support for clearing the color value
+- Clearing the value under `allowNull`
 
 ## Props
 
@@ -43,22 +42,18 @@ alpha channel (e.g., `#FF0000FF`).
 ## Validation
 
 Without a `control`, the component checks the format of the value itself. It accepts a string of 3, 4, 6 or 8
-hexadecimal digits with an optional leading `#` - `#f00`, `f00`, `#ff0000`, `#ff0000ff` and `ff0000ff` all pass. An
+hexadecimal digits with an optional leading `#`: `#f00`, `f00`, `#ff0000`, `#ff0000ff` and `ff0000ff` all pass. An
 empty value passes only when `allowNull` is set. Any other value gets an error of code `invalid_hex_color` with the
 detail `Not a valid hex string.`, shown once the field is touched and rendered like any other error
 (see [Translating errors](/examples/localisation#translating-errors)).
 
-With a bound `control`, the component checks nothing itself: the field's own validators decide whether the value is
-acceptable.
-
-A bound field validates through the DynamicForms Field:
+With a bound `control`, the component does not check the value; the field's validators do:
 
 ```javascript
 const colorField = new Field({
   value: '#FF0000',
   validators: [
     new Validators.Validator((value) => {
-      // Your custom validation logic
       if (value && !value.startsWith('#')) {
         return [new ValidationError('hash_prefix', {}, 'Color must start with #')];
       }
