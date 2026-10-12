@@ -18,15 +18,17 @@
     </template>
     <template #default>
       <v-menu v-if="clientRendered" v-model="dropdownShown" :close-on-content-click="false" activator="parent">
-        <v-confirm-edit v-model="value" @cancel="dropdownShown = false" @save="concludeEdit">
-          <template #default="{ model: proxyModel, save, actions }">
+        <v-confirm-edit v-model="value" hide-actions @cancel="dropdownShown = false" @save="concludeEdit">
+          <template #default="{ model: proxyModel, save, cancel, isPristine }">
             <v-card>
               <v-color-picker
                 v-model="proxyModel.value"
                 mode="hexa"
                 @dblclick="saveOnDoubleClick($event, colorChoices, save)"
               />
-              <v-card-actions class="justify-end"><component :is="actions" /></v-card-actions>
+              <v-card-actions class="justify-end">
+                <confirm-actions :save="save" :cancel="cancel" :is-pristine="isPristine" />
+              </v-card-actions>
             </v-card>
           </template>
         </v-confirm-edit>
@@ -42,6 +44,7 @@ import { ref } from 'vue';
 import { DfColorProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 import { useClientRendered } from './helpers/client-rendered';
+import ConfirmActions from './helpers/confirm-actions.vue';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfColorProps>(), { ...defaultBaseProps, allowNull: false });

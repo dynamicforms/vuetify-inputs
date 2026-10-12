@@ -98,6 +98,22 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
+    it('enables Cancel before a change and OK after one', async () => {
+      const control = new Field<string>({ value: '#f00' });
+      const wrapper = await openPicker(control);
+      const button = (text: string) => wrapper.findAllComponents({ name: 'VBtn' }).filter((b) => b.text() === text);
+
+      expect(button('Cancel')).toHaveLength(1);
+      expect(button('OK')).toHaveLength(1);
+      expect(button('Cancel')[0].props('disabled')).toBe(false);
+      expect(button('OK')[0].props('disabled')).toBe(true);
+
+      wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ff00');
+      await flushPromises();
+      expect(button('OK')[0].props('disabled')).toBe(false);
+      wrapper.unmount();
+    });
+
     it('writes a picked color on a double-click on the canvas', async () => {
       const control = new Field<string>({ value: '#f00' });
       const wrapper = await openPicker(control);
