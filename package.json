@@ -73,7 +73,6 @@
     "@tiptap/vue-3": "^3.30.2",
     "date-fns": "^4.1.0",
     "lodash-es": "^4.17.12",
-    "vitepress-plugin-crosslinks": "^1.0.0",
     "vue": "^3.5.2",
     "vue-cached-icon": "^3.0.3",
     "vue-markdown-render": "^2.2.1",

@@ -69,6 +69,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `<df-input>` with `input-type="number"` marks its control touched on blur, so its validators' errors are shown.
+- `vitepress-plugin-crosslinks` is a dev dependency of the documentation, not a peer dependency of the package.
+- `registerVuetifyComponents` registers every Vuetify component the library renders: `VBtnGroup`, `VBtnToggle`,
+  `VCard`, `VCardActions`, `VDivider`, `VList` and `VListItemTitle` are added.
 
 ### Removed
 
