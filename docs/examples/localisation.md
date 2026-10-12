@@ -99,8 +99,9 @@ An error is data: a `code`, `params` and an English `detail`. The application co
 as described in vue-forms' [Error messages and translation](:vue-forms:/api/validators.html#error-messages-and-translation),
 which also lists every code vue-forms raises with its params.
 
-The inputs of `@dynamicforms/vuetify-inputs` render each error as the content the `errorText` setting returns for
-it, and as its `detail` where the setting is not given or returns `undefined`. `errorText` is given once, when the
+The inputs of `@dynamicforms/vuetify-inputs` render an error with a code as the content the `errorText` setting
+returns for it, and as its `detail` where the setting is not given or returns `undefined`. An error without a code,
+and a string, render as written: they are text in the user's language, and `errorText` is not called for them. `errorText` is given once, when the
 plugin is installed, and converts every error the application shows: those of vue-forms' validators, of the
 application's own validators, of its server and of vuetify-inputs itself
 ([error codes](#error-codes)).
@@ -152,8 +153,7 @@ The errors this library raises itself:
 | `invalid_hex_color` | none | `Not a valid hex string.` | `<df-color>` without a `control`, for a value that is not 3, 4, 6 or 8 hex digits with an optional leading `#`, or an empty value without `allowNull` |
 | `file_gone` | none | the server's `errorText` | `<df-file>` and `<df-image>`, when the server reports the uploaded file as gone; its origin is `'server'` |
 
-A string in a component's `errors` prop becomes an error with an empty code, so it renders as written unless
-`errorText` returns something else for it.
+A string in a component's `errors` prop becomes an error with an empty code and renders as written.
 
 ## Dates and times
 

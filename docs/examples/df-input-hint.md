@@ -12,7 +12,7 @@ input, e.g. a group's errors, a section caption or a table row.
 
 | Prop           | Type                                               | Default        | Description                                                       |
 |----------------|----------------------------------------------------|----------------|-------------------------------------------------------------------|
-| errors         | `string \| (RenderableValue \| ErrorDescription)[]` | `''`           | The errors to render. When not empty, rendered instead of `message` |
+| errors         | `string \| (RenderableValue \| ErrorInput)[]` | `''`           | The errors to render. When not empty, rendered instead of `message` |
 | message        | `string \| RenderableValue[]`                      | `''`           | Rendered while there is no error, typically the field's hint    |
 | errorClasses   | `ClassTypes`                                       | `'text-error'` | Classes of each rendered message while there are errors           |
 | messageClasses | `ClassTypes`                                       | `''`           | Classes of each rendered message while there are none             |
@@ -22,8 +22,10 @@ non-whitespace character, and `message` otherwise. A whitespace-only string is n
 to keep a Vuetify message slot rendered shows the hint. The classes are `errorClasses` while the row renders errors and
 `messageClasses` while it renders the message.
 
-`ErrorDescription` is vue-forms' read-only shape of an error (`code`, `params`, `detail`, `origin`), which every
-`ValidationError` implements. `ClassTypes` is `ClassType | ClassType[]`, where a `ClassType` is a class name, an array
+`ErrorInput` is `string | Partial<ErrorDescription>`. `ErrorDescription` is vue-forms' read-only shape of an error
+(`code`, `params`, `detail`, `origin`), which every `ValidationError` implements. A string is text in the user's
+language. An error description may lack any member: `toErrorDescription(error)` sets a missing `code` to `''`,
+`params` to `{}`, `detail` to `''` and `origin` to `'application'`. `ClassTypes` is `ClassType | ClassType[]`, where a `ClassType` is a class name, an array
 of class names, or a `Record<string, boolean>` of conditional classes. Both `ClassTypes` and `RenderableValue` are
 exported by this library; see [Render content](#render-content).
 
@@ -33,8 +35,10 @@ exported by this library; see [Render content](#render-content).
 
 - a `string` renders as a single `<span>`
 - an array renders one node per item
-- an error renders as the content the `errorText` setting returns for it, and as its `detail` where that setting is
-  not given or returns `undefined` (see [Translating errors](/examples/localisation#translating-errors))
+- a string item renders as written
+- an error without a code renders as its `detail`
+- an error with a code renders as the content the `errorText` setting returns for it, and as its `detail` where that
+  setting is not given or returns `undefined` (see [Translating errors](/examples/localisation#translating-errors))
 - a `RenderableValue` renders its own content: plain text, markdown or a component
 
 An error carries no markdown or component of its own. An error renders as markdown or as a component when the
@@ -82,7 +86,7 @@ new value. `isSimpleComponentDef(content)` and `isCallableFunction(content)` tel
 
 | Prop | Type | Description |
 |---|---|---|
-| message | `string \| (RenderableValue \| ErrorDescription)[]` | A plain text, or the items to render, each in its own element |
+| message | `string \| (RenderableValue \| ErrorInput)[]` | A plain text, or the items to render, each in its own element |
 | classes | `ClassTypes` | Classes for every rendered item, beside the item's own `classes` |
 
 ## How the inputs use it

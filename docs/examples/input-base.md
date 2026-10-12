@@ -343,7 +343,11 @@ const { densityClass, value } = useInputBase<string>(props, emits);
 ## useInputBase()
 
 ```typescript
-function useInputBase<T = any>(props: BaseProps<T>, emit: BaseEmits<T>);
+function useInputBase<T = any>(
+  props: BaseProps<T>,
+  emit: BaseEmits<T>,
+  componentErrors?: () => ValidationError[],
+);
 ```
 
 `useInputBase()` is the composable every component in this library calls. It is exported; a component outside the
@@ -352,6 +356,16 @@ library that calls it gets the same value, error, touched, density, variant and 
 It is called in `setup()` with the component's props object and its emit function. If `control` is given and is not a
 vue-forms `FieldBase`, the call throws `Error('control prop is not a vue-form control instance')`, so the component
 fails at mount.
+
+`componentErrors` returns the errors the component finds in the value itself. They are added to the errors of the
+`errors` prop where no `control` is bound; a bound control reports through its own validators. The function is read
+inside a computed, so the reactive state it reads, such as `value`, is tracked:
+
+```typescript
+const { value, shownErrors } = useInputBase<string>(props, emits, () =>
+  /^\d{4}$/.test(value.value ?? '') ? [] : [new ValidationError('invalid_year', {}, 'Not a year.', 'validator')],
+);
+```
 
 ### What it returns
 

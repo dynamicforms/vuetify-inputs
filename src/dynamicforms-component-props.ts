@@ -1,4 +1,4 @@
-import { Action, type ErrorDescription } from '@dynamicforms/vue-forms';
+import { Action } from '@dynamicforms/vue-forms';
 import { type Locale } from 'date-fns';
 import { MaybeRef } from 'vue';
 import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
@@ -6,6 +6,7 @@ import { DefaultInputSlot } from 'vuetify/lib/components/VField/VField';
 import {
   BaseProps,
   type ClassTypes,
+  type ErrorInput,
   FileComms,
   Label,
   type MdString,
@@ -71,16 +72,17 @@ export interface DfInputProps extends BaseProps {
 }
 
 export interface MessagesWidgetProps {
-  /** A plain text, or the items to render, each in its own element: an error as the text the `errorText` setting
-   * gives for it, a `RenderableValue` as its content. */
-  message: string | (RenderableValue | ErrorDescription)[];
+  /** A plain text, or the items to render, each in its own element: a `RenderableValue` as its content, an error
+   * as `errorText()` gives it. */
+  message: string | readonly (RenderableValue | ErrorInput)[];
   /** Classes for every rendered item, beside the item's own `extraClasses`. */
   classes?: ClassTypes;
 }
 
 export interface DfInputHintProps {
-  /** The errors to render. Rendered in place of {@link message} whenever there is one. */
-  errors?: string | (RenderableValue | ErrorDescription)[];
+  /** The errors to render, in place of {@link message} whenever there is one. A string is text in the user's
+   * language; an error description may lack any member. */
+  errors?: string | readonly (RenderableValue | ErrorInput)[];
   /** The message to render, shown while there is no error. */
   message?: string | RenderableValue[];
   /** Classes for the rendered errors. Defaults to `text-error`. */

@@ -4,9 +4,32 @@ import type { RenderContentNonCallable } from './render-content';
 import type { VuetifyInputsSettings } from './settings';
 
 /**
- * What a component renders for `error`: the `errorText` setting's answer, and `error.detail` where the setting is not
- * given or answers `undefined`.
+ * An error as a component accepts it for rendering: a string, which is text in the user's language, or an error
+ * description of which any member may be missing.
  */
-export function errorText(error: ErrorDescription, settings: VuetifyInputsSettings): RenderContentNonCallable {
-  return settings.errorText?.(error) ?? error.detail;
+export type ErrorInput = string | Partial<ErrorDescription>;
+
+/**
+ * `error` with every missing member set: `code` to `''`, `params` to `{}`, `detail` to `''` and `origin` to
+ * `'application'`. A string becomes the `detail` of an error without a code.
+ */
+export function toErrorDescription(error: ErrorInput): ErrorDescription {
+  if (typeof error === 'string') return { code: '', params: {}, detail: error, origin: 'application' };
+  return {
+    code: typeof error.code === 'string' ? error.code : '',
+    params: error.params ?? {},
+    detail: typeof error.detail === 'string' ? error.detail : '',
+    origin: typeof error.origin === 'string' && error.origin ? error.origin : 'application',
+  };
+}
+
+/**
+ * What a component renders for `error`. An error without a code renders as its `detail`: it is text in the user's
+ * language. An error with a code renders as the `errorText` setting's answer, and as its `detail` where the setting
+ * is not given or answers `undefined`.
+ */
+export function errorText(error: ErrorInput, settings: VuetifyInputsSettings): RenderContentNonCallable {
+  const description = toErrorDescription(error);
+  if (!description.code) return description.detail;
+  return settings.errorText?.(description) ?? description.detail;
 }

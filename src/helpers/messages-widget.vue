@@ -3,13 +3,12 @@
 </template>
 
 <script setup lang="ts">
-import type { ErrorDescription } from '@dynamicforms/vue-forms';
 import { h, inject, resolveComponent } from 'vue';
 import VueMarkdown from 'vue-markdown-render';
 
 import type { MessagesWidgetProps } from '../dynamicforms-component-props';
 
-import { errorText } from './error-text';
+import { type ErrorInput, errorText } from './error-text';
 import { RenderableValue } from './render-content';
 import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
@@ -74,7 +73,7 @@ const htmlElements = new Set([
   'dd',
 ]);
 
-function asRenderable(msg: RenderableValue | ErrorDescription): RenderableValue {
+function asRenderable(msg: RenderableValue | ErrorInput): RenderableValue {
   return msg instanceof RenderableValue ? msg : new RenderableValue(errorText(msg, settings));
 }
 

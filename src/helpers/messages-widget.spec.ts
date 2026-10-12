@@ -88,4 +88,35 @@ describe('MessagesWidget', () => {
 
     expect(buildWrapper({ message: field.errors }).text()).toBe('Must be one of [a, b]');
   });
+
+  describe('errors as strings and partial descriptions', () => {
+    const errorText = () => 'from errorText';
+
+    it('renders a string item as it is, without asking errorText', () => {
+      const divs = buildWrapper({ message: ['Already translated'] }, { errorText }).findAll('div');
+
+      expect(divs.map((d) => d.text())).toEqual(['Already translated']);
+    });
+
+    it('renders an error without a code as its detail, without asking errorText', () => {
+      const divs = buildWrapper({ message: [{ detail: 'Only a detail' }] }, { errorText }).findAll('div');
+
+      expect(divs.map((d) => d.text())).toEqual(['Only a detail']);
+    });
+
+    it('asks errorText for an error with a code, with the missing members defaulted', () => {
+      let asked: unknown;
+      const settings: VuetifyInputsSettings = {
+        errorText: (error) => {
+          asked = error;
+          return undefined;
+        },
+      };
+
+      const divs = buildWrapper({ message: [{ code: 'taken' }] }, settings).findAll('div');
+
+      expect(asked).toEqual({ code: 'taken', params: {}, detail: '', origin: 'application' });
+      expect(divs.map((d) => d.text())).toEqual(['']);
+    });
+  });
 });
