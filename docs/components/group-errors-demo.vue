@@ -42,7 +42,7 @@
             hint="Reveals the section below"
           />
 
-          <!-- The whole section follows the visibility of the traveller group -->
+          <!-- The section is rendered by the visibility of the traveller group -->
           <v-card
             v-if="traveller.visibility !== 'suppress'"
             variant="outlined"
@@ -77,8 +77,7 @@
             </v-chip>
           </div>
 
-          <!-- The group-level validator writes here, so the message belongs to the form, not to any single field. It is
-               shown by the rule the inputs follow: once a field of the form has been touched -->
+          <!-- The group-level validator's errors, shown by the rule of the inputs: once a field of the form is touched -->
           <div class="mt-1">
             <df-input-hint :errors="formErrors" />
           </div>

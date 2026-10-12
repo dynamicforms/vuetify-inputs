@@ -63,9 +63,7 @@
       <v-card-actions>
         <v-btn-group>
           <v-btn @click="toggleField('firstName')" color="primary">
-            {{
-              personForm.fields.firstName.enabled ? "Disable" : "Enable"
-            }}
+            {{ personForm.fields.firstName.enabled ? "Disable" : "Enable" }}
             First Name
           </v-btn>
           <v-btn @click="toggleField('lastName')" color="primary">
@@ -76,9 +74,7 @@
             {{ personForm.fields.age.enabled ? "Disable" : "Enable" }} Age
           </v-btn>
           <v-btn @click="toggleField('country')" color="primary">
-            {{
-              personForm.fields.country.enabled ? "Disable" : "Enable"
-            }}
+            {{ personForm.fields.country.enabled ? "Disable" : "Enable" }}
             Country
           </v-btn>
         </v-btn-group>

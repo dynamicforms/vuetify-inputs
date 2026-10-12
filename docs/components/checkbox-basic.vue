@@ -29,9 +29,7 @@
                   color="secondary"
                   size="small"
                 >
-                  {{
-                    form.fields.binaryField.enabled ? "Disable" : "Enable"
-                  }}
+                  {{ form.fields.binaryField.enabled ? "Disable" : "Enable" }}
                   Field
                 </v-btn>
               </div>
@@ -68,9 +66,7 @@
                   color="secondary"
                   size="small"
                 >
-                  {{
-                    form.fields.ternaryField.enabled ? "Disable" : "Enable"
-                  }}
+                  {{ form.fields.ternaryField.enabled ? "Disable" : "Enable" }}
                   Field
                 </v-btn>
               </div>

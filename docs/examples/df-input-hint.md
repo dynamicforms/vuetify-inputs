@@ -189,7 +189,7 @@ credentials.registerAction(
   <!-- Standalone, with a plain string in each of the two props -->
   <df-input-hint
     :errors="standaloneErrors"
-    message="A message of its own, rendered when no error stands"
+    message="Shown while there is no error"
     message-classes="text-medium-emphasis"
   />
 

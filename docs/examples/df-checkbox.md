@@ -12,7 +12,7 @@
 
 - Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Binary (true/false) and ternary (true/false/null) values
-- Normalization of input values
+- A click cycles the value `false` → `true` → `null` → `false` with `allowNull`, and `false` ↔ `true` without it
 - The indeterminate state renders `null`
 - Labels and hints
 

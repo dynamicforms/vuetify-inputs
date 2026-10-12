@@ -78,7 +78,7 @@ This component emits all [common events from InputBase](./input-base):
 
 ## Working with HTML Content
 
-The value is HTML. HTML entered by users is sanitized by the application before it is displayed, to prevent XSS.
+The value is HTML, and the component does not sanitize it. An application that displays HTML entered by users sanitizes it first, to prevent XSS.
 
 List items and table cells save their text wrapped in a paragraph (`<li><p>...</p></li>`, `<td><p>...</p></td>`),
 so HTML rendered outside this component (a public page, a PDF export, a templated email) needs

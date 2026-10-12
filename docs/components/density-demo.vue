@@ -192,10 +192,9 @@ const components = [
 
 .demo-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(8em, max-content)) minmax(
-      11em,
-      max-content
-    ) repeat(3, minmax(8em, max-content));
+  grid-template-columns:
+    repeat(4, minmax(8em, max-content)) minmax(11em, max-content)
+    repeat(3, minmax(8em, max-content));
   gap: 8px;
   align-items: center;
 }

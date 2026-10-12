@@ -45,8 +45,8 @@ This component inherits all common props from [InputBase](./input-base), includi
 
 When `inputType` is set to 'number', the component:
 
-1. Applies min, max, and step controls
-2. Validates for proper numeric format
+1. Renders Vuetify's `v-number-input` with `min`, `max`, `precision` and `step`
+2. Marks the field touched on blur
 
 The number input supports:
 - Integer and decimal values

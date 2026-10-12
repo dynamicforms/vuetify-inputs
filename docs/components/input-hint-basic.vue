@@ -4,10 +4,9 @@
       <v-card-title>Inside an input</v-card-title>
       <v-card-text>
         <p class="mb-4">
-          The field carries a hint and two validators. The hint holds the
-          message row until the field is touched and invalid; from then on the
-          row belongs to the errors. Type a few letters and leave the field to
-          see the swap.
+          The field has a hint and two validators. The message row shows the
+          hint until the field is touched and invalid, and the errors after
+          that. Type a few letters and leave the field.
         </p>
 
         <df-input
@@ -37,14 +36,14 @@
         <div class="row-frame">
           <df-input-hint
             :errors="standaloneErrors"
-            message="A message of its own, rendered when no error stands"
+            message="Shown while there is no error"
             message-classes="text-medium-emphasis"
           />
         </div>
 
         <p class="mt-4 mb-0">
-          The middle option feeds the component three spaces. A whitespace-only
-          <code>errors</code> string is no error, so the message comes back.
+          The middle option passes three spaces. An <code>errors</code> string
+          of whitespace only is no error, so the message is shown.
         </p>
       </v-card-text>
     </v-card>
