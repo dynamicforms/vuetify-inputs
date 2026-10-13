@@ -12,7 +12,7 @@
       :key="idx"
       :variant="action.renderAs === 'button' ? 'tonal' : 'text'"
       :color="defaultActionColor(action)"
-      :disabled="!action.action.effectiveEnabled || action.action.busy"
+      :disabled="!action.action.executable"
       :loading="action.action.busy"
       :elevation="0"
       :size="buttonSize"
