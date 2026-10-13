@@ -115,7 +115,7 @@ const cancelAction = new Action({
 
 const actions: Ref<Action[]> = ref([saveAction, deleteAction, cancelAction]);
 
-// The buttons follow the enablement of the group holding them: each reads effectiveEnabled, which is false where
+// The buttons follow the enablement of the group holding them: each binds `executable`, which is false where
 // the action or any container above it is disabled.
 const section = new Group({
   save: saveAction,
