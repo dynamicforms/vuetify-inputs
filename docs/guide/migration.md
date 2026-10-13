@@ -26,7 +26,7 @@ const close = new Action({
   value: {
     name: 'close',
     label: () => t('Close'),
-    icon: 'ion-close-outline',
+    icon: 'mdi-close',
     renderAs: 'button',
     showLabel: true,
     showIcon: true,
