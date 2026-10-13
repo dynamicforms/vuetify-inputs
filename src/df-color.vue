@@ -3,7 +3,7 @@
     v-if="isRendered"
     v-model="value"
     :class="[densityClass, visibilityClass]"
-    :clearable="allowNull"
+    :clearable="allowNull && !vuetifyBindings.readonly"
     type="text"
     v-bind="vuetifyBindings"
     @blur="touched = true"
@@ -17,7 +17,13 @@
       />
     </template>
     <template #default>
-      <v-menu v-if="clientRendered" v-model="dropdownShown" :close-on-content-click="false" activator="parent">
+      <v-menu
+        v-if="clientRendered"
+        v-model="dropdownShown"
+        :close-on-content-click="false"
+        :disabled="vuetifyBindings.readonly"
+        activator="parent"
+      >
         <v-confirm-edit v-model="value" hide-actions @cancel="dropdownShown = false" @save="concludeEdit">
           <template #default="{ model: proxyModel, save, cancel, isPristine }">
             <v-card>

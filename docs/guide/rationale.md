@@ -68,8 +68,8 @@ looks like.
   [Label](/examples/input-base#label)
 - **Visibility**: `'full'`, `'invisible'`, `'hidden'` or `'suppress'`, taken from the bound element
   or from the `visibility` prop. [Display modes](/examples/input-base#display-modes)
-- **Enablement from the container.** A field reads `effectiveEnabled`, so the fields of a disabled group render
-  disabled. An action button reads `executable`, which is also `false` while the action is `busy` or one of its
+- **Enablement from the container.** A field reads `effectiveEnabled` and `effectiveAccess`, so the fields of a
+  `'readonly'` group render read-only and those of a disabled group render disabled. An action button reads `executable`, which is also `false` while the action is `busy` or one of its
   handlers returns `false` from `canExecute()`.
 - **`passthroughAttrs`**: a record merged last over the computed Vuetify bindings, so any prop of the underlying
   Vuetify component is reachable without this library declaring it.

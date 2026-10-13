@@ -65,13 +65,13 @@ describe('EditorCore writes only what the user edits', () => {
     expect(control.isChanged).toBe(false);
   });
 
-  it('does not write the value when it is disabled or enabled', async () => {
+  it('does not write the value when it is made read-only or editable', async () => {
     const vuetify = createVuetify({ components });
     const wrapper = mount(EditorCore, { props: { modelValue: html }, global: { plugins: [vuetify] } });
     await flushPromises();
 
-    await wrapper.setProps({ disabled: true });
-    await wrapper.setProps({ disabled: false });
+    await wrapper.setProps({ readonly: true });
+    await wrapper.setProps({ readonly: false });
     await flushPromises();
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();

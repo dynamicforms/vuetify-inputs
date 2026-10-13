@@ -5,7 +5,7 @@
         v-model="value"
         :class="{ 'mt-6': !!label }"
         :min-height="minHeight"
-        :disabled="vuetifyBindings.disabled"
+        :readonly="vuetifyBindings.readonly"
         :toolbar-button-size="toolbarButtonSize"
         :font-family="fontFamily"
         v-bind="passthroughAttrs"

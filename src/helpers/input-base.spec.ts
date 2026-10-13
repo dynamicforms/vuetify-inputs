@@ -591,6 +591,36 @@ describe('input-base', () => {
         expect(vuetifyBindings.value.disabled).toBe(true);
         expect(vuetifyBindings.value.readonly).toBe(true);
       });
+
+      it('draws an element of a read-only container read-only, not disabled', () => {
+        const section = new Form.Group({ amount: new Form.Field({ value: 1 }) }, { access: 'readonly' });
+        const emit = vi.fn();
+
+        const { enabled, vuetifyBindings } = useInputBase({ control: section.fields.amount }, emit);
+
+        expect(enabled.value).toBe(false);
+        expect(vuetifyBindings.value.readonly).toBe(true);
+        expect(vuetifyBindings.value.disabled).toBe(false);
+      });
+
+      it("draws a 'disabled-null' element disabled", () => {
+        const control = new Form.Field({ value: 1, access: 'disabled-null' });
+        const emit = vi.fn();
+
+        const { vuetifyBindings } = useInputBase({ control }, emit);
+
+        expect(vuetifyBindings.value.readonly).toBe(true);
+        expect(vuetifyBindings.value.disabled).toBe(true);
+      });
+
+      it('draws an input disabled by the enabled prop disabled', () => {
+        const emit = vi.fn();
+
+        const { vuetifyBindings } = useInputBase({ enabled: false }, emit);
+
+        expect(vuetifyBindings.value.readonly).toBe(true);
+        expect(vuetifyBindings.value.disabled).toBe(true);
+      });
     });
 
     describe('visibility prop', () => {

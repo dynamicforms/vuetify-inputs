@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.14.1] - Unreleased
 
+### Changed
+
+- An input bound to an element whose `effectiveAccess` is `'readonly'` is drawn read-only instead of disabled: it is
+  not greyed out and its text can be selected. `'disabled'` and `'disabled-null'` are drawn disabled as before.
+- A read-only input shows no clear button, `df-color` and `df-date-time` open no picker menu, and `df-file` uploads
+  no file dropped on it.
+
 ### Fixed
 
 - `<df-actions>` disables a button while its action's `executable` is `false`: also while an `ExecuteAction`

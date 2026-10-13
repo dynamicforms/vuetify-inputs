@@ -58,11 +58,11 @@ const props = withDefaults(
   defineProps<{
     modelValue?: string;
     minHeight?: string;
-    disabled?: boolean;
+    readonly?: boolean;
     toolbarButtonSize?: VuetifyButtonSize;
     fontFamily?: string;
   }>(),
-  { modelValue: '', minHeight: '7em', disabled: false, toolbarButtonSize: 'small', fontFamily: 'inherit' },
+  { modelValue: '', minHeight: '7em', readonly: false, toolbarButtonSize: 'small', fontFamily: 'inherit' },
 );
 
 const emit = defineEmits<{
@@ -105,7 +105,7 @@ onBeforeUnmount(() => toolbarResizeObserver?.disconnect());
 
 const editor = useEditor({
   content: props.modelValue,
-  editable: !props.disabled,
+  editable: !props.readonly,
   extensions: [
     StarterKit.configure({ link: false }),
     LinkWithDownload.configure({ openOnClick: false, autolink: true, defaultProtocol: 'https' }),
@@ -159,10 +159,10 @@ watch(
 // setEditable emits an `update` unless told not to: it would write the editor's serialization of the value, which
 // differs from the value as written (`<b>` read back as `<strong>`), into the field the user has not edited
 watch(
-  () => props.disabled,
-  (disabled) => editor.value?.setEditable(!disabled, false),
+  () => props.readonly,
+  (readonly) => editor.value?.setEditable(!readonly, false),
 );
-watch(editor, (instance) => instance?.setEditable(!props.disabled, false));
+watch(editor, (instance) => instance?.setEditable(!props.readonly, false));
 
 const bubbleButtonProps = { icon: true, size: 'small', density: 'comfortable', variant: 'text' } as const;
 

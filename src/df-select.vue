@@ -26,7 +26,7 @@
     chips
     :auto-select-first="true"
     :closable-chips="allowNull || (multiple && selected.length > 1)"
-    :clearable="allowNull"
+    :clearable="allowNull && !vuetifyBindings.readonly"
     :multiple="multiple"
     :loading="loading"
     :hide-selected="false"
