@@ -57,7 +57,7 @@ defineSlots<{
 
 const { isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 
-const isClearable = computed(() => !!(unref(props.clearable) && unref(value)));
+const isClearable = computed(() => !!(unref(props.clearable) && unref(value) && !vuetifyBindings.value.readonly));
 const focused = ref<boolean>(false);
 
 function setFocused(isFocused: boolean) {

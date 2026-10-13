@@ -137,7 +137,7 @@ const dropdown = ref('');
 const clientRendered = useClientRendered();
 const dateMenuShown = computed({
   get() {
-    return unref(dropdown) === 'date';
+    return !vuetifyBindings.value.readonly && unref(dropdown) === 'date';
   },
   set(newValue: boolean) {
     dropdown.value = newValue ? 'date' : '';
@@ -145,7 +145,7 @@ const dateMenuShown = computed({
 });
 const timeMenuShown = computed({
   get() {
-    return unref(dropdown) === 'time';
+    return !vuetifyBindings.value.readonly && unref(dropdown) === 'time';
   },
   set(newValue: boolean) {
     dropdown.value = newValue ? 'time' : '';

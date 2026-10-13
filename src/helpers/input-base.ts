@@ -169,9 +169,16 @@ export function useInputBase<T = any>(
     ),
   );
   const anyErrors = computed(() => (shownErrors.value.length > 0 ? ' ' : undefined));
-  // a field inside a disabled section is drawn disabled: effectiveEnabled is false where the element or any
-  // container above it is disabled, which is the question a rendered input asks
+  // effectiveEnabled is false where the element or any container above it accepts no input, so the inputs of a
+  // 'readonly' or disabled section accept none either
   const enabled = computed(() => (props.control ? props.control.effectiveEnabled : props.enabled !== false));
+  // an input is drawn disabled where its element sends no value, as an HTML control: 'readonly' is submitted and
+  // drawn read-only, 'disabled' and 'disabled-null' are drawn disabled
+  const disabled = computed(() => {
+    if (!props.control) return !enabled.value;
+    const access = props.control.effectiveAccess;
+    return access === 'disabled' || access === 'disabled-null';
+  });
   // A control states its own visibility - vue-forms refuses anything that is not one of the four. The prop is held to
   // the same, so an unrecognised visibility is refused here as loudly as it is there.
   const visibility = computed((): Form.Visibility => {
@@ -233,7 +240,7 @@ export function useInputBase<T = any>(
       errorMessages: anyErrors.value,
       // 'error-count': errors?.value.length || 0,
       readonly: !enabled.value,
-      disabled: !enabled.value,
+      disabled: disabled.value,
 
       placeholder: placeholder.value,
       'persistent-placeholder': !isEmpty(placeholder.value),

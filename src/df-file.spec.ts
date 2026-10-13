@@ -107,6 +107,17 @@ describe('DfFile', () => {
     expect(comms.touch).toHaveBeenCalledWith('file-id-1');
   });
 
+  it('uploads no file selected on a read-only field', async () => {
+    const control = new Form.Field<string | null>({ value: 'file-id-1', access: 'readonly' });
+    const wrapper = mountFile({ control });
+
+    await pickFile(wrapper, pdfFile());
+
+    expect(comms.upload).not.toHaveBeenCalled();
+    expect(control.value).toBe('file-id-1');
+    expect(wrapper.findComponent({ name: 'VField' }).props('clearable')).toBe(false);
+  });
+
   it('keeps the uploaded file when the field is disabled while the upload runs', async () => {
     let finishUpload!: (id: string) => void;
     comms.upload = vi.fn(() => new Promise<string>((resolve) => (finishUpload = resolve)));

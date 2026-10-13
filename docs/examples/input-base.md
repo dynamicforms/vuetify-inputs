@@ -128,9 +128,24 @@ Every input component applies the visibility to its own root element:
 - `'hidden'`: the root element gets the `d-none` class; the component is not displayed and takes no space
 - `'suppress'`: the root element is not rendered in the DOM at all
 
-Visibility is presentation only. Whether the bound element is sent and validated is set by its `access`, which the
-component reads as `effectiveEnabled` to decide whether it accepts input; see
+Visibility is presentation only. Whether the bound element is sent and validated is set by its `access`; see
 [what a container serializes](https://docs.velis.si/dynamicforms/vue-forms/api/container#what-a-container-serializes).
+
+## Access
+
+The component reads the bound element's access with the containers above it applied, as an HTML control does:
+
+| `effectiveAccess` | Input | Drawn |
+|-------------------|-------|-------|
+| `'editable'` | accepted | enabled |
+| `'readonly'` | none | read-only: not greyed out, the text can be selected and copied |
+| `'disabled'`, `'disabled-null'` | none | disabled |
+
+Without a `control`, `enabled: false` draws the input disabled.
+
+An input that accepts no input shows no clear button, and opens no picker menu (`df-color`, `df-date-time`). `df-file`
+uploads no file dropped on it, `df-image` takes neither a picked nor a dropped image, and `df-rtf-editor` is not
+editable and disables its toolbar.
 
 With a bound `control`, the visibility is `control.visibility` and the `visibility` prop is ignored. Without a
 control it is the prop, and `'full'` when neither is given. A `ConditionalVisibilityAction` registered on the control
@@ -382,7 +397,7 @@ const { value, shownErrors } = useInputBase<string>(props, emits, () =>
 | valid | `ComputedRef<boolean>` | `control.valid`, or `true` when there is no control |
 | errors | `ComputedRef<ValidationError[]>` | `control.errors`, or the `ValidationError` `toErrorDescription()` gives for each error of the `errors` prop, followed by the result of `componentErrors` |
 | shownErrors | `ComputedRef<ErrorInput[]>` | The errors to show now, see [Shown errors](#shown-errors): the control's errors, or the `errors` prop's as they were given. This is what gets bound to `DfInputHint` |
-| enabled | `ComputedRef<boolean>` | `control.effectiveEnabled` — `false` where the element or any container above it is disabled — or `props.enabled !== false` when there is no control |
+| enabled | `ComputedRef<boolean>` | `control.effectiveEnabled` — `false` where the access of the element or of any container above it is other than `'editable'` — or `props.enabled !== false` when there is no control |
 | visibility | `ComputedRef<Visibility>` | The resolved visibility, see [Display Modes](#display-modes) |
 | isRendered | `ComputedRef<boolean>` | `false` only for `'suppress'`; it is the `v-if` on the component's root element |
 | visibilityClass | `ComputedRef<{ 'd-none': boolean, invisible: boolean }>` | The class object for `'hidden'` and `'invisible'`, to bind on the root element |
@@ -411,7 +426,7 @@ value the field holds.
 | label | `renderContentText(label.text)` |
 | errorMessages | A single space when the field is touched and has errors, `undefined` otherwise |
 | readonly | `!enabled` |
-| disabled | `!enabled` |
+| disabled | `true` where `control.effectiveAccess` is `'disabled'` or `'disabled-null'`; `!enabled` without a control |
 | placeholder | The `placeholder` prop, `''` when unset |
 | persistent-placeholder | `true` when a placeholder is set |
 | hint | The `hint` prop, `''` when unset |

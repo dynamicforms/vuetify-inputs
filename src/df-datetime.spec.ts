@@ -95,6 +95,19 @@ describe('DfDateTime', () => {
     });
   });
 
+  describe('a read-only field', () => {
+    it('opens no menu on a click and shows no clear button', async () => {
+      const control = new Field<string | null>({ value: '2026-01-15', access: 'readonly' });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      await wrapper.find('input').trigger('click');
+      await flushPromises();
+
+      expect(wrapper.findComponent({ name: 'VField' }).props('disabled')).toBe(false);
+      expect(wrapper.findComponent({ name: 'VMenu' }).props('modelValue')).toBe(false);
+      expect(wrapper.findComponent({ name: 'VField' }).props('clearable')).toBe(false);
+    });
+  });
+
   describe('concluding an edit', () => {
     const serverError = () => new ValidationError('taken', {}, 'This date is taken.', 'server');
 

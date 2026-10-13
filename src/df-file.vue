@@ -151,6 +151,11 @@ async function upload(file: File) {
 }
 
 function handleFileChange(file: File | File[]): any {
+  // v-file-input's readonly blocks the file dialog but not a drop
+  if (vuetifyBindings.value.readonly) {
+    selectedFile.value = null;
+    return;
+  }
   if (file) {
     if (Array.isArray(file)) {
       console.error('Uploading multiple files not supported right now');
