@@ -1,6 +1,6 @@
 // df-actions.spec.ts
-import { Action as FormAction, ExecuteAction, Group } from '@dynamicforms/vue-forms';
-import { mount } from '@vue/test-utils';
+import { Action as FormAction, ExecuteAction, Field, Group, SubmitAction, Validators } from '@dynamicforms/vue-forms';
+import { flushPromises, mount } from '@vue/test-utils';
 import { vi } from 'vitest';
 import { nextTick, Ref, ref } from 'vue';
 import { createVuetify } from 'vuetify';
@@ -363,6 +363,29 @@ describe('DfActions', () => {
       expect(action.enabled).toBe(true);
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('disabled')).toBe(true);
+    });
+
+    it('gumb je onemogočen, ko ga handler zavrne s canExecute()', async () => {
+      const name = new Field({ value: '', validators: [new Validators.Required()] });
+      const save = new Action({
+        value: { name: 'save', label: 'Save', showLabel: true },
+        actions: [new SubmitAction((): Group => form, vi.fn())],
+      });
+      const form: Group = new Group({ name, save });
+
+      const wrapper = mount(DfActions, {
+        props: { actions: [save] },
+        global: { plugins: [vuetify] },
+      });
+      await flushPromises();
+
+      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
+      expect(save.effectiveEnabled).toBe(true);
+      expect(buttonComponent.props('disabled')).toBe(true);
+
+      name.value = 'Ana';
+      await flushPromises();
+      expect(buttonComponent.props('disabled')).toBe(false);
     });
   });
 

@@ -130,9 +130,12 @@ component reads none of these accessors.
 of `@dynamicforms/vue-forms` (`access` and `visibility` are set at the top level of the `new Action()` parameters or
 through `action.access` / `action.visibility`; `busy` is read-only). `<df-actions>` applies them:
 
-- an `access` other than `'editable'`, on the action or a container above it, disables the button
-  (`<v-btn disabled>`); the button binds `effectiveEnabled`.
-- `busy` disables the button and renders it `loading` until every run of the action has settled.
+- the button binds [`executable`](:vue-forms:/api/action.html) (`<v-btn :disabled="!action.executable">`). It is
+  disabled where `access` is other than `'editable'` on the action or a container above it, while `busy` is `true`,
+  and while any `ExecuteAction` handler of the action returns `false` from `canExecute()` - a
+  [`SubmitAction`](:vue-forms:/api/action.html#submitaction-target-handler-options) does while its target is invalid or a validation is
+  running.
+- `busy` renders the button `loading` until every run of the action has settled.
 - `visibility: 'invisible'` keeps the button in the layout with an `invisible` class (`visibility: hidden`).
 - `visibility: 'hidden'` keeps the button in the DOM with a `d-none` class.
 - `visibility: 'suppress'` removes the button from the rendered list entirely.
@@ -239,7 +242,7 @@ See [handling a failed run](:vue-forms:/api/action.html#handling-a-failed-run) f
 overlapping runs are counted, so it stays `true` until the last of them settles. `<df-actions>` binds it: the button is
 disabled and rendered `loading` while it is `true`, so a click cannot start a second run.
 
-`execute()` reads neither `enabled` nor `busy`, so only the click is prevented: a programmatic `execute()` runs
+`execute()` does not read `executable`, so only the click is prevented: a programmatic `execute()` runs
 regardless, and an action that refuses an overlapping run does so in its own handler.
 
 ### Default Confirm / Reject Actions
