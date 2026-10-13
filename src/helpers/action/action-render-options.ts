@@ -40,8 +40,8 @@ export interface ActionRenderOptions extends ActionValue {
   /** Marks this as the action to trigger on Escape when rendered inside `<df-modal>` (see that component's
    * `onKeydown` in `@dynamicforms/vuetify-modal-form-kit`) - e.g. a "Cancel" or "No" action. In `<df-actions>` it
    * also colors the button `secondary`, unless overridden via `passthroughAttrs.color`. At most one action in a
-   * given set should set this (an action such as `Action.closeAction()` may set both `defaultConfirm` and
-   * `defaultReject` so it fires on either key). */
+   * given set should set this (a single Close action may set both `defaultConfirm` and `defaultReject` so it fires
+   * on either key). */
   defaultReject?: boolean;
   /** Additional props/attrs forwarded verbatim to the rendered `<v-btn>` (e.g. `color`, `loading`, `density`,
    * `rounded`, `block`, `prependIcon`, ...), taking precedence over `<df-actions>`'s own computed bindings

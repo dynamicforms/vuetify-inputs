@@ -242,42 +242,17 @@ disabled and rendered `loading` while it is `true`, so a click cannot start a se
 `execute()` reads neither `enabled` nor `busy`, so only the click is prevented: a programmatic `execute()` runs
 regardless, and an action that refuses an overlapping run does so in its own handler.
 
-### Predefined Actions
-
-Predefined actions:
-
-```typescript
-// Close action with the "Close" label in the current translation and the close icon
-const closeAction = Action.closeAction();
-
-// Yes/No actions for confirmation dialogs
-const yesAction = Action.yesAction();
-const noAction = Action.noAction();
-
-// Save/Cancel actions for an edit dialog
-const saveAction = Action.saveAction({ value: { defaultConfirm: true } });
-const cancelAction = Action.cancelAction({ value: { defaultReject: true } });
-
-// Override default properties
-const customCloseAction = Action.closeAction({
-  value: {
-    label: 'Cancel',
-    renderAs: 'text'
-  }
-});
-```
-
 ### Default Confirm / Reject Actions
 
 `defaultConfirm` and `defaultReject` mark the "confirm" action of a set (e.g. Save, Yes, OK) and the "reject/dismiss"
 one (e.g. Cancel, No). `<df-actions>` colors them `primary` and `secondary` by default:
 
 ```typescript
-const yes = Action.yesAction({ value: { defaultConfirm: true } });   // colored primary
-const no = Action.noAction({ value: { defaultReject: true } });      // colored secondary
+const yes = new Action({ value: { name: 'yes', label: 'Yes', defaultConfirm: true } }); // colored primary
+const no = new Action({ value: { name: 'no', label: 'No', defaultReject: true } });     // colored secondary
 
 // A single close action can be both
-const close = Action.closeAction({ value: { defaultConfirm: true, defaultReject: true } });
+const close = new Action({ value: { name: 'close', label: 'Close', defaultConfirm: true, defaultReject: true } });
 ```
 
 At most one action in a given set should set `defaultConfirm`, and at most one should set `defaultReject`.

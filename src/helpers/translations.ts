@@ -4,10 +4,6 @@ import { getCurrentInstance, inject } from 'vue';
 import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
 const defaults = {
-  Yes: 'Yes',
-  No: 'No',
-  Close: 'Close',
-  Save: 'Save',
   Cancel: 'Cancel',
   Ok: 'OK',
   Paragraph: 'Paragraph',

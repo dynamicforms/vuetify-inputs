@@ -8,7 +8,7 @@ describe('translations', () => {
   });
 
   it('should answer the English defaults before translateStrings is called', () => {
-    expect(translate('Yes')).toBe('Yes');
+    expect(translate('Cancel')).toBe('Cancel');
     expect(translate('Bold')).toBe('Bold');
   });
 

@@ -5,12 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.13.1] - Unreleased
+## [0.14.0] - Unreleased
 
-### Added
+### Removed
 
-- `Action.saveAction()` and `Action.cancelAction()`, named `save` and `cancel`, labelled with the translation of
-  `Save` and `Cancel`. `Save` is a new translation key.
+- `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()`, and the translation keys `Yes`, `No` and
+  `Close`. An application builds these actions with `new Action()`.
 
 ## [0.13.0] - 2026-10-12
 

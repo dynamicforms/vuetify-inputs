@@ -8,6 +8,44 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.14.0 (from v0.13.x)
+
+0.14.0 removes the ready-made actions. There is a [checklist](#checklist-for-0-14-0) at the end of this section.
+
+### `Action.closeAction()`, `yesAction()` and `noAction()` are removed
+
+The library defines no ready-made actions, and its translations no longer have the keys `Yes`, `No` and `Close`. An
+application builds the three actions with `new Action()`, with the label, icon and translation key of its own:
+
+```typescript
+// before
+const close = Action.closeAction({ value: { defaultConfirm: true, defaultReject: true } });
+
+// after
+const close = new Action({
+  value: {
+    name: 'close',
+    label: () => t('Close'),
+    icon: 'ion-close-outline',
+    renderAs: 'button',
+    showLabel: true,
+    showIcon: true,
+    defaultConfirm: true,
+    defaultReject: true,
+  },
+});
+```
+
+The three actions were named `close`, `yes` and `no`, with the icons `ion-close-outline`, `ion-thumbs-up-outline`
+and `ion-thumbs-down-outline`, rendered as a button with both the label and the icon. An application that translated
+`Yes`, `No` and `Close` through `translateStrings` or the `translate` setting moves the three keys into its own
+translations.
+
+### Checklist for 0.14.0
+
+1. Replace `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()` with `new Action()`.
+2. Remove `Yes`, `No` and `Close` from the translations given to the library, and add them to the application's.
+
 ## Upgrading to v0.13.0 (from v0.12.x)
 
 0.13.0 requires `@dynamicforms/vue-forms` 3.0.0. Upgrade the two together, and read the

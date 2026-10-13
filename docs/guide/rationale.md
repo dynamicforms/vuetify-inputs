@@ -83,8 +83,6 @@ looks like.
 - **A plain vue-forms `Action` is rendered too.** `<df-actions>` reads what it renders from the action's value. The
   subclass is needed for responsive render options, the text-link style and the confirm / reject colours.
 - **`defaultConfirm` / `defaultReject`** mark the Enter and Escape actions of a set, and colour their buttons.
-- **`closeAction()`, `yesAction()`, `noAction()`, `saveAction()`, `cancelAction()`** are ready-made actions with
-  translated labels.
 - **Per-breakpoint render options.** Any render-options object states overrides from `xs` to `xl`; a breakpoint
   states only what it changes and inherits the rest from the smaller ones, e.g. an icon without a label on `xs`.
   [Responsive options](/examples/responsive-render-options)
