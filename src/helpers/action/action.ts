@@ -64,52 +64,46 @@ class Action extends FormAction<ActionBreakpointOptions> {
     return this.value.passthroughAttrs;
   }
 
-  static closeAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
-    const init: Partial<IFieldConstructorParams<ActionBreakpointOptions>> = {
-      ...(data ?? {}), // any properties in data should overwrite properties in the constant
+  // A ready-made action: its name, a label translated while it renders, its icon, drawn as a button with both.
+  // `data` overrides any of it; `data.value` is merged over the value.
+  private static predefined(
+    name: string,
+    key: Parameters<typeof translate>[0],
+    icon: string,
+    data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>,
+  ) {
+    return new Action({
+      ...(data ?? {}),
       value: {
-        name: 'close',
-        label: () => translate('Close'),
-        icon: 'ion-close-outline',
+        name,
+        label: () => translate(key),
+        icon,
         renderAs: 'button',
         showLabel: true,
         showIcon: true,
+        ...(data?.value ?? {}),
       },
-    };
-    init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
-    return new Action(init);
+    });
+  }
+
+  static closeAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
+    return Action.predefined('close', 'Close', 'ion-close-outline', data);
   }
 
   static yesAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
-    const init: Partial<IFieldConstructorParams<ActionBreakpointOptions>> = {
-      ...(data ?? {}), // any properties in data should overwrite properties in the constant
-      value: {
-        name: 'yes',
-        label: () => translate('Yes'),
-        icon: 'ion-thumbs-up-outline',
-        renderAs: 'button',
-        showLabel: true,
-        showIcon: true,
-      },
-    };
-    init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
-    return new Action(init);
+    return Action.predefined('yes', 'Yes', 'ion-thumbs-up-outline', data);
   }
 
   static noAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
-    const init: Partial<IFieldConstructorParams<ActionBreakpointOptions>> = {
-      ...(data ?? {}), // any properties in data should overwrite properties in the constant
-      value: {
-        name: 'no',
-        label: () => translate('No'),
-        icon: 'ion-thumbs-down-outline',
-        renderAs: 'button',
-        showLabel: true,
-        showIcon: true,
-      },
-    };
-    init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
-    return new Action(init);
+    return Action.predefined('no', 'No', 'ion-thumbs-down-outline', data);
+  }
+
+  static saveAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
+    return Action.predefined('save', 'Save', 'ion-save-outline', data);
+  }
+
+  static cancelAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
+    return Action.predefined('cancel', 'Cancel', 'ion-close-circle-outline', data);
   }
 }
 

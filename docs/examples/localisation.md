@@ -24,7 +24,9 @@ translation function reads, such as the locale.
 | `Yes` | `Yes` | Label of the action returned by `Action.yesAction()` |
 | `No` | `No` | Label of the action returned by `Action.noAction()` |
 | `Close` | `Close` | Label of the action returned by `Action.closeAction()` |
-| `Cancel` / `Ok` | `Cancel` / `OK` | The buttons of `<df-date-time>`'s and `<df-color>`'s pickers |
+| `Save` | `Save` | Label of the action returned by `Action.saveAction()` |
+| `Cancel` | `Cancel` | Label of the action returned by `Action.cancelAction()`; the Cancel button of `<df-date-time>`'s and `<df-color>`'s pickers |
+| `Ok` | `OK` | The OK button of `<df-date-time>`'s and `<df-color>`'s pickers |
 | `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, "no heading" entry |
 | `Heading1`–`Heading6` | `Heading 1`–`Heading 6` | `<df-rtf-editor>` heading dropdown entries |
 | `Undo` / `Redo` | `Undo` / `Redo` | `<df-rtf-editor>` toolbar button tooltips |
@@ -102,8 +104,9 @@ bound to that component's settings.
 
 ### When it takes effect
 
-- **Actions.** The label of `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()` is
-  `() => translate(key)`, read while the action renders, so an action that already exists follows a locale switch.
+- **Actions.** The label of `Action.closeAction()`, `yesAction()`, `noAction()`, `saveAction()` and
+  `cancelAction()` is `() => translate(key)`, read while the action renders, so an action that already exists follows
+  a locale switch.
   An action of the application's own does the same with a function as its `label`: `label: () => t('Save')`.
 - **The RTF editor.** `<df-rtf-editor>`'s toolbar, the heading dropdown included, reads its strings while it renders,
   so a toolbar that is already mounted follows a locale switch.
@@ -282,7 +285,7 @@ table above:
 const messages = {
   de: {
     df_inputs: {
-      Yes: 'Ja', No: 'Nein', Close: 'Schließen', Cancel: 'Abbrechen', Ok: 'OK',
+      Yes: 'Ja', No: 'Nein', Close: 'Schließen', Save: 'Speichern', Cancel: 'Abbrechen', Ok: 'OK',
       Paragraph: 'Absatz',
       Heading1: 'Überschrift 1', Heading2: 'Überschrift 2', /* ...Heading3-6 */
       Bold: 'Fett', Italic: 'Kursiv',

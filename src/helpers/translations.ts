@@ -7,6 +7,7 @@ const defaults = {
   Yes: 'Yes',
   No: 'No',
   Close: 'Close',
+  Save: 'Save',
   Cancel: 'Cancel',
   Ok: 'OK',
   Paragraph: 'Paragraph',

@@ -182,6 +182,31 @@ describe('Action', () => {
       expect(action.renderAs).toBe('button');
     });
 
+    it('saveAction() should return an Action object with correct values', () => {
+      const action = Action.saveAction();
+      expect(action).toBeInstanceOf(Action);
+      expect(action.name).toBe('save');
+      expect(action.label).toBe('Save');
+      expect(action.icon).toBe('ion-save-outline');
+      expect(action.renderAs).toBe('button');
+    });
+
+    it('cancelAction() should return an Action object with correct values', () => {
+      const action = Action.cancelAction();
+      expect(action).toBeInstanceOf(Action);
+      expect(action.name).toBe('cancel');
+      expect(action.label).toBe('Cancel');
+      expect(action.icon).toBe('ion-close-circle-outline');
+      expect(action.renderAs).toBe('button');
+    });
+
+    it('labels save and cancel in the current translation', () => {
+      translateStrings((key) => ({ Save: 'Shrani', Cancel: 'Prekliči' })[key] ?? key);
+      expect(Action.saveAction().label).toBe('Shrani');
+      expect(Action.cancelAction({ value: { defaultReject: true } }).label).toBe('Prekliči');
+      translateStrings((key) => key);
+    });
+
     it('labels a template action in the current translation', () => {
       const locale = ref('en');
       translateStrings((key) => (locale.value === 'sl' && key === 'Close' ? 'Zapri' : key));

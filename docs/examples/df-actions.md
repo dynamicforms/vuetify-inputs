@@ -254,6 +254,10 @@ const closeAction = Action.closeAction();
 const yesAction = Action.yesAction();
 const noAction = Action.noAction();
 
+// Save/Cancel actions for an edit dialog
+const saveAction = Action.saveAction({ value: { defaultConfirm: true } });
+const cancelAction = Action.cancelAction({ value: { defaultReject: true } });
+
 // Override default properties
 const customCloseAction = Action.closeAction({
   value: {
