@@ -1,7 +1,5 @@
 import { ref } from 'vue';
 
-import { translateStrings } from '../translations';
-
 import { Action } from './action';
 import { BreakpointNames } from './responsive-render-options';
 
@@ -154,59 +152,6 @@ describe('Action', () => {
     it('leaves passthroughAttrs undefined when not set', () => {
       const action = new Action({ value: { label: 'Neutral' } });
       expect(action.passthroughAttrs).toBeUndefined();
-    });
-  });
-
-  describe('Action template functions', () => {
-    it('closeAction() should return an Action object with correct values', () => {
-      const action = Action.closeAction();
-      expect(action).toBeInstanceOf(Action);
-      expect(action.label).toBe('Close');
-      expect(action.icon).toBe('ion-close-outline');
-      expect(action.renderAs).toBe('button');
-    });
-
-    it('yesAction() should return an Action object with correct values', () => {
-      const action = Action.yesAction();
-      expect(action).toBeInstanceOf(Action);
-      expect(action.label).toBe('Yes');
-      expect(action.icon).toBe('ion-thumbs-up-outline');
-      expect(action.renderAs).toBe('button');
-    });
-
-    it('noAction() should return an Action object with correct values', () => {
-      const action = Action.noAction();
-      expect(action).toBeInstanceOf(Action);
-      expect(action.label).toBe('No');
-      expect(action.icon).toBe('ion-thumbs-down-outline');
-      expect(action.renderAs).toBe('button');
-    });
-
-    it('labels a template action in the current translation', () => {
-      const locale = ref('en');
-      translateStrings((key) => (locale.value === 'sl' && key === 'Close' ? 'Zapri' : key));
-      const action = Action.closeAction();
-      const options = action.getBreakpointValue(ref<BreakpointNames>('xs'));
-
-      locale.value = 'sl';
-
-      expect(action.label).toBe('Zapri');
-      expect(options.value.label).toBe('Zapri');
-      translateStrings((key) => key);
-    });
-
-    it('template functions accept override data', () => {
-      const customData = {
-        value: {
-          label: 'Custom Close',
-          renderAs: 'text' as const,
-        },
-      };
-      const action = Action.closeAction(customData);
-
-      expect(action.label).toBe('Custom Close');
-      expect(action.icon).toBe('ion-close-outline'); // should keep default icon
-      expect(action.renderAs).toBe('text'); // should use override
     });
   });
 });

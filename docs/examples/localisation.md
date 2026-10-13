@@ -2,8 +2,8 @@
 
 The library renders three kinds of text that depend on the language:
 
-- **Its own strings**: the labels of the three predefined actions, every tooltip, dropdown entry and dialog label of
-  the RTF editor's toolbar, and the upload and download prompts on `<df-image>` and `<df-file>`. They are
+- **Its own strings**: the buttons of the pickers, every tooltip, dropdown entry and dialog label of the RTF editor's
+  toolbar, and the upload and download prompts on `<df-image>` and `<df-file>`. They are
   translated through [`translateStrings`](#translatestrings).
 - **Errors**: every error carries a `code`, `params` and an English `detail`, and the application converts it into
   what the user sees through the `errorText` setting. See [Translating errors](#translating-errors).
@@ -21,10 +21,8 @@ translation function reads, such as the locale.
 
 | Key | English default | Where it is rendered |
 |-----|-----------------|-------------------|
-| `Yes` | `Yes` | Label of the action returned by `Action.yesAction()` |
-| `No` | `No` | Label of the action returned by `Action.noAction()` |
-| `Close` | `Close` | Label of the action returned by `Action.closeAction()` |
-| `Cancel` / `Ok` | `Cancel` / `OK` | The buttons of `<df-date-time>`'s and `<df-color>`'s pickers |
+| `Cancel` | `Cancel` | The Cancel button of `<df-date-time>`'s and `<df-color>`'s pickers |
+| `Ok` | `OK` | The OK button of `<df-date-time>`'s and `<df-color>`'s pickers |
 | `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, "no heading" entry |
 | `Heading1`–`Heading6` | `Heading 1`–`Heading 6` | `<df-rtf-editor>` heading dropdown entries |
 | `Undo` / `Redo` | `Undo` / `Redo` | `<df-rtf-editor>` toolbar button tooltips |
@@ -102,9 +100,8 @@ bound to that component's settings.
 
 ### When it takes effect
 
-- **Actions.** The label of `Action.closeAction()`, `Action.yesAction()` and `Action.noAction()` is
-  `() => translate(key)`, read while the action renders, so an action that already exists follows a locale switch.
-  An action of the application's own does the same with a function as its `label`: `label: () => t('Save')`.
+- **Actions.** The library labels no action. An action whose `label` is a function, `label: () => t('Save')`, reads
+  it while it renders, so an action that already exists follows a locale switch.
 - **The RTF editor.** `<df-rtf-editor>`'s toolbar, the heading dropdown included, reads its strings while it renders,
   so a toolbar that is already mounted follows a locale switch.
 - **`<df-image>` and `<df-file>`.** Their prompts are read while they render, like the toolbar's.
@@ -282,7 +279,7 @@ table above:
 const messages = {
   de: {
     df_inputs: {
-      Yes: 'Ja', No: 'Nein', Close: 'Schließen', Cancel: 'Abbrechen', Ok: 'OK',
+      Cancel: 'Abbrechen', Ok: 'OK',
       Paragraph: 'Absatz',
       Heading1: 'Überschrift 1', Heading2: 'Überschrift 2', /* ...Heading3-6 */
       Bold: 'Fett', Italic: 'Kursiv',
@@ -310,10 +307,13 @@ The actions follow the locale without being rebuilt:
 
 <script setup lang="ts">
 import { Action, DfActions, DfRtfEditor } from '@dynamicforms/vuetify-inputs';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const dialogActions = [
-  Action.noAction({ value: { defaultReject: true } }),
-  Action.yesAction({ value: { defaultConfirm: true } }),
+  new Action({ value: { name: 'no', label: () => t('common.no'), defaultReject: true } }),
+  new Action({ value: { name: 'yes', label: () => t('common.yes'), defaultConfirm: true } }),
 ];
 </script>
 ```

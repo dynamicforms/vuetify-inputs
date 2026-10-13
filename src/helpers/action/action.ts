@@ -1,8 +1,6 @@
-import { Action as FormAction, IFieldConstructorParams } from '@dynamicforms/vue-forms';
+import { Action as FormAction } from '@dynamicforms/vue-forms';
 import { isEmpty, isString } from 'lodash-es';
 import { computed, Ref, toValue } from 'vue';
-
-import { translate } from '../translations';
 
 import { ActionBreakpointOptions, getRenderOptionsForBreakpoint } from './action-render-options';
 import { BreakpointNames } from './responsive-render-options';
@@ -62,54 +60,6 @@ class Action extends FormAction<ActionBreakpointOptions> {
   /** @see ActionRenderOptions.passthroughAttrs */
   get passthroughAttrs() {
     return this.value.passthroughAttrs;
-  }
-
-  static closeAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
-    const init: Partial<IFieldConstructorParams<ActionBreakpointOptions>> = {
-      ...(data ?? {}), // any properties in data should overwrite properties in the constant
-      value: {
-        name: 'close',
-        label: () => translate('Close'),
-        icon: 'ion-close-outline',
-        renderAs: 'button',
-        showLabel: true,
-        showIcon: true,
-      },
-    };
-    init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
-    return new Action(init);
-  }
-
-  static yesAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
-    const init: Partial<IFieldConstructorParams<ActionBreakpointOptions>> = {
-      ...(data ?? {}), // any properties in data should overwrite properties in the constant
-      value: {
-        name: 'yes',
-        label: () => translate('Yes'),
-        icon: 'ion-thumbs-up-outline',
-        renderAs: 'button',
-        showLabel: true,
-        showIcon: true,
-      },
-    };
-    init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
-    return new Action(init);
-  }
-
-  static noAction(data?: Partial<IFieldConstructorParams<ActionBreakpointOptions>>) {
-    const init: Partial<IFieldConstructorParams<ActionBreakpointOptions>> = {
-      ...(data ?? {}), // any properties in data should overwrite properties in the constant
-      value: {
-        name: 'no',
-        label: () => translate('No'),
-        icon: 'ion-thumbs-down-outline',
-        renderAs: 'button',
-        showLabel: true,
-        showIcon: true,
-      },
-    };
-    init.value = { ...init.value, ...(data?.value ?? {}) }; // data may only contain partial info of the value
-    return new Action(init);
   }
 }
 
