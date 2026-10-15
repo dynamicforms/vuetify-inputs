@@ -284,6 +284,25 @@ describe('DfDateTime', () => {
       expect(menuShown(wrapper)).toBe(false);
     });
 
+    it.each([
+      ['2026-05-10', 'ArrowRight', '2026-06-08'],
+      ['2026-06-08', 'ArrowLeft', '2026-05-10'],
+      ['2026-06-07', 'ArrowRight', '2026-07-01'],
+      ['2026-05-31', 'ArrowRight', '2026-06-29'],
+      ['2026-03-30', 'ArrowRight', '2026-03-31'],
+      ['2026-04-30', 'ArrowRight', '2026-05-01'],
+    ])('steps from %s on %s to %s across the edge of a calendar row', async (value, key, expected) => {
+      const control = new Field<string | null>({ value });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      const input = wrapper.find('input');
+      await input.trigger('click');
+      await input.trigger('keydown', { key });
+      await input.trigger('keydown', { key: 'Enter' });
+      await flushPromises();
+
+      expect(control.value).toBe(expected);
+    });
+
     it('moves the hour with left and right and the minute with up and down, across midnight', async () => {
       const control = new Field<string | null>({ value: '23:59:00' });
       const wrapper = mountDateTime({ control, inputType: 'time' });

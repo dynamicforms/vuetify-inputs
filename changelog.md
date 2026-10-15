@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `df-date-time` keyboard navigation in an open picker: left and right move the date by a day and the time by an hour,
-  up and down move the date by a week and the time by a minute, Enter writes the choice and Escape closes the picker.
+  up and down move the date by a week and the time by a minute. Right on the last column of the calendar goes to the
+  same row of the next month and left on the first column to the same row of the previous month. Enter writes the
+  choice and Escape closes the picker.
 - `df-date-time` selects the text of the date or the time when it receives focus, so typing replaces it.
 - `df-date-time` reads short forms of a typed date and time, such as `1206` for 12 June and `1843` for 18:43. A date is
   read in the order of day, month and year of the display format in the component's locale.

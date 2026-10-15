@@ -123,7 +123,21 @@
 
 <script setup lang="ts">
 import { ValidationError } from '@dynamicforms/vue-forms';
-import { addDays, format, parseISO } from 'date-fns';
+import {
+  addDays,
+  addMonths,
+  type Day,
+  differenceInCalendarWeeks,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameDay,
+  max,
+  min,
+  parseISO,
+  startOfMonth,
+  startOfWeek,
+} from 'date-fns';
 import { ref, computed, inject, watch, toRefs, unref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
@@ -301,6 +315,23 @@ function saveTime() {
 }
 
 const dateSteps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+
+// The calendar shows a month as rows of weeks. Left and right step one day within a row; from its last column right
+// goes to the first column of the same row of the next month, and from its first column left goes to the last column of
+// the same row of the previous month. A cell of that row outside that month is replaced by the month's nearest day.
+function stepDate(date: Date, key: string) {
+  const weekOptions = { weekStartsOn: firstDayOfWeek.value as Day };
+  const toNext = key === 'ArrowRight' && isSameDay(date, endOfWeek(date, weekOptions));
+  const toPrevious = key === 'ArrowLeft' && isSameDay(date, startOfWeek(date, weekOptions));
+  if (!toNext && !toPrevious) return addDays(date, dateSteps[key]);
+
+  const row = differenceInCalendarWeeks(date, startOfMonth(date), weekOptions);
+  const month = startOfMonth(addMonths(date, toNext ? 1 : -1));
+  const rowStart = addDays(startOfWeek(month, weekOptions), row * 7);
+  if (toNext) return max([month, min([rowStart, startOfWeek(endOfMonth(month), weekOptions)])]);
+  return min([addDays(rowStart, 6), endOfMonth(month)]);
+}
+
 const timeSteps: Record<string, number> = { ArrowLeft: -60, ArrowRight: 60, ArrowUp: 1, ArrowDown: -1 };
 
 // a step of the picker's time in minutes, wrapping around midnight
@@ -339,7 +370,7 @@ function onKeydown(event: KeyboardEvent) {
     cancelPicker();
   } else if (shown && event.key in dateSteps) {
     handled();
-    if (which === 'date') pickerDate.value = addDays(pickerDate.value ?? new Date(), dateSteps[event.key]);
+    if (which === 'date') pickerDate.value = stepDate(pickerDate.value ?? new Date(), event.key);
     else stepTime(timeSteps[event.key]);
   } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
     handled();

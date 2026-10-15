@@ -28,14 +28,22 @@ test('a click selects the text and opens the picker; typing replaces the text an
 test('the arrow keys move the day in the picker and Enter writes it', async ({ page }) => {
   const input = card(page, 'Date Only Example').locator('input');
   await input.click();
-  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('ArrowDown');
   await expect(fieldValue(page, 'Date Only Example')).toHaveText('2026-03-15');
 
   await page.keyboard.press('Enter');
-  await expect(fieldValue(page, 'Date Only Example')).toHaveText('2026-03-23');
+  await expect(fieldValue(page, 'Date Only Example')).toHaveText('2026-03-21');
   await expect(picker(page)).toBeHidden();
   await expect(input).toBeFocused();
+});
+
+test('right from the last column goes to the first column of the same row of the next month', async ({ page }) => {
+  await card(page, 'Date Only Example').locator('input').click();
+  await page.keyboard.press('ArrowRight');
+  await expect(picker(page).locator('[data-v-date="2026-04-13"]')).toHaveClass(/v-date-picker-month__day--selected/);
+  await page.keyboard.press('Enter');
+  await expect(fieldValue(page, 'Date Only Example')).toHaveText('2026-04-13');
 });
 
 test('a click on a day keeps the focus in the field', async ({ page }) => {
