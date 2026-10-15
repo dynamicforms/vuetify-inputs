@@ -222,7 +222,7 @@ function setValueISOFull(newISOValue: string | null, dateOrTimeIdx: number) {
     const vif = mergeParts(valueISOFull.value ?? formatNaive(new Date()), newISOValue, dateOrTimeIdx);
     valueISOFull.value = naiveFromParts(vif);
     if (unref(inputType) === 'date') value.value = vif[0];
-    else if (unref(inputType) === 'time') value.value = vif[1];
+    else if (unref(inputType) === 'time') value.value = valueISOFull.value.split('T')[1];
     // the offset is the one in force on the date written, not today's: across a DST change the two differ by an hour
     else value.value = valueISOFull.value + format(new Date(valueISOFull.value), 'XXX');
   }

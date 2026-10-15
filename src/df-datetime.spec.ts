@@ -361,7 +361,7 @@ describe('DfDateTime', () => {
         await clock.trigger('dblclick');
         await flushPromises();
 
-        expect(control.value).toBe('10:30');
+        expect(control.value).toBe('10:30:00');
       });
     });
 

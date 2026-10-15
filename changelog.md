@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `df-date-time` with `inputType: 'time'` writes a time chosen in the picker as `HH:mm:ss`, as it writes a typed time.
 - `df-file` and `df-image` write only the latest upload into the field. An upload superseded by another upload, a
   clear or a value set on the field while it runs writes nothing, and its identifier is deleted.
 - A touch that reports a file gone clears `df-file` and `df-image` only while the field still holds that file.
