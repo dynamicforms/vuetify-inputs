@@ -13,9 +13,7 @@ async function pickFruits(page: Page) {
   await page.mouse.click(5, 5);
 }
 
-test('chips that wrap stack the clear button above the menu arrow, and a wider field puts them back on one row', async ({
-  page,
-}) => {
+test('wrapped chips stack the clear button above the arrow; a wider field puts them on one row', async ({ page }) => {
   await page.setViewportSize({ width: 480, height: 900 });
   await page.goto('/examples/df-select');
   await pickFruits(page);
