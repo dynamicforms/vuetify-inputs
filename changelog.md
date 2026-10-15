@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `df-select` with `allowTags` keeps a value set from outside that is not among its choices.
 - `df-select` with `multiple` and `allowNull: false` offers no close button on its last chip.
+- `df-date-time` reads a typed `12:xx AM` as `00:xx` and `12:xx PM` as `12:xx`. A typed time with an hour or minute
+  out of range leaves the value as it is.
 
 ## [0.14.1] - 2026-10-13
 

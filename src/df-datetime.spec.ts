@@ -95,6 +95,32 @@ describe('DfDateTime', () => {
     });
   });
 
+  describe('a typed time', () => {
+    it.each([
+      ['12:30 AM', '00:30:00'],
+      ['12:30 PM', '12:30:00'],
+      ['1:05 am', '01:05:00'],
+      ['11:59 PM', '23:59:00'],
+      ['18:43', '18:43:00'],
+    ])('reads %s as %s', async (typed, expected) => {
+      const control = new Field<string | null>({ value: '10:00:00' });
+      const wrapper = mountDateTime({ control, inputType: 'time' });
+
+      await wrapper.find('input').setValue(typed);
+      await flushPromises();
+      expect(control.value).toBe(expected);
+    });
+
+    it.each([['13:00 PM'], ['0:30 AM'], ['24:00'], ['10:60']])('leaves the value as it is for %s', async (typed) => {
+      const control = new Field<string | null>({ value: '10:00:00' });
+      const wrapper = mountDateTime({ control, inputType: 'time' });
+
+      await wrapper.find('input').setValue(typed);
+      await flushPromises();
+      expect(control.value).toBe('10:00:00');
+    });
+  });
+
   describe('a read-only field', () => {
     it('opens no menu on a click and shows no clear button', async () => {
       const control = new Field<string | null>({ value: '2026-01-15', access: 'readonly' });

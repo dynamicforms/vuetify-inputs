@@ -252,8 +252,12 @@ const timeFormatted = computed({
     if (d == null) return;
     let hour = toNumber(d[1]);
     const minute = toNumber(d[2]);
-    if (isNaN(hour) || isNaN(minute)) return;
-    if (d[3] && d[3].toLowerCase() === 'pm' && hour < 13) hour += 12;
+    if (isNaN(hour) || isNaN(minute) || minute > 59) return;
+    const meridiem = d[3]?.toLowerCase();
+    if (meridiem === 'am' || meridiem === 'pm') {
+      if (hour < 1 || hour > 12) return;
+      hour = (hour % 12) + (meridiem === 'pm' ? 12 : 0);
+    } else if (hour > 23) return;
     setValueISOFull(`T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`, 1);
   },
 });
