@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-// Separate from `npm test`/`lint:ci` and run as its own `e2e` job in .github/workflows/ci.yml: these drive a
+// Separate from `npm test`/`npm run lint` and run as its own `e2e` job in .github/workflows/ci.yml: these drive a
 // real browser against the docs site to check things vitest's jsdom environment cannot (actual CSS layout/paint,
 // hover-revealed resize handles, a genuine `paste` DOM event, real bubbling drag events). Run locally by hand
 // with `npm run test:e2e`.
