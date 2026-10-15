@@ -1,6 +1,8 @@
 # @dynamicforms/vuetify-inputs
 
-Vuetify input components with guaranteed visual consistency across all form fields — unified density/variant system, globally configurable, with inline mode for table cells. Built for [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
+Vuetify input components with guaranteed visual consistency across all form fields — unified density/variant system,
+globally configurable, with inline mode for table cells. Built for
+[@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
 
 ## Introduction
 
@@ -71,8 +73,9 @@ consistent appearance.
 - **Localisable**: `translateStrings()`, or the `translate` setting per app, connects the library's own strings,
   including every RTF editor toolbar label and `<df-image>`/`<df-file>`'s upload and download prompts, to the
   application's translation function; the `errorText` setting translates errors; `DateTimeLocaleConfig`, or the
-  `dateTimeLocale` setting per app, sets the date-fns locale dates are formatted and parsed with — see the [localisation example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/localisation.html)
-  for every key and a worked example
+  `dateTimeLocale` setting per app, sets the date-fns locale dates are formatted and parsed with — see the [localisation
+  example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/localisation.html) for every key and a worked
+  example
 - **TypeScript**: every component's props are an exported interface, and the definitions ship with the build
 
 ## Installation
@@ -82,6 +85,7 @@ npm install @dynamicforms/vuetify-inputs
 ```
 
 In your main.ts
+
 ```typescript
 import { DynamicFormsInputs } from '@dynamicforms/vuetify-inputs';
 import '@dynamicforms/vuetify-inputs/styles.css';

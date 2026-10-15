@@ -164,7 +164,8 @@ its `params`; the docs' `errorText` renders `over_budget` from them, as markdown
 
 A `Validators.Validator` takes a function that returns either `null` (the rule holds) or an array of
 `ValidationError` objects. On a group, it runs whenever the value of any field in the group changes,
-including fields of nested groups, and once at registration, so the errors are current when the form opens. The function reads the fields it needs through `group.fields`:
+including fields of nested groups, and once at registration, so the errors are current when the form opens. The function
+reads the fields it needs through `group.fields`:
 
 ```js
 form.registerAction(new Validators.Validator((newValue, oldValue, group) => {
@@ -200,12 +201,11 @@ field reads its control's visibility.
 
 `visibility` is presentation only: a suppressed section is not rendered, and it is still sent and validated. Whether
 the section is part of the form's data is set by its `access`, which `ConditionalAccessAction` sets from the same
-statement: `'editable'` while it holds and `'disabled'` otherwise, or the two given accesses. A `'disabled'` group is left out
-of `form.value` and none of its fields is validated; `'disabled-null'` sends it as `null`. The group keeps its fields'
-values in both cases, so they are sent again when the section is enabled.
-`ConditionalValueAction` takes a statement and the value to assign,
-`new ConditionalValueAction(statement, valueWhenTrue)`; it writes that value while the statement
-holds and leaves the field alone otherwise.
+statement: `'editable'` while it holds and `'disabled'` otherwise, or the two given accesses. A `'disabled'` group is
+left out of `form.value` and none of its fields is validated; `'disabled-null'` sends it as `null`. The group keeps its
+fields' values in both cases, so they are sent again when the section is enabled. `ConditionalValueAction` takes a
+statement and the value to assign, `new ConditionalValueAction(statement, valueWhenTrue)`; it writes that value while
+the statement holds and leaves the field alone otherwise.
 
 ## Key Features Demonstrated
 
@@ -220,6 +220,7 @@ holds and leaves the field alone otherwise.
 ## Try It Yourself
 
 In the demo:
+
 1. Raise the flights amount until the total exceeds 2000 €
 2. Lower it again; the group message disappears
 3. Tick the checkbox; the second traveller is shown and the ticket is added to the total

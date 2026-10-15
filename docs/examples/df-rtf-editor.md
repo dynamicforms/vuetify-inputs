@@ -34,6 +34,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 ### Inherited Props
 
 This component inherits all common props from [InputBase](./input-base), including:
+
 - `control` - DynamicForms field object
 - `modelValue` - The HTML content (v-model)
 - `label` - Input label
@@ -74,11 +75,13 @@ This component inherits all common props from [InputBase](./input-base), includi
 ## Events
 
 This component emits all [common events from InputBase](./input-base):
+
 - `update:modelValue` - When the HTML content changes
 
 ## Working with HTML Content
 
-The value is HTML, and the component does not sanitize it. An application that displays HTML entered by users sanitizes it first, to prevent XSS.
+The value is HTML, and the component does not sanitize it. An application that displays HTML entered by users sanitizes
+it first, to prevent XSS.
 
 List items and table cells save their text wrapped in a paragraph (`<li><p>...</p></li>`, `<td><p>...</p></td>`),
 so HTML rendered outside this component (a public page, a PDF export, a templated email) needs

@@ -28,6 +28,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 ### Inherited Props
 
 This component inherits all common props from [InputBase](./input-base), including:
+
 - `control` - DynamicForms field object
 - `modelValue` - The textarea content (v-model)
 - `label` - Input label
@@ -39,6 +40,7 @@ This component inherits all common props from [InputBase](./input-base), includi
 The textarea grows with its content only when `maxRows` is a positive value; the growth stops at `maxRows`.
 
 When auto-grow is enabled:
+
 - The textarea starts with the height specified by `rows`
 - It grows as content is added, up to the limit specified by `maxRows`
 - A scrollbar appears if content exceeds the maximum height
@@ -46,6 +48,7 @@ When auto-grow is enabled:
 ## Events
 
 This component emits all [common events from InputBase](./input-base):
+
 - `update:modelValue` - When the textarea content changes
 
 ## Examples

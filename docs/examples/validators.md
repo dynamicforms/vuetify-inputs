@@ -77,6 +77,7 @@ validator's own code (`required`, `value_in_range`, …); the email pattern is g
 ## Try It Yourself
 
 In the demo:
+
 1. Leave the username empty, or enter only spaces
 2. Enter an invalid email address
 3. Set the age outside the valid range

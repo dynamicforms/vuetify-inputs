@@ -35,6 +35,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 ### Inherited Props
 
 This component inherits all common props from [InputBase](./input-base), including:
+
 - `control` - DynamicForms field object
 - `modelValue` - The input value (v-model)
 - `label` - Input label
@@ -53,6 +54,7 @@ is not written while the user types, and is set to the nearest bound on blur. Th
 that. `min` and `max` do not validate the field; a range the field refuses is a `ValueInRange` validator.
 
 The number input supports:
+
 - Integer and decimal values
 - Step controls for incrementing/decrementing
 - Precision control for decimal places
@@ -61,6 +63,7 @@ The number input supports:
 ## Events
 
 This component emits all [common events from InputBase](./input-base):
+
 - `update:modelValue` - When the input value changes
 
 ## Examples

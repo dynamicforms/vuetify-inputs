@@ -47,6 +47,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 ### Inherited Props
 
 This component inherits all common props from [InputBase](./input-base), including:
+
 - `control` - DynamicForms field object
 - `modelValue` - The selected value(s)
 - `label` - Input label
@@ -90,9 +91,10 @@ When using the `fetchChoices` prop instead of static `choices`, the component:
    outside the component, also when the field is read-only. With an empty value, the setup call passes the value
    itself (`null`) as idValue and expects the unfiltered choices back.
 
-Until that call resolves, the value is unchanged, and no chip shows the ids. Once it has resolved, the value is reconciled against the loaded choices as with static `choices`: an id the call returned no
-choice for is dropped from the value (unless `allowTags` is set). A call that rejects is logged with `console.error`
-and leaves the loaded choices as they are.
+Until that call resolves, the value is unchanged, and no chip shows the ids. Once it has resolved, the value is
+reconciled against the loaded choices as with static `choices`: an id the call returned no choice for is dropped from
+the value (unless `allowTags` is set). A call that rejects is logged with `console.error` and leaves the loaded choices
+as they are.
 
 ```typescript
 const fetchChoices = async (query?: string, idValue?: any): Promise<SelectChoice[]> => {

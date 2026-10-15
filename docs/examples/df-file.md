@@ -30,6 +30,7 @@ In addition to [common props from InputBase](./input-base), this component requi
 ### Inherited Props
 
 This component inherits all common props from [InputBase](./input-base), including:
+
 - `control` - DynamicForms field object
 - `modelValue` - The file identifier string (v-model)
 - `label` - Input label
@@ -128,6 +129,7 @@ An upload that returns and a clear of the field mark the field touched.
 ## Events
 
 This component emits all [common events from InputBase](./input-base):
+
 - `update:modelValue` - When the file identifier changes
 
 ## Examples
