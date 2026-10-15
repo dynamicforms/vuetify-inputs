@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.2] - 2026-10-15
+
+### Added
+
+- `df-date-time` reads short forms of a typed date and time, such as `1206` for 12 June and `1843` for 18:43. A date is
+  read in the order of day, month and year of the display format in the component's locale.
+
+### Changed
+
+- Requires `@dynamicforms/vue-forms` 3.0.0-alpha.2 (`peerDependencies` `^3.0.0-alpha.2`).
+- `df-date-time` reads typed text when the field loses focus or on Enter and leaves it as typed until then. Text it
+  cannot read stays in the field, the value is left as it is, and the field holds an error of code `invalid_date` or
+  `invalid_time` until the text is read or the value changes.
+
+### Removed
+
+- `useFileTouchKeepAlive`, the keep-alive `df-file` and `df-image` use internally. `setFileGoneError` is still
+  exported.
+
+### Fixed
+
+- `df-file` and `df-image` write only the latest upload into the field. An upload superseded by another upload, a
+  clear or a value set on the field while it runs writes nothing, and its identifier is deleted.
+- A touch that reports a file gone clears `df-file` and `df-image` only while the field still holds that file.
+- `df-image` shows the image of a value set on the field after an upload instead of the uploaded one, and `df-file`
+  shows its identifier.
+- `clearable: false` hides the clear button of `df-file` and `df-image`.
+- `df-file` and `df-image` touch and delete only a temporary upload: the identifier the component's last upload
+  returned, while the field holds it and, where a `control` is bound, it is not the control's `originalValue`.
+  Clearing any other identifier sets the value to `null` without calling `comms.delete`; a value the field is given is
+  not touched. An upload that replaces a temporary upload deletes the replaced one.
+- `df-select` with `allowTags` keeps a value set from outside that is not among its choices.
+- `df-select` with `multiple` and `allowNull: false` offers no close button on its last chip.
+- `df-select` lays its chips out again when the field's width changes: chips that fit on one row again take the clear
+  button and the menu arrow back beside them.
+- `df-date-time` reads a typed `12:xx AM` as `00:xx` and `12:xx PM` as `12:xx`.
+
 ## [0.14.1] - 2026-10-13
 
 ### Changed

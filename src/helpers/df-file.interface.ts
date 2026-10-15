@@ -28,7 +28,9 @@ export interface FileComms {
   upload: (file: File, progressCallback?: FileProgressCallback) => Promise<string>;
 
   /**
-   * delete is called when the file is removed from the input and needs to be deleted at the backend
+   * delete is called for a temporary upload the field clears or another upload replaces, and for an upload
+   * superseded before it returned. An identifier the field was given, or one that is the bound control's
+   * `originalValue`, is not deleted: clearing the field only sets its value to null
    *
    * throw {@link FileGoneError} if the backend reports the file identifier is already gone; any other thrown
    * error is treated as a transient failure
@@ -38,8 +40,10 @@ export interface FileComms {
   delete: (fileIdentifier: string) => Promise<void>;
 
   /**
-   * touch is called at a regular interval (see the `touchInterval` prop / `defaultTouchInterval` setting) to let
-   * the backend know that the file is still in play and must not be discarded
+   * touch is called at a regular interval (see the `touchInterval` prop / `defaultTouchInterval` setting) for a
+   * temporary upload, to let the backend know that the file is still in play and must not be discarded. A temporary
+   * upload is the identifier this component's last upload returned, while the field holds it and it is not the bound
+   * control's `originalValue`
    *
    * throw {@link FileGoneError} if the backend reports the file identifier no longer exists; any other thrown
    * error is treated as a transient failure and left to the consumer to act on, if at all

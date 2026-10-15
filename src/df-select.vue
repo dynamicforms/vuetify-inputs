@@ -47,7 +47,7 @@
         size="small"
         class="d-flex align-middle"
         :variant="multiple ? 'tonal' : 'text'"
-        :closable="multiple"
+        :closable="multiple && (allowNull || selected.length > 1)"
         @click:close="chipClose($event, item.value)"
       >
         <template #prepend>
@@ -83,7 +83,7 @@
 
 <script setup lang="ts">
 import { castArray, isEqual, unionBy } from 'lodash-es';
-import { computed, nextTick, ref, toRefs, unref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, toRefs, unref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import { VAutocomplete, VCombobox } from 'vuetify/components';
 
@@ -164,6 +164,10 @@ function emitModelValueDisplay(mcVal: any) {
   emits('update:modelValueDisplay', getSelectedChoices(loadedChoices.value, mcVal));
 }
 
+function syncSelected(value: any) {
+  updateSelectedFromValue(value, selected, multiple.value, taggable.value, loadedChoices.value);
+}
+
 const setResultingValueGuard = ref(false);
 
 function setResultingValue(newValue: any) {
@@ -182,7 +186,7 @@ function setResultingValue(newValue: any) {
     nextTick(() => {
       const current = multipleCompliantValue(resultingValue.value, multiple.value);
       if (!isEqual(current, newValue)) {
-        updateSelectedFromValue(current, selected, multiple.value, taggable.value, loadedChoices.value);
+        syncSelected(current);
       }
       setResultingValueGuard.value = false;
     });
@@ -247,11 +251,11 @@ watch(
     if (setResultingValueGuard.value) return;
     const mcVal = multipleCompliantValue(newValue, multiple.value);
     const resolved = resolveValueChoices(mcVal);
-    updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
+    syncSelected(mcVal);
     resolved?.then(() => {
       // A value set while this call was in flight started its own resolution and owns `selected` from then on.
       if (!isEqual(multipleCompliantValue(resultingValue.value, multiple.value), mcVal)) return;
-      updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
+      syncSelected(mcVal);
     });
   },
   { deep: true },
@@ -262,6 +266,27 @@ watch(setResultingValueGuard, () => {
     checkMultiline();
   }
 });
+
+// the chips wrap differently once the field's width changes; a change of its height alone leaves the layout as it is
+let observedWidth = 0;
+const resizeObserver =
+  typeof ResizeObserver === 'undefined'
+    ? null
+    : new ResizeObserver(([entry]) => {
+        const width = entry.contentRect.width;
+        if (width === observedWidth) return;
+        observedWidth = width;
+        checkMultiline();
+      });
+watch(
+  () => dfSelectRef.value?.$el as Element | undefined,
+  (el) => {
+    resizeObserver?.disconnect();
+    observedWidth = 0;
+    if (el instanceof Element) resizeObserver?.observe(el);
+  },
+);
+onBeforeUnmount(() => resizeObserver?.disconnect());
 
 function resetQuery() {
   if (searchText.value != null && searchText.value.length > 0) {
@@ -274,28 +299,22 @@ function onSelect(/* val: any */) {
   resetQuery();
   if (vuetifyBindings.value.readonly || taggable.value) return;
   const mcVal = multipleCompliantValue(selected.value, multiple.value);
-  updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
+  syncSelected(mcVal);
   setResultingValue(mcVal);
 }
 
 function chipClose(event: MouseEvent, itemValue: any) {
   event.stopPropagation();
-  if (vuetifyBindings.value.readonly || taggable.value) {
-    if (taggable.value) {
-      selected.value = selected.value.filter((v: any) => v !== itemValue);
-    }
+  if (vuetifyBindings.value.readonly) return;
+  const remaining =
+    multiple.value && Array.isArray(selected.value) ? selected.value.filter((v) => v !== itemValue) : [];
+  if (!allowNull.value && !remaining.length) return;
+  if (taggable.value) {
+    selected.value = remaining;
     return;
   }
-  let mcVal;
-  if (multiple.value && Array.isArray(selected.value)) {
-    mcVal = multipleCompliantValue(
-      selected.value.filter((v) => v !== itemValue),
-      multiple.value,
-    );
-  } else {
-    mcVal = null;
-  }
-  updateSelectedFromValue(mcVal, selected, multiple.value, false, loadedChoices.value);
+  const mcVal = multipleCompliantValue(remaining, multiple.value);
+  syncSelected(mcVal);
   setResultingValue(mcVal);
 }
 
@@ -359,7 +378,7 @@ function initialValueCheck() {
     val = options.value[0].value;
   }
   val = multipleCompliantValue(val, multiple.value);
-  updateSelectedFromValue(val, selected, multiple.value, taggable.value, loadedChoices.value);
+  syncSelected(val);
   if (resolvingValue.value > 0) return;
   emitModelValueDisplay(val);
   if (!readonly) setResultingValue(val);

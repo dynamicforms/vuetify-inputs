@@ -14,7 +14,7 @@ browser's file dialog. It uses the backend interface of [df-file](./df-file).
 - Preview of the current image
 - Drag & drop, and a click-to-browse dialog
 - Upload progress bar
-- Image deletion
+- Deletion of a temporary upload when the field is cleared or another upload replaces it
 - Downloading the current image; the value is a URL, so no `comms` method is needed, unlike `df-file`'s
   `getDownloadUrl`
 - Periodic touches that keep the uploaded image on the backend
@@ -48,8 +48,22 @@ The component stores and displays a URL string, not the file itself:
 2. The same value is used in subsequent operations (delete, touch) to reference the image.
 3. It is stored in the form data when using DynamicForms.
 
-A started upload completes regardless of changes to the field: if the field is disabled before `upload` resolves, the
-URL is still written into it and touched from then on.
+A started upload completes when the field is disabled while it runs: the URL is still written into it and touched from
+then on. A later upload, a clear of the field or a value set on the field while an upload runs supersedes that upload:
+it writes nothing into the field, and the URL it returns is deleted through `comms.delete`.
+
+## Temporary Uploads
+
+The URL the component's last upload returned is a temporary upload while the field holds it and, where a `control` is
+bound, it differs from the control's `originalValue`.
+
+- A temporary upload is touched every `touchInterval` milliseconds.
+- Clearing the field deletes a temporary upload through `comms.delete`. Clearing any other URL, such as one the field
+  was given with its record, sets the value to `null` and calls no `comms` method.
+- An upload that replaces a temporary upload deletes the replaced one through `comms.delete`.
+- Once the URL is the control's `originalValue` (`control.originalValue = control.value` or a `rebind` after the form is
+  saved), it is no longer touched or deleted. Without a `control`, an uploaded URL is temporary for as long as the field
+  holds it.
 
 ## FileComms Interface
 
@@ -66,15 +80,16 @@ interface FileComms {
   upload: (file: File, progressCallback?: FileProgressCallback) => Promise<string>;
 
   /**
-   * Called when the image is removed. Throw FileGoneError if the backend already reports the identifier as
-   * gone; any other thrown error is treated as transient.
+   * Called for a temporary upload the field clears or another upload replaces, and for an upload superseded
+   * before it returned. Throw FileGoneError if the backend already reports the identifier as gone; any other
+   * thrown error is treated as transient.
    * @param fileIdentifier The URL that was returned by upload
    */
   delete: (fileIdentifier: string) => Promise<void>;
 
   /**
-   * Called periodically to keep the image active. Throw FileGoneError if the backend reports the identifier
-   * no longer exists — the component then clears the field and, where a `control` is bound, reports an error
+   * Called periodically to keep a temporary upload active. Throw FileGoneError if the backend reports the
+   * identifier no longer exists — the component then clears the field and, where a `control` is bound, reports an error
    * of code `file_gone` with the error's `errorText` as its detail. Any other thrown error is treated as transient and left to the consumer.
    * @param fileIdentifier The URL that was returned by upload
    */
@@ -99,13 +114,13 @@ the URL.
 
 During an upload the component shows a progress bar from the values passed to `progressCallback` of `upload`.
 
-After an image has been uploaded to the backend, it is touched every `touchInterval` milliseconds (60 seconds by
-default), so the backend keeps it. If a touch rejects with a `FileGoneError`, the field and preview are cleared, a
-disabled field as well, and, where a `control` is bound, its errors are replaced with one
-`ValidationError` of code `file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the
-[`errorText` setting](/examples/localisation#translating-errors) can render another text for the code. Under
-vue-forms' default [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy) the field drops the error when a
-new image is uploaded. Any other rejection is ignored by the component and left to the application.
+A temporary upload is touched every `touchInterval` milliseconds (60 seconds by default), so the backend keeps it. If a
+touch rejects with a `FileGoneError` while the field still holds the touched URL, the field and preview are cleared, a
+disabled field as well, and, where a `control` is bound, its errors are replaced with one `ValidationError` of code
+`file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the [`errorText`
+setting](/examples/localisation#translating-errors) can render another text for the code. Under vue-forms' default
+[`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy) the field drops the error when a new image is uploaded. Any
+other rejection is ignored by the component and left to the application.
 
 An upload that returns and a clear of the field mark the field touched.
 

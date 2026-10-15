@@ -121,14 +121,44 @@ describe('DfImage', () => {
     errorSpy.mockRestore();
   });
 
-  it('deletes the uploaded file and clears modelValue on click:clear', async () => {
-    const wrapper = mountImage({ modelValue: 'https://example.com/existing.png' });
+  it('deletes an image it uploaded and clears modelValue on click:clear', async () => {
+    const wrapper = mountImage();
+    await pickImage(wrapper, pngFile());
 
     await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
 
-    expect(comms.delete).toHaveBeenCalledWith('https://example.com/existing.png');
+    expect(comms.delete).toHaveBeenCalledWith('https://example.com/uploaded.png');
     const emitted = wrapper.emitted('update:modelValue') as any[];
     expect(emitted[emitted.length - 1]).toEqual([null]);
+  });
+
+  it('clears an image it was given without deleting it', async () => {
+    const control = new Form.Field<string | null>({ value: 'https://example.com/existing.png' });
+    const wrapper = mountImage({ control });
+
+    await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
+
+    expect(comms.delete).not.toHaveBeenCalled();
+    expect(control.value).toBeNull();
+  });
+
+  it('shows no clear button with clearable false', () => {
+    const wrapper = mountImage({ modelValue: 'https://example.com/existing.png', clearable: false });
+
+    expect(wrapper.findComponent({ name: 'VField' }).props('clearable')).toBe(false);
+  });
+
+  it('shows the image of a value set on the field after an upload', async () => {
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountImage({ control });
+    await pickImage(wrapper, pngFile());
+    expect(wrapper.findComponent({ name: 'VImg' }).props('src')).toBe('blob:mock-url');
+
+    control.value = 'https://example.com/other.png';
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.findComponent({ name: 'VImg' }).props('src')).toBe('https://example.com/other.png');
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url');
   });
 
   it('touches the uploaded image at a regular interval', async () => {

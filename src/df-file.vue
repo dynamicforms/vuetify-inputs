@@ -1,11 +1,5 @@
 <template>
-  <input-base
-    v-bind="{ ...props, loading } as any"
-    :class="densityClass"
-    clearable
-    @click:clear="removeFile"
-    @blur="touched = true"
-  >
+  <input-base v-bind="{ ...props, loading } as any" :class="densityClass" @click:clear="clear" @blur="touched = true">
     <template #prepend-inner><cached-icon name="mdi-paperclip" /></template>
     <template #loader>
       <v-progress-linear
@@ -53,19 +47,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfFileProps } from './dynamicforms-component-props';
-import {
-  BaseEmits,
-  defaultBaseProps,
-  InputBase,
-  setFileGoneError,
-  translate,
-  useFileTouchKeepAlive,
-  useInputBase,
-} from './helpers';
+import { BaseEmits, defaultBaseProps, InputBase, translate, useInputBase } from './helpers';
+import { useFileUpload } from './helpers/use-file-upload';
 
 const props = withDefaults(defineProps<DfFileProps>(), defaultBaseProps);
 
@@ -75,11 +62,18 @@ const emits = defineEmits<Emits>();
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const t = translate;
 
-// State
-const currentFile = ref<File | null>(null);
-const progress = ref(0);
+const { currentFile, progress, loading, upload, clear } = useFileUpload({
+  value,
+  touched,
+  comms: () => props.comms,
+  touchInterval: () => props.touchInterval,
+  control: () => props.control,
+});
 const selectedFile = ref<File | null>();
-const loading = computed(() => currentFile.value && progress.value < 100);
+// the file input shows the picked file only while the value holds its upload
+watch(currentFile, (file) => {
+  if (!file) selectedFile.value = null;
+});
 
 const fileLabel = computed(() => {
   if (!selectedFile.value && value.value) {
@@ -99,55 +93,6 @@ async function downloadFile() {
   link.download = '';
   link.rel = 'noopener';
   link.click();
-}
-
-function resetFileState() {
-  value.value = null;
-  progress.value = 0;
-  currentFile.value = null;
-  selectedFile.value = null;
-  clearTouchInterval();
-}
-
-function handleFileGone(errorText: string) {
-  resetFileState();
-  setFileGoneError(props.control, errorText);
-}
-
-const { setupTouchInterval, clearTouchInterval } = useFileTouchKeepAlive(
-  value,
-  () => props.comms,
-  () => props.touchInterval,
-  handleFileGone,
-);
-
-async function removeFile() {
-  if (value.value) {
-    await props.comms.delete(value.value);
-  }
-
-  resetFileState();
-  touched.value = true;
-}
-
-async function upload(file: File) {
-  progress.value = -1;
-  currentFile.value = file;
-
-  try {
-    value.value = await props.comms.upload(file, (loaded: number, total: number) => {
-      progress.value = Math.round((loaded * 100) / total);
-    });
-    progress.value = 100;
-    // a picked file concludes the edit: the file dialog and a drop have no blur of the field
-    touched.value = true;
-    setupTouchInterval();
-  } catch (err) {
-    progress.value = 0;
-    currentFile.value = null;
-    selectedFile.value = null;
-    throw err;
-  }
 }
 
 function handleFileChange(file: File | File[]): any {
