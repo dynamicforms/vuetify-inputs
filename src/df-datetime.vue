@@ -48,23 +48,27 @@
         >
           <template #default>
             <v-menu v-if="clientRendered" v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
-              <div @mousedown.prevent>
-                <v-date-picker
-                  v-model="pickerDate"
-                  :hide-header="true"
-                  :first-day-of-week="firstDayOfWeek"
-                  :show-adjacent-months="true"
-                  :show-week="true"
-                  @update:view-mode="viewChanged"
-                  @update:month="viewChanged"
-                  @update:year="viewChanged"
-                  @dblclick="saveOnDoubleClick($event, '.v-date-picker-month__day', saveDate)"
-                >
-                  <template #actions>
-                    <confirm-actions :save="saveDate" :cancel="cancelPicker" :is-pristine="datePristine" />
-                  </template>
-                </v-date-picker>
-              </div>
+              <v-confirm-edit v-model="valueAsDate" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
+                <template #default="{ model: proxyModel, save, cancel, isPristine }">
+                  <v-date-picker
+                    :ref="(el) => bindEdit('date', el, { model: proxyModel, save, cancel })"
+                    v-model="proxyModel.value"
+                    :hide-header="true"
+                    :first-day-of-week="firstDayOfWeek"
+                    :show-adjacent-months="true"
+                    :show-week="true"
+                    @mousedown.prevent
+                    @update:view-mode="viewChanged"
+                    @update:month="viewChanged"
+                    @update:year="viewChanged"
+                    @dblclick="saveOnDoubleClick($event, '.v-date-picker-month__day', save)"
+                  >
+                    <template #actions>
+                      <confirm-actions :save="save" :cancel="cancel" :is-pristine="isPristine" />
+                    </template>
+                  </v-date-picker>
+                </template>
+              </v-confirm-edit>
             </v-menu>
           </template>
         </v-text-field>
@@ -99,20 +103,24 @@
         >
           <template #default>
             <v-menu v-if="clientRendered" v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
-              <div @mousedown.prevent>
-                <v-time-picker
-                  v-model="pickerTime"
-                  v-model:view-mode="timeViewMode"
-                  :hide-header="true"
-                  format="24hr"
-                  @update:view-mode="viewChanged"
-                  @dblclick="saveOnDoubleClick($event, '.v-time-picker-clock', saveTime)"
-                >
-                  <template #actions>
-                    <confirm-actions :save="saveTime" :cancel="cancelPicker" :is-pristine="timePristine" />
-                  </template>
-                </v-time-picker>
-              </div>
+              <v-confirm-edit v-model="valueAsTimeString" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
+                <template #default="{ model: proxyModel, save, cancel, isPristine }">
+                  <v-time-picker
+                    :ref="(el) => bindEdit('time', el, { model: proxyModel, save, cancel })"
+                    v-model="proxyModel.value"
+                    v-model:view-mode="timeViewMode"
+                    :hide-header="true"
+                    format="24hr"
+                    @mousedown.prevent
+                    @update:view-mode="viewChanged"
+                    @dblclick="saveOnDoubleClick($event, '.v-time-picker-clock', save)"
+                  >
+                    <template #actions>
+                      <confirm-actions :save="save" :cancel="cancel" :is-pristine="isPristine" />
+                    </template>
+                  </v-time-picker>
+                </template>
+              </v-confirm-edit>
             </v-menu>
           </template>
         </v-text-field>
@@ -138,7 +146,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
-import { ref, computed, inject, watch, toRefs, unref } from 'vue';
+import { ref, computed, inject, watch, toRefs, unref, type Ref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
 import {
@@ -210,12 +218,24 @@ function concludeEdit() {
   touched.value = true;
 }
 
-// typing into a field or leaving it closes its menu: the arrow keys then move the caret instead of the picker
-function closeMenu(which: 'date' | 'time') {
-  if (dropdown.value === which) dropdown.value = '';
+// `v-confirm-edit` gives the choice in its picker, `save` and `cancel` only to its slot; the picker's ref hands them to
+// the keyboard handler
+interface PickerEdit {
+  model: Ref<any>;
+  save: () => void;
+  cancel: () => void;
+}
+const edits: Partial<Record<'date' | 'time', PickerEdit>> = {};
+function bindEdit(which: 'date' | 'time', el: unknown, edit: PickerEdit) {
+  if (el) edits[which] = edit;
+  else delete edits[which];
 }
 
-function cancelPicker() {
+// Typing into a field or leaving it discards the choice in its picker and closes it: the arrow keys then move the caret
+// instead of the picker.
+function closeMenu(which: 'date' | 'time') {
+  if (dropdown.value !== which) return;
+  edits[which]?.cancel();
   dropdown.value = '';
 }
 
@@ -287,32 +307,10 @@ const valueAsTimeString = computed({
   },
 });
 
-// The choice in an open picker. OK, Enter and a double-click write it into the value; it is reset to the value when
-// the menu opens or the value changes.
-const pickerDate = ref<Date | null>(null);
-const pickerTime = ref('');
 const timeViewMode = ref<'hour' | 'minute' | 'second'>('hour');
-watch(
-  [dropdown, valueAsDate],
-  ([shown], [shownBefore]) => {
-    pickerDate.value = valueAsDate.value;
-    pickerTime.value = valueAsTimeString.value;
-    if (shown !== shownBefore) timeViewMode.value = 'hour';
-  },
-  { immediate: true },
-);
-const datePristine = computed(() => pickerDate.value?.getTime() === valueAsDate.value?.getTime());
-const timePristine = computed(() => pickerTime.value.slice(0, 5) === valueAsTimeString.value.slice(0, 5));
-
-function saveDate() {
-  if (!datePristine.value && pickerDate.value) valueAsDate.value = pickerDate.value;
-  concludeEdit();
-}
-
-function saveTime() {
-  if (!timePristine.value && pickerTime.value) valueAsTimeString.value = pickerTime.value;
-  concludeEdit();
-}
+watch(dropdown, () => {
+  timeViewMode.value = 'hour';
+});
 
 const dateSteps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
 
@@ -335,13 +333,12 @@ function stepDate(date: Date, key: string) {
 const timeSteps: Record<string, number> = { ArrowLeft: -60, ArrowRight: 60, ArrowUp: 1, ArrowDown: -1 };
 
 // a step of the picker's time in minutes, wrapping around midnight
-function stepTime(minutes: number) {
+function stepTime(time: string, minutes: number) {
   const now = new Date();
-  const [hours, mins] = pickerTime.value ? pickerTime.value.split(':').map(Number) : [now.getHours(), now.getMinutes()];
+  const [hours, mins] = time ? time.split(':').map(Number) : [now.getHours(), now.getMinutes()];
   const total = (((hours * 60 + mins + minutes) % 1440) + 1440) % 1440;
   const pad = (n: number) => n.toString().padStart(2, '0');
-  pickerTime.value = `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
-  timeViewMode.value = Math.abs(minutes) === 60 ? 'hour' : 'minute';
+  return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
 }
 
 // Runs in the capture phase, before the menu's own handler, which moves the focus into the menu on an up or down arrow
@@ -351,13 +348,14 @@ function onKeydown(event: KeyboardEvent) {
   const which = target.closest('.df-datetime-date') ? 'date' : target.closest('.df-datetime-time') ? 'time' : null;
   if (which == null || vuetifyBindings.value.readonly) return;
   const shown = dropdown.value === which;
+  const edit = edits[which];
   const handled = () => {
     event.preventDefault();
     event.stopPropagation();
   };
 
   if (event.key === 'Enter') {
-    if (shown) (which === 'date' ? saveDate : saveTime)();
+    if (shown) edit?.save();
     else if (which === 'date') commitDate();
     else commitTime();
   } else if (event.key === ' ') {
@@ -367,11 +365,15 @@ function onKeydown(event: KeyboardEvent) {
     dropdown.value = which;
   } else if (event.key === 'Escape' && shown) {
     handled();
-    cancelPicker();
-  } else if (shown && event.key in dateSteps) {
+    closeMenu(which);
+  } else if (shown && edit && event.key in dateSteps) {
     handled();
-    if (which === 'date') pickerDate.value = stepDate(pickerDate.value ?? new Date(), event.key);
-    else stepTime(timeSteps[event.key]);
+    if (which === 'date') {
+      edit.model.value = stepDate(edit.model.value ?? new Date(), event.key);
+    } else {
+      edit.model.value = stepTime(edit.model.value, timeSteps[event.key]);
+      timeViewMode.value = event.key === 'ArrowLeft' || event.key === 'ArrowRight' ? 'hour' : 'minute';
+    }
   } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
     handled();
     dropdown.value = which;

@@ -365,13 +365,17 @@ describe('DfDateTime', () => {
       expect(menuShown(wrapper)).toBe(false);
     });
 
-    it('closes the picker when the field loses focus', async () => {
+    it('closes the picker when the field loses focus and discards the choice in it', async () => {
       const wrapper = mountDateTime({ control: new Field<string | null>({ value: '2026-01-15' }), inputType: 'date' });
       const input = wrapper.find('input');
       await input.trigger('click');
+      await input.trigger('keydown', { key: 'ArrowRight' });
       await input.trigger('blur');
-
       expect(menuShown(wrapper)).toBe(false);
+
+      await input.trigger('click');
+      await flushPromises();
+      expect(wrapper.findComponent({ name: 'VDatePicker' }).props('modelValue')).toEqual(new Date(2026, 0, 15));
     });
   });
 
@@ -385,10 +389,9 @@ describe('DfDateTime', () => {
       await wrapper.find('input').trigger('click');
       await flushPromises();
 
-      wrapper.findComponent({ name: 'VDatePicker' }).vm.$emit('update:modelValue', new Date(2026, 0, 20));
-      await flushPromises();
-      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK')!;
-      await ok.trigger('click');
+      const confirm = wrapper.findComponent({ name: 'VConfirmEdit' });
+      confirm.vm.$emit('update:modelValue', new Date(2026, 0, 20));
+      confirm.vm.$emit('save', new Date(2026, 0, 20));
       await flushPromises();
 
       expect(control.value).toBe('2026-01-20');
