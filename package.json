@@ -57,7 +57,7 @@
   },
   "peerDependencies": {
     "@dynamicforms/translatable": "^0.3.0",
-    "@dynamicforms/vue-forms": "^3.0.0-alpha.1",
+    "@dynamicforms/vue-forms": "^3.0.0-alpha.2",
     "@mdi/font": "^7.4.47",
     "@tiptap/core": "^3.30.2",
     "@tiptap/extension-image": "^3.30.2",

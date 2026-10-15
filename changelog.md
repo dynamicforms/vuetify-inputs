@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Requires `@dynamicforms/vue-forms` 3.0.0-alpha.2 (`peerDependencies` `^3.0.0-alpha.2`).
 - `df-date-time` reads typed text when the field loses focus or on Enter and leaves it as typed until then. Text it
   cannot read stays in the field, the value is left as it is, and the field holds an error of code `invalid_date` or
   `invalid_time` until the text is read or the value changes.
