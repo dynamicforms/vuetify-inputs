@@ -43,8 +43,8 @@ the field loses focus.
 Focusing the date or the time selects its text, so typing replaces it. Right on the last column of the calendar goes
 to the first column of the same row of the next month, left on the first column to the last column of the same row of
 the previous month; where that row holds no day of the month, the step goes to the month's nearest day. Up and down
-step across months and years, the time steps across midnight. A step on an empty value starts from the current date or time. Left and right show the hours on the clock,
-up and down the minutes.
+step across months and years, the time steps across midnight. A step on an empty value starts from the current date
+or time. Left and right show the hours on the clock, up and down the minutes.
 
 ## Typing a value
 
