@@ -86,25 +86,31 @@ options.getOptionsForBreakpoint('sm'); // { }
 options.getOptionsForBreakpoint('md'); // { title: 'only at md' }
 ```
 
-## Options a breakpoint may not state
+## Options forbidden in breakpoint declarations
 
-Some options apply to the object as a whole, not to one screen width, e.g. an identifier or a flag another component
-reads. `BreakpointsJSON` takes a second type argument for the options a breakpoint may set, so such an option at a
-breakpoint is a type error:
+`ActionBreakpointOptions` forbids setting the following options at a breakpoint:
+
+- `name`
+- `defaultConfirm`
+- `defaultReject`
+
+These options identify the action and its role in the form, and that does not depend on screen width. They are set
+only on the base object. All other action options, including `label` and `icon`, may be set per breakpoint.
+
+A subclass forbids options the same way: `BreakpointsJSON` takes a second type argument, the options a breakpoint may
+set. An option left out of it is a type error at a breakpoint.
 
 ```typescript
 interface PanelOptions {
-  name?: string;
+  id?: string;
   title?: string;
 }
 
-type PanelBreakpointOptions = BreakpointsJSON<PanelOptions, Omit<PanelOptions, 'name'>>;
+type PanelBreakpointOptions = BreakpointsJSON<PanelOptions, Omit<PanelOptions, 'id'>>;
 
-const panel: PanelBreakpointOptions = { name: 'main', md: { name: 'wide' } };  // error: `name` is not per-breakpoint
+const ok: PanelBreakpointOptions = { id: 'main', title: 'Info', sm: { title: 'Order details' } };
+const bad: PanelBreakpointOptions = { id: 'main', md: { id: 'wide' } };  // error: `id` is forbidden at a breakpoint
 ```
-
-This is how an action's options are declared: `ActionBreakpointOptions` is `ActionRenderOptions` with `name`,
-`defaultConfirm` and `defaultReject` left out of every breakpoint.
 
 ---
 
