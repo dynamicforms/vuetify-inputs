@@ -108,7 +108,7 @@ interface PanelOptions {
 
 type PanelBreakpointOptions = BreakpointsJSON<PanelOptions, Omit<PanelOptions, 'id'>>;
 
-const ok: PanelBreakpointOptions = { id: 'main', title: 'Details', sm: { title: 'Info' } };
+const ok: PanelBreakpointOptions = { id: 'main', title: 'Info', sm: { title: 'Order details' } };
 const bad: PanelBreakpointOptions = { id: 'main', md: { id: 'wide' } };  // error: `id` is forbidden at a breakpoint
 ```
 
