@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   not touched. An upload that replaces a temporary upload deletes the replaced one.
 - `df-select` with `allowTags` keeps a value set from outside that is not among its choices.
 - `df-select` with `multiple` and `allowNull: false` offers no close button on its last chip.
+- `df-select` lays its chips out again when the field's width changes: chips that fit on one row again take the clear
+  button and the menu arrow back beside them.
 - `df-date-time` reads a typed `12:xx AM` as `00:xx` and `12:xx PM` as `12:xx`.
 
 ## [0.14.1] - 2026-10-13

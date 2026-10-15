@@ -83,7 +83,7 @@
 
 <script setup lang="ts">
 import { castArray, isEqual, unionBy } from 'lodash-es';
-import { computed, nextTick, ref, toRefs, unref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, toRefs, unref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import { VAutocomplete, VCombobox } from 'vuetify/components';
 
@@ -266,6 +266,27 @@ watch(setResultingValueGuard, () => {
     checkMultiline();
   }
 });
+
+// the chips wrap differently once the field's width changes; a change of its height alone leaves the layout as it is
+let observedWidth = 0;
+const resizeObserver =
+  typeof ResizeObserver === 'undefined'
+    ? null
+    : new ResizeObserver(([entry]) => {
+        const width = entry.contentRect.width;
+        if (width === observedWidth) return;
+        observedWidth = width;
+        checkMultiline();
+      });
+watch(
+  () => dfSelectRef.value?.$el as Element | undefined,
+  (el) => {
+    resizeObserver?.disconnect();
+    observedWidth = 0;
+    if (el instanceof Element) resizeObserver?.observe(el);
+  },
+);
+onBeforeUnmount(() => resizeObserver?.disconnect());
 
 function resetQuery() {
   if (searchText.value != null && searchText.value.length > 0) {

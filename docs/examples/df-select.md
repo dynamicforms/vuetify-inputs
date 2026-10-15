@@ -27,7 +27,8 @@ Choices loaded by `fetchChoices`, and icons:
 - Choices loaded through `fetchChoices`
 - Entry of new values (tagging)
 - Icons in choices
-- Chips for selected values
+- Chips for selected values. With `multiple` and `allowNull`, chips that wrap onto more rows put the clear button
+  above the menu arrow; the layout follows the field's width.
 - A `null` selection under `allowNull`
 - Search with filtering
 
