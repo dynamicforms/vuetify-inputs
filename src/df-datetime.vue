@@ -1,5 +1,12 @@
 <template>
-  <input-base v-bind="props" :class="densityClass" :clearable="clearable" @click:clear="clear" @blur="touched = true">
+  <input-base
+    v-bind="props"
+    :errors="shownInputErrors"
+    :class="densityClass"
+    :clearable="clearable"
+    @click:clear="clear"
+    @blur="touched = true"
+  >
     <template #default="slotProps">
       <div
         :class="[
@@ -12,7 +19,7 @@
       >
         <v-text-field
           v-if="['date', 'datetime'].includes(inputType)"
-          v-model="dateFormatted"
+          v-model="dateText"
           style="flex-grow: 4"
           density="compact"
           variant="plain"
@@ -26,7 +33,11 @@
           @click="dropdown = 'date'"
           @keydown.space="dropdown = 'date'"
           @focus="slotProps.focus()"
-          @blur="slotProps.blur()"
+          @keydown.enter="commitDate"
+          @blur="
+            commitDate();
+            slotProps.blur();
+          "
         >
           <template #default>
             <v-menu v-if="clientRendered" v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
@@ -55,7 +66,7 @@
 
         <v-text-field
           v-if="['time', 'datetime'].includes(inputType)"
-          v-model="timeFormatted"
+          v-model="timeText"
           style="flex-grow: 3"
           density="compact"
           variant="plain"
@@ -69,7 +80,11 @@
           @click="dropdown = 'time'"
           @keydown.space="dropdown = 'time'"
           @focus="slotProps.focus()"
-          @blur="slotProps.blur()"
+          @keydown.enter="commitTime"
+          @blur="
+            commitTime();
+            slotProps.blur();
+          "
         >
           <template #default>
             <v-menu v-if="clientRendered" v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
@@ -97,8 +112,8 @@
 </template>
 
 <script setup lang="ts">
-import { format, parse, parseISO } from 'date-fns';
-import { toNumber, isNaN } from 'lodash-es';
+import { ValidationError } from '@dynamicforms/vue-forms';
+import { format, parseISO } from 'date-fns';
 import { ref, computed, inject, watch, toRefs, unref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
@@ -113,6 +128,7 @@ import {
 } from './helpers';
 import { useClientRendered } from './helpers/client-rendered';
 import ConfirmActions from './helpers/confirm-actions.vue';
+import { parseDateInput, parseTimeInput, setInputError } from './helpers/date-time-input';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {
@@ -130,7 +146,19 @@ const currentLocale = computed(
   () => props.locale ?? unref(settings.dateTimeLocale) ?? unref(DateTimeLocaleConfig.dateTimeLocale),
 );
 const firstDayOfWeek = computed(() => currentLocale.value.options?.weekStartsOn ?? 1);
+// a typed date or time that cannot be read leaves the value as it is and reports an error until it is corrected
+const dateInvalid = ref(false);
+const timeInvalid = ref(false);
+const invalidDateError = new ValidationError('invalid_date', {}, 'Not a valid date.', 'application');
+const invalidTimeError = new ValidationError('invalid_time', {}, 'Not a valid time.', 'application');
+const inputErrors = () => [
+  ...(dateInvalid.value ? [invalidDateError] : []),
+  ...(timeInvalid.value ? [invalidTimeError] : []),
+];
+
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
+// without a control, input-base shows the errors it is given; a bound control holds them in its own errors
+const shownInputErrors = computed(() => [...(props.errors ?? []), ...inputErrors()]);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 const dropdown = ref('');
@@ -162,6 +190,7 @@ const { viewChanged, saveOnDoubleClick } = usePickerDoubleClick();
 
 function clear() {
   value.value = null;
+  showValue();
   touched.value = true;
 }
 
@@ -225,40 +254,69 @@ const valueAsTimeString = computed({
   },
 });
 
-const dateFormatted = computed({
-  get() {
-    const vad = unref(valueAsDate);
-    if (vad == null) return '';
-    return format(vad, unref(displayFormatDate), { locale: currentLocale.value });
-  },
-  set(newValue: string) {
-    try {
-      const d = parse(newValue, unref(displayFormatDate), new Date(), { locale: currentLocale.value });
-      setValueISOFull(formatNaive(d), 0);
-    } catch (err) {
-      console.error(err);
-    }
-  },
+const dateDisplay = computed(() => {
+  const vad = unref(valueAsDate);
+  return vad == null ? '' : format(vad, unref(displayFormatDate), { locale: currentLocale.value });
+});
+const timeDisplay = computed(() => {
+  const vad = unref(valueAsDate);
+  return vad == null ? '' : format(vad, unref(displayFormatTime), { locale: currentLocale.value });
 });
 
-const timeFormatted = computed({
-  get() {
-    const vad = unref(valueAsDate);
-    if (vad == null) return '';
-    return format(vad, unref(displayFormatTime), { locale: currentLocale.value });
-  },
-  set(newValue: string) {
-    const d = newValue.match(/(\d+):(\d+)\s?([a-zA-Z]+)?/);
-    if (d == null) return;
-    let hour = toNumber(d[1]);
-    const minute = toNumber(d[2]);
-    if (isNaN(hour) || isNaN(minute) || minute > 59) return;
-    const meridiem = d[3]?.toLowerCase();
-    if (meridiem === 'am' || meridiem === 'pm') {
-      if (hour < 1 || hour > 12) return;
-      hour = (hour % 12) + (meridiem === 'pm' ? 12 : 0);
-    } else if (hour > 23) return;
-    setValueISOFull(`T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`, 1);
-  },
+// The fields hold the text as typed; it is read into the value when the field loses focus or on Enter, and replaced
+// by the formatted value once it is read or the value changes.
+const dateText = ref('');
+const timeText = ref('');
+
+function showValue() {
+  dateText.value = dateDisplay.value;
+  timeText.value = timeDisplay.value;
+  dateInvalid.value = false;
+  timeInvalid.value = false;
+}
+watch([dateDisplay, timeDisplay], showValue, { immediate: true });
+
+watch([dateInvalid, timeInvalid], ([date, time]) => {
+  if (!props.control) return;
+  setInputError(props.control, 'invalid_date', date ? invalidDateError : null);
+  setInputError(props.control, 'invalid_time', time ? invalidTimeError : null);
 });
+
+function clearFromText() {
+  value.value = null;
+  showValue();
+}
+
+function commitDate() {
+  if (vuetifyBindings.value.readonly || dateText.value === dateDisplay.value) return;
+  if (!dateText.value.trim()) {
+    clearFromText();
+    return;
+  }
+  const date = parseDateInput(dateText.value, unref(displayFormatDate), currentLocale.value, new Date());
+  if (date == null) {
+    dateInvalid.value = true;
+    return;
+  }
+  dateInvalid.value = false;
+  setValueISOFull(formatNaive(date), 0);
+  dateText.value = dateDisplay.value;
+}
+
+function commitTime() {
+  if (vuetifyBindings.value.readonly || timeText.value === timeDisplay.value) return;
+  if (!timeText.value.trim()) {
+    clearFromText();
+    return;
+  }
+  const time = parseTimeInput(timeText.value, unref(displayFormatTime), currentLocale.value);
+  if (time == null) {
+    timeInvalid.value = true;
+    return;
+  }
+  timeInvalid.value = false;
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  setValueISOFull(`T${pad(time.hours)}:${pad(time.minutes)}:00`, 1);
+  timeText.value = timeDisplay.value;
+}
 </script>

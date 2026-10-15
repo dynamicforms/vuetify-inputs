@@ -167,6 +167,8 @@ The errors this library raises itself:
 | Code | Params | English `detail` | Raised by |
 |------|--------|------------------|-----------|
 | `invalid_hex_color` | none | `Not a valid hex string.` | `<df-color>` without a `control`, for a value that is not 3, 4, 6 or 8 hex digits with an optional leading `#`, or an empty value without `allowNull` |
+| `invalid_date` | none | `Not a valid date.` | `<df-date-time>`, for typed text it cannot read as a date; its origin is `'application'` |
+| `invalid_time` | none | `Not a valid time.` | `<df-date-time>`, for typed text it cannot read as a time; its origin is `'application'` |
 | `file_gone` | none | the server's `errorText` | `<df-file>` and `<df-image>`, when the server reports the uploaded file as gone; its origin is `'server'` |
 
 A string in a component's `errors` prop becomes an error with an empty code and renders as written.
@@ -198,7 +200,9 @@ The locale sets three things in `<df-date-time>`:
 
 - **Formatting.** The text fields are rendered with date-fns `format()` using `displayFormatDate` (default `'P'`) and
   `displayFormatTime` (default `'p'`), both of which resolve against the locale.
-- **Parsing.** Typed text is read back with date-fns `parse()` against the same patterns and the same locale.
+- **Parsing.** Typed text in the display format is read back with date-fns `parse()` against the same patterns and the
+  same locale; a [short form](/examples/df-datetime#typing-a-value) of a date is read in the order of day, month and
+  year the locale writes.
 - **First day of week.** The date picker takes `locale.options.weekStartsOn`, falling back to `1` (Monday) for a
   locale that does not state one.
 

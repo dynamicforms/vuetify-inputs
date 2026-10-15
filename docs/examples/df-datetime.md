@@ -14,6 +14,7 @@
 - Date only, time only, or both
 - Display formats as date-fns patterns
 - Date and time pickers in a menu
+- Typed dates and times, with short forms such as `1206` for 12 June and `1843` for 18:43
 - Clearing the value
 
 ## Picking a value
@@ -26,9 +27,49 @@ so the second click of a double-click that changed the view does not confirm a c
 choice and a clear mark the field touched.
 
 ::: warning
-Keyboard support is minimal. `<space>` triggers the picker, but keyboard navigation within the picker is not fully 
-supported. Manual entry is provisionally supported.
+Keyboard support is minimal. `<space>` triggers the picker, but keyboard navigation within the picker is not fully
+supported.
 :::
+
+## Typing a value
+
+The date and the time are each typed into their own text field. The field holds the text as typed and is read when it
+loses focus or on Enter; the field then shows the value in its display format. A field emptied of text clears the
+value.
+
+Text in the display format is read with date-fns `parse()` against the component's locale. Other text is read by the
+rules below.
+
+A time is read in the 24-hour clock, optionally followed by `am` or `pm`:
+
+| Typed | Read as | Example |
+|-------|---------|---------|
+| 1–2 digits up to 23 | whole hours | `9` = 9:00, `18` = 18:00 |
+| 2 digits above 23 | H:0M | `65` = 6:05 |
+| 3 digits | H:MM | `130` = 1:30, `930` = 9:30 |
+| 4 digits | HH:MM | `1843` = 18:43 |
+| digits split by other characters | hours, minutes and optional seconds, which are dropped | `18.43`, `9 30` |
+
+A date is read in the order of day, month and year of the display format in the component's locale: `812` is
+8 December where the order is day, month, year (`sl`, `de`), and 12 August where the month comes before the day (`ja`,
+`en-US`). Without a year, the day and the month keep their order and the year is the current one.
+
+| Typed | Read as | `sl` | `ja` |
+|-------|---------|------|------|
+| 1–2 digits | a day of the current month | `12` = 12th | `12` = 12th |
+| 3 digits | a one-digit first part and a two-digit second part | `812` = 8 Dec | `812` = 12 Aug |
+| 4 digits | two two-digit parts | `1206` = 12 Jun | `0812` = 12 Aug |
+| 6 digits | three two-digit parts, the year as two digits | `120627` | `270812` |
+| 8 digits | a full date with a four-digit year | `12062027` | `20270812` |
+| two parts split by other characters | a day and a month | `12.6` | `8/12` |
+| three parts split by other characters | a full date | `12. 6. 27` | `2027/8/12` |
+
+A two-digit year is the year ending in those digits that lies at most 20 years after the current one.
+
+Text that cannot be read, a time with an hour above 23 or a minute above 59, and a date that does not exist leave the
+text and the value as they are. The field then holds an error of code `invalid_date` or `invalid_time` with origin
+`'application'` until the text is read or the value changes: a bound `control` holds it in its `errors` and is
+invalid, and a field without a `control` shows it.
 
 ## Props
 

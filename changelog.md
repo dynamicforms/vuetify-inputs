@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.14.2] - Unreleased
 
+### Added
+
+- `df-date-time` reads short forms of a typed date and time, such as `1206` for 12 June and `1843` for 18:43. A date is
+  read in the order of day, month and year of the display format in the component's locale.
+
+### Changed
+
+- `df-date-time` reads typed text when the field loses focus or on Enter and leaves it as typed until then. Text it
+  cannot read stays in the field, the value is left as it is, and the field holds an error of code `invalid_date` or
+  `invalid_time` until the text is read or the value changes.
+
 ### Removed
 
 - `useFileTouchKeepAlive`, the keep-alive `df-file` and `df-image` use internally. `setFileGoneError` is still
@@ -26,8 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   not touched. An upload that replaces a temporary upload deletes the replaced one.
 - `df-select` with `allowTags` keeps a value set from outside that is not among its choices.
 - `df-select` with `multiple` and `allowNull: false` offers no close button on its last chip.
-- `df-date-time` reads a typed `12:xx AM` as `00:xx` and `12:xx PM` as `12:xx`. A typed time with an hour or minute
-  out of range leaves the value as it is.
+- `df-date-time` reads a typed `12:xx AM` as `00:xx` and `12:xx PM` as `12:xx`.
 
 ## [0.14.1] - 2026-10-13
 
