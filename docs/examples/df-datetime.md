@@ -19,17 +19,32 @@
 
 ## Picking a value
 
-A choice in a picker is written to the field when it is confirmed: with OK, or with a double-click on a day or on the
-clock. Cancel and closing the menu leave the field as it was. For 600 ms after the picker changes its view - a chosen
-hour switches the clock to the minutes, a chosen month or year switches to the days, a day of an adjacent month
-switches the calendar to that month - a double-click does not confirm,
-so the second click of a double-click that changed the view does not confirm a choice it landed on. A confirmed
-choice and a clear mark the field touched.
+A click into the date or the time opens its picker. A choice in a picker is written to the field when it is confirmed:
+with OK, with Enter, or with a double-click on a day or on the clock. Cancel, Escape and closing the menu leave the
+field as it was. For 600 ms after the picker changes its view - a chosen hour switches the clock to the minutes, a
+chosen month or year switches to the days, a day of an adjacent month switches the calendar to that month - a
+double-click does not confirm, so the second click of a double-click that changed the view does not confirm a choice it
+landed on. A confirmed choice and a clear mark the field touched.
 
-::: warning
-Keyboard support is minimal. `<space>` triggers the picker, but keyboard navigation within the picker is not fully
-supported.
-:::
+A click in the picker leaves the focus in the text field. The picker closes when text is typed into the field and when
+the field loses focus.
+
+## Keyboard
+
+| Key | Picker closed | Picker open |
+|---|---|---|
+| `<space>` | opens the picker while the text shows the value; types a space into edited text | |
+| `←` / `→` | moves the caret | date: one day back / forward; time: one hour back / forward |
+| `↑` / `↓` | opens the picker | date: one week back / forward; time: one minute forward / back |
+| `<enter>` | reads the typed text | writes the choice in the picker and closes it |
+| `<esc>` | | closes the picker and leaves the value |
+| `<tab>` | moves to the next field | closes the picker and moves to the next field |
+
+Focusing the date or the time selects its text, so typing replaces it. Right on the last column of the calendar goes
+to the first column of the same row of the next month, left on the first column to the last column of the same row of
+the previous month; where that row holds no day of the month, the step goes to the month's nearest day. Up and down
+step across months and years, the time steps across midnight. A step on an empty value starts from the current date
+or time. Left and right show the hours on the clock, up and down the minutes.
 
 ## Typing a value
 

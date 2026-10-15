@@ -262,6 +262,123 @@ describe('DfDateTime', () => {
     });
   });
 
+  describe('the keyboard', () => {
+    const menuShown = (wrapper: ReturnType<typeof mountDateTime>) =>
+      wrapper.findComponent({ name: 'VMenu' }).props('modelValue');
+
+    it('moves the day in an open picker with the arrows and writes it on Enter', async () => {
+      const control = new Field<string | null>({ value: '2026-01-31' });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      const input = wrapper.find('input');
+      await input.trigger('click');
+      await input.trigger('keydown', { key: 'ArrowRight' });
+      await input.trigger('keydown', { key: 'ArrowDown' });
+      await input.trigger('keydown', { key: 'ArrowLeft' });
+      await flushPromises();
+
+      expect(wrapper.findComponent({ name: 'VDatePicker' }).props('modelValue')).toEqual(new Date(2026, 1, 7));
+      expect(control.value).toBe('2026-01-31');
+      await input.trigger('keydown', { key: 'Enter' });
+      await flushPromises();
+      expect(control.value).toBe('2026-02-07');
+      expect(menuShown(wrapper)).toBe(false);
+    });
+
+    it.each([
+      ['2026-05-10', 'ArrowRight', '2026-06-08'],
+      ['2026-06-08', 'ArrowLeft', '2026-05-10'],
+      ['2026-06-07', 'ArrowRight', '2026-07-01'],
+      ['2026-05-31', 'ArrowRight', '2026-06-29'],
+      ['2026-03-30', 'ArrowRight', '2026-03-31'],
+      ['2026-04-30', 'ArrowRight', '2026-05-01'],
+    ])('steps from %s on %s to %s across the edge of a calendar row', async (value, key, expected) => {
+      const control = new Field<string | null>({ value });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      const input = wrapper.find('input');
+      await input.trigger('click');
+      await input.trigger('keydown', { key });
+      await input.trigger('keydown', { key: 'Enter' });
+      await flushPromises();
+
+      expect(control.value).toBe(expected);
+    });
+
+    it('moves the hour with left and right and the minute with up and down, across midnight', async () => {
+      const control = new Field<string | null>({ value: '23:59:00' });
+      const wrapper = mountDateTime({ control, inputType: 'time' });
+      const input = wrapper.find('input');
+      await input.trigger('click');
+      await input.trigger('keydown', { key: 'ArrowUp' });
+      await flushPromises();
+      expect(wrapper.findComponent({ name: 'VTimePicker' }).props('viewMode')).toBe('minute');
+      await input.trigger('keydown', { key: 'ArrowLeft' });
+      await flushPromises();
+      expect(wrapper.findComponent({ name: 'VTimePicker' }).props('viewMode')).toBe('hour');
+      await input.trigger('keydown', { key: 'Enter' });
+      await flushPromises();
+
+      expect(control.value).toBe('23:00:00');
+    });
+
+    it('leaves the arrows to the text while no picker is open', async () => {
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      const input = wrapper.find('input');
+      await input.trigger('keydown', { key: 'ArrowRight' });
+      await input.trigger('keydown', { key: 'Enter' });
+      await flushPromises();
+
+      expect(control.value).toBe('2026-01-15');
+    });
+
+    it('closes the picker on Escape and leaves the value', async () => {
+      const control = new Field<string | null>({ value: '2026-01-15' });
+      const wrapper = mountDateTime({ control, inputType: 'date' });
+      const input = wrapper.find('input');
+      await input.trigger('click');
+      await input.trigger('keydown', { key: 'ArrowRight' });
+      await input.trigger('keydown', { key: 'Escape' });
+      await flushPromises();
+
+      expect(menuShown(wrapper)).toBe(false);
+      expect(control.value).toBe('2026-01-15');
+    });
+
+    it('closes the picker when text is typed', async () => {
+      const wrapper = mountDateTime({ control: new Field<string | null>({ value: '2026-01-15' }), inputType: 'date' });
+      const input = wrapper.find('input');
+      await input.trigger('click');
+      expect(menuShown(wrapper)).toBe(true);
+      await input.setValue('2');
+
+      expect(menuShown(wrapper)).toBe(false);
+    });
+
+    it('opens the picker on space while the text shows the value, and types the space into edited text', async () => {
+      const wrapper = mountDateTime({ control: new Field<string | null>({ value: '2026-01-15' }), inputType: 'date' });
+      const input = wrapper.find('input');
+      await input.trigger('keydown', { key: ' ' });
+      expect(menuShown(wrapper)).toBe(true);
+
+      await input.setValue('15.');
+      await input.trigger('keydown', { key: ' ' });
+      expect(menuShown(wrapper)).toBe(false);
+    });
+
+    it('closes the picker when the field loses focus and discards the choice in it', async () => {
+      const wrapper = mountDateTime({ control: new Field<string | null>({ value: '2026-01-15' }), inputType: 'date' });
+      const input = wrapper.find('input');
+      await input.trigger('click');
+      await input.trigger('keydown', { key: 'ArrowRight' });
+      await input.trigger('blur');
+      expect(menuShown(wrapper)).toBe(false);
+
+      await input.trigger('click');
+      await flushPromises();
+      expect(wrapper.findComponent({ name: 'VDatePicker' }).props('modelValue')).toEqual(new Date(2026, 0, 15));
+    });
+  });
+
   describe('concluding an edit', () => {
     const serverError = () => new ValidationError('taken', {}, 'This date is taken.', 'server');
 
@@ -361,7 +478,7 @@ describe('DfDateTime', () => {
         await clock.trigger('dblclick');
         await flushPromises();
 
-        expect(control.value).toBe('10:30');
+        expect(control.value).toBe('10:30:00');
       });
     });
 

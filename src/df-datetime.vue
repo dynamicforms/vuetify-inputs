@@ -16,10 +16,12 @@
           'df-input-wrapper',
           density,
         ]"
+        @keydown.capture="onKeydown"
       >
         <v-text-field
           v-if="['date', 'datetime'].includes(inputType)"
           v-model="dateText"
+          class="df-datetime-date"
           style="flex-grow: 4"
           density="compact"
           variant="plain"
@@ -30,11 +32,16 @@
           :name="`${vuetifyBindings.name}-date`"
           :placeholder="vuetifyBindings.placeholder"
           v-bind="passthroughAttrs"
+          @update:model-value="closeMenu('date')"
           @click="dropdown = 'date'"
-          @keydown.space="dropdown = 'date'"
-          @focus="slotProps.focus()"
-          @keydown.enter="commitDate"
+          @mousedown="markPointerFocus"
+          @mouseup="keepSelectionOnPointerFocus"
+          @focus="
+            selectText($event);
+            slotProps.focus();
+          "
           @blur="
+            closeMenu('date');
             commitDate();
             slotProps.blur();
           "
@@ -44,11 +51,13 @@
               <v-confirm-edit v-model="valueAsDate" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
                 <template #default="{ model: proxyModel, save, cancel, isPristine }">
                   <v-date-picker
+                    :ref="(el) => bindEdit('date', el, { model: proxyModel, save, cancel })"
                     v-model="proxyModel.value"
                     :hide-header="true"
                     :first-day-of-week="firstDayOfWeek"
                     :show-adjacent-months="true"
                     :show-week="true"
+                    @mousedown.prevent
                     @update:view-mode="viewChanged"
                     @update:month="viewChanged"
                     @update:year="viewChanged"
@@ -67,6 +76,7 @@
         <v-text-field
           v-if="['time', 'datetime'].includes(inputType)"
           v-model="timeText"
+          class="df-datetime-time"
           style="flex-grow: 3"
           density="compact"
           variant="plain"
@@ -77,11 +87,16 @@
           :name="`${vuetifyBindings.name}-time`"
           :placeholder="inputType === 'time' ? vuetifyBindings.placeholder : undefined"
           v-bind="passthroughAttrs"
+          @update:model-value="closeMenu('time')"
           @click="dropdown = 'time'"
-          @keydown.space="dropdown = 'time'"
-          @focus="slotProps.focus()"
-          @keydown.enter="commitTime"
+          @mousedown="markPointerFocus"
+          @mouseup="keepSelectionOnPointerFocus"
+          @focus="
+            selectText($event);
+            slotProps.focus();
+          "
           @blur="
+            closeMenu('time');
             commitTime();
             slotProps.blur();
           "
@@ -91,9 +106,12 @@
               <v-confirm-edit v-model="valueAsTimeString" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
                 <template #default="{ model: proxyModel, save, cancel, isPristine }">
                   <v-time-picker
+                    :ref="(el) => bindEdit('time', el, { model: proxyModel, save, cancel })"
                     v-model="proxyModel.value"
+                    v-model:view-mode="timeViewMode"
                     :hide-header="true"
                     format="24hr"
+                    @mousedown.prevent
                     @update:view-mode="viewChanged"
                     @dblclick="saveOnDoubleClick($event, '.v-time-picker-clock', save)"
                   >
@@ -113,8 +131,22 @@
 
 <script setup lang="ts">
 import { ValidationError } from '@dynamicforms/vue-forms';
-import { format, parseISO } from 'date-fns';
-import { ref, computed, inject, watch, toRefs, unref } from 'vue';
+import {
+  addDays,
+  addMonths,
+  type Day,
+  differenceInCalendarWeeks,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameDay,
+  max,
+  min,
+  parseISO,
+  startOfMonth,
+  startOfWeek,
+} from 'date-fns';
+import { ref, computed, inject, watch, toRefs, unref, type Ref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
 import {
@@ -186,6 +218,27 @@ function concludeEdit() {
   touched.value = true;
 }
 
+// `v-confirm-edit` gives the choice in its picker, `save` and `cancel` only to its slot; the picker's ref hands them to
+// the keyboard handler
+interface PickerEdit {
+  model: Ref<any>;
+  save: () => void;
+  cancel: () => void;
+}
+const edits: Partial<Record<'date' | 'time', PickerEdit>> = {};
+function bindEdit(which: 'date' | 'time', el: unknown, edit: PickerEdit) {
+  if (el) edits[which] = edit;
+  else delete edits[which];
+}
+
+// Typing into a field or leaving it discards the choice in its picker and closes it: the arrow keys then move the caret
+// instead of the picker.
+function closeMenu(which: 'date' | 'time') {
+  if (dropdown.value !== which) return;
+  edits[which]?.cancel();
+  dropdown.value = '';
+}
+
 const { viewChanged, saveOnDoubleClick } = usePickerDoubleClick();
 
 function clear() {
@@ -222,7 +275,7 @@ function setValueISOFull(newISOValue: string | null, dateOrTimeIdx: number) {
     const vif = mergeParts(valueISOFull.value ?? formatNaive(new Date()), newISOValue, dateOrTimeIdx);
     valueISOFull.value = naiveFromParts(vif);
     if (unref(inputType) === 'date') value.value = vif[0];
-    else if (unref(inputType) === 'time') value.value = vif[1];
+    else if (unref(inputType) === 'time') value.value = valueISOFull.value.split('T')[1];
     // the offset is the one in force on the date written, not today's: across a DST change the two differ by an hour
     else value.value = valueISOFull.value + format(new Date(valueISOFull.value), 'XXX');
   }
@@ -253,6 +306,93 @@ const valueAsTimeString = computed({
     setValueISOFull(`T${newValue}`, 1);
   },
 });
+
+const timeViewMode = ref<'hour' | 'minute' | 'second'>('hour');
+watch(dropdown, () => {
+  timeViewMode.value = 'hour';
+});
+
+const dateSteps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+
+// The calendar shows a month as rows of weeks. Left and right step one day within a row; from its last column right
+// goes to the first column of the same row of the next month, and from its first column left goes to the last column of
+// the same row of the previous month. A cell of that row outside that month is replaced by the month's nearest day.
+function stepDate(date: Date, key: string) {
+  const weekOptions = { weekStartsOn: firstDayOfWeek.value as Day };
+  const toNext = key === 'ArrowRight' && isSameDay(date, endOfWeek(date, weekOptions));
+  const toPrevious = key === 'ArrowLeft' && isSameDay(date, startOfWeek(date, weekOptions));
+  if (!toNext && !toPrevious) return addDays(date, dateSteps[key]);
+
+  const row = differenceInCalendarWeeks(date, startOfMonth(date), weekOptions);
+  const month = startOfMonth(addMonths(date, toNext ? 1 : -1));
+  const rowStart = addDays(startOfWeek(month, weekOptions), row * 7);
+  if (toNext) return max([month, min([rowStart, startOfWeek(endOfMonth(month), weekOptions)])]);
+  return min([addDays(rowStart, 6), endOfMonth(month)]);
+}
+
+const timeSteps: Record<string, number> = { ArrowLeft: -60, ArrowRight: 60, ArrowUp: 1, ArrowDown: -1 };
+
+// a step of the picker's time in minutes, wrapping around midnight
+function stepTime(time: string, minutes: number) {
+  const now = new Date();
+  const [hours, mins] = time ? time.split(':').map(Number) : [now.getHours(), now.getMinutes()];
+  const total = (((hours * 60 + mins + minutes) % 1440) + 1440) % 1440;
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+}
+
+// Runs in the capture phase, before the menu's own handler, which moves the focus into the menu on an up or down arrow
+// and so out of the field, which closes the menu.
+function onKeydown(event: KeyboardEvent) {
+  const target = event.target as HTMLElement;
+  const which = target.closest('.df-datetime-date') ? 'date' : target.closest('.df-datetime-time') ? 'time' : null;
+  if (which == null || vuetifyBindings.value.readonly) return;
+  const shown = dropdown.value === which;
+  const edit = edits[which];
+  const handled = () => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  if (event.key === 'Enter') {
+    if (shown) edit?.save();
+    else if (which === 'date') commitDate();
+    else commitTime();
+  } else if (event.key === ' ') {
+    // the text as shown opens the picker; text being typed takes the space
+    if (which === 'date' ? dateText.value !== dateDisplay.value : timeText.value !== timeDisplay.value) return;
+    handled();
+    dropdown.value = which;
+  } else if (event.key === 'Escape' && shown) {
+    handled();
+    closeMenu(which);
+  } else if (shown && edit && event.key in dateSteps) {
+    handled();
+    if (which === 'date') {
+      edit.model.value = stepDate(edit.model.value ?? new Date(), event.key);
+    } else {
+      edit.model.value = stepTime(edit.model.value, timeSteps[event.key]);
+      timeViewMode.value = event.key === 'ArrowLeft' || event.key === 'ArrowRight' ? 'hour' : 'minute';
+    }
+  } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+    handled();
+    dropdown.value = which;
+  }
+}
+
+// Focus selects the text, so typing replaces it. A focusing click would put the caret at the pointer on mouseup and
+// remove the selection.
+let pointerFocus = false;
+function selectText(event: FocusEvent) {
+  (event.target as HTMLInputElement).select();
+}
+function markPointerFocus(event: MouseEvent) {
+  pointerFocus = event.target instanceof HTMLInputElement && event.target !== document.activeElement;
+}
+function keepSelectionOnPointerFocus(event: MouseEvent) {
+  if (pointerFocus) event.preventDefault();
+  pointerFocus = false;
+}
 
 const dateDisplay = computed(() => {
   const vad = unref(valueAsDate);
