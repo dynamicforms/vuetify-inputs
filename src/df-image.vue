@@ -3,8 +3,7 @@
     v-bind="{ ...props, loading } as any"
     class="df-image-field"
     :class="densityClass"
-    clearable
-    @click:clear="removeFile"
+    @click:clear="clear"
     @blur="touched = true"
   >
     <template #prepend-inner><cached-icon name="mdi-image" /></template>
@@ -77,19 +76,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, useId } from 'vue';
+import { computed, onBeforeUnmount, ref, useId, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfImageProps } from './dynamicforms-component-props';
-import {
-  BaseEmits,
-  defaultBaseProps,
-  InputBase,
-  setFileGoneError,
-  translate,
-  useFileTouchKeepAlive,
-  useInputBase,
-} from './helpers';
+import { BaseEmits, defaultBaseProps, InputBase, translate, useInputBase } from './helpers';
+import { useFileUpload } from './helpers/use-file-upload';
 
 const props = withDefaults(defineProps<DfImageProps>(), defaultBaseProps);
 
@@ -100,78 +92,37 @@ const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(
 const t = translate;
 const fileInputId = useId();
 
-// State
-const currentFile = ref<File | null>(null);
-const progress = ref(0);
-const objectUrl = ref<string | null>(null);
+const { currentFile, progress, loading, upload, clear } = useFileUpload({
+  value,
+  touched,
+  comms: () => props.comms,
+  touchInterval: () => props.touchInterval,
+  control: () => props.control,
+});
 const dragCounter = ref(0);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
-const loading = computed(() => currentFile.value && progress.value < 100);
 const isDisabled = computed(() => !!(vuetifyBindings.value.disabled || vuetifyBindings.value.readonly));
 const isDragging = computed(() => dragCounter.value > 0);
+
+// the picked image is shown from the browser while the value holds its upload, the value's URL otherwise
+const objectUrl = ref<string | null>(null);
+function revokeObjectUrl() {
+  if (objectUrl.value) URL.revokeObjectURL(objectUrl.value);
+  objectUrl.value = null;
+}
+watch(
+  currentFile,
+  (file) => {
+    revokeObjectUrl();
+    if (file) objectUrl.value = URL.createObjectURL(file);
+  },
+  { flush: 'sync' },
+);
+onBeforeUnmount(revokeObjectUrl);
+
 const previewUrl = computed<string | null>(() => objectUrl.value ?? (value.value ? (value.value as string) : null));
 const canDownload = computed(() => !!value.value);
-
-function revokeObjectUrl() {
-  if (objectUrl.value) {
-    URL.revokeObjectURL(objectUrl.value);
-    objectUrl.value = null;
-  }
-}
-
-function resetFileState() {
-  value.value = null;
-  progress.value = 0;
-  currentFile.value = null;
-  revokeObjectUrl();
-  clearTouchInterval();
-}
-
-function handleFileGone(errorText: string) {
-  resetFileState();
-  setFileGoneError(props.control, errorText);
-}
-
-const { setupTouchInterval, clearTouchInterval } = useFileTouchKeepAlive(
-  value,
-  () => props.comms,
-  () => props.touchInterval,
-  handleFileGone,
-);
-
-onBeforeUnmount(() => revokeObjectUrl());
-
-async function removeFile() {
-  if (value.value) {
-    await props.comms.delete(value.value);
-  }
-
-  resetFileState();
-  touched.value = true;
-}
-
-async function upload(file: File) {
-  progress.value = -1;
-  currentFile.value = file;
-  revokeObjectUrl();
-  objectUrl.value = URL.createObjectURL(file);
-
-  try {
-    value.value = await props.comms.upload(file, (loaded: number, total: number) => {
-      progress.value = Math.round((loaded * 100) / total);
-    });
-    progress.value = 100;
-    // a picked file concludes the edit: the file dialog and a drop have no blur of the field
-    touched.value = true;
-    setupTouchInterval();
-  } catch (err) {
-    progress.value = 0;
-    currentFile.value = null;
-    revokeObjectUrl();
-    throw err;
-  }
-}
 
 function handleFile(file: File) {
   if (!file.type.startsWith('image/')) {

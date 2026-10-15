@@ -66,14 +66,43 @@ describe('DfFile', () => {
     expect(wrapper.find('.v-file-input').classes()).toContain('v-file-input--dragging');
   });
 
-  it('deletes the uploaded file and clears modelValue on click:clear', async () => {
-    const wrapper = mountFile({ modelValue: 'file-id-1' });
+  it('deletes a file it uploaded and clears modelValue on click:clear', async () => {
+    const wrapper = mountFile();
+    await pickFile(wrapper, pdfFile());
 
     await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
 
     expect(comms.delete).toHaveBeenCalledWith('file-id-1');
     const emitted = wrapper.emitted('update:modelValue') as any[];
     expect(emitted[emitted.length - 1]).toEqual([null]);
+  });
+
+  it('clears a file it was given without deleting it', async () => {
+    const control = new Form.Field<string | null>({ value: 'file-id-1' });
+    const wrapper = mountFile({ control });
+
+    await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
+
+    expect(comms.delete).not.toHaveBeenCalled();
+    expect(control.value).toBeNull();
+  });
+
+  it('shows no clear button with clearable false', () => {
+    const wrapper = mountFile({ modelValue: 'file-id-1', clearable: false });
+
+    expect(wrapper.findComponent({ name: 'VField' }).props('clearable')).toBe(false);
+  });
+
+  it('shows a value set on the field after an upload as the file label', async () => {
+    const control = new Form.Field<string | null>({ value: null });
+    const wrapper = mountFile({ control });
+    await pickFile(wrapper, pdfFile());
+
+    control.value = 'other.pdf';
+    await wrapper.vm.$nextTick();
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.findComponent({ name: 'VFileInput' }).props('label')).toBe('other.pdf');
   });
 
   it('shows an existing control-bound value as the file label', () => {

@@ -7,8 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.14.2] - Unreleased
 
+### Removed
+
+- `useFileTouchKeepAlive`, the keep-alive `df-file` and `df-image` use internally. `setFileGoneError` is still
+  exported.
+
 ### Fixed
 
+- `df-file` and `df-image` write only the latest upload into the field. An upload superseded by another upload, a
+  clear or a value set on the field while it runs writes nothing, and its identifier is deleted.
+- A touch that reports a file gone clears `df-file` and `df-image` only while the field still holds that file.
+- `df-image` shows the image of a value set on the field after an upload instead of the uploaded one, and `df-file`
+  shows its identifier.
+- `clearable: false` hides the clear button of `df-file` and `df-image`.
+- `df-file` and `df-image` touch and delete only a temporary upload: the identifier the component's last upload
+  returned, while the field holds it and, where a `control` is bound, it is not the control's `originalValue`.
+  Clearing any other identifier sets the value to `null` without calling `comms.delete`; a value the field is given is
+  not touched. An upload that replaces a temporary upload deletes the replaced one.
 - `df-select` with `allowTags` keeps a value set from outside that is not among its choices.
 - `df-select` with `multiple` and `allowNull: false` offers no close button on its last chip.
 - `df-date-time` reads a typed `12:xx AM` as `00:xx` and `12:xx PM` as `12:xx`. A typed time with an hour or minute
