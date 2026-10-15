@@ -119,12 +119,12 @@ Every one of these but `name`, `defaultConfirm` and `defaultReject` can also be 
 
 `icon` is an accessor of `@dynamicforms/vue-forms`: it reads the member of the same name from the value, and a write
 to it is a value change. `label` is this subclass's accessor over the same member: it returns the string the member
-gives now, reading a ref or calling a function, and a write to it is a value change. `defaultConfirm` and `defaultReject` are read-only accessors of vue-forms: each
-reads the member of the same name from the value and returns `false` where it is unset. `renderedLabel` and
-`renderedIcon` are this subclass's: the text where `showLabel` is true, the icon name where `showIcon` is true, and
-`undefined` otherwise. `showLabel` and `showIcon` return `false` where the label or icon is missing or empty,
-regardless of the value. The breakpoint-resolved options `<df-actions>` renders from are filtered the same way; the
-component reads none of these accessors.
+gives now, reading a ref or calling a function, and a write to it is a value change. `defaultConfirm` and
+`defaultReject` are read-only accessors of vue-forms: each reads the member of the same name from the value and returns
+`false` where it is unset. `renderedLabel` and `renderedIcon` are this subclass's: the text where `showLabel` is true,
+the icon name where `showIcon` is true, and `undefined` otherwise. `showLabel` and `showIcon` return `false` where the
+label or icon is missing or empty, regardless of the value. The breakpoint-resolved options `<df-actions>` renders from
+are filtered the same way; the component reads none of these accessors.
 
 `access`, `busy` and `visibility` aren't part of `ActionRenderOptions` - they're standard `Action`/`Field` members
 of `@dynamicforms/vue-forms` (`access` and `visibility` are set at the top level of the `new Action()` parameters or
@@ -133,8 +133,8 @@ through `action.access` / `action.visibility`; `busy` is read-only). `<df-action
 - the button binds [`executable`](:vue-forms:/api/action.html) (`<v-btn :disabled="!action.executable">`). It is
   disabled where `access` is other than `'editable'` on the action or a container above it, while `busy` is `true`,
   and while any `ExecuteAction` handler of the action returns `false` from `canExecute()` - a
-  [`SubmitAction`](:vue-forms:/api/action.html#submitaction-target-handler-options) does while its target is invalid or a validation is
-  running.
+  [`SubmitAction`](:vue-forms:/api/action.html#submitaction-target-handler-options) does while its target is invalid or
+  a validation is running.
 - `busy` renders the button `loading` until every run of the action has settled.
 - `visibility: 'invisible'` keeps the button in the layout with an `invisible` class (`visibility: hidden`).
 - `visibility: 'hidden'` keeps the button in the DOM with a `d-none` class.
@@ -347,6 +347,7 @@ const saveAction = new Action({
 ```
 
 With this configuration:
+
 - On small screens: Only the icon is shown
 - On medium screens: Only the label is shown
 - On large screens: Both icon and label are shown

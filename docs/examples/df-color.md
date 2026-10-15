@@ -34,6 +34,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 ### Inherited Props
 
 This component inherits all common props from [InputBase](./input-base), including:
+
 - `control` - DynamicForms field object
 - `modelValue` - The color value in hex format
 - `label` - Input label
@@ -42,7 +43,7 @@ This component inherits all common props from [InputBase](./input-base), includi
 
 ## Color Format
 
-The component accepts and outputs color values in hex format (e.g., `#FF0000` for red). It also supports the 
+The component accepts and outputs color values in hex format (e.g., `#FF0000` for red). It also supports the
 alpha channel (e.g., `#FF0000FF`).
 
 ## Validation
@@ -72,6 +73,7 @@ const colorField = new Field({
 ## Events
 
 This component emits all [common events from InputBase](./input-base):
+
 - `update:modelValue` - When the color value changes
 
 ## Example: Custom Validation

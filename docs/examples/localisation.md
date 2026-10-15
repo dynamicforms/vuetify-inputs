@@ -117,10 +117,10 @@ which also lists every code vue-forms raises with its params.
 
 The inputs of `@dynamicforms/vuetify-inputs` render an error with a code as the content the `errorText` setting
 returns for it, and as its `detail` where the setting is not given or returns `undefined`. An error without a code,
-and a string, render as written: they are text in the user's language, and `errorText` is not called for them. `errorText` is given once, when the
-plugin is installed, and converts every error the application shows: those of vue-forms' validators, of the
-application's own validators, of its server and of vuetify-inputs itself
-([error codes](#error-codes)).
+and a string, render as written: they are text in the user's language, and `errorText` is not called for them.
+`errorText` is given once, when the plugin is installed, and converts every error the application shows: those of
+vue-forms' validators, of the application's own validators, of its server and of vuetify-inputs itself ([error
+codes](#error-codes)).
 
 `errorText` returns plain text, an `MdString`, which renders as markdown, an `HtmlString`, which renders as HTML, or a
 `SimpleComponentDef`. A catalogue that holds a markdown variant of a message under the code with `Md` appended lets the
@@ -212,8 +212,8 @@ picker come from Vuetify's own locale configuration.
 ### Per-component override
 
 Every `<df-date-time>` accepts a `locale` prop of the same date-fns `Locale` type. When it is set the component uses
-it; when it is not, the `dateTimeLocale` setting of the app applies, and without that `DateTimeLocaleConfig`. One form can thereby show one field
-in the application's locale and another in a fixed one.
+it; when it is not, the `dateTimeLocale` setting of the app applies, and without that `DateTimeLocaleConfig`. One form
+can thereby show one field in the application's locale and another in a fixed one.
 
 <datetime-multilingual/>
 

@@ -116,6 +116,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 ### Inherited Props
 
 This component inherits all common props from [InputBase](./input-base), including:
+
 - `control` - DynamicForms field object
 - `modelValue` - The date/time value as ISO string (v-model)
 - `label` - Input field label
@@ -144,6 +145,7 @@ Dates and times are displayed with [date-fns format patterns](https://date-fns.o
 - Default time format: `'p'` (locale-specific time representation)
 
 Common format strings:
+
 - `'yyyy-MM-dd'` - 2023-04-17
 - `'dd.MM.yyyy'` - 17.04.2023
 - `'HH:mm'` - 14:30
@@ -217,6 +219,7 @@ import {
 ```
 
 The date-fns locale affects:
+
 - Display formatting (how dates/times appear)
 - Parsing (how manual input is interpreted)
 - First day of week in date picker
@@ -227,6 +230,7 @@ come from Vuetify's locale configuration. See [Localisation](/examples/localisat
 ## Events
 
 This component emits all [common events from InputBase](./input-base):
+
 - `update:modelValue` - When the date/time value changes
 
 ## Examples

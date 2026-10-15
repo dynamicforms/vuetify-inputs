@@ -33,6 +33,7 @@ In addition to [common props from InputBase](./input-base), this component requi
 ### Inherited Props
 
 This component inherits all common props from [InputBase](./input-base), including:
+
 - `control` - DynamicForms field object
 - `modelValue` - The image URL (v-model)
 - `label` - Input label
@@ -131,6 +132,7 @@ A dropped or picked file whose type is not `image/*` is rejected without calling
 ## Events
 
 This component emits all [common events from InputBase](./input-base):
+
 - `update:modelValue` - When the image URL changes
 
 ## Examples

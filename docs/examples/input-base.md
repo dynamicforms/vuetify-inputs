@@ -102,8 +102,8 @@ descending priority:
 - global defaults, set when installing the library:
   `app.use(DynamicFormsInputs, { defaultVariant: 'your variant', defaultDensity: 'your density' })`
 - baked-in defaults (when nothing is specified):
-    - density: `'default'`
-    - variant: `'underlined'`
+  - density: `'default'`
+  - variant: `'underlined'`
 
 The [demo](./density.md) renders every density under every variant.
 
@@ -167,8 +167,9 @@ once. The errors a component displays are a subset of them, `shownErrors`, selec
 
 - nothing where the bound element is sent nowhere (its `effectiveAccess` is `'disabled'`);
 - an error whose [origin](https://docs.velis.si/dynamicforms/vue-forms/api/validators#origin) is `'server'`
-  immediately, without the field being touched. Under vue-forms' default [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy), the field drops it when it is
-  marked touched holding a value other than the one it held when the error was written;
+  immediately, without the field being touched. Under vue-forms' default
+  [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy), the field drops it when it is marked touched holding a
+  value other than the one it held when the error was written;
 - every other error (a validator's, or one the application wrote) once the field is touched. `form.touched = true`
   sets every member touched, which shows all errors, e.g. on a submit attempt.
 
@@ -232,6 +233,7 @@ label's text (`renderContentText`): a string and an `MdString` as written, an `H
 component as the text of its children.
 
 Declaration of the `Label` class:
+
 ```typescript
 export class Label {
   constructor(
@@ -293,7 +295,8 @@ const name = ref('');
 
 `InputBase` is a component, exported from the package as `InputBase`. `df-date-time`, `df-file` and `df-rtf-editor`
 are built on it: it renders the Vuetify field (label, hint, error state, clear button, loader), and the component
-places its own control inside that field. The plugin's `registerComponents` option does not register it, so a template that uses it imports it.
+places its own control inside that field. The plugin's `registerComponents` option does not register it, so a template
+that uses it imports it.
 
 It takes every prop from the [table above](#common-properties-props), plus one of its own:
 

@@ -241,6 +241,7 @@ credentials.registerAction(
 ## Try It Yourself
 
 Experiment with the demo by:
+
 1. Leaving the email field empty and clicking away, to watch the hint give up the row to the errors, which both
    validators contribute to and which render one node each
 2. Typing an address without an `@` and leaving the field again, to see the second validator's message, which its

@@ -22,8 +22,9 @@ app.use(DynamicFormsInputs, {
 });
 ```
 
-The options argument and every option in it are optional: `app.use(DynamicFormsInputs)` keeps the built-in defaults. The type is `DynamicFormsInputsOptions`, which is `VuetifyInputsSettings` (the default
-settings) plus the two registration flags.
+The options argument and every option in it are optional: `app.use(DynamicFormsInputs)` keeps the built-in defaults. The
+type is `DynamicFormsInputsOptions`, which is `VuetifyInputsSettings` (the default settings) plus the two registration
+flags.
 
 | Option | Type | Default | Description |
 |---|---|---|---|

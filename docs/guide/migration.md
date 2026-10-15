@@ -517,7 +517,6 @@ This is safe to apply everywhere you render content saved by this library, past 
 4. If your own styling targeted CKEditor-specific classes or DOM structure (rather than the semantic HTML this
    library always documented as its saved format), re-check it against the new output.
 
-
 ## Upgrading to v0.9.1 (from v0.9.0)
 
 Nothing this library exports is renamed or removed. What changes is that your compiler finally sees the package's
@@ -569,7 +568,6 @@ draws, and anything else that reads the action's `enabled` reads a run in flight
 3. Drop the `watchEffect` (or equivalent) that mirrored `busy` into `enabled` on an action.
 4. Check the tests that click a button of an action whose handler is asynchronous: a click that lands while the
    previous run is in flight no longer reaches the handler.
-
 
 ## Upgrading to v0.9.0 (from v0.8.x)
 

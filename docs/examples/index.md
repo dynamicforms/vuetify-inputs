@@ -65,6 +65,7 @@ A RTF editor input.
 ### [df-select](./df-select)
 
 A component for selecting values from a list. The examples show:
+
 - Basic usage with a static list
 - Advanced features (multiple selection, AJAX loading, icons)
 - Integration with DynamicForms

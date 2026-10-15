@@ -7,6 +7,7 @@ npm install @dynamicforms/vuetify-inputs
 ```
 
 In your main.ts
+
 ```typescript
 import { DynamicFormsInputs } from '@dynamicforms/vuetify-inputs';
 import '@dynamicforms/vuetify-inputs/styles.css';
@@ -29,6 +30,7 @@ import { VuetifyComponents } from '@dynamicforms/vuetify-inputs';
 
 Object.entries(VuetifyComponents).map(([name, component]) => app.component(name, component));
 ```
+
 :::
 
 ### Resolving a component by its tag
@@ -48,7 +50,7 @@ component added to this library in a later version is in the map; a hand-written
 
 ## Basic Usage
 
-`@dynamicforms/vuetify-inputs` provides Vuetify-based input components that work with `@dynamicforms/vue-forms` for form 
+`@dynamicforms/vuetify-inputs` provides Vuetify-based input components that work with `@dynamicforms/vue-forms` for form
 state management.
 
 ### Setting up the components

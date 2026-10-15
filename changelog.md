@@ -128,9 +128,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking:** `<df-color>` writes a color chosen in its picker when OK or a double-click confirms it, as
   `<df-date-time>` does; Cancel and closing the menu leave the field as it was.
 - **Breaking:** requires `vue-cached-icon` 3.2 (`peerDependencies` `^3.2.0`), which fetches no icon on the server.
-- **Breaking:** in the pickers of `<df-date-time>` and `<df-color>`, Cancel is enabled before a change and closes the picker; OK is
-  enabled once the choice differs from the value. Their labels are the library's strings `Cancel` and `Ok`, translated
-  as the other strings are, in place of Vuetify's `$vuetify.confirmEdit.cancel` and `$vuetify.confirmEdit.ok`.
+- **Breaking:** in the pickers of `<df-date-time>` and `<df-color>`, Cancel is enabled before a change and closes the
+  picker; OK is enabled once the choice differs from the value. Their labels are the library's strings `Cancel` and
+  `Ok`, translated as the other strings are, in place of Vuetify's `$vuetify.confirmEdit.cancel` and
+  `$vuetify.confirmEdit.ok`.
 - **Breaking:** `SimpleComponentDef` has no `componentVHtml`, and an `innerHTML` in its `componentProps` is dropped.
   HTML content is an `HtmlString`.
 - **Breaking:** `<df-input-hint>`'s `message` takes `RenderContentRef | RenderableValue[]`: a string, an `MdString`,
@@ -550,7 +551,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- df-input-hint wrapper around messages-widget. It can take both a fields description / hint or a list of errors and 
+- df-input-hint wrapper around messages-widget. It can take both a fields description / hint or a list of errors and
   displays errors as priority, otherwise hint / description
   messages-widget removed as it's provided in the vue-forms package
   The wrapper itself is now exported for use in further packages / apps
@@ -562,24 +563,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.6.6] - 2025-11-10
 
 ### Added
+
 - Translatable editor
 
 ## [0.6.3 - 0.6.5] - 2025-10-22
 
 ### Added
+
 - Support additional attributes for rendering the MdString
 
 ## [0.6.2] - 2025-10-01
 
 ### Added
+
 - Support MdString for label text
 
 ### Changed
+
 - All label rendering goes through df-label
 
 ## [0.6.0] - 2025-09-28
 
 ### Added
+
 - Initial effort for all the inputs to be correctly vertically aligned
 - Initial effort for all inputs to render correctly in all Vuetify variants
 - Density: inline for use in tables
@@ -587,83 +593,99 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.13] - 2025-09-25
 
 ### Fixed
+
 - Fix SSR
 
 ## [0.5.10 - 0.5.12] - 2025-09-24
 
 ### Fixed
+
 - Version bumps
 - Fixed CSS location in package.json
 
 ## [0.5.9] - 2025-09-19
 
 ### Added
+
 - Add support for vue-forms' touched property
 
 ## [0.5.8] - 2025-09-18
 
 ### Changed
+
 - Support vuetify 3.9+ instead of 3.8+
 
 ## [0.5.7] - 2025-09-05
 
 ### Added
+
 - messages-widget now takes additional parameter "classes" to be used on its generated elements. default `'text-error'`
 
 ### Changed
+
 - messages-widget modified to render functions to speed up rendering and remove redundancies in DOM elements
 
 ## [0.5.6] - 2025-08-25
 
 ### Added
-- input base: all components now take `passthrough-attrs` prop that contains any props that should be passed to the 
+
+- input base: all components now take `passthrough-attrs` prop that contains any props that should be passed to the
   underlying vuetify component.
 
 ## [0.5.5] - 2025-08-21
 
 ### Added
-- df-date-time now supports tracking current locale via 
+
+- df-date-time now supports tracking current locale via
   `DateTimeLocaleConfig.setDateTimeLocale(locale: Locale | Ref<Locale>)` configuration.
 
 ## [0.5.4] - 2025-07-29
 
 ### Fixed
+
 - df-date-time did not implement the clearable prop
 
 ## [0.5.3] - 2025-07-17
 
 ### Added
+
 - input retains its value when no v-model and no control is given to hold the value instead
 
 ## [0.5.2] - 2025-07-17
 
 ### Added
+
 - export props interfaces for the inputs
 
 ## [0.5.1] - 2025-06-09
 
 ### Added
+
 - Translation support for predefined actions
 
 ### Fixed
+
 - Removed breakpoint parameter from predefined actions (it was useless)
 
 ## [0.5.0] - 2025-05-31
 
 ### Changed
-- Refactored Action component to extend Form.Action instead of using it as a property, providing better 
+
+- Refactored Action component to extend Form.Action instead of using it as a property, providing better
   inheritance and type safety
 - Action is now fully responsive with support for breakpoint-based declarations
 
 ## [0.4.2 - 0.4.5] - 2025-05-19
 
 ### Added
+
 - Reactive choices and value support for df-select component
 - New slots (append-inner, prepend-inner) for df-select component customization
 
 ## [0.4.0 - 0.4.1] - 2025-05-18
 
 ### Fixed
+
 - Uniform input styling across all input-base components
 - Error display now only shows after field has been touched, improving user experience
 - Proper error rendering with enhanced validation message support
@@ -671,10 +693,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.1 - 0.3.3] - 2025-05-17
 
 ### Added
+
 - Settings support with configurable input variants (outlined, underlined, etc.)
 - Image support in component labels alongside existing icon support
 
 ### Fixed
+
 - DateTime component label display issues
 - Select component bug where previously selected choices were lost during new searches
 - Density and variant processing for df-datetime component
@@ -682,51 +706,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.4] - 2025-05-13
 
 ### Changed
+
 - Reorganized dropdown layouts for better user experience
 
 ## [0.2.3] - 2025-05-08
 
 ### Added
+
 - Exported getBreakpointName function for external use
 
 ## [0.2.1 - 0.2.2] - 2025-05-04
 
 ### Fixed
+
 - Type declarations and member visibility improvements
 - Generic solution for ResponsiveRenderOptions with correct exports
 
 ## [0.1.11 - 0.1.15] - 2025-04-21
 
 ### Changed
+
 - Simplified select component due to variant changes
 - Unified input heights across all components
 - Enhanced message widget to support hints and help text
 
 ### Fixed
+
 - Number input demo styling issues
 - Precision handling (null when undefined)
 - Selection clearing functionality in df-select component
 
 ### Removed
+
 - Redundant form data handling
 
 ### Added
+
 - Proper styles declaration
 
 ## [0.1.7 - 0.1.10] - 2025-04-19
 
 ### Fixed
+
 - Color picker closing behavior - no longer closes on every internal click
 - Checkbox unnecessary value reassignments
 - DateTime values now include timezone information
 
 ### Changed
+
 - Updated repository URL
 - Excluded Vuetify components from package bundle for smaller distribution size
 
 ## [0.1.0 - 0.1.6] - 2025-04-18
 
 ### Added
+
 - Initial implementation with three example components
 - Helper classes for component development
 - Complete documentation with working examples

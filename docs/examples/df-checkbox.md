@@ -27,6 +27,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 ### Inherited Props
 
 This component inherits all common props from [InputBase](./input-base), including:
+
 - `control` - DynamicForms field object
 - `modelValue` - The checkbox value (v-model)
 - `label` - Checkbox label
@@ -44,6 +45,7 @@ When clicked, the checkbox cycles through states in the following order:
 ## Events
 
 This component emits all [common events from InputBase](./input-base):
+
 - `update:modelValue` - When the checkbox value changes
 
 ## Examples
