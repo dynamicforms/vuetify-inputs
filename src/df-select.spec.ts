@@ -161,6 +161,63 @@ describe('DfSelect', () => {
     });
   });
 
+  describe('with allowTags', () => {
+    it('keeps a value set after mount that no choice covers', async () => {
+      const control = new Field<string | null>({ value: null });
+      const wrapper = mountSelect({ control, allowTags: true, choices: [] });
+      await flushPromises();
+
+      control.value = 'new';
+      await flushPromises();
+      expect(control.value).toBe('new');
+      expect(wrapper.findComponent(components.VCombobox).props('modelValue')).toBe('new');
+    });
+
+    it('keeps a multiple value set after mount that no choice covers', async () => {
+      const control = new Field<string[] | null>({ value: null });
+      mountSelect({ control, allowTags: true, multiple: true, choices: [] });
+      await flushPromises();
+
+      control.value = ['a', 'b'];
+      await flushPromises();
+      expect(control.value).toEqual(['a', 'b']);
+    });
+  });
+
+  describe('with allowNull false and multiple', () => {
+    const closeButtons = (wrapper: ReturnType<typeof mountSelect>) =>
+      wrapper.findAll('.v-chip').map((chip) => chip.find('.v-chip__close').exists());
+
+    it('offers no close on the only chip and keeps its value', async () => {
+      const control = new Field<number[] | null>({ value: [1] });
+      const wrapper = mountSelect({ control, multiple: true, allowNull: false, choices: ALL_CHOICES });
+      await flushPromises();
+
+      expect(closeButtons(wrapper)).toEqual([false]);
+    });
+
+    it('offers close on every chip while more than one is selected', async () => {
+      const control = new Field<number[] | null>({ value: [1, 2] });
+      const wrapper = mountSelect({ control, multiple: true, allowNull: false, choices: ALL_CHOICES });
+      await flushPromises();
+
+      expect(closeButtons(wrapper)).toEqual([true, true]);
+      await wrapper.find('.v-chip .v-chip__close').trigger('click');
+      await flushPromises();
+      expect(control.value).toEqual([2]);
+      expect(closeButtons(wrapper)).toEqual([false]);
+    });
+
+    it('keeps the last tag of a taggable select', async () => {
+      const control = new Field<string[] | null>({ value: ['a'] });
+      const wrapper = mountSelect({ control, multiple: true, allowNull: false, allowTags: true, choices: [] });
+      await flushPromises();
+
+      expect(closeButtons(wrapper)).toEqual([false]);
+      expect(control.value).toEqual(['a']);
+    });
+  });
+
   describe('with a disabled control', () => {
     it('selects no default while disabled and selects the first choice once enabled', async () => {
       const control = new Field<number | null>({ value: null, access: 'disabled' });
