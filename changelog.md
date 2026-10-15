@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `df-date-time` keyboard navigation in an open picker: left and right move the date by a day and the time by an hour,
+  up and down move the date by a week and the time by a minute, Enter writes the choice and Escape closes the picker.
+- `df-date-time` selects the text of the date or the time when it receives focus, so typing replaces it.
 - `df-date-time` reads short forms of a typed date and time, such as `1206` for 12 June and `1843` for 18:43. A date is
   read in the order of day, month and year of the display format in the component's locale.
 
@@ -18,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `df-date-time` reads typed text when the field loses focus or on Enter and leaves it as typed until then. Text it
   cannot read stays in the field, the value is left as it is, and the field holds an error of code `invalid_date` or
   `invalid_time` until the text is read or the value changes.
+- `df-date-time` closes its picker when text is typed into the field and when the field loses focus. A click in the
+  picker leaves the focus in the text field. Space opens the picker only while the field's text shows the value; in
+  edited text it types a space.
 
 ### Removed
 

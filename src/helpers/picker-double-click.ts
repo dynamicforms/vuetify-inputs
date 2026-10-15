@@ -8,9 +8,9 @@
 export const viewSettleMs = 600;
 
 /**
- * Double-click confirmation for a picker inside `v-confirm-edit`: a double-click on a choice selects it and confirms
- * it, as a choice followed by OK does. `viewChanged` is bound to the picker's events that change what it shows:
- * `update:viewMode`, and `update:month` and `update:year` of a date picker.
+ * Double-click confirmation for a picker whose choice is written on confirmation: a double-click on a choice selects
+ * it and confirms it, as a choice followed by OK does. `viewChanged` is bound to the picker's events that change what
+ * it shows: `update:viewMode`, and `update:month` and `update:year` of a date picker.
  */
 export function usePickerDoubleClick() {
   let viewChangedAt = Number.NEGATIVE_INFINITY;

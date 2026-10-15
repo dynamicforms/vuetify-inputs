@@ -16,10 +16,12 @@
           'df-input-wrapper',
           density,
         ]"
+        @keydown.capture="onKeydown"
       >
         <v-text-field
           v-if="['date', 'datetime'].includes(inputType)"
           v-model="dateText"
+          class="df-datetime-date"
           style="flex-grow: 4"
           density="compact"
           variant="plain"
@@ -30,36 +32,39 @@
           :name="`${vuetifyBindings.name}-date`"
           :placeholder="vuetifyBindings.placeholder"
           v-bind="passthroughAttrs"
+          @update:model-value="closeMenu('date')"
           @click="dropdown = 'date'"
-          @keydown.space="dropdown = 'date'"
-          @focus="slotProps.focus()"
-          @keydown.enter="commitDate"
+          @mousedown="markPointerFocus"
+          @mouseup="keepSelectionOnPointerFocus"
+          @focus="
+            selectText($event);
+            slotProps.focus();
+          "
           @blur="
+            closeMenu('date');
             commitDate();
             slotProps.blur();
           "
         >
           <template #default>
             <v-menu v-if="clientRendered" v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsDate" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
-                <template #default="{ model: proxyModel, save, cancel, isPristine }">
-                  <v-date-picker
-                    v-model="proxyModel.value"
-                    :hide-header="true"
-                    :first-day-of-week="firstDayOfWeek"
-                    :show-adjacent-months="true"
-                    :show-week="true"
-                    @update:view-mode="viewChanged"
-                    @update:month="viewChanged"
-                    @update:year="viewChanged"
-                    @dblclick="saveOnDoubleClick($event, '.v-date-picker-month__day', save)"
-                  >
-                    <template #actions>
-                      <confirm-actions :save="save" :cancel="cancel" :is-pristine="isPristine" />
-                    </template>
-                  </v-date-picker>
-                </template>
-              </v-confirm-edit>
+              <div @mousedown.prevent>
+                <v-date-picker
+                  v-model="pickerDate"
+                  :hide-header="true"
+                  :first-day-of-week="firstDayOfWeek"
+                  :show-adjacent-months="true"
+                  :show-week="true"
+                  @update:view-mode="viewChanged"
+                  @update:month="viewChanged"
+                  @update:year="viewChanged"
+                  @dblclick="saveOnDoubleClick($event, '.v-date-picker-month__day', saveDate)"
+                >
+                  <template #actions>
+                    <confirm-actions :save="saveDate" :cancel="cancelPicker" :is-pristine="datePristine" />
+                  </template>
+                </v-date-picker>
+              </div>
             </v-menu>
           </template>
         </v-text-field>
@@ -67,6 +72,7 @@
         <v-text-field
           v-if="['time', 'datetime'].includes(inputType)"
           v-model="timeText"
+          class="df-datetime-time"
           style="flex-grow: 3"
           density="compact"
           variant="plain"
@@ -77,32 +83,36 @@
           :name="`${vuetifyBindings.name}-time`"
           :placeholder="inputType === 'time' ? vuetifyBindings.placeholder : undefined"
           v-bind="passthroughAttrs"
+          @update:model-value="closeMenu('time')"
           @click="dropdown = 'time'"
-          @keydown.space="dropdown = 'time'"
-          @focus="slotProps.focus()"
-          @keydown.enter="commitTime"
+          @mousedown="markPointerFocus"
+          @mouseup="keepSelectionOnPointerFocus"
+          @focus="
+            selectText($event);
+            slotProps.focus();
+          "
           @blur="
+            closeMenu('time');
             commitTime();
             slotProps.blur();
           "
         >
           <template #default>
             <v-menu v-if="clientRendered" v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsTimeString" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
-                <template #default="{ model: proxyModel, save, cancel, isPristine }">
-                  <v-time-picker
-                    v-model="proxyModel.value"
-                    :hide-header="true"
-                    format="24hr"
-                    @update:view-mode="viewChanged"
-                    @dblclick="saveOnDoubleClick($event, '.v-time-picker-clock', save)"
-                  >
-                    <template #actions>
-                      <confirm-actions :save="save" :cancel="cancel" :is-pristine="isPristine" />
-                    </template>
-                  </v-time-picker>
-                </template>
-              </v-confirm-edit>
+              <div @mousedown.prevent>
+                <v-time-picker
+                  v-model="pickerTime"
+                  v-model:view-mode="timeViewMode"
+                  :hide-header="true"
+                  format="24hr"
+                  @update:view-mode="viewChanged"
+                  @dblclick="saveOnDoubleClick($event, '.v-time-picker-clock', saveTime)"
+                >
+                  <template #actions>
+                    <confirm-actions :save="saveTime" :cancel="cancelPicker" :is-pristine="timePristine" />
+                  </template>
+                </v-time-picker>
+              </div>
             </v-menu>
           </template>
         </v-text-field>
@@ -113,7 +123,7 @@
 
 <script setup lang="ts">
 import { ValidationError } from '@dynamicforms/vue-forms';
-import { format, parseISO } from 'date-fns';
+import { addDays, format, parseISO } from 'date-fns';
 import { ref, computed, inject, watch, toRefs, unref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
@@ -186,6 +196,15 @@ function concludeEdit() {
   touched.value = true;
 }
 
+// typing into a field or leaving it closes its menu: the arrow keys then move the caret instead of the picker
+function closeMenu(which: 'date' | 'time') {
+  if (dropdown.value === which) dropdown.value = '';
+}
+
+function cancelPicker() {
+  dropdown.value = '';
+}
+
 const { viewChanged, saveOnDoubleClick } = usePickerDoubleClick();
 
 function clear() {
@@ -253,6 +272,94 @@ const valueAsTimeString = computed({
     setValueISOFull(`T${newValue}`, 1);
   },
 });
+
+// The choice in an open picker. OK, Enter and a double-click write it into the value; it is reset to the value when
+// the menu opens or the value changes.
+const pickerDate = ref<Date | null>(null);
+const pickerTime = ref('');
+const timeViewMode = ref<'hour' | 'minute' | 'second'>('hour');
+watch(
+  [dropdown, valueAsDate],
+  ([shown], [shownBefore]) => {
+    pickerDate.value = valueAsDate.value;
+    pickerTime.value = valueAsTimeString.value;
+    if (shown !== shownBefore) timeViewMode.value = 'hour';
+  },
+  { immediate: true },
+);
+const datePristine = computed(() => pickerDate.value?.getTime() === valueAsDate.value?.getTime());
+const timePristine = computed(() => pickerTime.value.slice(0, 5) === valueAsTimeString.value.slice(0, 5));
+
+function saveDate() {
+  if (!datePristine.value && pickerDate.value) valueAsDate.value = pickerDate.value;
+  concludeEdit();
+}
+
+function saveTime() {
+  if (!timePristine.value && pickerTime.value) valueAsTimeString.value = pickerTime.value;
+  concludeEdit();
+}
+
+const dateSteps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 };
+const timeSteps: Record<string, number> = { ArrowLeft: -60, ArrowRight: 60, ArrowUp: 1, ArrowDown: -1 };
+
+// a step of the picker's time in minutes, wrapping around midnight
+function stepTime(minutes: number) {
+  const now = new Date();
+  const [hours, mins] = pickerTime.value ? pickerTime.value.split(':').map(Number) : [now.getHours(), now.getMinutes()];
+  const total = (((hours * 60 + mins + minutes) % 1440) + 1440) % 1440;
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  pickerTime.value = `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+  timeViewMode.value = Math.abs(minutes) === 60 ? 'hour' : 'minute';
+}
+
+// Runs in the capture phase, before the menu's own handler, which moves the focus into the menu on an up or down arrow
+// and so out of the field, which closes the menu.
+function onKeydown(event: KeyboardEvent) {
+  const target = event.target as HTMLElement;
+  const which = target.closest('.df-datetime-date') ? 'date' : target.closest('.df-datetime-time') ? 'time' : null;
+  if (which == null || vuetifyBindings.value.readonly) return;
+  const shown = dropdown.value === which;
+  const handled = () => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  if (event.key === 'Enter') {
+    if (shown) (which === 'date' ? saveDate : saveTime)();
+    else if (which === 'date') commitDate();
+    else commitTime();
+  } else if (event.key === ' ') {
+    // the text as shown opens the picker; text being typed takes the space
+    if (which === 'date' ? dateText.value !== dateDisplay.value : timeText.value !== timeDisplay.value) return;
+    handled();
+    dropdown.value = which;
+  } else if (event.key === 'Escape' && shown) {
+    handled();
+    cancelPicker();
+  } else if (shown && event.key in dateSteps) {
+    handled();
+    if (which === 'date') pickerDate.value = addDays(pickerDate.value ?? new Date(), dateSteps[event.key]);
+    else stepTime(timeSteps[event.key]);
+  } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+    handled();
+    dropdown.value = which;
+  }
+}
+
+// Focus selects the text, so typing replaces it. A focusing click would put the caret at the pointer on mouseup and
+// remove the selection.
+let pointerFocus = false;
+function selectText(event: FocusEvent) {
+  (event.target as HTMLInputElement).select();
+}
+function markPointerFocus(event: MouseEvent) {
+  pointerFocus = event.target instanceof HTMLInputElement && event.target !== document.activeElement;
+}
+function keepSelectionOnPointerFocus(event: MouseEvent) {
+  if (pointerFocus) event.preventDefault();
+  pointerFocus = false;
+}
 
 const dateDisplay = computed(() => {
   const vad = unref(valueAsDate);
