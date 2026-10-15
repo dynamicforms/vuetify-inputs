@@ -84,10 +84,14 @@ export function datePartOrder(displayFormat: string, locale: Locale): DatePart[]
   return (['day', 'month', 'year'] as DatePart[]).sort((a, b) => found[a] - found[b]);
 }
 
-/** A two-digit year is the year ending in those digits that lies at most 20 years after `today`'s year. */
+/**
+ * A two-digit year is the year ending in those digits from 50 years before to 49 years after `today`'s year, the
+ * year date-fns `parse()` reads for `yy`.
+ */
 function fullYear(twoDigits: number, today: Date) {
-  const year = 2000 + twoDigits;
-  return year > today.getFullYear() + 20 ? year - 100 : year;
+  const rangeEnd = today.getFullYear() + 50;
+  const century = Math.floor(rangeEnd / 100) * 100;
+  return twoDigits + century - (twoDigits >= rangeEnd % 100 ? 100 : 0);
 }
 
 function dateOf(year: number, month: number, day: number): Date | null {
@@ -106,8 +110,8 @@ function dateOf(year: number, month: number, day: number): Date | null {
  *   4 digits two two-digit parts, 6 digits three two-digit parts and 8 digits a full date with a four-digit year;
  * - digits split by any other characters: two parts are a day and a month, three parts a full date.
  *
- * A two-digit year is the year ending in those digits at most 20 years after `today`'s. Returns null for any other
- * text and for a date that does not exist.
+ * A two-digit year is the year ending in those digits from 50 years before to 49 years after `today`'s. Returns null
+ * for any other text and for a date that does not exist.
  */
 export function parseDateInput(text: string, displayFormat: string, locale: Locale, today: Date): Date | null {
   const trimmed = text.trim();

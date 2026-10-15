@@ -33,43 +33,59 @@ supported.
 
 ## Typing a value
 
-The date and the time are each typed into their own text field. The field holds the text as typed and is read when it
-loses focus or on Enter; the field then shows the value in its display format. A field emptied of text clears the
-value.
+The date and the time are each typed into their own text field. The field holds the text as typed and reads it when
+it loses focus or on Enter; once read, the field shows the value in its display format. Leading and trailing spaces
+are ignored. A field emptied of its text clears the whole value: in `datetime` mode, emptying the date or the time
+clears both.
 
-Text in the display format is read with date-fns `parse()` against the component's locale. Other text is read by the
-rules below.
+Each text is read in two steps:
 
-A time is read in the 24-hour clock, optionally followed by `am` or `pm`:
+1. Text in the display format (`displayFormatDate`, `displayFormatTime`) is read with date-fns `parse()` against the
+   component's locale. A date read this way with a year below 1000, such as `8/12/27` against `MM/dd/yyyy`, goes to
+   step 2.
+2. Any other text is read by the rules below.
+
+### Time
+
+A time is read in the 24-hour clock. It may end in `a` or `p`, written as `am`, `pm`, `a.m.` or `p.m.` in either
+case; the hour is then 1–12, `12 am` is midnight and `12 pm` noon.
 
 | Typed | Read as | Example |
 |-------|---------|---------|
-| 1–2 digits up to 23 | whole hours | `9` = 9:00, `18` = 18:00 |
-| 2 digits above 23 | H:0M | `65` = 6:05 |
-| 3 digits | H:MM | `130` = 1:30, `930` = 9:30 |
-| 4 digits | HH:MM | `1843` = 18:43 |
-| digits split by other characters | hours, minutes and optional seconds, which are dropped | `18.43`, `9 30` |
+| 1 digit | whole hours | `9` = 9:00 |
+| 2 digits up to 23 (up to 12 with `am`/`pm`) | whole hours | `18` = 18:00, `12a` = 0:00 |
+| 2 digits above that | H:0M | `65` = 6:05, `24` = 2:04 |
+| 3 digits | H:MM | `130` = 1:30, `930` = 9:30, `130pm` = 13:30 |
+| 4 digits | HH:MM | `1843` = 18:43, `0005` = 0:05 |
+| 2 or 3 parts of 1–2 digits, separated by spaces, `:`, `.`, `,` or `-` | hours, minutes and seconds; the seconds are dropped | `18.43`, `9 30`, `18:43:20` = 18:43 |
 
-A date is read in the order of day, month and year of the display format in the component's locale: `812` is
-8 December where the order is day, month, year (`sl`, `de`), and 12 August where the month comes before the day (`ja`,
-`en-US`). Without a year, the day and the month keep their order and the year is the current one.
+An hour above 23 or a minute above 59 is not read.
 
-| Typed | Read as | `sl` | `ja` |
+### Date
+
+A date is read in the order of day, month and year of the display format in the component's locale. A display format
+without a numeric day, month and year, such as `PPP`, gives the order of the locale's short date format `P`. Text
+without a year keeps the order of the day and the month, and takes the current year.
+
+| Typed | Read as | `sl` (day, month, year) | `ja` (year, month, day) |
 |-------|---------|------|------|
 | 1–2 digits | a day of the current month | `12` = 12th | `12` = 12th |
-| 3 digits | a one-digit first part and a two-digit second part | `812` = 8 Dec | `812` = 12 Aug |
-| 4 digits | two two-digit parts | `1206` = 12 Jun | `0812` = 12 Aug |
-| 6 digits | three two-digit parts, the year as two digits | `120627` | `270812` |
-| 8 digits | a full date with a four-digit year | `12062027` | `20270812` |
-| two parts split by other characters | a day and a month | `12.6` | `8/12` |
-| three parts split by other characters | a full date | `12. 6. 27` | `2027/8/12` |
+| 3 digits | first part 1 digit, second part 2 digits | `812` = 8 Dec | `812` = 12 Aug |
+| 4 digits | two parts of 2 digits | `1206` = 12 Jun | `0812` = 12 Aug |
+| 6 digits | three parts of 2 digits | `120627` = 12 Jun 2027 | `270812` = 12 Aug 2027 |
+| 8 digits | a full date with a 4-digit year | `12062027` | `20270812` |
+| 2 parts separated by spaces, `.`, `/`, `,` or `-` | a day and a month of 1–2 digits each | `12.6` | `8/12` |
+| 3 parts separated the same way | a full date; the year has 2 or 4 digits | `12. 6. 27` | `2027/8/12` |
 
-A two-digit year is the year ending in those digits that lies at most 20 years after the current one.
+Trailing separators are ignored (`12.6.`). A two-digit year is the year ending in those digits from 50 years before
+to 49 years after the current one, the year date-fns `parse()` reads for `yy`. A date that does not exist, such as
+31 February or `sl` `131` (1st of month 31), is not read; 5 or 7 digits, or more than 8, are not read either.
 
-Text that cannot be read, a time with an hour above 23 or a minute above 59, and a date that does not exist leave the
-text and the value as they are. The field then holds an error of code `invalid_date` or `invalid_time` with origin
-`'application'` until the text is read or the value changes: a bound `control` holds it in its `errors` and is
-invalid, and a field without a `control` shows it.
+### Text that is not read
+
+Text that is not read stays in the field and the value is left as it is. The field holds an error of code
+`invalid_date` or `invalid_time` with origin `'application'` until its text is read or the value changes: a bound
+`control` holds the error in its `errors` and is invalid, and a field without a `control` shows it.
 
 ## Props
 

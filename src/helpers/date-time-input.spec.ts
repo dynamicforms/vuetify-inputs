@@ -117,6 +117,15 @@ describe('parseDateInput', () => {
     },
   );
 
+  it.each([
+    ['120675', '2075-06-12'],
+    ['120676', '1976-06-12'],
+    ['12.6.50', '2050-06-12'],
+    ['12. 06. 50', '2050-06-12'],
+  ])('reads the two-digit year of %s as date-fns does: %s', (text, expected) => {
+    expect(date(text)).toBe(expected);
+  });
+
   it('reads a 29 February only in a leap year', () => {
     expect(date('290228')).toBe('2028-02-29');
     expect(date('290227')).toBeNull();
