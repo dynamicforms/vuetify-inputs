@@ -133,17 +133,17 @@ describe('parseDateInput', () => {
 });
 
 describe('setInputError', () => {
-  const error = new ValidationError('invalid_date', {}, 'Not a valid date.', 'application');
+  const error = new ValidationError('vuetify-inputs.invalid_date', {}, 'Not a valid date.', 'application');
 
   it('adds the error beside the errors the control holds and removes only it', () => {
     const control = new Form.Field<string | null>({ value: null });
     const server = new ValidationError('taken', {}, 'Taken.', 'server');
     control.errors = [server];
 
-    setInputError(control, 'invalid_date', error);
+    setInputError(control, 'vuetify-inputs.invalid_date', error);
     expect(control.errors).toEqual([server, error]);
 
-    setInputError(control, 'invalid_date', null);
+    setInputError(control, 'vuetify-inputs.invalid_date', null);
     expect(control.errors).toEqual([server]);
   });
 
@@ -151,7 +151,7 @@ describe('setInputError', () => {
     const control = new Form.Field<string | null>({ value: null });
     const errors = control.errors;
 
-    setInputError(control, 'invalid_date', null);
+    setInputError(control, 'vuetify-inputs.invalid_date', null);
     expect(control.errors).toBe(errors);
   });
 });

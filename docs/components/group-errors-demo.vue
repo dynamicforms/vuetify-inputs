@@ -119,7 +119,7 @@ form.registerAction(
     const over = total - budgetLimit;
     return [
       new ValidationError(
-        'over_budget',
+        'app.over_budget',
         { total, over },
         `The trip totals ${total} €, which is ${over} € over the budget.`,
       ),

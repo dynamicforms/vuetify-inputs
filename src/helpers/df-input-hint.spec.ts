@@ -67,8 +67,8 @@ describe('DfInputHint', () => {
 
   it('displays errors when errors is an array of ValidationError objects', () => {
     const validationErrors: ValidationError[] = [
-      new ValidationError('required', {}, 'Field is required'),
-      new ValidationError('pattern', {}, 'Invalid format'),
+      new ValidationError('vue-forms.required', {}, 'Field is required'),
+      new ValidationError('vue-forms.pattern', {}, 'Invalid format'),
     ];
     const wrapper = createWrapper({ message: 'Helper text', errors: validationErrors });
     expectMessagesWidget(wrapper, validationErrors, 'text-error');

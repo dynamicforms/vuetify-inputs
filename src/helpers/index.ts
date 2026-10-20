@@ -5,6 +5,7 @@ export * from './df-file.interface';
 export { default as DfInputHint } from './df-input-hint.vue';
 export { default as DfLabel } from './df-label.vue';
 export * from './df-select.interface';
+export { ERROR_NAMESPACE } from './error-namespace';
 export * from './error-text';
 export * from './input-base';
 export { default as InputBase } from './input-base.vue';

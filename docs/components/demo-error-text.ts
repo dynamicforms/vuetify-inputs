@@ -1,7 +1,8 @@
 import { formatParams, interpolate } from '@dynamicforms/translatable';
+import { ERROR_NAMESPACE as VUE_FORMS_ERRORS } from '@dynamicforms/vue-forms';
 import { ref } from 'vue';
 
-import { type ErrorText, MdString } from '../../src';
+import { ERROR_NAMESPACE as VUETIFY_INPUTS_ERRORS, type ErrorText, MdString } from '../../src';
 
 import messages from './demo-error-messages.json';
 
@@ -22,9 +23,27 @@ export const languages: { id: Language; text: string }[] = [
 export const errorLanguage = ref<Language>('en');
 export const markdownErrors = ref(true);
 
-// the message for a key in the current language with the params substituted, or the key where there is none
+// the block of `errors` that holds the messages of each error namespace: vue-forms', this library's and the docs' own
+const messageBlocks: Record<string, string> = {
+  [VUE_FORMS_ERRORS]: 'vue-forms',
+  [VUETIFY_INPUTS_ERRORS]: 'vuetify-inputs',
+  app: 'app',
+};
+
+// the key of a full error code: its block and its code, split at the code's last `.`; undefined for a namespace
+// without a block
+const errorKey = (fullCode: string) => {
+  const dot = fullCode.lastIndexOf('.');
+  const block = messageBlocks[fullCode.slice(0, dot)];
+  return block === undefined ? undefined : `${block}.${fullCode.slice(dot + 1)}`;
+};
+
+// the message for a key (`<block>.<code>`) in the current language with the params substituted, or the key where
+// there is none
 const t = (key: string, params: Record<string, unknown>) => {
-  const template = (messages[errorLanguage.value].errors as Record<string, string>)[key];
+  const dot = key.indexOf('.');
+  const blocks = messages[errorLanguage.value].errors as Record<string, Record<string, string>>;
+  const template = blocks[key.slice(0, dot)]?.[key.slice(dot + 1)];
   return template === undefined ? key : interpolate(template, params);
 };
 
@@ -41,16 +60,18 @@ export const roleName = (role: string) => (messages[errorLanguage.value].roles a
  * plain message otherwise, and the error's detail for a code without a message.
  */
 export const errorText: ErrorText = (error) => {
+  const key = errorKey(error.code);
+  if (key === undefined) return undefined;
   const params =
-    error.code === 'in_allowed_values'
+    error.code === `${VUE_FORMS_ERRORS}.in_allowed_values`
       ? {
           allowedAsText: (error.params.allowedValues as string[]).map(roleName).join(', '),
         }
       : error.params;
   if (markdownErrors.value) {
-    const markdown = tf(`${error.code}Md`, params);
-    if (markdown !== `${error.code}Md`) return new MdString(markdown);
+    const markdown = tf(`${key}Md`, params);
+    if (markdown !== `${key}Md`) return new MdString(markdown);
   }
-  const text = tf(error.code, params);
-  return text === error.code ? undefined : text;
+  const text = tf(key, params);
+  return text === key ? undefined : text;
 };

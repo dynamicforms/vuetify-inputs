@@ -151,8 +151,8 @@ const form = new Group({
     value: '<p>Enter a detailed product description here.</p>',
     validators: [
       new Validators.Validator((value) => {
-        if (!value || value === '<p></p>') return [new ValidationError('description_required', {}, 'Description is required')];
-        if (value.length < 20) return [new ValidationError('description_too_short', { minLength: 20 }, 'Description is too short')];
+        if (!value || value === '<p></p>') return [new ValidationError('app.description_required', {}, 'Description is required')];
+        if (value.length < 20) return [new ValidationError('app.description_too_short', { minLength: 20 }, 'Description is too short')];
         return null;
       })
     ]

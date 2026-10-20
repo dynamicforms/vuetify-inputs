@@ -49,7 +49,7 @@ const colorField = new Field({
   value: '#42A5F5',
   validators: [
     new Validators.Pattern(/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/, {
-      code: 'hex_color',
+      code: 'app.hex_color',
       detail: 'Please enter a valid hex color code (e.g., #FF0000 or #FF0000FF)',
     }),
   ],

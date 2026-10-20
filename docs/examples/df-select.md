@@ -178,7 +178,7 @@ const form = new Group({
     value: [1],
     validators: [
       new Validators.Validator((value) => {
-        if (!value || value.length === 0) return [new ValidationError('no_category', {}, 'Select at least one category')];
+        if (!value || value.length === 0) return [new ValidationError('app.no_category', {}, 'Select at least one category')];
         return null;
       })
     ]

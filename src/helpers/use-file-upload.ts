@@ -2,6 +2,7 @@ import Form, { ValidationError } from '@dynamicforms/vue-forms';
 import { computed, inject, onBeforeUnmount, ref, watch, type Ref } from 'vue';
 
 import { FileComms, FileGoneError } from './df-file.interface';
+import { namespaced } from './error-namespace';
 import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
 export interface FileUploadOptions {
@@ -146,5 +147,5 @@ export function useFileUpload({ value, touched, comms, touchInterval, control }:
  * goes through `Form.FieldBase`'s own setter, the same way `useInputBase`'s `touched` does.
  */
 export function setFileGoneError(control: Form.FieldBase | undefined, errorText: string) {
-  if (control) control.errors = [new ValidationError('file_gone', {}, errorText, 'server')];
+  if (control) control.errors = [new ValidationError(namespaced('file_gone'), {}, errorText, 'server')];
 }

@@ -123,12 +123,22 @@ vue-forms' validators, of the application's own validators, of its server and of
 codes](#error-codes)).
 
 `errorText` returns plain text, an `MdString`, which renders as markdown, an `HtmlString`, which renders as HTML, or a
-`SimpleComponentDef`. A catalogue that holds a markdown variant of a message under the code with `Md` appended lets the
-application render its errors as markdown without changing a validator:
+`SimpleComponentDef`. An error's code is `<namespace>.<code>` ([error codes](#error-codes)). The application maps
+each namespace to a translation key prefix of its own, taking a library's namespace from its `ERROR_NAMESPACE`
+constant: here `vue-forms.required` renders through the key `libs.vue-forms.required`,
+`vuetify-inputs.invalid_hex_color` through `libs.vuetify-inputs.invalid_hex_color` and the application's
+`app.over_budget` through `errors.over_budget`. A catalogue that holds a markdown variant of a message under the
+key with `Md` appended lets the application render its errors as markdown without changing a validator:
 
 ```typescript
 import { formatParams } from '@dynamicforms/translatable';
-import { DynamicFormsInputs, type ErrorText, MdString } from '@dynamicforms/vuetify-inputs';
+import { ERROR_NAMESPACE as VUE_FORMS_ERRORS } from '@dynamicforms/vue-forms';
+import {
+  DynamicFormsInputs,
+  ERROR_NAMESPACE as VUETIFY_INPUTS_ERRORS,
+  type ErrorText,
+  MdString,
+} from '@dynamicforms/vuetify-inputs';
 
 const { t, n, d, te } = i18n.global;
 // formats numbers and dates for the locale before t substitutes them
@@ -136,8 +146,18 @@ const tf = formatParams(t, (value) =>
   typeof value === 'number' ? n(value) : value instanceof Date ? d(value) : value);
 const markdown = true;
 
+// the translation key prefix of each error namespace
+const keyPrefixes: Record<string, string> = {
+  [VUE_FORMS_ERRORS]: 'libs.vue-forms',
+  [VUETIFY_INPUTS_ERRORS]: 'libs.vuetify-inputs',
+  app: 'errors',
+};
+
 const errorText: ErrorText = (error) => {
-  const key = `errors.${error.code}`;
+  const dot = error.code.lastIndexOf('.');
+  const prefix = keyPrefixes[error.code.slice(0, dot)];
+  if (prefix === undefined) return undefined;
+  const key = `${prefix}.${error.code.slice(dot + 1)}`;
   if (markdown && te(`${key}Md`)) return new MdString(tf(`${key}Md`, error.params));
   return te(key) ? tf(key, error.params) : undefined;
 };
@@ -147,11 +167,15 @@ app.use(DynamicFormsInputs, { errorText });
 
 ```json
 {
-  "errors": {
-    "required": "Prosimo, vnesite vrednost",
-    "min_value": "Vrednost mora biti vsaj {minValue}",
-    "min_valueMd": "Vrednost mora biti vsaj **{minValue}**"
-  }
+  "libs": {
+    "vue-forms": {
+      "required": "Prosimo, vnesite vrednost",
+      "min_value": "Vrednost mora biti vsaj {minValue}",
+      "min_valueMd": "Vrednost mora biti vsaj **{minValue}**"
+    },
+    "vuetify-inputs": { "invalid_hex_color": "Ni veljaven šestnajstiški niz." }
+  },
+  "errors": { "over_budget": "Izlet stane {total} €, kar je {over} € nad proračunom." }
 }
 ```
 
@@ -162,14 +186,32 @@ app.use(DynamicFormsInputs, { errorText });
 
 ## Error codes
 
+An error code is a full code, `<namespace>.<code>`:
+
+- `code` is snake_case and contains no `.`: `[a-z0-9]+(_[a-z0-9]+)*`;
+- `namespace` is one or more segments joined by `.`, each `[a-z0-9]+(-[a-z0-9]+)*`;
+- a full code splits at its last `.`: everything before it is the namespace, everything after it the code.
+
+The codes this library raises are in the namespace `vuetify-inputs`, exported as `ERROR_NAMESPACE`. vue-forms'
+codes are in the namespace `vue-forms`, exported by vue-forms as its own `ERROR_NAMESPACE`. A code the application
+gives an error is used as given: the library does not prefix, check or rewrite it. The application prefixes its own
+codes with a namespace of its own, such as `app.over_budget`. The library ships no translation keys for error
+codes; the application chooses them, as in [Translating errors](#translating-errors).
+
+```typescript
+import { ERROR_NAMESPACE } from '@dynamicforms/vuetify-inputs';
+
+const unreadDate = control.errors.some((error) => error.code === `${ERROR_NAMESPACE}.invalid_date`);
+```
+
 The errors this library raises itself:
 
 | Code | Params | English `detail` | Raised by |
 |------|--------|------------------|-----------|
-| `invalid_hex_color` | none | `Not a valid hex string.` | `<df-color>` without a `control`, for a value that is not 3, 4, 6 or 8 hex digits with an optional leading `#`, or an empty value without `allowNull` |
-| `invalid_date` | none | `Not a valid date.` | `<df-date-time>`, for typed text it cannot read as a date; its origin is `'application'` |
-| `invalid_time` | none | `Not a valid time.` | `<df-date-time>`, for typed text it cannot read as a time; its origin is `'application'` |
-| `file_gone` | none | the server's `errorText` | `<df-file>` and `<df-image>`, when the server reports the uploaded file as gone; its origin is `'server'` |
+| `vuetify-inputs.invalid_hex_color` | none | `Not a valid hex string.` | `<df-color>` without a `control`, for a value that is not 3, 4, 6 or 8 hex digits with an optional leading `#`, or an empty value without `allowNull` |
+| `vuetify-inputs.invalid_date` | none | `Not a valid date.` | `<df-date-time>`, for typed text it cannot read as a date; its origin is `'application'` |
+| `vuetify-inputs.invalid_time` | none | `Not a valid time.` | `<df-date-time>`, for typed text it cannot read as a time; its origin is `'application'` |
+| `vuetify-inputs.file_gone` | none | the server's `errorText` | `<df-file>` and `<df-image>`, when the server reports the uploaded file as gone; its origin is `'server'` |
 
 A string in a component's `errors` prop becomes an error with an empty code and renders as written.
 
@@ -291,11 +333,13 @@ const messages = {
       Downloadable: 'Herunterladbar',
       // ...the rest of the table above
     },
-    errors: {
-      required: 'Bitte geben Sie einen Wert ein',
-      min_length: 'Die Länge muss mindestens {minLength} betragen',
-      min_lengthMd: 'Die Länge muss mindestens **{minLength}** betragen',
-      invalid_hex_color: 'Keine gültige Hex-Farbe.',
+    libs: {
+      'vue-forms': {
+        required: 'Bitte geben Sie einen Wert ein',
+        min_length: 'Die Länge muss mindestens {minLength} betragen',
+        min_lengthMd: 'Die Länge muss mindestens **{minLength}** betragen',
+      },
+      'vuetify-inputs': { invalid_hex_color: 'Keine gültige Hex-Farbe.' },
     },
   },
 };

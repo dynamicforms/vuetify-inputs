@@ -388,7 +388,7 @@ inside a computed, so the reactive state it reads, such as `value`, is tracked:
 
 ```typescript
 const { value, shownErrors } = useInputBase<string>(props, emits, () =>
-  /^\d{4}$/.test(value.value ?? '') ? [] : [new ValidationError('invalid_year', {}, 'Not a year.', 'validator')],
+  /^\d{4}$/.test(value.value ?? '') ? [] : [new ValidationError('app.invalid_year', {}, 'Not a year.', 'validator')],
 );
 ```
 

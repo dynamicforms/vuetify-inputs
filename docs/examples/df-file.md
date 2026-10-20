@@ -87,7 +87,7 @@ interface FileComms {
   /**
    * Called periodically to keep a temporary upload active. Throw FileGoneError if the backend reports the
    * identifier no longer exists — the component then clears the field and, where a `control` is bound, reports an error
-   * of code `file_gone` with the error's `errorText` as its detail. Any other thrown error is treated as transient and left to the consumer.
+   * of code `vuetify-inputs.file_gone` with the error's `errorText` as its detail. Any other thrown error is treated as transient and left to the consumer.
    * @param fileIdentifier The identifier that was returned by upload
    */
   touch: (fileIdentifier: string) => Promise<void>;
@@ -119,7 +119,7 @@ During an upload the component shows a progress bar from the values passed to `p
 A temporary upload is touched every `touchInterval` milliseconds (60 seconds by default), so the backend keeps it. If a
 touch rejects with a `FileGoneError` while the field still holds the touched identifier, the field is cleared, a
 disabled one as well, and, where a `control` is bound, its errors are replaced with one `ValidationError` of code
-`file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the [`errorText`
+`vuetify-inputs.file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the [`errorText`
 setting](/examples/localisation#translating-errors) can render another text for the code. Under vue-forms' default
 [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy) the field drops the error when a new file is uploaded. Any
 other rejection is ignored by the component and left to the application.

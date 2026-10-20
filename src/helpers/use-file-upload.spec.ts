@@ -166,7 +166,7 @@ describe('useFileUpload', () => {
 
       await vi.advanceTimersByTimeAsync(1_000);
       expect(control.value).toBeNull();
-      expect(control.errors.map((error) => error.code)).toEqual(['file_gone']);
+      expect(control.errors.map((error) => error.code)).toEqual(['vuetify-inputs.file_gone']);
     });
 
     it('leaves the value as it is when a touch rejects with a transient error', async () => {
@@ -321,6 +321,10 @@ describe('setFileGoneError', () => {
 
     expect(control.errors).toHaveLength(1);
     expect(control.errors[0]).toBeInstanceOf(ValidationError);
-    expect(control.errors[0]).toMatchObject({ code: 'file_gone', detail: 'The file is gone', origin: 'server' });
+    expect(control.errors[0]).toMatchObject({
+      code: 'vuetify-inputs.file_gone',
+      detail: 'The file is gone',
+      origin: 'server',
+    });
   });
 });

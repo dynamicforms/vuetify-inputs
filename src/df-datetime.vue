@@ -161,6 +161,7 @@ import {
 import { useClientRendered } from './helpers/client-rendered';
 import ConfirmActions from './helpers/confirm-actions.vue';
 import { parseDateInput, parseTimeInput, setInputError } from './helpers/date-time-input';
+import { namespaced } from './helpers/error-namespace';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {
@@ -181,8 +182,8 @@ const firstDayOfWeek = computed(() => currentLocale.value.options?.weekStartsOn 
 // a typed date or time that cannot be read leaves the value as it is and reports an error until it is corrected
 const dateInvalid = ref(false);
 const timeInvalid = ref(false);
-const invalidDateError = new ValidationError('invalid_date', {}, 'Not a valid date.', 'application');
-const invalidTimeError = new ValidationError('invalid_time', {}, 'Not a valid time.', 'application');
+const invalidDateError = new ValidationError(namespaced('invalid_date'), {}, 'Not a valid date.', 'application');
+const invalidTimeError = new ValidationError(namespaced('invalid_time'), {}, 'Not a valid time.', 'application');
 const inputErrors = () => [
   ...(dateInvalid.value ? [invalidDateError] : []),
   ...(timeInvalid.value ? [invalidTimeError] : []),
@@ -418,8 +419,8 @@ watch([dateDisplay, timeDisplay], showValue, { immediate: true });
 
 watch([dateInvalid, timeInvalid], ([date, time]) => {
   if (!props.control) return;
-  setInputError(props.control, 'invalid_date', date ? invalidDateError : null);
-  setInputError(props.control, 'invalid_time', time ? invalidTimeError : null);
+  setInputError(props.control, invalidDateError.code, date ? invalidDateError : null);
+  setInputError(props.control, invalidTimeError.code, time ? invalidTimeError : null);
 });
 
 function clearFromText() {

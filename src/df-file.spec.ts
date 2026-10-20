@@ -197,7 +197,7 @@ describe('DfFile', () => {
     await pickFile(wrapper, pdfFile());
     await vi.advanceTimersByTimeAsync(1_000);
     await wrapper.vm.$nextTick();
-    expect(control.errors.map((error) => error.code)).toEqual(['file_gone']);
+    expect(control.errors.map((error) => error.code)).toEqual(['vuetify-inputs.file_gone']);
 
     comms.touch = vi.fn(async () => undefined);
     await pickFile(wrapper, pdfFile());
