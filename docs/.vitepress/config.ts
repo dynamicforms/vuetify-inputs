@@ -4,7 +4,7 @@ import { crosslinksConfig } from 'vitepress-plugin-crosslinks';
 
 export default defineConfig({
   title: 'DynamicForms Vuetify Inputs',
-  description: 'Vuetify 3 input components for Vue 3 forms: text, select, date/time, file, image, rich-text, checkbox and colour fields, bound to vue-forms or v-model.',
+  description: 'Vuetify 3 fields that share one layout, so text fields, selects, checkboxes and date pickers align. Density and variant are set per app, section or field.',
   srcExclude: ['readme.md'],
   transformHead({ pageData, siteConfig }) {
     const path = pageData.relativePath.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '.html');

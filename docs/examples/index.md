@@ -1,5 +1,5 @@
 ---
-description: 'API reference with live examples for each input: text, select, date/time, file, image, rich-text, checkbox, colour and action buttons.'
+description: 'Live examples of every input, from text and select to date/time, file, rich text and actions, each on the same shared layout.'
 ---
 
 # Examples
