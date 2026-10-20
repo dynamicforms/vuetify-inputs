@@ -1,3 +1,7 @@
+---
+description: 'Live examples of every input, from text and select to date/time, file, rich text and actions, each on the same shared layout.'
+---
+
 # Examples
 
 Examples of the components of `@dynamicforms/vuetify-inputs`. Each page has a live demo and its code.
