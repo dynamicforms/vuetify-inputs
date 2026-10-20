@@ -1,3 +1,7 @@
+---
+description: 'API reference with live examples for each input: text, select, date/time, file, image, rich-text, checkbox, colour and action buttons.'
+---
+
 # Examples
 
 Examples of the components of `@dynamicforms/vuetify-inputs`. Each page has a live demo and its code.

@@ -1,4 +1,6 @@
 ---
+title: 'Vuetify 3 Form Inputs for Vue 3'
+description: 'Vuetify 3 input fields with one density and variant system and an inline mode for table cells, bound to @dynamicforms/vue-forms fields or to v-model.'
 layout: home
 hero:
   name: DynamicForms Vuetify Inputs

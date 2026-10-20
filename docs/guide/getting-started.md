@@ -1,3 +1,7 @@
+---
+description: 'Install @dynamicforms/vuetify-inputs, register the Vuetify plugin and render vue-forms fields or v-model values with df-input, df-select and the rest.'
+---
+
 # Getting Started
 
 ## Installation

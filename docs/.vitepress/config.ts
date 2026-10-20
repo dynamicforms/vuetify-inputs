@@ -4,7 +4,12 @@ import { crosslinksConfig } from 'vitepress-plugin-crosslinks';
 
 export default defineConfig({
   title: 'DynamicForms Vuetify Inputs',
-  description: 'A collection of base input fields supporting @dynamicforms/vue-forms',
+  description: 'Vuetify 3 input components for Vue 3 forms: text, select, date/time, file, image, rich-text, checkbox and colour fields, bound to vue-forms or v-model.',
+  srcExclude: ['readme.md'],
+  transformHead({ pageData, siteConfig }) {
+    const path = pageData.relativePath.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '.html');
+    return [['link', { rel: 'canonical', href: `https://docs.velis.si${siteConfig.site.base}${path}` }]];
+  },
   markdown: {
     config: crosslinksConfig({
       projects: {
