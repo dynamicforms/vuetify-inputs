@@ -14,7 +14,7 @@
 - Vuetify's color picker in a menu
 - Hex color input
 - A swatch of the current color
-- Built-in hex format check for the uncontrolled (v-model) case, reported as an `vuetify-inputs.invalid_hex_color` error
+- Built-in hex format check for the uncontrolled (v-model) case, reported as a `vuetify-inputs.invalid_hex_color` error
 - Clearing the value under `allowNull`
 
 ## Picking a value
