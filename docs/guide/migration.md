@@ -8,6 +8,38 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.15.0 (from v0.14.x)
+
+0.15.0 prefixes every error code the library raises with its namespace. It requires `@dynamicforms/vue-forms`
+3.0.0-alpha.3, whose codes are prefixed in the same way. There is a [checklist](#checklist-for-0-15-0) at the end of
+this section.
+
+### Error codes carry a namespace
+
+An error code is `<namespace>.<code>`. The codes this library raises are in the namespace `vuetify-inputs`, exported
+as `ERROR_NAMESPACE`:
+
+| 0.14 | 0.15 |
+|------|------|
+| `invalid_hex_color` | `vuetify-inputs.invalid_hex_color` |
+| `invalid_date` | `vuetify-inputs.invalid_date` |
+| `invalid_time` | `vuetify-inputs.invalid_time` |
+| `file_gone` | `vuetify-inputs.file_gone` |
+
+vue-forms 3.0.0-alpha.3 renames its codes the same way, from `required` to `vue-forms.required` and so on; its
+migration guide lists them. Code comparing `error.code` with an old code keeps compiling and stops matching. An
+`errorText` setting that looks the code up as a translation key maps each namespace to a key prefix
+([Translating errors](/examples/localisation#translating-errors)). An empty code is unchanged: an error without a
+code renders as its `detail`.
+
+### Checklist for 0.15.0
+
+1. Install `@dynamicforms/vue-forms` 3.0.0-alpha.3.
+2. Replace every comparison with an old error code by the new one.
+3. Map the namespaces `vue-forms` and `vuetify-inputs` to translation key prefixes in `errorText`, through the
+   `ERROR_NAMESPACE` constants of the two packages.
+4. Prefix the application's own error codes with a namespace of its own.
+
 ## Upgrading to v0.14.0 (from v0.13.x)
 
 0.14.0 removes the ready-made actions. There is a [checklist](#checklist-for-0-14-0) at the end of this section.

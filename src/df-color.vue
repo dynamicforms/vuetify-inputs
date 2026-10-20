@@ -51,6 +51,7 @@ import { DfColorProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 import { useClientRendered } from './helpers/client-rendered';
 import ConfirmActions from './helpers/confirm-actions.vue';
+import { namespaced } from './helpers/error-namespace';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 
 const props = withDefaults(defineProps<DfColorProps>(), { ...defaultBaseProps, allowNull: false });
@@ -66,7 +67,7 @@ function hexColorErrors(): ValidationError[] {
   const val = value.value;
   if (!val && props.allowNull) return [];
   if (hexColor.test(val ?? '')) return [];
-  return [new ValidationError('invalid_hex_color', {}, 'Not a valid hex string.', 'validator')];
+  return [new ValidationError(namespaced('invalid_hex_color'), {}, 'Not a valid hex string.', 'validator')];
 }
 
 const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(

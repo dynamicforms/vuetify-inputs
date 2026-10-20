@@ -247,7 +247,7 @@ describe('input-base', () => {
     describe('errors', () => {
       it('returns control.errors when control is provided', () => {
         const control = new Form.Field({ value: '' });
-        control.errors = [new ValidationError('required', {}, 'Required field')];
+        control.errors = [new ValidationError('vue-forms.required', {}, 'Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -282,7 +282,7 @@ describe('input-base', () => {
 
       it('shownErrors holds an error back until the control is touched', async () => {
         const control = new Form.Field({ value: '' });
-        control.errors = [new ValidationError('required', {}, 'Required field')];
+        control.errors = [new ValidationError('vue-forms.required', {}, 'Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
 
@@ -320,7 +320,7 @@ describe('input-base', () => {
 
       it('anyErrors returns space when touched and has errors', async () => {
         const control = new Form.Field({ value: '' });
-        control.errors = [new ValidationError('required', {}, 'Required field')];
+        control.errors = [new ValidationError('vue-forms.required', {}, 'Required field')];
         const props: BaseProps = { control };
         const emit = vi.fn();
 

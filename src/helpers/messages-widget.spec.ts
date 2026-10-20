@@ -146,9 +146,12 @@ describe('MessagesWidget', () => {
 
   it('renders what the errorText setting answers, and the default where it answers undefined', () => {
     const settings: VuetifyInputsSettings = {
-      errorText: (error) => (error.code === 'required' ? new MdString('**Required**') : undefined),
+      errorText: (error) => (error.code === 'vue-forms.required' ? new MdString('**Required**') : undefined),
     };
-    const message = [new ValidationError('required', {}, 'x'), new ValidationError('other', {}, 'Other detail')];
+    const message = [
+      new ValidationError('vue-forms.required', {}, 'x'),
+      new ValidationError('other', {}, 'Other detail'),
+    ];
 
     const wrapper = buildWrapper({ message }, settings);
 

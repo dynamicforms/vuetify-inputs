@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] - 2026-10-20
+
+### Added
+
+- `ERROR_NAMESPACE`, exported from the package root: `'vuetify-inputs'`, the namespace of every error code the
+  library raises.
+
+### Changed
+
+- Every error code the library raises is `<namespace>.<code>` in the namespace `vuetify-inputs`:
+
+  | 0.14.2 | 0.15.0 |
+  |--------|--------|
+  | `invalid_hex_color` | `vuetify-inputs.invalid_hex_color` |
+  | `invalid_date` | `vuetify-inputs.invalid_date` |
+  | `invalid_time` | `vuetify-inputs.invalid_time` |
+  | `file_gone` | `vuetify-inputs.file_gone` |
+
+  An empty code still means an error whose `detail` is text in the user's language. A code the application gives an
+  error is used as given.
+- Requires `@dynamicforms/vue-forms` 3.0.0-alpha.3, whose error codes carry the namespace `vue-forms`
+  (`peerDependencies` `^3.0.0-alpha.3`).
+
 ## [0.14.2] - 2026-10-15
 
 ### Added

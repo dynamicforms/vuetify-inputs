@@ -50,7 +50,7 @@ describe('DfColor', () => {
   it('renders the error through the errorText setting by its code', async () => {
     const wrapper = mountColor(
       { modelValue: 'red' },
-      { errorText: (error) => (error.code === 'invalid_hex_color' ? 'Neveljavna barva' : undefined) },
+      { errorText: (error) => (error.code === 'vuetify-inputs.invalid_hex_color' ? 'Neveljavna barva' : undefined) },
     );
     await touch(wrapper);
 

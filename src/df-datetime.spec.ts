@@ -185,7 +185,7 @@ describe('DfDateTime', () => {
       await flushPromises();
       expect(control.value).toBe('2026-01-15');
       expect((input.element as HTMLInputElement).value).toBe('131');
-      expect(control.errors.map((error) => error.code)).toEqual(['invalid_date']);
+      expect(control.errors.map((error) => error.code)).toEqual(['vuetify-inputs.invalid_date']);
       expect(control.valid).toBe(false);
 
       await input.setValue('1301');
@@ -203,7 +203,7 @@ describe('DfDateTime', () => {
       await input.setValue('99:99');
       await input.trigger('blur');
       await flushPromises();
-      expect(control.errors.map((error) => error.code)).toEqual(['invalid_time']);
+      expect(control.errors.map((error) => error.code)).toEqual(['vuetify-inputs.invalid_time']);
 
       await input.setValue('10');
       await input.trigger('blur');

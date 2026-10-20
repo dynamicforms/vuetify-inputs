@@ -89,7 +89,7 @@ const validatedForm = new Group({
     validators: [
       new Validators.Required(),
       new Validators.Pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
-        code: 'invalid_email',
+        code: 'app.invalid_email',
         detail: 'Please enter a valid email address',
       }),
     ],

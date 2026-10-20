@@ -77,7 +77,7 @@ const email = new Field<string>({
   validators: [
     new Validators.Required(),
     new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
-      code: 'invalid_email',
+      code: 'app.invalid_email',
       detail: 'An address of the form name@example.com, please',
     }),
   ],
@@ -106,7 +106,7 @@ credentials.registerAction(
   new Validators.Validator(() => {
     const { password, confirmation } = credentials.fields;
     if (!confirmation.value || password.value === confirmation.value) return null;
-    return [new ValidationError('passwords_differ', {}, 'The two entries do not match')];
+    return [new ValidationError('app.passwords_differ', {}, 'The two entries do not match')];
   }),
 );
 </script>

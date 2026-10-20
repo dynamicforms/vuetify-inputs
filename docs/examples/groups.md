@@ -82,7 +82,7 @@ form.registerAction(new Validators.Validator(() => {
   if (total <= budgetLimit) return null;
   const over = total - budgetLimit;
   return [
-    new ValidationError('over_budget', { total, over }, `The trip totals ${total} €, which is ${over} € over the budget.`),
+    new ValidationError('app.over_budget', { total, over }, `The trip totals ${total} €, which is ${over} € over the budget.`),
   ];
 }));
 
@@ -157,7 +157,7 @@ touched.
 renders `message`, so a form within the budget shows nothing. An error renders as the content the
 [`errorText` setting](/examples/localisation#translating-errors) returns for it, which may be plain text, an `MdString`
 for markdown or a component definition, and otherwise as its `detail`. The budget error carries `total` and `over` in
-its `params`; the docs' `errorText` renders `over_budget` from them, as markdown while the
+its `params`; the docs' `errorText` renders `app.over_budget` from them, as markdown while the
 [validation and i18n demo](/examples/validators)'s markdown setting is on.
 
 ## Writing a group-level validator
@@ -171,7 +171,7 @@ reads the fields it needs through `group.fields`:
 form.registerAction(new Validators.Validator((newValue, oldValue, group) => {
   const { password, confirmation } = group.fields;
   if (!confirmation.value || password.value === confirmation.value) return null;
-  return [new ValidationError('passwords_differ', {}, 'The two passwords do not match')];
+  return [new ValidationError('app.passwords_differ', {}, 'The two passwords do not match')];
 }));
 ```
 

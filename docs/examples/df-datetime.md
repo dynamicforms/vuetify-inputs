@@ -99,8 +99,9 @@ to 49 years after the current one, the year date-fns `parse()` reads for `yy`. A
 ### Text that is not read
 
 Text that is not read stays in the field and the value is left as it is. The field holds an error of code
-`invalid_date` or `invalid_time` with origin `'application'` until its text is read or the value changes: a bound
-`control` holds the error in its `errors` and is invalid, and a field without a `control` shows it.
+`vuetify-inputs.invalid_date` or `vuetify-inputs.invalid_time` with origin `'application'` until its text is read
+or the value changes: a bound `control` holds the error in its `errors` and is invalid, and a field without a
+`control` shows it.
 
 ## Props
 

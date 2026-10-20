@@ -14,7 +14,7 @@
 - Vuetify's color picker in a menu
 - Hex color input
 - A swatch of the current color
-- Built-in hex format check for the uncontrolled (v-model) case, reported as an `invalid_hex_color` error
+- Built-in hex format check for the uncontrolled (v-model) case, reported as a `vuetify-inputs.invalid_hex_color` error
 - Clearing the value under `allowNull`
 
 ## Picking a value
@@ -50,9 +50,9 @@ alpha channel (e.g., `#FF0000FF`).
 
 Without a `control`, the component checks the format of the value itself. It accepts a string of 3, 4, 6 or 8
 hexadecimal digits with an optional leading `#`: `#f00`, `f00`, `#ff0000`, `#ff0000ff` and `ff0000ff` all pass. An
-empty value passes only when `allowNull` is set. Any other value gets an error of code `invalid_hex_color` with the
-detail `Not a valid hex string.`, shown once the field is touched and rendered like any other error
-(see [Translating errors](/examples/localisation#translating-errors)).
+empty value passes only when `allowNull` is set. Any other value gets an error of code
+`vuetify-inputs.invalid_hex_color` with the detail `Not a valid hex string.`, shown once the field is touched and
+rendered like any other error (see [Translating errors](/examples/localisation#translating-errors)).
 
 With a bound `control`, the component does not check the value; the field's validators do:
 
@@ -62,7 +62,7 @@ const colorField = new Field({
   validators: [
     new Validators.Validator((value) => {
       if (value && !value.startsWith('#')) {
-        return [new ValidationError('hash_prefix', {}, 'Color must start with #')];
+        return [new ValidationError('app.hash_prefix', {}, 'Color must start with #')];
       }
       return null; // Return null for valid values
     })
@@ -100,7 +100,7 @@ const colorField = new Field({
     new Validators.Validator((value) => {
       if (!value) return null;
       if (!brandColors.includes(value)) {
-        return [new ValidationError('not_brand_color', { allowedValues: brandColors }, 'Please select a color from the brand palette')];
+        return [new ValidationError('app.not_brand_color', { allowedValues: brandColors }, 'Please select a color from the brand palette')];
       }
       return null;
     })

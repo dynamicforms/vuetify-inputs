@@ -22,18 +22,23 @@ The docs install the plugin with `app.use(DynamicFormsInputs, { errorText })`, w
 
 <<< @/components/demo-error-text.ts
 
-The messages, in `demo-error-messages.json`, hold each code's message and, for some codes, a markdown variant under
-the code with `Md` appended:
+The messages, in `demo-error-messages.json`, are grouped in blocks per error namespace: `vue-forms` for vue-forms'
+codes, `vuetify-inputs` for this library's and `app` for the docs' own. A block holds each code's message and, for
+some codes, a markdown variant under the code with `Md` appended:
 
 ```json
 {
   "sl": {
     "errors": {
-      "required": "Prosimo, vnesite vrednost",
-      "value_in_range": "Vrednost mora biti med {minValue} in {maxValue}",
-      "value_in_rangeMd": "Vrednost mora biti med **{minValue}** in **{maxValue}**",
-      "invalid_email": "Vnesite veljaven e-poštni naslov",
-      "invalid_emailMd": "Vnesite veljaven **e-poštni naslov**"
+      "vue-forms": {
+        "required": "Prosimo, vnesite vrednost",
+        "value_in_range": "Vrednost mora biti med {minValue} in {maxValue}",
+        "value_in_rangeMd": "Vrednost mora biti med **{minValue}** in **{maxValue}**"
+      },
+      "app": {
+        "invalid_email": "Vnesite veljaven e-poštni naslov",
+        "invalid_emailMd": "Vnesite veljaven **e-poštni naslov**"
+      }
     },
     "roles": { "admin": "Skrbnik", "user": "Uporabnik", "guest": "Gost" }
   }
@@ -43,12 +48,15 @@ the code with `Md` appended:
 ## Errors in This Demo
 
 Every error has a `code`, `params` and an English `detail`. The validators built without options carry the
-validator's own code (`required`, `value_in_range`, …); the email pattern is given `{ code: 'invalid_email', detail }`.
+validator's own code (`vue-forms.required`, `vue-forms.value_in_range`, …); the email pattern is given
+`{ code: 'app.invalid_email', detail }`.
 
-- **Messages.** `errorText` looks the code up in the current language and substitutes the params with `interpolate`
-  from `@dynamicforms/translatable`. A code the language has no message for renders as the error's `detail`.
+- **Messages.** `errorText` splits the code at its last `.` into namespace and code, finds the namespace's block
+  (`messageBlocks` maps vue-forms' and this library's `ERROR_NAMESPACE` and the docs' namespace `app`), looks the code
+  up there in the current language and substitutes the params with `interpolate` from `@dynamicforms/translatable`.
+  A code the language has no message for, or one of a namespace without a block, renders as the error's `detail`.
 - **Markdown.** With the checkbox on, `errorText` returns the code's `Md` variant as an `MdString`. A code without
-  one, such as `required`, renders as plain text.
+  one, such as `vue-forms.required`, renders as plain text.
 - **Numbers.** `formatParams` formats the params before they are substituted, so Persian and Bengali show the age
   range in their own digits.
 - **Role names.** A role is stored as its code. The error's params carry the codes in `allowedValues`, and
