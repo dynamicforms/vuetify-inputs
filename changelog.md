@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.1] - 2026-10-21
+
+### Added
+
+- `df-color` prop `alpha` (default `true`). `false` runs the picker in `hex` mode without the alpha slider and the alpha
+  modes, and the component's format check accepts only `#rgb` and `#rrggbb`; any other value gets an error of code
+  `vuetify-inputs.invalid_opaque_hex_color`.
+- `df-color` prop `normalize: (value: string) => string`, applied to a valid color: the swatch, the color confirmed in
+  the picker, a typed color when the field loses focus or Enter is pressed, and `preview` events carry the normalized
+  color. The picker's own model keeps the color as picked.
+- `df-color` event `preview: string | null`: the pending color while the picker is open, emitted when it opens and on
+  every change in the picker; `null` when it closes.
+- `df-color` hexagon palette, selected with `picker: 'hexagon'` (default `'generic'`, Vuetify's color picker): cells
+  of OKLCH colors around a grey centre, the outer ring at the largest chroma each hue has inside sRGB. Props
+  `hexagonRings` (default 5, 61 cells) and `lightnessLevels` (default `[0.45, 0.6, 0.75]`, with a level selector for
+  more than one level). Library strings `ColorPalette` and `Lightness`.
+
+### Fixed
+
+- `df-color` picker menu is as wide as the picker instead of the field, with the actions under the picker.
+
 ## [0.15.0] - 2026-10-20
 
 ### Added

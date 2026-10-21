@@ -23,6 +23,8 @@ translation function reads, such as the locale.
 |-----|-----------------|-------------------|
 | `Cancel` | `Cancel` | The Cancel button of `<df-date-time>`'s and `<df-color>`'s pickers |
 | `Ok` | `OK` | The OK button of `<df-date-time>`'s and `<df-color>`'s pickers |
+| `ColorPalette` | `Color palette` | `<df-color picker="hexagon">`, the accessible label of the palette |
+| `Lightness` | `Lightness {level}` | `<df-color picker="hexagon">`, the accessible label of a lightness level button; `level` counts from 1 |
 | `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, "no heading" entry |
 | `Heading1`–`Heading6` | `Heading 1`–`Heading 6` | `<df-rtf-editor>` heading dropdown entries |
 | `Undo` / `Redo` | `Undo` / `Redo` | `<df-rtf-editor>` toolbar button tooltips |
@@ -208,7 +210,8 @@ The errors this library raises itself:
 
 | Code | Params | English `detail` | Raised by |
 |------|--------|------------------|-----------|
-| `vuetify-inputs.invalid_hex_color` | none | `Not a valid hex string.` | `<df-color>` without a `control`, for a value that is not 3, 4, 6 or 8 hex digits with an optional leading `#`, or an empty value without `allowNull` |
+| `vuetify-inputs.invalid_hex_color` | none | `Not a valid hex string.` | `<df-color>` without a `control` and with `alpha` (the default), for a value that is not 3, 4, 6 or 8 hex digits with an optional leading `#`, or an empty value without `allowNull` |
+| `vuetify-inputs.invalid_opaque_hex_color` | none | `Not a valid hex string without alpha.` | `<df-color>` without a `control` and with `alpha: false`, for a value that is not 3 or 6 hex digits with an optional leading `#`, or an empty value without `allowNull` |
 | `vuetify-inputs.invalid_date` | none | `Not a valid date.` | `<df-date-time>`, for typed text it cannot read as a date; its origin is `'application'` |
 | `vuetify-inputs.invalid_time` | none | `Not a valid time.` | `<df-date-time>`, for typed text it cannot read as a time; its origin is `'application'` |
 | `vuetify-inputs.file_gone` | none | the server's `errorText` | `<df-file>` and `<df-image>`, when the server reports the uploaded file as gone; its origin is `'server'` |
