@@ -11,7 +11,8 @@
         "length_in_rangeMd": "Length must be between **{minLength}** and **{maxLength}**"
       },
       "vuetify-inputs": {
-        "invalid_hex_color": "Not a valid hex string."
+        "invalid_hex_color": "Not a valid hex string.",
+        "invalid_opaque_hex_color": "Not a valid hex string without alpha."
       },
       "app": {
         "invalid_email": "Please enter a valid email address",
@@ -40,7 +41,8 @@
         "length_in_rangeMd": "Dolžina mora biti med **{minLength}** in **{maxLength}**"
       },
       "vuetify-inputs": {
-        "invalid_hex_color": "Ni veljaven šestnajstiški niz."
+        "invalid_hex_color": "Ni veljaven šestnajstiški niz.",
+        "invalid_opaque_hex_color": "Ni veljaven šestnajstiški niz brez prosojnosti."
       },
       "app": {
         "invalid_email": "Vnesite veljaven e-poštni naslov",
@@ -69,7 +71,8 @@
         "length_in_rangeMd": "Die Länge muss zwischen **{minLength}** und **{maxLength}** liegen"
       },
       "vuetify-inputs": {
-        "invalid_hex_color": "Keine gültige Hex-Zeichenfolge."
+        "invalid_hex_color": "Keine gültige Hex-Zeichenfolge.",
+        "invalid_opaque_hex_color": "Keine gültige Hex-Zeichenfolge ohne Alphakanal."
       },
       "app": {
         "invalid_email": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
@@ -98,7 +101,8 @@
         "length_in_rangeMd": "La longitud debe estar entre **{minLength}** y **{maxLength}**"
       },
       "vuetify-inputs": {
-        "invalid_hex_color": "No es una cadena hexadecimal válida."
+        "invalid_hex_color": "No es una cadena hexadecimal válida.",
+        "invalid_opaque_hex_color": "No es una cadena hexadecimal válida sin canal alfa."
       },
       "app": {
         "invalid_email": "Introduzca una dirección de correo válida",
@@ -127,7 +131,8 @@
         "length_in_rangeMd": "長さは **{minLength}** から **{maxLength}** の間でなければなりません"
       },
       "vuetify-inputs": {
-        "invalid_hex_color": "有効な16進文字列ではありません。"
+        "invalid_hex_color": "有効な16進文字列ではありません。",
+        "invalid_opaque_hex_color": "アルファなしの有効な16進文字列ではありません。"
       },
       "app": {
         "invalid_email": "有効なメールアドレスを入力してください",
@@ -156,7 +161,8 @@
         "length_in_rangeMd": "长度必须介于 **{minLength}** 和 **{maxLength}** 之间"
       },
       "vuetify-inputs": {
-        "invalid_hex_color": "不是有效的十六进制字符串。"
+        "invalid_hex_color": "不是有效的十六进制字符串。",
+        "invalid_opaque_hex_color": "不是有效的无透明度十六进制字符串。"
       },
       "app": {
         "invalid_email": "请输入有效的电子邮件地址",
@@ -185,7 +191,8 @@
         "length_in_rangeMd": "طول باید بین **{minLength}** و **{maxLength}** باشد"
       },
       "vuetify-inputs": {
-        "invalid_hex_color": "رشتهٔ هگز معتبری نیست."
+        "invalid_hex_color": "رشتهٔ هگز معتبری نیست.",
+        "invalid_opaque_hex_color": "رشتهٔ هگز معتبر بدون آلفا نیست."
       },
       "app": {
         "invalid_email": "لطفاً یک نشانی ایمیل معتبر وارد کنید",
@@ -214,7 +221,8 @@
         "length_in_rangeMd": "দৈর্ঘ্য **{minLength}** থেকে **{maxLength}** এর মধ্যে হতে হবে"
       },
       "vuetify-inputs": {
-        "invalid_hex_color": "বৈধ হেক্স স্ট্রিং নয়।"
+        "invalid_hex_color": "বৈধ হেক্স স্ট্রিং নয়।",
+        "invalid_opaque_hex_color": "আলফা ছাড়া বৈধ হেক্স স্ট্রিং নয়।"
       },
       "app": {
         "invalid_email": "একটি বৈধ ইমেল ঠিকানা লিখুন",

@@ -34,6 +34,23 @@ export interface DfCheckboxProps extends BaseProps {
 
 export interface DfColorProps extends BaseProps {
   allowNull?: boolean;
+  /** Whether the color has an alpha channel. `false` runs the picker in `hex` mode without the alpha slider and
+   *  accepts only `#rgb` and `#rrggbb`. Default `true`. */
+  alpha?: boolean;
+  /** Maps a valid color to the value the component writes and shows in its swatch and `preview` events. The picker
+   *  itself works on the unmapped color. */
+  normalize?: (value: string) => string;
+  /** The picker in the menu: `'generic'`, Vuetify's color picker, or `'hexagon'`, a palette of hexagon cells.
+   *  Default `'generic'`. */
+  picker?: 'generic' | 'hexagon';
+  /** The number of rings of the hexagon palette, the centre cell counted as the first: `1 + 3·n·(n − 1)` cells.
+   *  Default 5 (61 cells). */
+  hexagonRings?: number;
+  /** The OKLCH lightness (0..1) of the hexagon palette's cells. `undefined` (default): any lightness from 0 to 1,
+   *  chosen with a slider. An integer `n` ≥ 2: `n` levels evenly spaced from 0 to 1, both included; `1`: the single
+   *  level 0.5. An array: those levels. A number that is not an integer of at least 1, and an empty array, give the
+   *  full range. */
+  lightnessLevels?: number | number[];
 }
 
 export interface DfDateTimeProps extends BaseProps {

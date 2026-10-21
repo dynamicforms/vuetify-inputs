@@ -1,10 +1,12 @@
 import { Field } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
+import { hexagonCells } from './helpers/hexagon-palette';
+import HexagonPalette from './helpers/hexagon-palette.vue';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './helpers/settings';
 import { translateStrings } from './helpers/translations';
 
@@ -57,6 +59,62 @@ describe('DfColor', () => {
     expect(wrapper.text()).toContain('Neveljavna barva');
   });
 
+  describe('without alpha', () => {
+    it.each(['#f00', 'f00', '#ff0000', 'ff0000'])('accepts %s', async (modelValue) => {
+      const wrapper = mountColor({ modelValue, alpha: false });
+      await touch(wrapper);
+
+      expect(wrapper.text()).not.toContain('Not a valid hex string');
+    });
+
+    it.each(['#f00f', '#ff0000ff', 'red'])('reports an invalid_opaque_hex_color error for %s', async (modelValue) => {
+      const wrapper = mountColor(
+        { modelValue, alpha: false },
+        {
+          errorText: (error) =>
+            error.code === 'vuetify-inputs.invalid_opaque_hex_color' ? 'Brez prosojnosti' : undefined,
+        },
+      );
+      await touch(wrapper);
+
+      expect(wrapper.text()).toContain('Brez prosojnosti');
+    });
+  });
+
+  describe('normalize', () => {
+    const upper = (value: string) => value.toUpperCase();
+
+    it('shows the normalized color in the swatch', () => {
+      const wrapper = mountColor({ modelValue: '#abcdef', normalize: upper });
+
+      expect(wrapper.find('.v-field__prepend-inner div').attributes('style')).toContain('rgb(171, 205, 239)');
+      expect(wrapper.find('input').element.value).toBe('#abcdef');
+    });
+
+    it('writes a typed valid color normalized when the field loses focus', async () => {
+      const control = new Field<string>({ value: '#000' });
+      const wrapper = mountColor({ control, normalize: upper });
+
+      await wrapper.find('input').setValue('#abcdef');
+      expect(control.value).toBe('#abcdef');
+
+      await touch(wrapper);
+      expect(control.value).toBe('#ABCDEF');
+    });
+
+    it('leaves a typed invalid value as typed', async () => {
+      const normalize = vi.fn(upper);
+      const control = new Field<string>({ value: '#000' });
+      const wrapper = mountColor({ control, normalize });
+
+      await wrapper.find('input').setValue('red');
+      await touch(wrapper);
+
+      expect(control.value).toBe('red');
+      expect(normalize).not.toHaveBeenCalledWith('red');
+    });
+  });
+
   it('leaves the check to the validators of a bound control', async () => {
     const wrapper = mountColor({ control: new Field({ value: 'red' }) });
     await touch(wrapper);
@@ -67,14 +125,14 @@ describe('DfColor', () => {
   describe('the picker', () => {
     // jsdom has no canvas: the stub stands in for the picker, with an element of the canvas's class
     const ColorPickerStub = {
-      props: ['modelValue'],
+      props: ['modelValue', 'mode', 'modes', 'elevation'],
       emits: ['update:modelValue'],
       template: '<div class="color-picker-stub"><div class="v-color-picker-canvas" /></div>',
     };
 
-    async function openPicker(control: Field<string>) {
+    async function openPicker(control: Field<string>, props: Record<string, any> = {}) {
       const wrapper = mount(DfColor, {
-        props: { control },
+        props: { control, ...props },
         global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
         attachTo: document.body,
       });
@@ -136,6 +194,308 @@ describe('DfColor', () => {
       expect(control.value).toBe('#00ff00');
       expect(control.touched).toBe(true);
       wrapper.unmount();
+    });
+    it('sizes the menu to the picker, not to the field', async () => {
+      const wrapper = await openPicker(new Field<string>({ value: '#f00' }));
+
+      expect(Number(wrapper.findComponent({ name: 'VMenu' }).props('minWidth'))).toBe(0);
+      expect(Number(wrapper.findComponent(ColorPickerStub).props('elevation'))).toBe(0);
+      wrapper.unmount();
+    });
+
+    it('runs the picker in hexa mode with all its modes by default', async () => {
+      const wrapper = await openPicker(new Field<string>({ value: '#f00' }));
+      const picker = wrapper.findComponent(ColorPickerStub);
+
+      expect(picker.props('mode')).toBe('hexa');
+      expect(picker.props('modes')).toBeUndefined();
+      wrapper.unmount();
+    });
+
+    it('runs the picker in hex mode without alpha modes under alpha: false', async () => {
+      const wrapper = await openPicker(new Field<string>({ value: '#f00' }), { alpha: false });
+      const picker = wrapper.findComponent(ColorPickerStub);
+
+      expect(picker.props('mode')).toBe('hex');
+      expect(picker.props('modes')).toEqual(['hex', 'rgb', 'hsl']);
+      wrapper.unmount();
+    });
+
+    it('keeps the raw color in the picker and writes it normalized on OK', async () => {
+      const control = new Field<string>({ value: '#ff0000' });
+      const wrapper = await openPicker(control, { normalize: (value: string) => value.toUpperCase() });
+      const picker = wrapper.findComponent(ColorPickerStub);
+
+      picker.vm.$emit('update:modelValue', '#00ffaa');
+      await flushPromises();
+      expect(picker.props('modelValue')).toBe('#00ffaa');
+
+      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
+      await ok!.trigger('click');
+
+      expect(control.value).toBe('#00FFAA');
+      wrapper.unmount();
+    });
+
+    it('emits the pending color as preview on opening and on every change, and null on closing', async () => {
+      const control = new Field<string>({ value: '#ff0000' });
+      const wrapper = await openPicker(control, { normalize: (value: string) => value.toUpperCase() });
+      expect(wrapper.emitted('preview')).toEqual([['#FF0000']]);
+
+      wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ffaa');
+      await flushPromises();
+      expect(wrapper.emitted('preview')!.at(-1)).toEqual(['#00FFAA']);
+
+      const cancel = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'Cancel');
+      await cancel!.trigger('click');
+      await flushPromises();
+
+      expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
+      expect(control.value).toBe('#ff0000');
+      wrapper.unmount();
+    });
+
+    it('emits a null preview when OK closes the picker', async () => {
+      const wrapper = await openPicker(new Field<string>({ value: '#ff0000' }));
+
+      wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ffaa');
+      await flushPromises();
+      expect(wrapper.emitted('preview')!.at(-1)).toEqual(['#00ffaa']);
+      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
+      await ok!.trigger('click');
+      await flushPromises();
+
+      expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
+      wrapper.unmount();
+    });
+
+    it('emits a null preview when the menu closes by a click outside', async () => {
+      const wrapper = await openPicker(new Field<string>({ value: '#ff0000' }));
+
+      await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', false);
+      await flushPromises();
+
+      expect(wrapper.emitted('preview')).toEqual([['#ff0000'], [null]]);
+      wrapper.unmount();
+    });
+    describe('hexagon', () => {
+      const hexagon = { picker: 'hexagon' };
+      const palette = (wrapper: Awaited<ReturnType<typeof openPicker>>) => wrapper.findComponent(HexagonPalette);
+      const cellsOf = (wrapper: Awaited<ReturnType<typeof openPicker>>) => palette(wrapper).findAll('.df-hexagon-cell');
+      const okButton = (wrapper: Awaited<ReturnType<typeof openPicker>>) =>
+        wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK')!;
+
+      it('replaces the generic picker with the hexagon palette', async () => {
+        const wrapper = await openPicker(new Field<string>({ value: '#f00' }), hexagon);
+
+        expect(wrapper.findComponent(ColorPickerStub).exists()).toBe(false);
+        expect(cellsOf(wrapper)).toHaveLength(61);
+        wrapper.unmount();
+      });
+
+      it('lays out hexagonRings rings', async () => {
+        const wrapper = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, hexagonRings: 3 });
+
+        expect(cellsOf(wrapper)).toHaveLength(19);
+        wrapper.unmount();
+      });
+
+      const levels = (wrapper: Awaited<ReturnType<typeof openPicker>>) => ({
+        slider: palette(wrapper).findComponent({ name: 'VSlider' }).exists(),
+        toggle: palette(wrapper).find('.df-hexagon-palette__levels').exists(),
+        bar: palette(wrapper).find('.df-hexagon-palette__segments').exists(),
+      });
+
+      it('offers the full range with a slider without lightnessLevels', async () => {
+        const wrapper = await openPicker(new Field<string>({ value: '#f00' }), hexagon);
+
+        expect(levels(wrapper)).toEqual({ slider: true, toggle: false, bar: false });
+        wrapper.unmount();
+      });
+
+      it('offers fewer than 16 levels with level buttons and no selector for one level', async () => {
+        const three = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, lightnessLevels: 3 });
+        const array = await openPicker(new Field<string>({ value: '#f00' }), {
+          ...hexagon,
+          lightnessLevels: [0.3, 0.7],
+        });
+        const one = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, lightnessLevels: 1 });
+
+        expect(levels(three)).toEqual({ slider: false, toggle: true, bar: false });
+        expect(palette(three).findAll('.df-hexagon-palette__level')).toHaveLength(3);
+        expect(palette(three).find('.df-hexagon-palette__level').attributes('aria-label')).toBe('Lightness 1');
+        expect(levels(array)).toEqual({ slider: false, toggle: true, bar: false });
+        expect(levels(one)).toEqual({ slider: false, toggle: false, bar: false });
+        [three, array, one].forEach((wrapper) => wrapper.unmount());
+      });
+
+      it('lays out the level buttons as a grid of one column per level', async () => {
+        const wrapper = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, lightnessLevels: 15 });
+        const grid = palette(wrapper).find('.df-hexagon-palette__levels');
+
+        expect(grid.attributes('role')).toBe('radiogroup');
+        expect((grid.element as HTMLElement).style.getPropertyValue('--df-level-count')).toBe('15');
+        expect(grid.findAll('.df-hexagon-palette__level')).toHaveLength(15);
+        // the selector is at most one cell high: the cell's height as a fraction of the SVG's width
+        const viewBoxWidth = Number(palette(wrapper).find('svg').attributes('viewBox')!.split(' ')[2]);
+        const ratio = Number((palette(wrapper).element as HTMLElement).style.getPropertyValue('--df-cell-ratio'));
+        expect(ratio).toBeCloseTo((2 * 0.95) / Math.sqrt(3) / viewBoxWidth, 6);
+        wrapper.unmount();
+      });
+
+      it('selects a level button by the arrow keys', async () => {
+        const control = new Field<string>({ value: hexagonCells(5, 0.6)[20].color });
+        const wrapper = await openPicker(control, { ...hexagon, lightnessLevels: 6 });
+        const button = (index: number) => palette(wrapper).findAll('.df-hexagon-palette__level')[index];
+        expect(button(3).attributes('aria-checked')).toBe('true');
+
+        await button(3).trigger('keydown', { key: 'ArrowLeft' });
+        expect(button(2).attributes('aria-checked')).toBe('true');
+        expect(button(2).element).toBe(document.activeElement);
+        await flushPromises();
+        await okButton(wrapper).trigger('click');
+
+        expect(control.value).toBe(hexagonCells(5, 0.4)[20].color);
+        wrapper.unmount();
+      });
+
+      it('offers 16 or more levels with a segmented bar', async () => {
+        const wrapper = await openPicker(new Field<string>({ value: '#808080' }), { ...hexagon, lightnessLevels: 16 });
+        const segments = palette(wrapper).findAll('.df-hexagon-palette__segment');
+
+        expect(levels(wrapper)).toEqual({ slider: false, toggle: false, bar: true });
+        expect(segments).toHaveLength(16);
+        expect(segments[3].attributes('aria-label')).toBe('Lightness 4');
+        const checked = segments.filter((segment) => segment.attributes('aria-checked') === 'true');
+        expect(checked).toHaveLength(1);
+        expect(checked[0].attributes('tabindex')).toBe('0');
+        wrapper.unmount();
+      });
+
+      it('selects a segment by a click and by the arrow keys, keeping the place of the selected cell', async () => {
+        const control = new Field<string>({ value: hexagonCells(5, 0.6)[20].color });
+        const wrapper = await openPicker(control, { ...hexagon, lightnessLevels: 21 });
+        const segment = (index: number) => palette(wrapper).findAll('.df-hexagon-palette__segment')[index];
+        expect(segment(12).attributes('aria-checked')).toBe('true');
+
+        await segment(5).trigger('click');
+        expect(segment(5).attributes('aria-checked')).toBe('true');
+        await segment(5).trigger('keydown', { key: 'ArrowRight' });
+        expect(segment(6).attributes('aria-checked')).toBe('true');
+        expect(segment(6).element).toBe(document.activeElement);
+        await flushPromises();
+        await okButton(wrapper).trigger('click');
+
+        expect(control.value).toBe(hexagonCells(5, 0.3)[20].color);
+        wrapper.unmount();
+      });
+
+      it('selects the exact lightness of the value in the full range, and writes along the slider', async () => {
+        const control = new Field<string>({ value: hexagonCells(5, 0.37)[33].color });
+        const wrapper = await openPicker(control, hexagon);
+        const slider = palette(wrapper).findComponent({ name: 'VSlider' });
+        expect(Number(slider.props('modelValue'))).toBeCloseTo(0.37, 2);
+        expect(palette(wrapper).findAll('.df-hexagon-cell')[33].attributes('aria-checked')).toBe('true');
+
+        slider.vm.$emit('update:modelValue', 0.8);
+        await flushPromises();
+        expect(Number(slider.props('modelValue'))).toBe(0.8);
+        await okButton(wrapper).trigger('click');
+
+        expect(control.value).toBe(hexagonCells(5, 0.8)[33].color);
+        wrapper.unmount();
+      });
+
+      it('selects the level and the cell nearest to the value on opening', async () => {
+        const L = 0.75;
+        const cells = hexagonCells(5, L);
+        const wrapper = await openPicker(new Field<string>({ value: cells[30].color }), {
+          ...hexagon,
+          lightnessLevels: [0.6, 0.75, 0.45],
+        });
+
+        // the levels are sorted: 0.45, 0.6, 0.75
+        const levelButtons = palette(wrapper).findAll('.df-hexagon-palette__level');
+        expect(levelButtons.map((button) => button.attributes('aria-checked'))).toEqual(['false', 'false', 'true']);
+        const checked = cellsOf(wrapper).filter((cell) => cell.attributes('aria-checked') === 'true');
+        expect(checked.map((cell) => cell.attributes('aria-label'))).toEqual([cells[30].color]);
+        expect(checked[0].attributes('tabindex')).toBe('0');
+        wrapper.unmount();
+      });
+
+      it('writes a clicked cell when OK confirms it', async () => {
+        const control = new Field<string>({ value: '#808080' });
+        const wrapper = await openPicker(control, hexagon);
+        const cell = cellsOf(wrapper)[12];
+
+        await cell.trigger('click');
+        await flushPromises();
+        expect(control.value).toBe('#808080');
+        expect(cell.attributes('aria-checked')).toBe('true');
+
+        await okButton(wrapper).trigger('click');
+        expect(control.value).toBe(cell.attributes('aria-label'));
+        expect(control.touched).toBe(true);
+        wrapper.unmount();
+      });
+
+      it('writes a cell on a double-click', async () => {
+        const control = new Field<string>({ value: '#808080' });
+        const wrapper = await openPicker(control, hexagon);
+        const cell = cellsOf(wrapper)[40];
+
+        await cell.trigger('click');
+        await cell.trigger('dblclick');
+
+        expect(control.value).toBe(cell.attributes('aria-label'));
+        wrapper.unmount();
+      });
+
+      it('writes the cell at the same place of another level when the level changes', async () => {
+        const control = new Field<string>({ value: hexagonCells(5, 0.6)[20].color });
+        const wrapper = await openPicker(control, { ...hexagon, lightnessLevels: [0.45, 0.6, 0.75] });
+
+        await palette(wrapper).findAll('.df-hexagon-palette__level')[0].trigger('click');
+        await flushPromises();
+        await okButton(wrapper).trigger('click');
+
+        expect(control.value).toBe(hexagonCells(5, 0.45)[20].color);
+        wrapper.unmount();
+      });
+
+      it('applies normalize to the preview and the written value, not to the pending one', async () => {
+        const control = new Field<string>({ value: '#808080' });
+        const wrapper = await openPicker(control, { ...hexagon, normalize: (value: string) => value.toUpperCase() });
+        const cell = cellsOf(wrapper)[25];
+        const raw = cell.attributes('aria-label')!;
+
+        await cell.trigger('click');
+        await flushPromises();
+        expect(wrapper.emitted('preview')).toEqual([['#808080'], [raw.toUpperCase()]]);
+        expect(cell.attributes('aria-checked')).toBe('true');
+
+        await okButton(wrapper).trigger('click');
+        await flushPromises();
+        expect(control.value).toBe(raw.toUpperCase());
+        expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
+        wrapper.unmount();
+      });
+
+      it('moves the focus with the arrow keys and picks with Enter', async () => {
+        const control = new Field<string>({ value: hexagonCells(5, 0.6)[0].color });
+        const wrapper = await openPicker(control, hexagon);
+        const centre = cellsOf(wrapper)[0];
+
+        await centre.trigger('keydown', { key: 'ArrowRight' });
+        const focused = cellsOf(wrapper).find((cell) => cell.attributes('tabindex') === '0')!;
+        expect(focused.element).toBe(document.activeElement);
+        expect(focused.element).not.toBe(centre.element);
+
+        await focused.trigger('keydown', { key: 'Enter' });
+        await okButton(wrapper).trigger('click');
+        expect(control.value).toBe(focused.attributes('aria-label'));
+        wrapper.unmount();
+      });
     });
   });
 });

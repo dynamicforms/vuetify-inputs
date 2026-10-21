@@ -21,6 +21,7 @@ export { VMenu } from 'vuetify/components/VMenu';
 export { VNumberInput } from 'vuetify/components/VNumberInput';
 export { VProgressLinear } from 'vuetify/components/VProgressLinear';
 export { VSelect } from 'vuetify/components/VSelect';
+export { VSlider } from 'vuetify/components/VSlider';
 export { VSwitch } from 'vuetify/components/VSwitch';
 export { VTextarea } from 'vuetify/components/VTextarea';
 export { VTextField } from 'vuetify/components/VTextField';
