@@ -6,6 +6,7 @@ import {
   hexToOkLab,
   hexToRgb,
   isInGamut,
+  lightnessLevelsOf,
   maxChromaInGamut,
   nearestCell,
   nearestLevel,
@@ -173,5 +174,32 @@ describe('nearestCell and nearestLevel', () => {
     expect(nearestLevel([0.45, 0.6, 0.75], '#ffffff')).toBe(2);
     expect(nearestLevel([0.45, 0.6, 0.75], okLabToHex({ L: 0.62, a: 0, b: 0 }))).toBe(1);
     expect(nearestLevel([0.45, 0.6, 0.75], 'nope')).toBe(0);
+  });
+});
+
+describe('lightnessLevelsOf', () => {
+  it('gives the full range for undefined, an empty array and a number that is not an integer of at least 1', () => {
+    [undefined, [], 0, -3, 2.5, Number.NaN].forEach((spec) => expect(lightnessLevelsOf(spec)).toBeNull());
+  });
+
+  it('gives the single level 0.5 for 1', () => {
+    expect(lightnessLevelsOf(1)).toEqual([0.5]);
+  });
+
+  it('spreads n levels evenly from 0 to 1', () => {
+    expect(lightnessLevelsOf(2)).toEqual([0, 1]);
+    lightnessLevelsOf(6)!.forEach((level, i) => expect(level).toBeCloseTo([0, 0.2, 0.4, 0.6, 0.8, 1][i], 10));
+    expect(lightnessLevelsOf(16)).toHaveLength(16);
+  });
+
+  it('sorts the levels of an array and leaves the array as it was', () => {
+    const spec = [0.7, 0.3, 0.5];
+    expect(lightnessLevelsOf(spec)).toEqual([0.3, 0.5, 0.7]);
+    expect(spec).toEqual([0.7, 0.3, 0.5]);
+  });
+
+  it('makes every cell black at 0 and white at 1', () => {
+    expect(new Set(hexagonCells(5, 0).map((cell) => cell.color))).toEqual(new Set(['#000000']));
+    expect(new Set(hexagonCells(5, 1).map((cell) => cell.color))).toEqual(new Set(['#ffffff']));
   });
 });

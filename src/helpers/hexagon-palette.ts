@@ -178,3 +178,17 @@ export function nearestLevel(levels: number[], color: string | null | undefined)
     0,
   );
 }
+
+/**
+ * The lightness levels of a `lightnessLevels` prop, ascending; `null` for the full, continuous range 0..1.
+ * - `undefined`, an empty array, or a number that is not an integer of at least 1: `null`.
+ * - `1`: the single level 0.5.
+ * - an integer `n` of at least 2: `n` levels evenly spaced from 0 to 1, both included.
+ * - an array: its levels, sorted.
+ */
+export function lightnessLevelsOf(spec: number | number[] | undefined): number[] | null {
+  if (Array.isArray(spec)) return spec.length ? [...spec].sort((one, other) => one - other) : null;
+  if (spec === undefined || !Number.isInteger(spec) || spec < 1) return null;
+  if (spec === 1) return [0.5];
+  return Array.from({ length: spec }, (_, index) => index / (spec - 1));
+}

@@ -46,9 +46,11 @@ export interface DfColorProps extends BaseProps {
   /** The number of rings of the hexagon palette, the centre cell counted as the first: `1 + 3·n·(n − 1)` cells.
    *  Default 5 (61 cells). */
   hexagonRings?: number;
-  /** The OKLCH lightness levels (0..1) the hexagon palette offers, with a selector of the level where there is more
-   *  than one. Default `[0.45, 0.6, 0.75]`. */
-  lightnessLevels?: number[];
+  /** The OKLCH lightness (0..1) of the hexagon palette's cells. `undefined` (default): any lightness from 0 to 1,
+   *  chosen with a slider. An integer `n` ≥ 2: `n` levels evenly spaced from 0 to 1, both included; `1`: the single
+   *  level 0.5. An array: those levels. A number that is not an integer of at least 1, and an empty array, give the
+   *  full range. */
+  lightnessLevels?: number | number[];
 }
 
 export interface DfDateTimeProps extends BaseProps {

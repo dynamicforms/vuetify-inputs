@@ -19,8 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   every change in the picker; `null` when it closes.
 - `df-color` hexagon palette, selected with `picker: 'hexagon'` (default `'generic'`, Vuetify's color picker): cells
   of OKLCH colors around a grey centre, the outer ring at the largest chroma each hue has inside sRGB. Props
-  `hexagonRings` (default 5, 61 cells) and `lightnessLevels` (default `[0.45, 0.6, 0.75]`, with a level selector for
-  more than one level). Library strings `ColorPalette` and `Lightness`.
+  `hexagonRings` (default 5, 61 cells) and `lightnessLevels`: `undefined` (default) for any lightness from 0 to 1 on
+  a slider, an integer `n` for `n` levels evenly spaced from 0 to 1, or an array of levels; 2 to 15 levels are
+  selected with a row of square buttons, 16 or more with a segmented bar. Library strings `ColorPalette`, `Lightness` and
+  `LightnessRange`.
 
 ### Fixed
 

@@ -41,7 +41,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | normalize | `(value: string) => string` | `undefined` | Maps a valid color to the value the component stores and shows (see [Normalizing the color](#normalizing-the-color)) |
 | picker | `'generic' \| 'hexagon'` | `'generic'` | The picker in the menu: `'generic'` is Vuetify's color picker, `'hexagon'` the [hexagon palette](#hexagon-palette) |
 | hexagonRings | `number` | `5` | The number of rings of the hexagon palette, the centre cell counted as the first: `1 + 3·n·(n − 1)` cells (3 → 19, 4 → 37, 5 → 61) |
-| lightnessLevels | `number[]` | `[0.45, 0.6, 0.75]` | The OKLCH lightness levels (0..1) of the hexagon palette |
+| lightnessLevels | `number \| number[]` | `undefined` | The OKLCH lightness (0..1) the hexagon palette offers: the full range, `n` evenly spaced levels, or the given levels (see [Lightness](#lightness)) |
 
 ### Inherited Props
 
@@ -61,39 +61,61 @@ also supports the alpha channel (e.g., `#FF0000FF`); with `alpha: false` the val
 ## Hexagon palette
 
 With `picker="hexagon"` the menu shows a palette of hexagon cells in place of Vuetify's color picker. The cells
-of one lightness level of `lightnessLevels` are shown at a time:
+of one lightness are shown at a time:
 
-- the centre cell is the grey (OKLCH chroma 0) of the level;
+- the centre cell is the grey (OKLCH chroma 0) of the lightness;
 - ring `r` holds `6·r` cells; ring `r` starts `r` cells up and to the left of the centre and runs clockwise. Cell `i`
   of side `a` (0..5) has the hue `(a + i/r) / 6 × 360°`;
 - a cell of ring `r` has the chroma `r / (hexagonRings − 1)` of the largest chroma its hue has inside sRGB at the
-  level's lightness, so the outer ring holds the most saturated color of each hue.
+  lightness, so the outer ring holds the most saturated color of each hue. At lightness 0 every cell is black, at 1
+  every cell is white.
 
-A cell's color is written as `#rrggbb`. With more than one level, a row of buttons under the palette, one per level and
-drawn as the level's grey, switches the level; switching it moves a selected cell to the same place on the new level.
-With one level there is no selector.
+A cell's color is written as `#rrggbb`. A click on a cell makes it the pending color; OK writes it, Cancel leaves the
+field as it was, and a double-click on a cell writes it at once. `normalize` and `preview` apply to the cells as to
+the generic picker. When the menu opens, the palette marks the cell nearest to the value by OKLab distance.
 
-When the menu opens, the palette shows the level nearest to the OKLCH lightness of the current value and marks the
-cell nearest to the value by OKLab distance. A click on a cell makes it the pending color; OK writes it, Cancel
-leaves the field as it was, and a double-click on a cell writes it at once. `normalize` and `preview` apply to the
-cells as to the generic picker.
+### Lightness
+
+`lightnessLevels` sets the lightness the palette offers, and the control under the palette that selects it:
+
+| `lightnessLevels` | Levels | Control |
+|-------------------|--------|---------|
+| `undefined` (default), an empty array, or a number that is not an integer of at least 1 | any lightness from 0 to 1 | a slider over a black-to-white gradient of the centre grey |
+| `1` | the single level 0.5 | none |
+| an integer `n` ≥ 2 | `n` levels evenly spaced from 0 to 1, both included (`6` → 0, 0.2, 0.4, 0.6, 0.8, 1) | see below |
+| an array | the given levels, sorted ascending | see below |
+
+Between 2 and 15 levels are a row of square buttons, one per level and filled with the level's grey. The levels share
+the width of the palette in equal columns; each square is as wide as its column but no higher than a cell of the
+palette, and is centred in its column. 16 or more levels are a single bar of contiguous segments, one per level and
+filled with the level's grey, at most as high as a cell. Both are a `radiogroup` with the selected level outlined. A
+click selects a level; the arrow keys select the neighbouring level and Home and End the first and the last one.
+
+When the menu opens, the palette shows the exact OKLCH lightness of the value on the slider, or the level nearest to
+it. A change of the lightness moves a selected cell to the same place at the new lightness, so the pending color
+follows the slider or the level.
+
+### Accessibility
 
 The palette is a `radiogroup` of `radio` cells, each labelled with its hex value. The arrow keys move the focus
-between neighbouring cells, and Enter or Space makes the focused cell the pending color. The radiogroup and the level
-buttons are labelled with the library's strings `ColorPalette` and `Lightness` (see
-[The strings the library owns](/examples/localisation#the-strings-the-library-owns)).
+between neighbouring cells, and Enter or Space makes the focused cell the pending color. The labels are the library's
+strings (see [The strings the library owns](/examples/localisation#the-strings-the-library-owns)): `ColorPalette`
+for the palette, `LightnessRange` for the slider and the level selectors, and `Lightness` for a level button or
+segment.
 
 <color-hexagon/>
 
 ```vue
 <df-color
   v-model="color"
-  label="Tag color"
+  label="6 levels"
   picker="hexagon"
-  :lightness-levels="[0.4, 0.55, 0.7, 0.85]"
+  :lightness-levels="6"
   @preview="previewColor = $event"
 />
 ```
+
+Without `lightnessLevels` the same palette offers the full lightness range with a slider.
 
 ## Normalizing the color
 

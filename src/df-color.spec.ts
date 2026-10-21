@@ -300,24 +300,123 @@ describe('DfColor', () => {
         wrapper.unmount();
       });
 
-      it('shows the level selector only for more than one level', async () => {
-        const three = await openPicker(new Field<string>({ value: '#f00' }), hexagon);
-        const one = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, lightnessLevels: [0.6] });
+      const levels = (wrapper: Awaited<ReturnType<typeof openPicker>>) => ({
+        slider: palette(wrapper).findComponent({ name: 'VSlider' }).exists(),
+        toggle: palette(wrapper).find('.df-hexagon-palette__levels').exists(),
+        bar: palette(wrapper).find('.df-hexagon-palette__segments').exists(),
+      });
 
-        expect(three.findComponent({ name: 'VBtnToggle' }).exists()).toBe(true);
-        expect(palette(three).findAll('.df-hexagon-palette__levels .v-btn')).toHaveLength(3);
-        expect(palette(three).find('.df-hexagon-palette__levels .v-btn').attributes('aria-label')).toBe('Lightness 1');
-        expect(one.findComponent({ name: 'VBtnToggle' }).exists()).toBe(false);
-        three.unmount();
-        one.unmount();
+      it('offers the full range with a slider without lightnessLevels', async () => {
+        const wrapper = await openPicker(new Field<string>({ value: '#f00' }), hexagon);
+
+        expect(levels(wrapper)).toEqual({ slider: true, toggle: false, bar: false });
+        wrapper.unmount();
+      });
+
+      it('offers fewer than 16 levels with level buttons and no selector for one level', async () => {
+        const three = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, lightnessLevels: 3 });
+        const array = await openPicker(new Field<string>({ value: '#f00' }), {
+          ...hexagon,
+          lightnessLevels: [0.3, 0.7],
+        });
+        const one = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, lightnessLevels: 1 });
+
+        expect(levels(three)).toEqual({ slider: false, toggle: true, bar: false });
+        expect(palette(three).findAll('.df-hexagon-palette__level')).toHaveLength(3);
+        expect(palette(three).find('.df-hexagon-palette__level').attributes('aria-label')).toBe('Lightness 1');
+        expect(levels(array)).toEqual({ slider: false, toggle: true, bar: false });
+        expect(levels(one)).toEqual({ slider: false, toggle: false, bar: false });
+        [three, array, one].forEach((wrapper) => wrapper.unmount());
+      });
+
+      it('lays out the level buttons as a grid of one column per level', async () => {
+        const wrapper = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, lightnessLevels: 15 });
+        const grid = palette(wrapper).find('.df-hexagon-palette__levels');
+
+        expect(grid.attributes('role')).toBe('radiogroup');
+        expect((grid.element as HTMLElement).style.getPropertyValue('--df-level-count')).toBe('15');
+        expect(grid.findAll('.df-hexagon-palette__level')).toHaveLength(15);
+        // the selector is at most one cell high: the cell's height as a fraction of the SVG's width
+        const viewBoxWidth = Number(palette(wrapper).find('svg').attributes('viewBox')!.split(' ')[2]);
+        const ratio = Number((palette(wrapper).element as HTMLElement).style.getPropertyValue('--df-cell-ratio'));
+        expect(ratio).toBeCloseTo((2 * 0.95) / Math.sqrt(3) / viewBoxWidth, 6);
+        wrapper.unmount();
+      });
+
+      it('selects a level button by the arrow keys', async () => {
+        const control = new Field<string>({ value: hexagonCells(5, 0.6)[20].color });
+        const wrapper = await openPicker(control, { ...hexagon, lightnessLevels: 6 });
+        const button = (index: number) => palette(wrapper).findAll('.df-hexagon-palette__level')[index];
+        expect(button(3).attributes('aria-checked')).toBe('true');
+
+        await button(3).trigger('keydown', { key: 'ArrowLeft' });
+        expect(button(2).attributes('aria-checked')).toBe('true');
+        expect(button(2).element).toBe(document.activeElement);
+        await flushPromises();
+        await okButton(wrapper).trigger('click');
+
+        expect(control.value).toBe(hexagonCells(5, 0.4)[20].color);
+        wrapper.unmount();
+      });
+
+      it('offers 16 or more levels with a segmented bar', async () => {
+        const wrapper = await openPicker(new Field<string>({ value: '#808080' }), { ...hexagon, lightnessLevels: 16 });
+        const segments = palette(wrapper).findAll('.df-hexagon-palette__segment');
+
+        expect(levels(wrapper)).toEqual({ slider: false, toggle: false, bar: true });
+        expect(segments).toHaveLength(16);
+        expect(segments[3].attributes('aria-label')).toBe('Lightness 4');
+        const checked = segments.filter((segment) => segment.attributes('aria-checked') === 'true');
+        expect(checked).toHaveLength(1);
+        expect(checked[0].attributes('tabindex')).toBe('0');
+        wrapper.unmount();
+      });
+
+      it('selects a segment by a click and by the arrow keys, keeping the place of the selected cell', async () => {
+        const control = new Field<string>({ value: hexagonCells(5, 0.6)[20].color });
+        const wrapper = await openPicker(control, { ...hexagon, lightnessLevels: 21 });
+        const segment = (index: number) => palette(wrapper).findAll('.df-hexagon-palette__segment')[index];
+        expect(segment(12).attributes('aria-checked')).toBe('true');
+
+        await segment(5).trigger('click');
+        expect(segment(5).attributes('aria-checked')).toBe('true');
+        await segment(5).trigger('keydown', { key: 'ArrowRight' });
+        expect(segment(6).attributes('aria-checked')).toBe('true');
+        expect(segment(6).element).toBe(document.activeElement);
+        await flushPromises();
+        await okButton(wrapper).trigger('click');
+
+        expect(control.value).toBe(hexagonCells(5, 0.3)[20].color);
+        wrapper.unmount();
+      });
+
+      it('selects the exact lightness of the value in the full range, and writes along the slider', async () => {
+        const control = new Field<string>({ value: hexagonCells(5, 0.37)[33].color });
+        const wrapper = await openPicker(control, hexagon);
+        const slider = palette(wrapper).findComponent({ name: 'VSlider' });
+        expect(Number(slider.props('modelValue'))).toBeCloseTo(0.37, 2);
+        expect(palette(wrapper).findAll('.df-hexagon-cell')[33].attributes('aria-checked')).toBe('true');
+
+        slider.vm.$emit('update:modelValue', 0.8);
+        await flushPromises();
+        expect(Number(slider.props('modelValue'))).toBe(0.8);
+        await okButton(wrapper).trigger('click');
+
+        expect(control.value).toBe(hexagonCells(5, 0.8)[33].color);
+        wrapper.unmount();
       });
 
       it('selects the level and the cell nearest to the value on opening', async () => {
         const L = 0.75;
         const cells = hexagonCells(5, L);
-        const wrapper = await openPicker(new Field<string>({ value: cells[30].color }), hexagon);
+        const wrapper = await openPicker(new Field<string>({ value: cells[30].color }), {
+          ...hexagon,
+          lightnessLevels: [0.6, 0.75, 0.45],
+        });
 
-        expect(wrapper.findComponent({ name: 'VBtnToggle' }).props('modelValue')).toBe(2);
+        // the levels are sorted: 0.45, 0.6, 0.75
+        const levelButtons = palette(wrapper).findAll('.df-hexagon-palette__level');
+        expect(levelButtons.map((button) => button.attributes('aria-checked'))).toEqual(['false', 'false', 'true']);
         const checked = cellsOf(wrapper).filter((cell) => cell.attributes('aria-checked') === 'true');
         expect(checked.map((cell) => cell.attributes('aria-label'))).toEqual([cells[30].color]);
         expect(checked[0].attributes('tabindex')).toBe('0');
@@ -354,9 +453,9 @@ describe('DfColor', () => {
 
       it('writes the cell at the same place of another level when the level changes', async () => {
         const control = new Field<string>({ value: hexagonCells(5, 0.6)[20].color });
-        const wrapper = await openPicker(control, hexagon);
+        const wrapper = await openPicker(control, { ...hexagon, lightnessLevels: [0.45, 0.6, 0.75] });
 
-        await palette(wrapper).findAll('.df-hexagon-palette__levels .v-btn')[0].trigger('click');
+        await palette(wrapper).findAll('.df-hexagon-palette__level')[0].trigger('click');
         await flushPromises();
         await okButton(wrapper).trigger('click');
 

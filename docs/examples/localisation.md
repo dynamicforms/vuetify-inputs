@@ -24,7 +24,8 @@ translation function reads, such as the locale.
 | `Cancel` | `Cancel` | The Cancel button of `<df-date-time>`'s and `<df-color>`'s pickers |
 | `Ok` | `OK` | The OK button of `<df-date-time>`'s and `<df-color>`'s pickers |
 | `ColorPalette` | `Color palette` | `<df-color picker="hexagon">`, the accessible label of the palette |
-| `Lightness` | `Lightness {level}` | `<df-color picker="hexagon">`, the accessible label of a lightness level button; `level` counts from 1 |
+| `Lightness` | `Lightness {level}` | `<df-color picker="hexagon">`, the accessible label of a lightness level button or segment; `level` counts from 1 |
+| `LightnessRange` | `Lightness` | `<df-color picker="hexagon">`, the accessible label of the lightness slider and of the level selectors |
 | `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, "no heading" entry |
 | `Heading1`–`Heading6` | `Heading 1`–`Heading 6` | `<df-rtf-editor>` heading dropdown entries |
 | `Undo` / `Redo` | `Undo` / `Redo` | `<df-rtf-editor>` toolbar button tooltips |

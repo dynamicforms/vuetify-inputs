@@ -39,7 +39,7 @@
                 v-if="picker === 'hexagon'"
                 v-model="proxyModel.value"
                 :rings="hexagonRings"
-                :levels="lightnessLevels"
+                :levels="paletteLevels"
                 @update:model-value="previewPicked"
                 @dblclick="saveOnDoubleClick($event, hexagonChoices, save)"
               />
@@ -72,6 +72,7 @@ import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from 
 import { useClientRendered } from './helpers/client-rendered';
 import ConfirmActions from './helpers/confirm-actions.vue';
 import { namespaced } from './helpers/error-namespace';
+import { lightnessLevelsOf } from './helpers/hexagon-palette';
 import HexagonPalette from './helpers/hexagon-palette.vue';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 
@@ -82,7 +83,7 @@ const props = withDefaults(defineProps<DfColorProps>(), {
   normalize: undefined,
   picker: 'generic',
   hexagonRings: 5,
-  lightnessLevels: () => [0.45, 0.6, 0.75],
+  lightnessLevels: undefined,
 });
 
 interface Emits extends BaseEmits {
@@ -128,6 +129,7 @@ const dropdownShown = ref(false);
 const clientRendered = useClientRendered();
 const colorChoices = '.v-color-picker-canvas';
 const hexagonChoices = '.df-hexagon-cell';
+const paletteLevels = computed(() => lightnessLevelsOf(props.lightnessLevels));
 const { saveOnDoubleClick } = usePickerDoubleClick();
 
 const swatchColor = computed(() => normalized(value.value) ?? undefined);

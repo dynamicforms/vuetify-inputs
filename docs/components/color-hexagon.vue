@@ -7,11 +7,23 @@
           <v-col cols="12" md="6">
             <df-color
               v-model="color"
-              label="Tag color"
+              label="6 levels"
               picker="hexagon"
-              :lightness-levels="[0.4, 0.55, 0.7, 0.85]"
+              :lightness-levels="6"
               @preview="previewColor = $event"
             />
+          </v-col>
+          <v-col cols="12" md="6">
+            <df-color v-model="fullRangeColor" label="Full lightness range" picker="hexagon" />
+          </v-col>
+          <v-col cols="12" md="6">
+            <df-color v-model="twoColor" label="2 levels" picker="hexagon" :lightness-levels="[0.4, 0.7]" />
+          </v-col>
+          <v-col cols="12" md="6">
+            <df-color v-model="fifteenColor" label="15 levels" picker="hexagon" :lightness-levels="15" />
+          </v-col>
+          <v-col cols="12" md="6">
+            <df-color v-model="barColor" label="21 levels" picker="hexagon" :lightness-levels="21" />
           </v-col>
           <v-col cols="12" md="6">
             <div class="preview" :style="{ backgroundColor: previewColor ?? color }">
@@ -31,6 +43,10 @@ import { DfColor } from '../../src';
 
 const color = ref('#3f8fd2');
 const previewColor = ref<string | null>(null);
+const fullRangeColor = ref('#c0504d');
+const barColor = ref('#4f81bd');
+const fifteenColor = ref('#9bbb59');
+const twoColor = ref('#8064a2');
 </script>
 
 <style scoped>

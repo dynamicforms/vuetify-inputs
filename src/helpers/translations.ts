@@ -8,6 +8,7 @@ const defaults = {
   Ok: 'OK',
   ColorPalette: 'Color palette',
   Lightness: 'Lightness {level}',
+  LightnessRange: 'Lightness',
   Paragraph: 'Paragraph',
   Heading1: 'Heading 1',
   Heading2: 'Heading 2',
