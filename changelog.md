@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.2] - 2026-10-24
+
+### Fixed
+
+- `df-select` no longer writes into the value when it is set up, mounted or enabled, when choices load, or when the
+  value is set from outside; it writes only when the user edits the selection. A form with a select no longer starts
+  out changed.
+- `df-select` with `multiple` keeps an empty array as an empty array instead of turning it into `null`. Closing the
+  last chip leaves an empty array; the clear button sets `null`.
+- `df-select` with `allowNull: false` no longer selects the first choice by itself; an empty value stays empty until
+  the user selects a choice.
+- `df-select` keeps ids that no choice covers in the value and shows them with a choice whose text is the id, until
+  choices that cover them are loaded or given.
+- `df-input` with `inputType: 'number'` no longer writes the value `v-number-input` corrects to `min`, `max` or
+  `precision` on mount; the corrected value is written when the user enters the field.
+
 ## [0.15.1] - 2026-10-21
 
 ### Added

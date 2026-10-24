@@ -1,7 +1,7 @@
 import { Field, Group, ValueChangedAction } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { defineComponent, h, ref } from 'vue';
+import { defineComponent, h, ref, toRaw } from 'vue';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import { VAutocomplete } from 'vuetify/components';
@@ -83,17 +83,19 @@ describe('DfSelect', () => {
       expect(chipTexts(wrapper)).toEqual(['Choice 2']);
     });
 
-    it('drops an id only once fetchChoices has answered without a choice for it', async () => {
+    it('shows an id fetchChoices has answered no choice for as the id, and keeps it', async () => {
       const { fetchChoices, release } = deferredFetchChoices();
       const control = new Field<number[] | null>({ value: [2, 99] });
       const wrapper = mountSelect({ control, multiple: true, fetchChoices });
 
       await flushPromises();
       expect(control.value).toEqual([2, 99]);
+      expect(chipTexts(wrapper)).toEqual([]);
 
       await release();
-      expect(control.value).toEqual([2]);
-      expect(chipTexts(wrapper)).toEqual(['Choice 2']);
+      expect(control.value).toEqual([2, 99]);
+      expect(control.isChanged).toBe(false);
+      expect(chipTexts(wrapper)).toEqual(['Choice 2', '99']);
     });
 
     it('resolves the ids of a value set after mount that no loaded choice covers', async () => {
@@ -128,14 +130,15 @@ describe('DfSelect', () => {
       expect(chipTexts(wrapper)).toEqual(['Choice 1']);
     });
 
-    it('loads the unfiltered choices for an empty value and selects the first when null is not allowed', async () => {
+    it('loads the unfiltered choices for an empty value and selects nothing when null is not allowed', async () => {
       const { fetchChoices, release } = deferredFetchChoices();
       const control = new Field<number | null>({ value: null });
       mountSelect({ control, fetchChoices, allowNull: false });
 
       await release();
       expect(fetchChoices).toHaveBeenCalledWith(undefined, null);
-      expect(control.value).toBe(1);
+      expect(control.value).toBeNull();
+      expect(control.isChanged).toBe(false);
     });
   });
 
@@ -152,12 +155,90 @@ describe('DfSelect', () => {
   });
 
   describe('with static choices', () => {
-    it('drops ids that are not among the choices', async () => {
+    it('shows ids that are not among the choices as the id, and keeps them', async () => {
       const control = new Field<number[] | null>({ value: [2, 99] });
-      mountSelect({ control, multiple: true, choices: ALL_CHOICES });
+      const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
 
       await flushPromises();
-      expect(control.value).toEqual([2]);
+      expect(control.value).toEqual([2, 99]);
+      expect(chipTexts(wrapper)).toEqual(['Choice 2', '99']);
+    });
+
+    it('shows the choice for an id once the choices are given', async () => {
+      const control = new Field<number | null>({ value: 3 });
+      const wrapper = mountSelect({ control, choices: [] });
+      await flushPromises();
+      expect(chipTexts(wrapper)).toEqual(['3']);
+
+      await wrapper.setProps({ choices: ALL_CHOICES });
+      await flushPromises();
+      expect(chipTexts(wrapper)).toEqual(['Choice 3']);
+      expect(control.value).toBe(3);
+    });
+  });
+
+  describe('setting up and mounting', () => {
+    it.each([
+      { name: 'an empty array', value: [], multiple: true, allowNull: true },
+      { name: 'null', value: null, multiple: true, allowNull: true },
+      { name: 'an empty array without allowNull', value: [], multiple: true, allowNull: false },
+      { name: 'null without allowNull', value: null, multiple: false, allowNull: false },
+      { name: 'a multiple value', value: [1, 2], multiple: true, allowNull: true },
+      { name: 'a single value', value: 2, multiple: false, allowNull: true },
+      { name: 'an id that is not among the choices', value: 99, multiple: false, allowNull: true },
+    ])('leave $name as it is', async ({ value, multiple, allowNull }) => {
+      const control = new Field<any>({ value });
+      const changed = vi.fn();
+      control.registerAction(
+        new ValueChangedAction((field, supr, newValue, oldValue) => {
+          changed(newValue);
+          return supr(field, newValue, oldValue);
+        }),
+      );
+      const wrapper = mountSelect({ control, multiple, allowNull, choices: ALL_CHOICES });
+      await flushPromises();
+
+      expect(toRaw(control.value)).toBe(value);
+      expect(changed).not.toHaveBeenCalled();
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+    });
+  });
+
+  describe('emptying a multiple select', () => {
+    it.each([{ initial: [1] }, { initial: [] as number[] }])(
+      'closing the last chip leaves an empty array (initial $initial)',
+      async ({ initial }) => {
+        const control = new Field<number[] | null>({ value: initial });
+        const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
+        await flushPromises();
+        if (!initial.length) {
+          wrapper.findComponent(VAutocomplete).vm.$emit('update:modelValue', [1]);
+          await flushPromises();
+          expect(control.value).toEqual([1]);
+        }
+
+        await wrapper.find('.v-chip .v-chip__close').trigger('click');
+        await flushPromises();
+        expect(control.value).toEqual([]);
+      },
+    );
+
+    it('the clear button sets null', async () => {
+      const control = new Field<number[] | null>({ value: [1, 2] });
+      const values: any[] = [];
+      control.registerAction(
+        new ValueChangedAction((field, supr, newValue, oldValue) => {
+          values.push(newValue);
+          return supr(field, newValue, oldValue);
+        }),
+      );
+      const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
+      await flushPromises();
+
+      await wrapper.find('.v-field__clearable .v-icon').trigger('click');
+      await flushPromises();
+      expect(control.value).toBeNull();
+      expect(values).toEqual([null]);
     });
   });
 
@@ -219,7 +300,7 @@ describe('DfSelect', () => {
   });
 
   describe('with a disabled control', () => {
-    it('selects no default while disabled and selects the first choice once enabled', async () => {
+    it('selects no default while disabled nor once enabled', async () => {
       const control = new Field<number | null>({ value: null, access: 'disabled' });
       mountSelect({ control, choices: ALL_CHOICES, allowNull: false });
 
@@ -229,7 +310,8 @@ describe('DfSelect', () => {
 
       control.access = 'editable';
       await flushPromises();
-      expect(control.value).toBe(1);
+      expect(control.value).toBeNull();
+      expect(control.isChanged).toBe(false);
     });
 
     it('keeps ids that are not among the choices', async () => {

@@ -29,7 +29,7 @@ Choices loaded by `fetchChoices`, and icons:
 - Icons in choices
 - Chips for selected values. With `multiple` and `allowNull`, chips that wrap onto more rows put the clear button
   above the menu arrow; the layout follows the field's width.
-- A `null` selection under `allowNull`
+- A `null` selection under `allowNull`, and an empty array for a multiple select
 - Search with filtering
 
 ## Props
@@ -42,7 +42,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | fetchChoices | `(query?: any, idValue?: any) => Promise<SelectChoice[]>` | `undefined` | Function to load choices dynamically |
 | multiple | `boolean` | `false` | Whether multiple selection is allowed |
 | allowTags | `boolean` | `false` | Whether custom values can be entered |
-| allowNull | `boolean` | `true` | Whether null/empty selection is allowed. With `false`, an enabled select whose value is empty selects the first choice; a read-only or disabled one leaves the value as it is and selects the first choice once it is enabled |
+| allowNull | `boolean` | `true` | Whether the user can empty the selection. With `false`, the select offers no clear button and no close on the last chip of a multiple select; it selects no default, and an empty value stays empty until the user selects a choice |
 
 ### Inherited Props
 
@@ -76,7 +76,16 @@ The value depends on `multiple`:
   
 - When `multiple: true`:
   - Returns an array of values (the `id`s of selected options)
-  - Returns `null` when nothing is selected (not an empty array)
+  - Closing the last chip leaves an empty array; the clear button (under `allowNull`) sets `null`
+
+The select writes into the value only when the user edits the selection. Setting it up, mounting it, enabling it,
+loading choices and a value set from outside leave the value as it is: `null` stays `null`, an empty array stays an
+empty array, and a value the select would show differently - a single id for a multiple select, an array for a single
+one - is shown as the select needs it and written in that form only with the user's next edit.
+
+An id of the value that no choice covers is shown with a choice whose text is the id, and stays in the value. Once
+choices that cover it are loaded or given, the select shows that choice instead. With `allowTags`, such an id is shown
+as it is.
 
 ## Dynamic Option Loading
 
@@ -91,10 +100,9 @@ When using the `fetchChoices` prop instead of static `choices`, the component:
    outside the component, also when the field is read-only. With an empty value, the setup call passes the value
    itself (`null`) as idValue and expects the unfiltered choices back.
 
-Until that call resolves, the value is unchanged, and no chip shows the ids. Once it has resolved, the value is
-reconciled against the loaded choices as with static `choices`: an id the call returned no choice for is dropped from
-the value (unless `allowTags` is set). A call that rejects is logged with `console.error` and leaves the loaded choices
-as they are.
+Until that call resolves, no chip shows the ids. Once it has resolved, an id the call returned no choice for is shown
+with a choice whose text is the id, as with static `choices`. The value is unchanged either way. A call that rejects is
+logged with `console.error` and leaves the loaded choices as they are.
 
 ```typescript
 const fetchChoices = async (query?: string, idValue?: any): Promise<SelectChoice[]> => {
@@ -113,10 +121,9 @@ const fetchChoices = async (query?: string, idValue?: any): Promise<SelectChoice
 In addition to the [common events from InputBase](./input-base):
 
 - `update:modelValue` - When the selected value(s) change
-- `update:modelValueDisplay` - Carries a `SelectChoice[]` holding the choices that match the current value. It is
-  emitted whenever the value settles: once while the component is being set up (with `fetchChoices` and a non-empty
-  value, only once the choices for the value have been fetched), again when the initial `fetchChoices` call resolves,
-  and on every later change of the selection
+- `update:modelValueDisplay` - Carries a `SelectChoice[]` holding the choices shown for the current value, including
+  those whose text is the id. It is emitted while the component is being set up and whenever those choices change; not
+  while the choices for the value's ids are being fetched, nor on the server for a select with `fetchChoices`
 
 ## Slots
 
