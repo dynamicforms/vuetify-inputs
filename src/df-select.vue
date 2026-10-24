@@ -36,7 +36,7 @@
     v-bind="vuetifyBindings"
     @update:search="(query: any) => queryOptions(query, undefined)"
     @update:model-value="onSelect"
-    @click:clear="selected = null"
+    @click:clear="onClear"
     @blur="touched = true"
     @mousedown.capture="onMouseDown($event)"
   >
@@ -134,24 +134,43 @@ const {
 // on the server and until it renders in the browser, the select is a text field holding the chosen choices' text:
 // Vuetify's autocomplete keeps its menu in memory after a server render
 const clientRendered = useClientRendered();
+const inBrowser = typeof window !== 'undefined';
 const selected = ref<any>(null);
 const takeLoaded = ref(false);
 const loaded = ref<SelectChoice[]>([]);
 const loadedChoices = computed<SelectChoice[]>(() => (unref(takeLoaded) ? unref(loaded) : unref(choices) || []));
+// Number of fetchChoices calls in flight that resolve ids held by the value (resolveValueChoices()).
+const resolvingValue = ref(0);
+// The choices for the value are not known yet while they are being fetched, and on the server for a select with
+// fetchChoices, which does not fetch there.
+const valueChoicesPending = computed(
+  () => resolvingValue.value > 0 || (propsWithDefaults.fetchChoices !== undefined && !inBrowser),
+);
 
-const options = computed(() => convertItems(loadedChoices.value));
+function currentValue() {
+  return multipleCompliantValue(resultingValue.value, multiple.value);
+}
+
+// The loaded choices and, for every id of the value that none of them covers, a choice whose text is the id: the
+// select shows the value it holds and does not drop those ids from it. A taggable select shows such ids by itself.
+const displayChoices = computed<SelectChoice[]>(() => {
+  const loadedList = loadedChoices.value;
+  const mcVal = currentValue();
+  if (taggable.value || mcVal == null || valueChoicesPending.value) return loadedList;
+  const unknown = castArray(mcVal).filter((val) => !loadedList.some((choice) => choice.id === val));
+  if (!unknown.length) return loadedList;
+  return [...loadedList, ...unknown.map((val): SelectChoice => ({ id: val, text: String(val) }))];
+});
+
+const options = computed(() => convertItems(displayChoices.value));
 const chosenText = computed(() =>
-  getSelectedChoices(loadedChoices.value, multipleCompliantValue(resultingValue.value, multiple.value))
+  getSelectedChoices(displayChoices.value, currentValue())
     .map((choice) => choice.text)
     .join(', '),
 );
 const searchText = ref<string | null>(null);
 const fetchCounterGlobal = ref(0);
 const isMultiline = ref(false);
-// Number of fetchChoices calls in flight that resolve ids held by the value (resolveValueChoices()). While any is
-// pending, loadedChoices is not yet complete for the value, so `selected` - which only holds ids loadedChoices has a
-// choice for - is not written back into the value: that would drop every id still being resolved.
-const resolvingValue = ref(0);
 // Number of queryOptions() calls in flight.
 const searching = ref(0);
 const loading = computed(() => searching.value > 0 || resolvingValue.value > 0);
@@ -160,17 +179,29 @@ if (choices.value?.length && propsWithDefaults.fetchChoices !== undefined) {
   console.warn('Both choices and fetchChoices are set. Only one of them should be set.');
 }
 
-function emitModelValueDisplay(mcVal: any) {
-  emits('update:modelValueDisplay', getSelectedChoices(loadedChoices.value, mcVal));
+let emittedDisplay: SelectChoice[] | null = null;
+
+function emitModelValueDisplay() {
+  if (valueChoicesPending.value) return;
+  const display = getSelectedChoices(displayChoices.value, currentValue());
+  if (emittedDisplay !== null && isEqual(display, emittedDisplay)) return;
+  emittedDisplay = display;
+  emits('update:modelValueDisplay', display);
 }
 
+// sets what the select shows; the value is not written
 function syncSelected(value: any) {
-  updateSelectedFromValue(value, selected, multiple.value, taggable.value, loadedChoices.value);
+  updateSelectedFromValue(value, selected, multiple.value, taggable.value, displayChoices.value);
 }
 
 const setResultingValueGuard = ref(false);
+// Number of writes into the value. A write onSelect() defers is dropped when another write is made before it.
+let writeCount = 0;
 
+// The only place the select writes into the value. It is called from the user's edits only: setting the select up,
+// mounting it, loading choices or a value set from outside leave the value as it is.
 function setResultingValue(newValue: any) {
+  writeCount++;
   setResultingValueGuard.value = true;
   try {
     resultingValue.value = newValue;
@@ -233,39 +264,22 @@ function onMouseDown(event: MouseEvent) {
   }
 }
 
-watch(
-  selected,
-  (newValue) => {
-    if (vuetifyBindings.value.readonly || resolvingValue.value > 0) return;
-    nextTick(() => {
-      const mcVal = multipleCompliantValue(newValue, multiple.value);
-      emitModelValueDisplay(mcVal);
-      setResultingValue(mcVal);
-    });
-  },
-  { deep: true },
-);
+// a value set from outside the component: its choices are resolved and the select shows it
 watch(
   resultingValue,
   (newValue: any) => {
     if (setResultingValueGuard.value) return;
     const mcVal = multipleCompliantValue(newValue, multiple.value);
-    const resolved = resolveValueChoices(mcVal);
+    resolveValueChoices(mcVal);
     syncSelected(mcVal);
-    resolved?.then(() => {
-      // A value set while this call was in flight started its own resolution and owns `selected` from then on.
-      if (!isEqual(multipleCompliantValue(resultingValue.value, multiple.value), mcVal)) return;
-      syncSelected(mcVal);
-    });
   },
   { deep: true },
 );
+// choices loaded, replaced or resolved for the value: the select shows the value against them
+watch(displayChoices, () => syncSelected(currentValue()));
+watch([displayChoices, valueChoicesPending, resultingValue], emitModelValueDisplay, { deep: true });
 
-watch(setResultingValueGuard, () => {
-  if (!setResultingValueGuard.value) {
-    checkMultiline();
-  }
-});
+watch(selected, () => nextTick(checkMultiline), { deep: true });
 
 // the chips wrap differently once the field's width changes; a change of its height alone leaves the layout as it is
 let observedWidth = 0;
@@ -295,24 +309,34 @@ function resetQuery() {
   }
 }
 
+// Vuetify reports a clear as a selection of nothing and emits click:clear after it: the write waits a tick, and
+// onClear() writes in its place. A taggable select keeps the search text: a single combobox selects as it is typed.
 function onSelect(/* val: any */) {
-  resetQuery();
-  if (vuetifyBindings.value.readonly || taggable.value) return;
-  const mcVal = multipleCompliantValue(selected.value, multiple.value);
-  syncSelected(mcVal);
-  setResultingValue(mcVal);
+  if (vuetifyBindings.value.readonly) return;
+  if (!taggable.value) resetQuery();
+  const writesBefore = writeCount;
+  nextTick(() => {
+    if (writeCount !== writesBefore) return;
+    const mcVal = multipleCompliantValue(selected.value, multiple.value);
+    syncSelected(mcVal);
+    setResultingValue(mcVal);
+  });
 }
 
+// the clear button is offered under allowNull only
+function onClear() {
+  if (vuetifyBindings.value.readonly) return;
+  syncSelected(null);
+  setResultingValue(null);
+}
+
+// closing the last chip of a multiple select leaves an empty array
 function chipClose(event: MouseEvent, itemValue: any) {
   event.stopPropagation();
   if (vuetifyBindings.value.readonly) return;
   const remaining =
     multiple.value && Array.isArray(selected.value) ? selected.value.filter((v) => v !== itemValue) : [];
   if (!allowNull.value && !remaining.length) return;
-  if (taggable.value) {
-    selected.value = remaining;
-    return;
-  }
   const mcVal = multipleCompliantValue(remaining, multiple.value);
   syncSelected(mcVal);
   setResultingValue(mcVal);
@@ -346,8 +370,8 @@ async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
 /**
  * Loads the choices for the ids in `mcVal` that loadedChoices has none for, through fetchChoices' idValue. Returns
  * null when there is nothing to load: no fetchChoices, a taggable select (its value is not limited to choices), or
- * every id already has its choice. An id fetchChoices returns no choice for stays without one, and the next
- * reconciliation against loadedChoices drops it from the value.
+ * every id already has its choice. An id fetchChoices returns no choice for is shown with a choice whose text is the
+ * id (displayChoices).
  */
 function resolveValueChoices(mcVal: any): Promise<void> | null {
   const fetchChoices = propsWithDefaults.fetchChoices;
@@ -368,47 +392,14 @@ function resolveValueChoices(mcVal: any): Promise<void> | null {
   })();
 }
 
-function initialValueCheck() {
-  // A disabled select shows what the field holds and writes nothing into it: the field takes the write, and a
-  // default chosen by the control would mark it changed and put the choice into the form's data.
-  const readonly = vuetifyBindings.value.readonly;
-  let val = resultingValue.value;
-  if (!readonly && !allowNull.value && val == null && options.value.length) {
-    // Starting settings: check if value is mandatory and select the first item from the options
-    val = options.value[0].value;
-  }
-  val = multipleCompliantValue(val, multiple.value);
-  syncSelected(val);
-  if (resolvingValue.value > 0) return;
-  emitModelValueDisplay(val);
-  if (!readonly) setResultingValue(val);
-}
-
-// Starting settings: with fetchChoices, a value is first resolved into its choices and only then reconciled against
-// them. Anything else - an empty value, a taggable select - goes through queryOptions() with the value as idValue.
-// On the server nothing is fetched, and a value is not reconciled against choices it has not loaded: the server
-// does not wait for a fetch, so its result would not reach the HTML.
-const inBrowser = typeof window !== 'undefined';
-let initialLoad: Promise<void> | null = null;
+// Starting settings: with fetchChoices, the ids of the value are resolved into their choices. Anything else - an
+// empty value, a taggable select - goes through queryOptions() with the value as idValue. On the server nothing is
+// fetched: the server does not wait for a fetch, so its result would not reach the HTML.
 if (propsWithDefaults.fetchChoices !== undefined && inBrowser) {
-  initialLoad =
-    resolveValueChoices(multipleCompliantValue(resultingValue.value, multiple.value)) ??
-    queryOptions(undefined, resultingValue.value);
+  if (!resolveValueChoices(currentValue())) queryOptions(undefined, resultingValue.value);
 }
-
-if (inBrowser || propsWithDefaults.fetchChoices === undefined) initialValueCheck();
-
-initialLoad?.then(() => {
-  initialValueCheck();
-});
-
-// a select enabled after mount states its default then
-watch(
-  () => vuetifyBindings.value.readonly,
-  (readonly) => {
-    if (!readonly) initialValueCheck();
-  },
-);
+syncSelected(currentValue());
+emitModelValueDisplay();
 </script>
 
 <style scoped>
