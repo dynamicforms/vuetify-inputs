@@ -53,6 +53,10 @@ When `inputType` is set to 'number', the component:
 is not written while the user types, and is set to the nearest bound on blur. The field receives the value after
 that. `min` and `max` do not validate the field; a range the field refuses is a `ValueInRange` validator.
 
+A value outside `min` and `max`, or with more decimals than `precision`, is shown corrected from the start, and the
+corrected value is written when the user enters the field: focuses it or presses one of its step controls. Until then
+the field keeps its value.
+
 The number input supports:
 
 - Integer and decimal values

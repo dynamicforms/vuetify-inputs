@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the user selects a choice.
 - `df-select` keeps ids that no choice covers in the value and shows them with a choice whose text is the id, until
   choices that cover them are loaded or given.
+- `df-input` with `inputType: 'number'` no longer writes the value `v-number-input` corrects to `min`, `max` or
+  `precision` on mount; the corrected value is written when the user enters the field.
 
 ## [0.15.1] - 2026-10-21
 
