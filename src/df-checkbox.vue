@@ -3,7 +3,7 @@
     v-if="isRendered"
     v-model="boolValue"
     density="compact"
-    :class="[densityClass, visibilityClass]"
+    :class="[densityClass, variantClass, visibilityClass]"
     :indeterminate="indeterminate"
     :false-value="false"
     :true-value="true"
@@ -31,6 +31,11 @@ const emits = defineEmits<Emits>();
 const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
   props,
   emits,
+);
+
+// v-checkbox takes no variant: the class lets the label line up with the text of plain and underlined fields
+const variantClass = computed(() =>
+  ['plain', 'underlined'].includes(vuetifyBindings.value.variant) ? 'df-variant-plain-underlined' : '',
 );
 
 const indeterminate = computed(() => props.allowNull && value.value == null);
