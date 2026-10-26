@@ -99,6 +99,24 @@
   --df-add-bottom-margin-variant: -10px;
 }
 
+/* plain and underlined fields are 8px lower than the checkbox and carry their text below the centre: the margins give
+   the checkbox control the field's height and put the label on the text's line */
+.v-checkbox.df-variant-plain-underlined .v-selection-control {
+  margin-top: 4px;
+  margin-bottom: -12px;
+}
+.v-checkbox.df-variant-plain-underlined.df-density-compact .v-selection-control {
+  margin-top: 0;
+  margin-bottom: -8px;
+}
+.v-checkbox.df-variant-plain-underlined.df-density-comfortable .v-selection-control {
+  margin-top: 3px;
+  margin-bottom: -11px;
+}
+.v-checkbox.df-variant-plain-underlined.df-density-inline .v-selection-control {
+  margin: 0;
+}
+
 .df-density-inline .v-field__outline,
 .df-density-inline .v-field--variant-filled .v-field-label--floating,
 .df-density-inline .v-field--variant-solo .v-field-label--floating,
