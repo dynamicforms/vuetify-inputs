@@ -1,7 +1,7 @@
 # df-image Component
 
-`df-image` is an image upload field: a preview of the current image, a drag & drop zone, and a button that opens the
-browser's file dialog. It uses the backend interface of [df-file](./df-file).
+`df-image` is an image upload field: a preview of the current image, a drag & drop zone, a button that opens the
+browser's file dialog, and a button that pastes an image from the clipboard. It uses the backend interface of [df-file](./df-file).
 
 ## Basic Usage
 
@@ -13,6 +13,7 @@ browser's file dialog. It uses the backend interface of [df-file](./df-file).
 
 - Preview of the current image
 - Drag & drop, and a click-to-browse dialog
+- Pasting an image from the clipboard, with the paste button or Ctrl+V
 - Upload progress bar
 - Deletion of a temporary upload when the field is cleared or another upload replaces it
 - Downloading the current image; the value is a URL, so no `comms` method is needed, unlike `df-file`'s
@@ -125,9 +126,21 @@ other rejection is ignored by the component and left to the application.
 
 An upload that returns and a clear of the field mark the field touched.
 
+## Pasting From the Clipboard
+
+The paste button reads the clipboard with `navigator.clipboard.read()` and uploads the first image it holds, e.g. one
+copied with a browser's "Copy image". Chromium asks for the clipboard permission on the first paste; Firefox and Safari
+show their own "Paste" prompt on every paste. A refused permission or a dismissed prompt uploads nothing. The button is
+shown where the browser offers `navigator.clipboard.read()` (secure contexts only) and the field is neither disabled nor
+read-only. It sits at the top right corner, left of the replace button when an image is shown.
+
+Ctrl+V uploads the first image of the pasted data while focus is in the field: on the file input (reached with Tab) or
+on the paste button.
+
 ## Non-image Files
 
-A dropped or picked file whose type is not `image/*` is rejected without calling `comms.upload`.
+A dropped, picked or pasted file whose type is not `image/*` is rejected without calling `comms.upload`, and so is a
+paste-button click when the clipboard holds no image.
 
 ## Events
 

@@ -47,6 +47,7 @@ translation function reads, such as the locale.
 | `ImageInsert` | `Insert` | `<df-rtf-editor>` image menu, the insert-from-URL button |
 | `ImageDropHint` | `Drop image here or click to browse` | `<df-image>`'s empty-state drop zone |
 | `ImageReplace` | `Replace image` | `<df-image>`'s replace-image button tooltip |
+| `ImagePaste` | `Paste image from clipboard` | `<df-image>`'s paste-from-clipboard button tooltip and aria-label |
 | `ImageDownload` | `Download image` | `<df-image>`'s download button tooltip and aria-label |
 | `FileDownload` | `Download file` | `<df-file>`'s download button tooltip and aria-label |
 | `Table` | `Table` | `<df-rtf-editor>` toolbar button tooltip |

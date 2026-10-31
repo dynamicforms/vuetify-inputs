@@ -2,7 +2,9 @@ import { Fragment, Node as PMNode, Schema, Slice } from '@tiptap/pm/model';
 import { EditorState } from '@tiptap/pm/state';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createImagePasteHandler, extractImageFiles, fileToDataUrl } from './image-paste';
+import { extractImageFiles } from '../image-files';
+
+import { createImagePasteHandler, fileToDataUrl } from './image-paste';
 
 const schema = new Schema({
   nodes: {

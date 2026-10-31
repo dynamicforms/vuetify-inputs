@@ -73,3 +73,22 @@ test('replacing an existing image opens the file chooser from the overlay button
 
   expect(replaceChooser.isMultiple()).toBe(false);
 });
+
+test('the paste button uploads an image copied to the clipboard', async ({ page, context, browserName }) => {
+  test.skip(browserName !== 'chromium', 'clipboard permissions can only be granted in Chromium');
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+
+  await page.evaluate(async () => {
+    // a 1x1 PNG with a red pixel, distinct from the demo's initial SVG
+    const base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==';
+    const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': new Blob([bytes], { type: 'image/png' }) })]);
+  });
+
+  const img = page.locator('.df-image-preview img');
+  const srcBefore = await img.getAttribute('src');
+  await page.click('.df-image-paste-btn');
+
+  await expect(img).not.toHaveAttribute('src', srcBefore!, { timeout: 10000 });
+  await expect(img).toHaveAttribute('src', /^blob:/);
+});

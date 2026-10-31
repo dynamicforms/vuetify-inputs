@@ -25,6 +25,7 @@
         @dragover.prevent
         @dragleave.prevent="onDragLeave"
         @drop.prevent="onDrop"
+        @paste="onPaste"
         @click.stop
       >
         <input
@@ -58,6 +59,17 @@
         >
           <cached-icon name="mdi-pencil" />
         </label>
+        <button
+          v-if="canPaste && !isDisabled"
+          type="button"
+          class="df-image-paste-btn"
+          :class="{ 'df-image-paste-btn-shifted': previewUrl }"
+          :title="t('ImagePaste')"
+          :aria-label="t('ImagePaste')"
+          @click="pasteFromClipboard"
+        >
+          <cached-icon name="mdi-clipboard-arrow-down" />
+        </button>
         <a
           v-if="canDownload"
           :href="value as string"
@@ -76,11 +88,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, useId, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfImageProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, InputBase, translate, useInputBase } from './helpers';
+import { extractImageFiles } from './helpers/image-files';
 import { useFileUpload } from './helpers/use-file-upload';
 
 const props = withDefaults(defineProps<DfImageProps>(), defaultBaseProps);
@@ -152,6 +165,39 @@ function onDrop(event: DragEvent) {
   const file = event.dataTransfer?.files?.[0];
   if (file) handleFile(file);
 }
+
+function onPaste(event: ClipboardEvent) {
+  if (isDisabled.value) return;
+  const file = extractImageFiles(event.clipboardData)[0];
+  if (!file) return;
+  event.preventDefault();
+  handleFile(file);
+}
+
+// set after mount: SSR has no navigator, and the server render must match the first client render
+const canPaste = ref(false);
+onMounted(() => {
+  canPaste.value = typeof navigator.clipboard?.read === 'function';
+});
+
+async function pasteFromClipboard() {
+  let items: ClipboardItems;
+  try {
+    items = await navigator.clipboard.read();
+  } catch {
+    // the user denied the permission or dismissed the browser's paste prompt
+    return;
+  }
+  for (const item of items) {
+    const type = item.types.find((itemType) => itemType.startsWith('image/'));
+    if (type) {
+      const blob = await item.getType(type);
+      handleFile(new File([blob], `clipboard.${type.slice('image/'.length)}`, { type }));
+      return;
+    }
+  }
+  console.error('The clipboard holds no image');
+}
 </script>
 
 <style>
@@ -218,6 +264,7 @@ function onDrop(event: DragEvent) {
 }
 
 .df-image-replace-btn,
+.df-image-paste-btn,
 .df-image-download-btn {
   position: absolute;
   top: 4px;
@@ -233,6 +280,15 @@ function onDrop(event: DragEvent) {
 }
 .df-image-replace-btn {
   right: 4px;
+}
+.df-image-paste-btn {
+  right: 4px;
+  padding: 0;
+  border: none;
+  color: inherit;
+}
+.df-image-paste-btn.df-image-paste-btn-shifted {
+  right: 40px;
 }
 .df-image-download-btn {
   left: 4px;
