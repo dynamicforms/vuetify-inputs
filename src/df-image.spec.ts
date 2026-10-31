@@ -247,4 +247,108 @@ describe('DfImage', () => {
     const emitted = wrapper.emitted('update:modelValue') as any[];
     expect(emitted[emitted.length - 1]).toEqual(['https://example.com/uploaded.png']);
   });
+
+  describe('clipboard', () => {
+    const setClipboard = (read?: () => Promise<any[]>) =>
+      Object.defineProperty(navigator, 'clipboard', {
+        value: read ? { read: vi.fn(read) } : undefined,
+        configurable: true,
+      });
+    const clipboardItem = (types: string[], blob: Blob) => ({ types, getType: vi.fn(async () => blob) });
+
+    afterEach(() => setClipboard());
+
+    it('shows no paste button where the browser cannot read the clipboard', async () => {
+      setClipboard();
+      const wrapper = mountImage();
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find('.df-image-paste-btn').exists()).toBe(false);
+    });
+
+    it('shows no paste button on a disabled field', async () => {
+      setClipboard(async () => []);
+      const wrapper = mountImage({ control: new Form.Field<string | null>({ value: null, access: 'disabled' }) });
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find('.df-image-paste-btn').exists()).toBe(false);
+    });
+
+    it('moves the paste button next to the replace button when an image is shown', async () => {
+      setClipboard(async () => []);
+      const empty = mountImage();
+      const filled = mountImage({ modelValue: 'https://example.com/existing.png' });
+      await empty.vm.$nextTick();
+      await filled.vm.$nextTick();
+
+      expect(empty.find('.df-image-paste-btn').classes()).not.toContain('df-image-paste-btn-shifted');
+      expect(filled.find('.df-image-paste-btn').classes()).toContain('df-image-paste-btn-shifted');
+    });
+
+    it('uploads the image the paste button reads from the clipboard', async () => {
+      const blob = new Blob([new Uint8Array([137, 80, 78, 71])], { type: 'image/png' });
+      setClipboard(async () => [clipboardItem(['text/html', 'image/png'], blob)]);
+      const wrapper = mountImage();
+      await wrapper.vm.$nextTick();
+
+      await wrapper.find('.df-image-paste-btn').trigger('click');
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(comms.upload).toHaveBeenCalledTimes(1);
+      const file = (comms.upload as any).mock.calls[0][0] as File;
+      expect(file.type).toBe('image/png');
+      expect(file.name).toBe('clipboard.png');
+    });
+
+    it('uploads nothing when the clipboard holds no image', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      setClipboard(async () => [clipboardItem(['text/plain'], new Blob(['hello']))]);
+      const wrapper = mountImage();
+      await wrapper.vm.$nextTick();
+
+      await wrapper.find('.df-image-paste-btn').trigger('click');
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(comms.upload).not.toHaveBeenCalled();
+      expect(errorSpy).toHaveBeenCalled();
+      errorSpy.mockRestore();
+    });
+
+    it('uploads nothing when reading the clipboard is refused', async () => {
+      setClipboard(async () => {
+        throw new DOMException('denied', 'NotAllowedError');
+      });
+      const wrapper = mountImage();
+      await wrapper.vm.$nextTick();
+
+      await wrapper.find('.df-image-paste-btn').trigger('click');
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(comms.upload).not.toHaveBeenCalled();
+    });
+
+    it('uploads an image pasted with Ctrl+V', async () => {
+      const wrapper = mountImage();
+      const file = pngFile();
+
+      await wrapper.find('.df-image-wrapper').trigger('paste', {
+        clipboardData: { items: [{ kind: 'file', getAsFile: () => file }], files: fileList([file]) },
+      });
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(comms.upload).toHaveBeenCalledWith(file, expect.any(Function));
+    });
+
+    it('ignores a Ctrl+V paste on a disabled field', async () => {
+      const wrapper = mountImage({ control: new Form.Field<string | null>({ value: null, access: 'disabled' }) });
+      const file = pngFile();
+
+      await wrapper.find('.df-image-wrapper').trigger('paste', {
+        clipboardData: { items: [{ kind: 'file', getAsFile: () => file }], files: fileList([file]) },
+      });
+      await vi.advanceTimersByTimeAsync(0);
+
+      expect(comms.upload).not.toHaveBeenCalled();
+    });
+  });
 });

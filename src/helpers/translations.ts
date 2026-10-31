@@ -51,6 +51,7 @@ const defaults = {
   ImageInsert: 'Insert',
   ImageDropHint: 'Drop image here or click to browse',
   ImageReplace: 'Replace image',
+  ImagePaste: 'Paste image from clipboard',
   ImageDownload: 'Download image',
   FileDownload: 'Download file',
   Table: 'Table',
