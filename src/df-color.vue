@@ -39,6 +39,7 @@
                 name="picker-prepend"
                 :color="pendingColor"
                 :select="(color: string) => selectPending(proxyModel, color)"
+                :save="save"
               />
               <hexagon-palette
                 v-if="picker === 'hexagon'"
@@ -49,7 +50,7 @@
                 @dblclick="saveOnDoubleClick($event, hexagonChoices, save)"
               />
               <v-color-picker
-                v-else
+                v-else-if="picker !== 'none'"
                 v-model="proxyModel.value"
                 :mode="alpha ? 'hexa' : 'hex'"
                 :modes="alpha ? undefined : opaqueModes"
@@ -97,8 +98,11 @@ interface Emits extends BaseEmits {
 
 const emits = defineEmits<Emits>();
 defineSlots<{
-  /** Content above the picker in the menu: `color` is the pending color, `select` makes a color the pending one. */
-  'picker-prepend'?: (props: { color: string | null; select: (color: string) => void }) => any;
+  /**
+   * Content above the picker in the menu, or in its place under `picker: 'none'`: `color` is the pending color,
+   * `select` makes a color the pending one, `save` writes the pending color to the field and closes the menu.
+   */
+  'picker-prepend'?: (props: { color: string | null; select: (color: string) => void; save: () => void }) => any;
 }>();
 
 const hexColor = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{4}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;

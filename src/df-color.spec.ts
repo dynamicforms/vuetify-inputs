@@ -306,6 +306,33 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
+    it("shows only the picker-prepend slot under picker 'none', and save writes the pending color", async () => {
+      const control = new Field<string>({ value: '#ff0000' });
+      const wrapper = mount(DfColor, {
+        props: { control, picker: 'none' },
+        slots: {
+          'picker-prepend':
+            '<template #picker-prepend="{ select, save }">' +
+            '<b class="pick" @click="select(\'#00ffaa\'); save()" /></template>',
+        },
+        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
+        attachTo: document.body,
+      });
+      const menu = wrapper.findComponent({ name: 'VMenu' });
+      await menu.vm.$emit('update:modelValue', true);
+      await flushPromises();
+      expect(wrapper.findComponent(ColorPickerStub).exists()).toBe(false);
+      expect(wrapper.findComponent(HexagonPalette).exists()).toBe(false);
+      expect(document.querySelector('.df-color-picker .pick')).not.toBeNull();
+
+      (document.querySelector('.pick') as HTMLElement).click();
+      await flushPromises();
+
+      expect(control.value).toBe('#00ffaa');
+      expect(menu.props('modelValue')).toBe(false);
+      wrapper.unmount();
+    });
+
     it('emits a null preview when OK closes the picker', async () => {
       const wrapper = await openPicker(new Field<string>({ value: '#ff0000' }));
 
