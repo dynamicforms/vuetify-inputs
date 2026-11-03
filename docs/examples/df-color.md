@@ -19,6 +19,7 @@
 - Colors with or without an alpha channel (`alpha`)
 - Mapping of the chosen color to the stored value (`normalize`)
 - A `preview` event with the pending color while the picker is open
+- Own content above the picker in the menu (`picker-prepend` slot)
 - A hexagon palette of OKLCH colors in place of Vuetify's picker (`picker="hexagon"`)
 - Clearing the value under `allowNull`
 
@@ -200,6 +201,23 @@ In addition:
 | Event | Payload | Description |
 |-------|---------|-------------|
 | preview | `string \| null` | While the picker is open: the pending color, once when the picker opens and on every change in the picker; normalized when `normalize` is given. `null` when the picker closes, by OK, Cancel, a double-click or a click outside |
+
+## Slots
+
+| Slot | Slot props | Description |
+|------|------------|-------------|
+| picker-prepend | `{ color: string \| null }` | Content in the menu, above the picker. `color` is the pending color, as the `preview` event carries it |
+
+Content in the slot moves with the menu, which opens below or above the field, so a preview of the pending color
+there is not covered by the menu:
+
+```vue
+<df-color v-model="color" label="Group color" :alpha="false">
+  <template #picker-prepend="{ color: pending }">
+    <div class="pa-2" :style="{ backgroundColor: pending ?? undefined }">Group name</div>
+  </template>
+</df-color>
+```
 
 ## Example: Custom Validation
 

@@ -35,6 +35,7 @@
         >
           <template #default="{ model: proxyModel, save, cancel, isPristine }">
             <v-card class="df-color-picker">
+              <slot name="picker-prepend" :color="pendingColor" />
               <hexagon-palette
                 v-if="picker === 'hexagon'"
                 v-model="proxyModel.value"
@@ -91,6 +92,10 @@ interface Emits extends BaseEmits {
 }
 
 const emits = defineEmits<Emits>();
+defineSlots<{
+  /** Content above the picker in the menu; `color` is the pending color, as the `preview` event carries it. */
+  'picker-prepend'?: (props: { color: string | null }) => any;
+}>();
 
 const hexColor = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{4}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;
 const opaqueHexColor = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/;
@@ -147,11 +152,19 @@ function commitPicked(color: string | null) {
   value.value = (normalized(color) ?? color) as string;
 }
 
+// the pending color while the picker is open, normalized; null while it is closed
+const pendingColor = ref<string | null>(null);
+
 function previewPicked(color: string | null) {
-  if (dropdownShown.value) emits('preview', normalized(color));
+  if (!dropdownShown.value) return;
+  pendingColor.value = normalized(color);
+  emits('preview', pendingColor.value);
 }
 
-watch(dropdownShown, (shown) => emits('preview', shown ? normalized(value.value) : null));
+watch(dropdownShown, (shown) => {
+  pendingColor.value = shown ? normalized(value.value) : null;
+  emits('preview', pendingColor.value);
+});
 
 // a value confirmed in the picker concludes the edit: the field may hold no focus to lose
 function concludeEdit() {

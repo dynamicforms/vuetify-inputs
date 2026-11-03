@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.5] - 2026-11-03
+
+### Added
+
+- `df-color` has a `picker-prepend` slot: content in the menu above the picker, with the pending color as the slot
+  prop `color`.
+
 ## [0.15.4] - 2026-10-31
 
 ### Added

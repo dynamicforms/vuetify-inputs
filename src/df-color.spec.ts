@@ -255,6 +255,31 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
+    it('renders the picker-prepend slot above the picker with the pending color', async () => {
+      const wrapper = mount(DfColor, {
+        props: { control: new Field<string>({ value: '#ff0000' }), normalize: (value: string) => value.toUpperCase() },
+        slots: {
+          'picker-prepend': '<template #picker-prepend="{ color }"><i class="prepended">{{ color }}</i></template>',
+        },
+        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
+        attachTo: document.body,
+      });
+      expect(document.querySelector('.prepended')).toBeNull();
+
+      await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
+      await flushPromises();
+      const card = document.querySelector('.df-color-picker')!;
+      const prepended = card.querySelector('.prepended')!;
+      const picker = card.querySelector('.color-picker-stub')!;
+      expect(prepended.compareDocumentPosition(picker) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(card.querySelector('.prepended')!.textContent).toBe('#FF0000');
+
+      wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ffaa');
+      await flushPromises();
+      expect(card.querySelector('.prepended')!.textContent).toBe('#00FFAA');
+      wrapper.unmount();
+    });
+
     it('emits a null preview when OK closes the picker', async () => {
       const wrapper = await openPicker(new Field<string>({ value: '#ff0000' }));
 
