@@ -19,8 +19,7 @@
 - Colors with or without an alpha channel (`alpha`)
 - Mapping of the chosen color to the stored value (`normalize`)
 - A `preview` event with the pending color while the picker is open
-- Content of your own above the picker in the menu, or in its place, with the pending color, which it can also set
-  and save (`picker-prepend` slot, `picker="none"`)
+- `picker-prepend` slot with read and write access to the pending color; `picker="none"` shows only the slot
 - A hexagon palette of OKLCH colors in place of Vuetify's picker (`picker="hexagon"`)
 - Clearing the value under `allowNull`
 
@@ -205,17 +204,17 @@ In addition:
 
 ## Slots
 
-| Slot | Slot props | Description |
-|------|------------|-------------|
-| picker-prepend | `{ color: string \| null, select: (color: string) => void, save: () => void }` | Content in the menu, above the picker; under `picker="none"` the only content besides OK and Cancel |
+### picker-prepend
 
-- `color` is the pending color, normalized when `normalize` is given, as the `preview` event carries it. It follows
-  every change in the picker.
-- `select(color)` makes `color` the pending color, as a pick in the picker does: the picker shows it and a `preview`
-  event carries it. OK writes it to the field, Cancel discards it.
-- `save()` writes the pending color to the field and closes the menu, as OK does.
+Rendered in the menu above the picker. With `picker="none"` the picker is not rendered; OK and Cancel remain.
 
-The slot can show the pending color as the application draws it, or offer colors of its own to pick from:
+| Slot prop | Type | Description |
+|-----------|------|-------------|
+| color | `string \| null` | Pending color. Same value as the payload of the last `preview` event |
+| select | `(color: string) => void` | Sets the pending color. Updates the picker and emits `preview`. The field value is unchanged until OK |
+| save | `() => void` | Writes the pending color to the field and closes the menu. Same as OK |
+
+Pending color preview and preset colors:
 
 ```vue
 <df-color v-model="color" label="Group color" :alpha="false">
@@ -235,7 +234,7 @@ The slot can show the pending color as the application draws it, or offer colors
 </df-color>
 ```
 
-With `picker="none"` the slot is the whole picker. Here a click on a color picks and saves it at once:
+`picker="none"` with preset colors; a click selects and saves:
 
 ```vue
 <df-color v-model="color" label="Brand color" picker="none">

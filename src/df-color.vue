@@ -169,7 +169,7 @@ function previewPicked(color: string | null) {
   emits('preview', pendingColor.value);
 }
 
-// a color chosen in the picker-prepend slot: pending, as if picked in the picker
+// select() of the picker-prepend slot: sets the pending color like a pick in the picker
 function selectPending(proxyModel: { value: string | null }, color: string) {
   proxyModel.value = color;
   previewPicked(color);
