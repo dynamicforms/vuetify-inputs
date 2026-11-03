@@ -280,6 +280,32 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
+    it('makes a color selected through the picker-prepend slot pending, written by OK', async () => {
+      const control = new Field<string>({ value: '#ff0000' });
+      const wrapper = mount(DfColor, {
+        props: { control, normalize: (value: string) => value.toUpperCase() },
+        slots: {
+          'picker-prepend':
+            '<template #picker-prepend="{ select }"><b class="pick" @click="select(\'#00ffaa\')" /></template>',
+        },
+        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
+        attachTo: document.body,
+      });
+      await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
+      await flushPromises();
+
+      (document.querySelector('.pick') as HTMLElement).click();
+      await flushPromises();
+      expect(wrapper.findComponent(ColorPickerStub).props('modelValue')).toBe('#00ffaa');
+      expect(wrapper.emitted('preview')!.at(-1)).toEqual(['#00FFAA']);
+      expect(control.value).toBe('#ff0000');
+
+      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
+      await ok!.trigger('click');
+      expect(control.value).toBe('#00FFAA');
+      wrapper.unmount();
+    });
+
     it('emits a null preview when OK closes the picker', async () => {
       const wrapper = await openPicker(new Field<string>({ value: '#ff0000' }));
 

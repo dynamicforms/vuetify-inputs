@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `df-color` has a `picker-prepend` slot: content in the menu above the picker, with the pending color as the slot
-  prop `color`.
+- `df-color` has a `picker-prepend` slot: content in the menu above the picker. Its props are the pending color
+  (`color`) and `select(color)`, which makes a color the pending one.
 
 ## [0.15.4] - 2026-10-31
 

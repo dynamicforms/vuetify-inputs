@@ -35,7 +35,11 @@
         >
           <template #default="{ model: proxyModel, save, cancel, isPristine }">
             <v-card class="df-color-picker">
-              <slot name="picker-prepend" :color="pendingColor" />
+              <slot
+                name="picker-prepend"
+                :color="pendingColor"
+                :select="(color: string) => selectPending(proxyModel, color)"
+              />
               <hexagon-palette
                 v-if="picker === 'hexagon'"
                 v-model="proxyModel.value"
@@ -93,8 +97,8 @@ interface Emits extends BaseEmits {
 
 const emits = defineEmits<Emits>();
 defineSlots<{
-  /** Content above the picker in the menu; `color` is the pending color, as the `preview` event carries it. */
-  'picker-prepend'?: (props: { color: string | null }) => any;
+  /** Content above the picker in the menu: `color` is the pending color, `select` makes a color the pending one. */
+  'picker-prepend'?: (props: { color: string | null; select: (color: string) => void }) => any;
 }>();
 
 const hexColor = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{4}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;
@@ -159,6 +163,12 @@ function previewPicked(color: string | null) {
   if (!dropdownShown.value) return;
   pendingColor.value = normalized(color);
   emits('preview', pendingColor.value);
+}
+
+// a color chosen in the picker-prepend slot: pending, as if picked in the picker
+function selectPending(proxyModel: { value: string | null }, color: string) {
+  proxyModel.value = color;
+  previewPicked(color);
 }
 
 watch(dropdownShown, (shown) => {

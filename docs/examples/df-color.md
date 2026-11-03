@@ -19,7 +19,8 @@
 - Colors with or without an alpha channel (`alpha`)
 - Mapping of the chosen color to the stored value (`normalize`)
 - A `preview` event with the pending color while the picker is open
-- Own content above the picker in the menu (`picker-prepend` slot)
+- Content of your own above the picker in the menu, with the pending color, which it can also set (`picker-prepend`
+  slot)
 - A hexagon palette of OKLCH colors in place of Vuetify's picker (`picker="hexagon"`)
 - Clearing the value under `allowNull`
 
@@ -206,15 +207,29 @@ In addition:
 
 | Slot | Slot props | Description |
 |------|------------|-------------|
-| picker-prepend | `{ color: string \| null }` | Content in the menu, above the picker. `color` is the pending color, as the `preview` event carries it |
+| picker-prepend | `{ color: string \| null, select: (color: string) => void }` | Content in the menu, above the picker |
 
-Content in the slot moves with the menu, which opens below or above the field, so a preview of the pending color
-there is not covered by the menu:
+- `color` is the pending color, normalized when `normalize` is given, as the `preview` event carries it. It follows
+  every change in the picker.
+- `select(color)` makes `color` the pending color, as a pick in the picker does: the picker shows it and a `preview`
+  event carries it. OK writes it to the field, Cancel discards it.
+
+The slot can show the pending color as the application draws it, or offer colors of its own to pick from:
 
 ```vue
 <df-color v-model="color" label="Group color" :alpha="false">
-  <template #picker-prepend="{ color: pending }">
+  <template #picker-prepend="{ color: pending, select }">
     <div class="pa-2" :style="{ backgroundColor: pending ?? undefined }">Group name</div>
+    <div class="d-flex ga-1 pa-2">
+      <v-btn
+        v-for="recent in recentColors"
+        :key="recent"
+        :color="recent"
+        size="small"
+        icon
+        @click="select(recent)"
+      />
+    </div>
   </template>
 </df-color>
 ```
