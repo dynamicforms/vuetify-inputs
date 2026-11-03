@@ -19,6 +19,7 @@
 - Colors with or without an alpha channel (`alpha`)
 - Mapping of the chosen color to the stored value (`normalize`)
 - A `preview` event with the pending color while the picker is open
+- `picker-prepend` slot with read and write access to the pending color; `picker="none"` shows only the slot
 - A hexagon palette of OKLCH colors in place of Vuetify's picker (`picker="hexagon"`)
 - Clearing the value under `allowNull`
 
@@ -39,7 +40,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | allowNull | `boolean` | `false` | Whether to allow null (empty) values |
 | alpha | `boolean` | `true` | Whether the color has an alpha channel. `true`: the picker runs in `hexa` mode with the alpha slider. `false`: the picker runs in `hex` mode, offers only the `hex`, `rgb` and `hsl` modes, has no alpha slider, and the format check accepts only 3 or 6 hex digits |
 | normalize | `(value: string) => string` | `undefined` | Maps a valid color to the value the component stores and shows (see [Normalizing the color](#normalizing-the-color)) |
-| picker | `'generic' \| 'hexagon'` | `'generic'` | The picker in the menu: `'generic'` is Vuetify's color picker, `'hexagon'` the [hexagon palette](#hexagon-palette) |
+| picker | `'generic' \| 'hexagon' \| 'none'` | `'generic'` | The picker in the menu: `'generic'` is Vuetify's color picker, `'hexagon'` the [hexagon palette](#hexagon-palette), `'none'` only the [`picker-prepend` slot](#slots) |
 | hexagonRings | `number` | `5` | The number of rings of the hexagon palette, the centre cell counted as the first: `1 + 3·n·(n − 1)` cells (3 → 19, 4 → 37, 5 → 61) |
 | lightnessLevels | `number \| number[]` | `undefined` | The OKLCH lightness (0..1) the hexagon palette offers: the full range, `n` evenly spaced levels, or the given levels (see [Lightness](#lightness)) |
 
@@ -200,6 +201,57 @@ In addition:
 | Event | Payload | Description |
 |-------|---------|-------------|
 | preview | `string \| null` | While the picker is open: the pending color, once when the picker opens and on every change in the picker; normalized when `normalize` is given. `null` when the picker closes, by OK, Cancel, a double-click or a click outside |
+
+## Slots
+
+### picker-prepend
+
+Rendered in the menu above the picker. With `picker="none"` the picker is not rendered; OK and Cancel remain.
+
+| Slot prop | Type | Description |
+|-----------|------|-------------|
+| color | `string \| null` | Pending color. Same value as the payload of the last `preview` event |
+| select | `(color: string) => void` | Sets the pending color. Updates the picker and emits `preview`. The field value is unchanged until OK |
+| save | `() => void` | Writes the pending color to the field and closes the menu. Same as OK |
+
+Pending color preview and preset colors:
+
+```vue
+<df-color v-model="color" label="Group color" :alpha="false">
+  <template #picker-prepend="{ color: pending, select }">
+    <div class="pa-2" :style="{ backgroundColor: pending ?? undefined }">Group name</div>
+    <div class="d-flex ga-1 pa-2">
+      <v-btn
+        v-for="recent in recentColors"
+        :key="recent"
+        :color="recent"
+        size="small"
+        icon
+        @click="select(recent)"
+      />
+    </div>
+  </template>
+</df-color>
+```
+
+`picker="none"` with preset colors; a click selects and saves:
+
+```vue
+<df-color v-model="color" label="Brand color" picker="none">
+  <template #picker-prepend="{ select, save }">
+    <div class="d-flex ga-1 pa-2">
+      <v-btn
+        v-for="brand in brandColors"
+        :key="brand"
+        :color="brand"
+        size="small"
+        icon
+        @click="select(brand); save()"
+      />
+    </div>
+  </template>
+</df-color>
+```
 
 ## Example: Custom Validation
 
