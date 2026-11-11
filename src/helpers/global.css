@@ -168,3 +168,10 @@
     visibility: hidden !important;
 }
 
+
+/* Vuetify gives the control row of a horizontal v-input `1fr`: a v-input stretched to the height of a taller sibling in
+   its row grows its control. The extra height goes to the messages row instead, so the controls of a row stay level. */
+.v-input--horizontal[class*="df-density-"],
+[class*="df-density-"] > .v-input--horizontal {
+  grid-template-rows: auto 1fr;
+}
