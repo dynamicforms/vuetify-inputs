@@ -50,6 +50,45 @@
         </div>
       </v-card-text>
     </v-card>
+
+    <v-card class="mb-4">
+      <v-card-title>A field with a hint</v-card-title>
+      <v-card-text>
+        <p class="mb-4">
+          The columns stretch their fields to the height of the row. The hint of one field makes the row taller, and the
+          controls of all fields stay level.
+        </p>
+        <v-row class="hint-row">
+          <v-col cols="3">
+            <df-input v-model="formData.input" label="df-input" :variant="selectedVariant" />
+          </v-col>
+          <v-col cols="3">
+            <df-select
+              v-model="formData.select"
+              label="df-select"
+              :choices="selectChoices"
+              :variant="selectedVariant"
+            />
+          </v-col>
+          <v-col cols="3">
+            <df-date-time
+              v-model="formData.datetime"
+              label="df-date-time"
+              input-type="date"
+              :variant="selectedVariant"
+            />
+          </v-col>
+          <v-col cols="3">
+            <df-color
+              v-model="formData.color"
+              label="df-color"
+              hint="A hint long enough to wrap onto a second line in this column"
+              :variant="selectedVariant"
+            />
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
@@ -212,5 +251,13 @@ const components = [
 
 .component-cell > * {
   width: 100%;
+}
+
+.hint-row > .v-col {
+  display: flex;
+}
+
+.hint-row > .v-col > * {
+  flex: 1 1 auto;
 }
 </style>

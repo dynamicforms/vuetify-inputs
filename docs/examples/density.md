@@ -12,6 +12,8 @@ and grid layouts.
 - **Vertical alignment**: components of different types on one row are aligned
 - **Density**: each density (default, compact, comfortable, inline) applies to all components the same way
 - **Variant**: every Vuetify variant applies to all components
+- **Fields with a hint**: on a row whose columns stretch their fields to the row's height, a field's hint or errors
+  make the row taller and the controls of all fields stay level
 
 ## Density Options
 

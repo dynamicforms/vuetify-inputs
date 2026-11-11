@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.6] - 2026-11-11
+
+### Fixed
+
+- Fields on one row keep their controls level when a neighbour is taller because of a hint or an error: the extra
+  height of a stretched field goes below its message row instead of into its control.
+
 ## [0.15.5] - 2026-11-03
 
 ### Added
