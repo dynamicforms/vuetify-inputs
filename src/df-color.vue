@@ -13,7 +13,7 @@
     <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
     <template #prepend-inner>
       <div
-        style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid #ccc"
+        style="position: relative; width: 24px; height: 24px; border-radius: 4px; border: 1px solid #ccc"
         :style="{ backgroundColor: swatchColor }"
       />
     </template>
