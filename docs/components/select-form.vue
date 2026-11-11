@@ -100,7 +100,7 @@ personForm.registerAction(
   margin: 2rem 0;
 }
 .output {
-  background-color: #f5f5f5;
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
   padding: 1rem;
   border-radius: 4px;
   white-space: pre-wrap;

@@ -1,7 +1,8 @@
-import { h } from 'vue'
+import { defineComponent, h, onMounted, watch } from 'vue'
 import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
-import { createVuetify } from 'vuetify'
+import { useData } from 'vitepress'
+import { createVuetify, useTheme } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import 'vuetify/styles'
@@ -31,9 +32,15 @@ export default {
 
     // app.use(DynamicFormsInputsVuetify);
   },
-  Layout: () => {
-    return h(DefaultTheme.Layout, null, {
-      // lahko dodamo custom slote za layout, če bo potrebno
-    })
-  }
+  // the demos follow the site's light / dark appearance. Applied after mounting: the server renders the light theme
+  Layout: defineComponent({
+    setup() {
+      const { isDark } = useData();
+      const theme = useTheme();
+      onMounted(() => {
+        watch(isDark, (dark) => theme.change(dark ? 'dark' : 'light'), { immediate: true });
+      });
+      return () => h(DefaultTheme.Layout);
+    },
+  }),
 } satisfies Theme

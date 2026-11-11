@@ -69,7 +69,7 @@ function resetField() {
 }
 
 pre {
-  background-color: #f5f5f5;
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
   padding: 0.5rem;
   border-radius: 4px;
   max-height: 150px;
@@ -80,9 +80,9 @@ pre {
 
 .preview-container {
   padding: 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   border-radius: 4px;
   margin-top: 0.5rem;
-  background-color: #ffffff;
+  background-color: rgb(var(--v-theme-surface));
 }
 </style>
