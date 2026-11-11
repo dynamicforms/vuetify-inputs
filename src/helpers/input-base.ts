@@ -238,7 +238,7 @@ export function useInputBase<T = any>(
       class: cssClass.value,
 
       density: boundDensity.value,
-      // 'inverted' is Vuetify's solo on the surface-variant background, focused or not
+      // 'inverted' is solo-inverted inverted always: solo on the background solo-inverted takes while focused
       variant: (variant.value === 'inverted' ? 'solo' : variant.value) as VuetifyVariant,
       bgColor: variant.value === 'inverted' ? 'surface-variant' : undefined,
 

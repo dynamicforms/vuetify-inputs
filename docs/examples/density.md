@@ -32,9 +32,9 @@ and grid layouts.
 - **solo**: Elevated appearance with shadows
 - **solo-inverted**: Solo variant whose colours invert while focused
 - **solo-filled**: Filled solo variant
-- **inverted**: Solo variant on the theme's `surface-variant` background with `on-surface-variant` text, focused or
-  not. The label is at full opacity while the field is focused. The library renders it as Vuetify's `solo` with
-  `bg-color="surface-variant"`; `df-checkbox` has no field and renders as in every other variant
+- **inverted**: `solo-inverted` with the colours inverted always, not only while focused. Focus shows as in `solo`:
+  the label is at full opacity. Rendered as Vuetify's `solo` with `bg-color="surface-variant"`. `df-checkbox` has no
+  field and renders as in every other variant
 
 ## Support for setting variant and density on groups of inputs
 

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Variant `inverted`: Vuetify's `solo` on the theme's `surface-variant` background, focused or not.
+- Variant `inverted`: `solo-inverted` with the colours inverted always, not only while focused.
 
 ### Fixed
 
