@@ -40,7 +40,8 @@ flags.
 | `errorText` | `ErrorText`: `(error: ErrorDescription) => RenderContentNonCallable \| undefined` | unset | The content an error renders as: a string, an `MdString` for markdown, an `HtmlString` for HTML or a `SimpleComponentDef` for a component. `undefined` renders the error's `detail`. It runs while the errors are rendered, and what it reads reactively is tracked. See [Translating errors](/examples/localisation#translating-errors) |
 
 `FieldDensity` is `'default' | 'comfortable' | 'compact' | 'inline'`, `FieldVariant` is
-`'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled'`.
+`'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled' | 'inverted'`. `'inverted'` is
+the library's own; see [Variant options](/examples/density#variant-options).
 
 The options are provided to the application under the library's settings key, and every field reads
 `defaultDensity` and `defaultVariant` from it.

@@ -30,8 +30,11 @@ and grid layouts.
 - **underlined**: Components with bottom borders only
 - **plain**: Minimal styling with no backgrounds or borders
 - **solo**: Elevated appearance with shadows
-- **solo-inverted**: Inverted solo variant
+- **solo-inverted**: Solo variant whose colours invert while focused
 - **solo-filled**: Filled solo variant
+- **inverted**: `solo-inverted` with the colours inverted always, not only while focused. Focus shows as in `solo`:
+  the label is at full opacity. Rendered as Vuetify's `solo` with `bg-color="surface-variant"`. `df-checkbox` has no
+  field and renders as in every other variant
 
 ## Support for setting variant and density on groups of inputs
 

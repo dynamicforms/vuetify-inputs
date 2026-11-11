@@ -137,7 +137,7 @@ function calculateTotal() {
 }
 
 .values-display {
-  background-color: #f5f5f5;
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
   padding: 15px;
   border-radius: 4px;
 }

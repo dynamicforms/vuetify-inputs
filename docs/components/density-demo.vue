@@ -28,7 +28,7 @@
                 {{ component.label }}
               </div>
             </div>
-            <div style="grid-column: 1/9; border-top: 1px solid #666" />
+            <div style="grid-column: 1/9; border-top: 1px solid rgba(var(--v-theme-on-surface), 0.4)" />
             <!-- Density rows -->
             <template v-for="density in densityOptions" :key="density">
               <div class="grid-row">
@@ -44,7 +44,7 @@
                   />
                 </div>
               </div>
-              <div style="grid-column: 1/9; border-top: 1px solid #666" />
+              <div style="grid-column: 1/9; border-top: 1px solid rgba(var(--v-theme-on-surface), 0.4)" />
             </template>
           </div>
         </div>
@@ -108,6 +108,7 @@ const variantOptions = [
   { text: 'Solo', id: 'solo' },
   { text: 'Solo Inverted', id: 'solo-inverted' },
   { text: 'Solo Filled', id: 'solo-filled' },
+  { text: 'Inverted', id: 'inverted' },
 ];
 
 const densityOptions = ['default', 'compact', 'comfortable', 'inline'];
@@ -235,7 +236,7 @@ const components = [
   font-weight: 600;
   text-align: right;
   padding-right: 1em;
-  color: #666;
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
   font-size: 0.875rem;
 }
 
@@ -243,10 +244,10 @@ const components = [
   font-weight: 600;
   text-align: center;
   padding: 8px 4px;
-  background-color: #f5f5f5;
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
   border-radius: 4px;
   font-size: 0.75rem;
-  color: #666;
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity));
 }
 
 .component-cell > * {

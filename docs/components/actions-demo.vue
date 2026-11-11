@@ -140,12 +140,12 @@ const currentBreakpoint = computed(() => {
 
 <style scoped>
 .actions-demo {
-  border: 0.2em solid #ccc;
+  border: 0.2em solid rgba(var(--v-border-color), var(--v-border-opacity));
   border-radius: 1em;
 }
 
 .actions-container {
-  border: 0.1em dashed #ccc;
+  border: 0.1em dashed rgba(var(--v-border-color), var(--v-border-opacity));
   padding: 1em;
   border-radius: 0.5em;
 }

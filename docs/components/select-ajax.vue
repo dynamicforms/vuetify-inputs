@@ -71,7 +71,7 @@ const fetchLanguages = async (query) => {
 }
 
 pre {
-  background-color: #f5f5f5;
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
   padding: 10px;
   border-radius: 4px;
   max-height: 100px;

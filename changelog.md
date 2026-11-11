@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.15.6] - 2026-11-11
 
+### Added
+
+- Variant `inverted`: `solo-inverted` with the colours inverted always, not only while focused.
+
 ### Fixed
 
 - Fields on one row keep their controls level when a neighbour is taller because of a hint or an error: the extra

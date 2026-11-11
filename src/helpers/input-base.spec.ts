@@ -803,6 +803,20 @@ describe('input-base', () => {
 
         expect(result.vuetifyBindings.value.variant).toBe('underlined');
       });
+
+      it('binds "inverted" as solo on the surface-variant background', () => {
+        const result = useInputBase({ variant: 'inverted' }, vi.fn());
+
+        expect(result.vuetifyBindings.value.variant).toBe('solo');
+        expect(result.vuetifyBindings.value.bgColor).toBe('surface-variant');
+      });
+
+      it('binds no background for a Vuetify variant', () => {
+        const result = useInputBase({ variant: 'solo-inverted' }, vi.fn());
+
+        expect(result.vuetifyBindings.value.variant).toBe('solo-inverted');
+        expect(result.vuetifyBindings.value.bgColor).toBeUndefined();
+      });
     });
 
     describe('vuetifyBindings', () => {

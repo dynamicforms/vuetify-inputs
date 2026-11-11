@@ -16,7 +16,11 @@ export class Label {
   ) {}
 }
 
-export type FieldVariant = 'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled';
+/** The variants Vuetify's fields take */
+export type VuetifyVariant = Exclude<FieldVariant, 'inverted'>;
+
+export type FieldVariant =
+  'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled' | 'inverted';
 export type VuetifyDensity = 'default' | 'comfortable' | 'compact';
 export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
 /** Vuetify's own `size` prop (`v-btn`, `v-icon`, ...) also accepts an arbitrary CSS length or number, so this
@@ -234,7 +238,9 @@ export function useInputBase<T = any>(
       class: cssClass.value,
 
       density: boundDensity.value,
-      variant: variant.value,
+      // 'inverted' is solo-inverted inverted always: solo on the background solo-inverted takes while focused
+      variant: (variant.value === 'inverted' ? 'solo' : variant.value) as VuetifyVariant,
+      bgColor: variant.value === 'inverted' ? 'surface-variant' : undefined,
 
       label: renderContentText(label.value.text),
       errorMessages: anyErrors.value,
