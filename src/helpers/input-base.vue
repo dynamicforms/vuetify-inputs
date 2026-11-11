@@ -11,6 +11,7 @@
   >
     <v-field
       :variant="vuetifyBindings.variant"
+      :bg-color="vuetifyBindings.bgColor"
       :density="vuetifyBindings.density"
       :label="vuetifyBindings.label"
       :disabled="vuetifyBindings.disabled"
