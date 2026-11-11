@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `df-input-group`: one field's frame, label and message row around several inputs, e.g. a set of checkboxes. Its
+  children render without frames of their own; a bound `Group` or `List` shows the errors of all its elements.
+- `selectShownErrorsDeep(element, settings)`: the shown errors of an element and of every element it contains.
 - Variant `inverted`: `solo-inverted` with the colours inverted always, not only while focused.
 
 ### Fixed

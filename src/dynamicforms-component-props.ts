@@ -87,6 +87,16 @@ export interface DfInputProps extends BaseProps {
   max?: number;
 }
 
+/** How `DfInputGroup` lays out its children: on one row, on rows that wrap, or in a column. */
+export type DfInputGroupDirection = 'row' | 'wrap' | 'column';
+
+export interface DfInputGroupProps extends Pick<
+  BaseProps,
+  'control' | 'label' | 'errors' | 'hint' | 'enabled' | 'visibility' | 'cssClass' | 'density' | 'variant'
+> {
+  direction?: DfInputGroupDirection;
+}
+
 export interface MessagesWidgetProps {
   /** A plain text, or the items to render, each in its own element: a `RenderableValue` as its content, an error
    * as `errorText()` gives it. */

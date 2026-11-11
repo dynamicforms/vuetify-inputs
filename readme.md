@@ -51,8 +51,8 @@ consistent appearance.
 
 ## Everything else it does
 
-- **Ten components**: `df-input`, `df-text-area`, `df-select`, `df-checkbox`, `df-color`, `df-date-time`, `df-file`,
-  `df-rtf-editor`, `df-actions` and `df-input-hint`
+- **Twelve components**: `df-input`, `df-text-area`, `df-select`, `df-checkbox`, `df-color`, `df-date-time`,
+  `df-file`, `df-image`, `df-rtf-editor`, `df-actions`, `df-input-hint` and `df-input-group`
 - **A control, a v-model, or neither**: a bound element owns the value, validity, touched, enabled and visibility;
   `v-model` reports changes to the parent; neither keeps the value internally
 - **Errors, hints and help text** in one row, rendered through the library's own `MessagesWidget`; an error
@@ -174,7 +174,9 @@ Detailed documentation is available at [https://docs.velis.si/dynamicforms/vueti
 - **df-color**: A color input.
 - **df-date-time**: A date and time selection component with configurable format and type.
 - **df-file**: A file upload component with progress indication
+- **df-image**: An image upload with a preview, drag and drop and paste
 - **df-input**: A general value input.
+- **df-input-group**: One field's frame, label and message row around several inputs, e.g. a set of checkboxes
 - **df-input-hint**: Renders a field's or a group's errors, falling back to its hint text.
 - **df-rtf-editor**: A RTF editor input.
 - **df-select**: A selection component supporting static or dynamic options, multiple selection, and tagging

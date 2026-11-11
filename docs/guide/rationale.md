@@ -48,8 +48,10 @@ looks like.
 | [df-color](/examples/df-color) | Hex colour field with a swatch and a picker |
 | [df-date-time](/examples/df-datetime) | Date, time or both, with a configurable display format and a date-fns locale |
 | [df-file](/examples/df-file) | File upload driven by a `FileComms` object — upload with progress, delete, and a periodic touch |
+| [df-image](/examples/df-image) | Image upload with a preview, drag and drop and paste from the clipboard |
 | [df-rtf-editor](/examples/df-rtf-editor) | Rich text on TipTap, with a Vuetify toolbar, inside the same field frame as every other input |
 | [df-actions](/examples/df-actions) | A row of `Action` objects as buttons or text links |
+| [df-input-group](/examples/df-input-group) | One field's frame, label and message row around several inputs, e.g. a set of checkboxes |
 | [df-input-hint](/examples/df-input-hint) | The message row every field renders: errors when there are any, the hint otherwise |
 
 ### What every field shares

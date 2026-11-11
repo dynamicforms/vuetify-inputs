@@ -200,6 +200,9 @@ const formErrors = useShownErrors(form);   // ComputedRef<ValidationError[]>, tr
 ```
 
 `selectShownErrors(errors, control, touched, settings)` is the rule itself, for code that has the settings in hand.
+`selectShownErrorsDeep(element, settings)` applies it to `element` and to every element a `Group` or `List` contains,
+each by its own `touched`: the container's own errors first, then its members' in their order. It is what
+[`df-input-group`](/examples/df-input-group#errors) shows for a bound container.
 
 ## passthroughAttrs
 

@@ -5,6 +5,7 @@ export { default as DfDateTime } from './df-datetime.vue';
 export { default as DfFile } from './df-file.vue';
 export { default as DfImage } from './df-image.vue';
 export { default as DfInput } from './df-input.vue';
+export { default as DfInputGroup } from './df-input-group.vue';
 export { default as DfInputHint } from './helpers/df-input-hint.vue';
 export { default as DfLabel } from './helpers/df-label.vue';
 export { default as DfRtfEditor } from './df-rtf-editor.vue';
