@@ -1,4 +1,4 @@
-import type { FieldBase, ValidationError } from '@dynamicforms/vue-forms';
+import { type FieldBase, Group, List, type ValidationError } from '@dynamicforms/vue-forms';
 import { computed, type ComputedRef, inject, type MaybeRefOrGetter, toValue } from 'vue';
 
 import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
@@ -35,4 +35,16 @@ export function useShownErrors(element: MaybeRefOrGetter<FieldBase | undefined>)
     const control = toValue(element);
     return control ? selectShownErrors(control.errors, control, control.touched, settings) : [];
   });
+}
+
+/**
+ * The errors to show now of `element` and of every element it contains, each selected by its own `touched` as in
+ * `selectShownErrors`. A container's own errors come before those of its members, in the members' order.
+ */
+export function selectShownErrorsDeep(element: FieldBase, settings: VuetifyInputsSettings): ValidationError[] {
+  const own = selectShownErrors(element.errors, element, element.touched, settings);
+  let members: readonly FieldBase[] = [];
+  if (element instanceof Group) members = Object.values(element.fields);
+  else if (element instanceof List) members = element.items;
+  return [...own, ...members.flatMap((member) => selectShownErrorsDeep(member, settings))];
 }

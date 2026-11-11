@@ -28,14 +28,24 @@
                 {{ component.label }}
               </div>
             </div>
-            <div style="grid-column: 1/9; border-top: 1px solid rgba(var(--v-theme-on-surface), 0.4)" />
+            <div style="grid-column: 1/10; border-top: 1px solid rgba(var(--v-theme-on-surface), 0.4)" />
             <!-- Density rows -->
             <template v-for="density in densityOptions" :key="density">
               <div class="grid-row">
                 <div class="density-label">{{ density }}</div>
                 <div v-for="component in components" :key="`${density}-${component.name}`" class="component-cell">
+                  <df-input-group
+                    v-if="component.name === 'group'"
+                    :label="component.label"
+                    :variant="selectedVariant"
+                    :density="density"
+                  >
+                    <df-checkbox v-model="formData.groupFirst" label="First" />
+                    <df-checkbox v-model="formData.groupSecond" label="Second" />
+                  </df-input-group>
                   <component
                     :is="component.component"
+                    v-else
                     v-model="formData[component.model]"
                     :label="component.label"
                     v-bind="component.props"
@@ -44,7 +54,7 @@
                   />
                 </div>
               </div>
-              <div style="grid-column: 1/9; border-top: 1px solid rgba(var(--v-theme-on-surface), 0.4)" />
+              <div style="grid-column: 1/10; border-top: 1px solid rgba(var(--v-theme-on-surface), 0.4)" />
             </template>
           </div>
         </div>
@@ -95,7 +105,7 @@
 <script setup>
 import { ref } from 'vue';
 
-import { DfInput, DfSelect, DfCheckbox, DfDateTime, DfFile, DfTextArea, DfColor } from '../../src';
+import { DfInput, DfInputGroup, DfSelect, DfCheckbox, DfDateTime, DfFile, DfTextArea, DfColor } from '../../src';
 
 const selectedVariant = ref('outlined');
 const fullscreen = ref(false);
@@ -117,6 +127,8 @@ const formData = ref({
   input: 'Sample text',
   select: 'option1',
   checkbox: true,
+  groupFirst: true,
+  groupSecond: false,
   datetime: new Date().toISOString().split('T')[0],
   file: null,
   textarea: 'Sample text area content',
@@ -170,6 +182,13 @@ const components = [
     props: {},
   },
   {
+    name: 'group',
+    label: 'df-input-group',
+    component: DfInputGroup,
+    model: 'groupFirst',
+    props: {},
+  },
+  {
     name: 'datetime',
     label: 'df-date-time',
     component: DfDateTime,
@@ -218,7 +237,7 @@ const components = [
 .demo-grid {
   display: grid;
   grid-template-columns:
-    repeat(4, minmax(8em, max-content)) minmax(11em, max-content)
+    repeat(4, minmax(8em, max-content)) minmax(13em, max-content) minmax(11em, max-content)
     repeat(3, minmax(8em, max-content));
   gap: 8px;
   align-items: center;

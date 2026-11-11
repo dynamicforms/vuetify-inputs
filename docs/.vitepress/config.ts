@@ -73,6 +73,7 @@ export default defineConfig({
             { text: 'df-file', link: '/examples/df-file' },
             { text: 'df-image', link: '/examples/df-image' },
             { text: 'df-input', link: '/examples/df-input' },
+            { text: 'df-input-group', link: '/examples/df-input-group' },
             { text: 'df-input-hint', link: '/examples/df-input-hint' },
             { text: 'df-rtf-editor', link: '/examples/df-rtf-editor' },
             { text: 'df-select', link: '/examples/df-select' },

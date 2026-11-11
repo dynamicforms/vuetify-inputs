@@ -11,7 +11,7 @@ function measureRows(page: Page) {
   return page.locator('.demo-grid').evaluate((grid) => {
     const cells = [...grid.querySelectorAll('.component-cell')];
     const rows = [];
-    for (let i = 0; i < cells.length; i += 7) {
+    for (let i = 0; i < cells.length; i += 8) {
       const input = cells[i].querySelector('input')!;
       const box = input.getBoundingClientRect();
       const style = getComputedStyle(input);

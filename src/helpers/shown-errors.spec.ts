@@ -1,9 +1,9 @@
-import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
+import { Field, Group, List, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
 
 import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
-import { selectShownErrors, useShownErrors } from './shown-errors';
+import { selectShownErrors, selectShownErrorsDeep, useShownErrors } from './shown-errors';
 
 const required = (value: string) => new Field<string>({ value, validators: [new Validators.Required()] });
 
@@ -72,5 +72,34 @@ describe('useShownErrors', () => {
 
     expect(form.valid).toBe(false);
     expect(shown.value).toHaveLength(1);
+  });
+});
+
+describe('selectShownErrorsDeep', () => {
+  it("shows a container's own errors, then its members' in their order, each by its own touched", () => {
+    const first = required('');
+    const second = required('');
+    const group = new Group({ first, second });
+    group.errors.push(new ValidationError('app.group', {}, 'the group', 'server'));
+
+    expect(selectShownErrorsDeep(group, {}).map((error) => error.code)).toEqual(['app.group']);
+
+    second.touched = true;
+    expect(selectShownErrorsDeep(group, {}).map((error) => error.code)).toEqual(['app.group', 'vue-forms.required']);
+    expect(selectShownErrorsDeep(group, {})[1]).toBe(second.errors[0]);
+  });
+
+  it('walks the rows of a list', () => {
+    const list = new List(new Group({ name: required('') }), { value: [{ name: '' }, { name: 'set' }] });
+    list.touched = true;
+
+    expect(selectShownErrorsDeep(list, {}).map((error) => error.code)).toEqual(['vue-forms.required']);
+  });
+
+  it("shows a field's own errors", () => {
+    const field = required('');
+    field.touched = true;
+
+    expect(selectShownErrorsDeep(field, {})).toEqual(field.errors);
   });
 });
