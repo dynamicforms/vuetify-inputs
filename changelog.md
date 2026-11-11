@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fields on one row keep their controls level when a neighbour is taller because of a hint or an error: the extra
   height of a stretched field goes below its message row instead of into its control.
+- `df-color` keeps its colour swatch visible while focused in the `solo-inverted` variant.
 
 ## [0.15.5] - 2026-11-03
 
