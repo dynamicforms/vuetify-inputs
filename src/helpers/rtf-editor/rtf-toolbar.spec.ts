@@ -56,6 +56,21 @@ describe('RtfToolbar heading dropdown', () => {
 });
 
 describe('RtfToolbar button groups', () => {
+  it('names the icon-only action buttons in the current language', async () => {
+    const editor = makeEditor();
+    const wrapper = mountToolbar(editor);
+
+    expect(wrapper.find('button[title="Bold"]').attributes('aria-label')).toBe('Bold');
+
+    translateStrings((key) => (key === 'Bold' ? 'Krepko' : key));
+    await nextTick();
+    const bold = wrapper.find('button[title="Krepko"]');
+    expect(bold.attributes('aria-label')).toBe('Krepko');
+
+    translateStrings((key) => key);
+    editor.destroy();
+  });
+
   it('undoes and redoes an edit', async () => {
     const editor = makeEditor();
     const wrapper = mountToolbar(editor);

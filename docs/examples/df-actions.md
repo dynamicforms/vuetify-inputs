@@ -12,7 +12,7 @@ A row of actions:
 
 - Renders actions as buttons or text links
 - Supports responsive display based on screen size
-- Icon and label shown per `showIcon` / `showLabel`
+- Icon and label shown per `showIcon` / `showLabel`; a button that does not show its label is named by it
 - Grouped button layouts
 - Renders `@dynamicforms/vue-forms` actions
 - `defaultConfirm` / `defaultReject` actions are colored `primary` / `secondary`
@@ -75,7 +75,8 @@ of `ActionRenderOptions`, which only it declares.
 
 `getRenderOptionsForBreakpoint(value, breakpoint)` returns the `ResolvedActionRenderOptions` a value renders as at one
 breakpoint: `ActionRenderOptions` with the label read, defaults filled in and `label` / `icon` filtered by their
-flags.
+flags. Its `accessibleLabel` is the plain text of the label whether `showLabel` is set or not, and `undefined` where
+the label is missing or empty.
 `Action.getBreakpointValue(breakpointRef)` is a `computed()` over the same call.
 
 ### Creating Actions
@@ -110,7 +111,7 @@ The `value` object defines the visual appearance and behavior:
 | `icon` | `string` | Icon name, resolved by `vue-cached-icon`; both `ion-` and `mdi-` prefixed names work |
 | `renderAs` | `ActionDisplayStyle` | How to render: `'button'` or `'text'` |
 | `showIcon` | `boolean` | Whether to display the icon |
-| `showLabel` | `boolean` | Whether to display the label |
+| `showLabel` | `boolean` | Whether to display the label. A button that does not display it has the label's plain text as its `aria-label` and `title` |
 | `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the button `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
 | `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the button `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
 | `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>`, overriding `<df-actions>`'s own computed props |
@@ -268,7 +269,8 @@ At most one action in a given set should set `defaultConfirm`, and at most one s
 ### Passthrough Attributes
 
 `passthroughAttrs` passes props to the rendered `<v-btn>` and takes precedence over `<df-actions>`'s computed props
-(`variant`, `color`, `disabled`, `loading`). It covers any `<v-btn>` prop that `ActionRenderOptions` does not:
+(`variant`, `color`, `disabled`, `loading`, and the `aria-label` and `title` of a button that does not show its
+label). It covers any `<v-btn>` prop that `ActionRenderOptions` does not:
 
 ```typescript
 const deleteAction = new Action({

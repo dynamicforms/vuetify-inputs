@@ -1,5 +1,11 @@
+import { HtmlString } from '../render-content';
+
 import { type ActionDisplayStyle, isActionDisplayStyle } from './action-display-style';
-import { getRenderOptionsForBreakpoint, ResponsiveActionRenderOptions } from './action-render-options';
+import {
+  type ActionRenderOptions,
+  getRenderOptionsForBreakpoint,
+  ResponsiveActionRenderOptions,
+} from './action-render-options';
 
 describe('ResponsiveRenderOptions', () => {
   it('check parsing and correct breakpoint resolution', () => {
@@ -79,6 +85,7 @@ describe('getRenderOptionsForBreakpoint', () => {
     expect(getRenderOptionsForBreakpoint({ label: 'Save' }, 'md')).toEqual({
       name: undefined,
       label: 'Save',
+      accessibleLabel: 'Save',
       icon: undefined,
       renderAs: 'button',
       showLabel: true,
@@ -99,6 +106,27 @@ describe('getRenderOptionsForBreakpoint', () => {
     expect(getRenderOptionsForBreakpoint(value, 'md').label).toBe('Save');
     expect(getRenderOptionsForBreakpoint(value, 'lg').label).toBeUndefined();
     expect(getRenderOptionsForBreakpoint(value, 'lg').icon).toBe('save-outline');
+  });
+
+  it('answers the accessible label whether the label is shown or not', () => {
+    const value = { label: 'Save', showLabel: true, lg: { showLabel: false } };
+
+    expect(getRenderOptionsForBreakpoint(value, 'md').accessibleLabel).toBe('Save');
+    expect(getRenderOptionsForBreakpoint(value, 'lg').accessibleLabel).toBe('Save');
+  });
+
+  it('answers the accessible label of rich content as plain text', () => {
+    const label = new HtmlString('<p>Save</p><p>and&nbsp;close</p>') as unknown as string;
+
+    const value: ActionRenderOptions = { label, showLabel: false };
+
+    expect(getRenderOptionsForBreakpoint(value, 'md').accessibleLabel).toBe('Save and close');
+  });
+
+  it('answers no accessible label where the label is missing or empty', () => {
+    expect(getRenderOptionsForBreakpoint({ icon: 'save-outline' }, 'md').accessibleLabel).toBeUndefined();
+    expect(getRenderOptionsForBreakpoint({ label: '' }, 'md').accessibleLabel).toBeUndefined();
+    expect(getRenderOptionsForBreakpoint({ label: { text: 'Save' } }, 'md').accessibleLabel).toBeUndefined();
   });
 
   it('resolves an icon a breakpoint names and the base does not', () => {
