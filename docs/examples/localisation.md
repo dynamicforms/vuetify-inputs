@@ -26,6 +26,9 @@ translation function reads, such as the locale.
 | `ColorPalette` | `Color palette` | `<df-color picker="hexagon">`, the accessible label of the palette |
 | `Lightness` | `Lightness {level}` | `<df-color picker="hexagon">`, the accessible label of a lightness level button or segment; `level` counts from 1 |
 | `LightnessRange` | `Lightness` | `<df-color picker="hexagon">`, the accessible label of the lightness slider and of the level selectors |
+| `Loading` | `Loading` | `<df-select>`, the accessible label of the progress bar shown while choices are being fetched |
+| `Uploading` | `Uploading` | `<df-file>` and `<df-image>`, the accessible label of the upload progress bar |
+| `RemoveChoice` | `Remove {choice}` | `<df-select multiple>`, the accessible label of a chip's close button; `choice` is the chip's text |
 | `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, "no heading" entry |
 | `Heading1`–`Heading6` | `Heading 1`–`Heading 6` | `<df-rtf-editor>` heading dropdown entries |
 | `Undo` / `Redo` | `Undo` / `Redo` | `<df-rtf-editor>` toolbar button tooltips |

@@ -48,6 +48,15 @@ describe('DfFile', () => {
     vi.useRealTimers();
   });
 
+  it('names the progress bar shown while a file uploads', async () => {
+    comms.upload = vi.fn(() => new Promise<string>(() => {}));
+    const wrapper = mountFile();
+
+    await pickFile(wrapper, pdfFile());
+
+    expect(wrapper.find('.v-field__loader [role="progressbar"]').attributes('aria-label')).toBe('Uploading');
+  });
+
   it('uploads a picked file and reflects the returned identifier as modelValue', async () => {
     const wrapper = mountFile();
 

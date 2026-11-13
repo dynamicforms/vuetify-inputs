@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   also where a breakpoint hides the label. `passthroughAttrs` override both. `ResolvedActionRenderOptions` has the
   text in `accessibleLabel`.
 - The icon-only buttons of the `df-rtf-editor` toolbar that render through `df-actions` have an `aria-label`.
+- `df-select`: Enter and Space on a chip's close button remove the chip instead of opening the menu, and focus moves
+  to the next chip's close button or to the input.
+- `df-select`: a chip's close button is labelled with the chip's text (`Remove {choice}`, key `RemoveChoice`).
+- `df-select`: choice icons in chips and options are hidden from assistive technology.
+- `df-select`: an id of the value that no choice covers and that is blank (such as `''`) no longer adds an option and a
+  chip without text; a multiple select keeps it in the value through the user's edits.
+- `df-select`, `df-file`, `df-image`: the progress bar has an accessible label (`Loading`, `Uploading`).
 
 ## [0.15.6] - 2026-11-11
 

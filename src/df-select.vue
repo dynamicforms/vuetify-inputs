@@ -47,13 +47,24 @@
         size="small"
         class="d-flex align-middle"
         :variant="multiple ? 'tonal' : 'text'"
-        :closable="multiple && (allowNull || selected.length > 1)"
-        @click:close="chipClose($event, item.value)"
+        :closable="false"
       >
         <template #prepend>
-          <cached-icon v-if="item.raw?.icon" class="me-1" :name="item.raw.icon" />
+          <cached-icon v-if="item.raw?.icon" class="me-1" :name="item.raw.icon" aria-hidden="true" />
         </template>
         <span :class="{ 'text-body-1': !multiple }">{{ item.title }}</span>
+        <!-- VChip's own close button passes its label through Vuetify's locale function, which reads it as a key -->
+        <template v-if="multiple && (allowNull || selected.length > 1)" #append>
+          <button
+            type="button"
+            class="v-chip__close"
+            :aria-label="t('RemoveChoice', { choice: item.title })"
+            @click="chipCloseClick($event, item.value)"
+            @keydown="chipCloseKeydown($event, item.value)"
+          >
+            <v-icon icon="$delete" size="x-small" />
+          </button>
+        </template>
       </v-chip>
     </template>
     <template #label="labelData">
@@ -64,10 +75,13 @@
       <v-list-item v-bind="prps">
         <template #prepend>
           <span v-if="item.raw?.icon" class="me-1">
-            <cached-icon class="action-icon" :name="item.raw.icon" />
+            <cached-icon class="action-icon" :name="item.raw.icon" aria-hidden="true" />
           </span>
         </template>
       </v-list-item>
+    </template>
+    <template #loader="{ color, isActive }">
+      <v-progress-linear :active="isActive" :color="color" height="2" indeterminate :aria-label="t('Loading')" />
     </template>
     <template #message="{ message }">
       <df-input-hint :message="message" :errors="shownErrors" />
@@ -88,7 +102,7 @@ import { CachedIcon } from 'vue-cached-icon';
 import { VAutocomplete, VCombobox } from 'vuetify/components';
 
 import { DfSelectProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, SelectChoice, useInputBase } from './helpers';
+import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, SelectChoice, translate, useInputBase } from './helpers';
 import { useClientRendered } from './helpers/client-rendered';
 import {
   convertItems,
@@ -117,6 +131,8 @@ defineSlots<{
   'append-inner'?: (props: any) => any;
   'prepend-inner'?: (props: any) => any;
 }>();
+
+const t = translate;
 
 const dfSelectRef = ref<InstanceType<typeof VAutocomplete> | InstanceType<typeof VCombobox> | null>(null);
 
@@ -152,15 +168,29 @@ function currentValue() {
 }
 
 // The loaded choices and, for every id of the value that none of them covers, a choice whose text is the id: the
-// select shows the value it holds and does not drop those ids from it. A taggable select shows such ids by itself.
+// select shows the value it holds and does not drop those ids from it. An id whose text is blank gets no choice: an
+// option and a chip without text have no accessible name. A taggable select shows such ids by itself.
 const displayChoices = computed<SelectChoice[]>(() => {
   const loadedList = loadedChoices.value;
   const mcVal = currentValue();
   if (taggable.value || mcVal == null || valueChoicesPending.value) return loadedList;
-  const unknown = castArray(mcVal).filter((val) => !loadedList.some((choice) => choice.id === val));
+  const unknown = castArray(mcVal).filter(
+    (val) => String(val).trim() !== '' && !loadedList.some((choice) => choice.id === val),
+  );
   if (!unknown.length) return loadedList;
   return [...loadedList, ...unknown.map((val): SelectChoice => ({ id: val, text: String(val) }))];
 });
+
+// The blank ids of a multiple value that no choice covers. The select shows no selection for them, and its writes
+// keep them in the value.
+function withHiddenIds(ids: any[]): any[] {
+  const mcVal = currentValue();
+  if (taggable.value || !multiple.value || mcVal == null) return ids;
+  const hidden = castArray(mcVal).filter(
+    (val) => !ids.includes(val) && !displayChoices.value.some((choice) => choice.id === val),
+  );
+  return hidden.length ? [...ids, ...hidden] : ids;
+}
 
 const options = computed(() => convertItems(displayChoices.value));
 const chosenText = computed(() =>
@@ -317,7 +347,10 @@ function onSelect(/* val: any */) {
   const writesBefore = writeCount;
   nextTick(() => {
     if (writeCount !== writesBefore) return;
-    const mcVal = multipleCompliantValue(selected.value, multiple.value);
+    const mcVal = multipleCompliantValue(
+      multiple.value && Array.isArray(selected.value) ? withHiddenIds(selected.value) : selected.value,
+      multiple.value,
+    );
     syncSelected(mcVal);
     setResultingValue(mcVal);
   });
@@ -330,16 +363,45 @@ function onClear() {
   setResultingValue(null);
 }
 
-// closing the last chip of a multiple select leaves an empty array
-function chipClose(event: MouseEvent, itemValue: any) {
+// closing the last chip of a multiple select leaves an empty array; returns whether the chip was removed
+function chipClose(event: Event, itemValue: any): boolean {
   event.stopPropagation();
-  if (vuetifyBindings.value.readonly) return;
+  if (vuetifyBindings.value.readonly) return false;
   const remaining =
     multiple.value && Array.isArray(selected.value) ? selected.value.filter((v) => v !== itemValue) : [];
-  if (!allowNull.value && !remaining.length) return;
-  const mcVal = multipleCompliantValue(remaining, multiple.value);
+  if (!allowNull.value && !remaining.length) return false;
+  const mcVal = multipleCompliantValue(withHiddenIds(remaining), multiple.value);
   syncSelected(mcVal);
   setResultingValue(mcVal);
+  return true;
+}
+
+function chipCloseClick(event: MouseEvent, itemValue: any) {
+  event.preventDefault();
+  chipClose(event, itemValue);
+}
+
+// Enter and Space on a chip's close button remove the chip; the autocomplete does not see the key, as its Enter opens
+// the menu. A held Space removes one chip only. Focus moves to the close button of the chip that takes the removed
+// one's place, else to the input.
+function chipCloseKeydown(event: KeyboardEvent, itemValue: any) {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  const button = event.currentTarget as Element;
+  event.preventDefault();
+  if (event.key === ' ' && event.repeat) {
+    event.stopPropagation();
+    return;
+  }
+  const root: Element | undefined = dfSelectRef.value?.$el;
+  const buttons = root ? Array.from(root.querySelectorAll('.v-chip__close')) : [];
+  const index = buttons.indexOf(button);
+  if (!chipClose(event, itemValue)) return;
+  nextTick(() => {
+    const remaining = root ? Array.from(root.querySelectorAll<HTMLElement>('.v-chip__close')) : [];
+    const next = remaining[Math.min(index, remaining.length - 1)];
+    if (next) next.focus();
+    else dfSelectRef.value?.focus();
+  });
 }
 
 async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
