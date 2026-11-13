@@ -30,31 +30,32 @@
         @click.stop
       >
         <input
-          :id="fileInputId"
+          :id="slotProps.props.id"
           ref="fileInputRef"
           type="file"
           accept="image/*"
           class="df-image-native-input"
           :disabled="isDisabled"
           :name="vuetifyBindings.name"
+          v-bind="controlAria(slotProps.props)"
           @change="onNativeChange"
           @focus="slotProps.focus()"
           @blur="slotProps.blur()"
         />
-        <label v-if="previewUrl" :for="fileInputId" class="df-image-preview-label">
+        <label v-if="previewUrl" :for="slotProps.props.id" class="df-image-preview-label">
           <v-img
             :src="previewUrl"
             class="df-image-preview"
             :style="currentFile && progress < 100 ? 'visibility: hidden' : ''"
           />
         </label>
-        <label v-else :for="fileInputId" class="df-image-placeholder">
+        <label v-else :for="slotProps.props.id" class="df-image-placeholder">
           <cached-icon name="mdi-tray-arrow-up" />
           <span>{{ t('ImageDropHint') }}</span>
         </label>
         <label
           v-if="previewUrl && !isDisabled"
-          :for="fileInputId"
+          :for="slotProps.props.id"
           class="df-image-replace-btn"
           :title="t('ImageReplace')"
         >
@@ -89,11 +90,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfImageProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, InputBase, translate, useInputBase } from './helpers';
+import { controlAria } from './helpers/control-aria';
 import { extractImageFiles } from './helpers/image-files';
 import { useFileUpload } from './helpers/use-file-upload';
 
@@ -104,7 +106,6 @@ const emits = defineEmits<Emits>();
 
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const t = translate;
-const fileInputId = useId();
 
 const { currentFile, progress, loading, upload, clear } = useFileUpload({
   value,

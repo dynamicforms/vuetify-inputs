@@ -14,7 +14,7 @@ All input components inherit the following properties:
 | modelValue       | `T`                           | `undefined`    | The field value (v-model) when used without control                                                |
 | label            | `RenderContentNonCallable \| Label` | `undefined`    | The label: a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef`, or a `Label`, which adds an icon (see [Label](#label)) |
 | hint             | `string`                      | `undefined`    | Hint text displayed below the input field                                                          |
-| helpText         | `string`                      | `undefined`    | Placed in `vuetifyBindings.helpText`, which no component renders; `df-select` reads its presence to set `aria-describedby` |
+| helpText         | `string`                      | `undefined`    | Not rendered by any component and not passed to Vuetify                                             |
 | placeholder      | `string`                      | `undefined`    | Placeholder text displayed when the input is empty                                                 |
 | errors           | `ErrorInput[]`                | `undefined`    | The errors, used only without a control: content in any of the four forms or error descriptions (see [df-input-hint](/examples/df-input-hint#props)) |
 | enabled          | `boolean`                     | `undefined`    | The input is enabled unless the prop is `false` (used only without control)                        |
@@ -40,11 +40,11 @@ handles no `click:clear`; pressing it leaves the text unchanged.
 
 ### Presentation carried by the element
 
-A bound `control` carries the presentation the component renders it with. `label`, `placeholder`, `helpText`,
-`hint`, `cssClass`, `density` and `variant` are declared on
+A bound `control` carries the presentation the component renders it with. `label`, `placeholder`, `hint`,
+`cssClass`, `density` and `variant` are declared on
 [`Extras`](:vue-forms:/api/field-base.html#extended-properties), the augmentation point of `@dynamicforms/vue-forms`,
 so they are typed on every element in an application that installs this library, including fields written inline in
-a `Group` declaration.
+a `Group` declaration. `helpText` is declared there too; no component renders it.
 
 They are set where the field is declared:
 
@@ -296,8 +296,8 @@ const name = ref('');
 
 ## The InputBase component
 
-`InputBase` is a component, exported from the package as `InputBase`. `df-date-time`, `df-file` and `df-rtf-editor`
-are built on it: it renders the Vuetify field (label, hint, error state, clear button, loader), and the component
+`InputBase` is a component, exported from the package as `InputBase`. `df-date-time`, `df-file`, `df-image` and
+`df-rtf-editor` are built on it: it renders the Vuetify field (label, hint, error state, clear button, loader), and the component
 places its own control inside that field. The plugin's `registerComponents` option does not register it, so a template
 that uses it imports it.
 
@@ -316,18 +316,20 @@ It emits `BaseEmits` plus one event of its own:
 
 The root element is a `v-input`, rendered only when the visibility is not `'suppress'`, carrying the `name`,
 `density`, `hint`, `persistent-hint`, `hide-details` and `errorMessages` bindings together with the `cssClass` prop
-and the visibility classes. Its `message` slot renders `DfInputHint` with the errors of a touched field. Inside it, a
-`v-field` carries the `variant`, `density`, `label` and `disabled` bindings, is `dirty` while there is a value or a
-placeholder, is `active` while the hosted control has focus, and takes `loading` from the prop. The field's `label`
-slot renders `DfLabel`, so an icon label and an `MdString` label render as on the components that bind a Vuetify
-input directly. The density class is not applied here: the host binds `:class="densityClass"` on the
-`InputBase` element itself.
+and the visibility classes. Its `message` slot renders `DfInputHint` with the errors of a touched field and the hint.
+Inside it, a `v-field` takes the `v-input`'s id, as Vuetify's own text field does: the field label's `for` is that id,
+the label's own id is the id with `-label` appended, and while the message row is rendered its id is the id with
+`-messages` appended. The `v-field` carries the `variant`, `density`, `label` and `disabled` bindings, is `dirty`
+while there is a value or a placeholder, is `active` while the hosted control has focus, and takes `loading` from the
+prop. The field's `label` slot renders `DfLabel`, so an icon label and an `MdString` label render as on the components
+that bind a Vuetify input directly. The density class is not applied here: the host binds `:class="densityClass"` on
+the `InputBase` element itself.
 
 ### Slots
 
 | Slot | Slot props | Description |
 |------|------------|-------------|
-| default | `props`, `isActive`, `isFocused`, `iconColor`, `controlRef`, `focus()`, `blur()` | The control that fills the field, wrapped in a full-width flex container whose styling neutralises the field's own overlay and outline |
+| default | `props`, `isActive`, `isFocused`, `iconColor`, `controlRef`, `focus()`, `blur()` | The control that fills the field, wrapped in a full-width flex container whose styling neutralises the field's own overlay and outline. `props` holds the attributes for the control, see [Accessibility](#accessibility) |
 | loader | `color`, `isActive` | Replaces the field's default indeterminate progress bar. It renders whether or not `loading` is set, and `isActive` reports which it is |
 | prepend-inner | `isActive`, `isFocused`, `iconColor`, `controlRef`, `focus()`, `blur()` | Content inside the field, before the default slot. Rendered only when the slot is supplied |
 | prepend | `id`, `messagesId`, `isDirty`, `isDisabled`, `isReadonly`, `isPristine`, `isValid`, `isValidating`, `hasDetails`, `reset()`, `resetValidation()`, `validate()` | Content outside the field, at the start of the input. Rendered only when the slot is supplied |
@@ -345,6 +347,45 @@ progress, a paperclip icon in `prepend-inner`, and its `v-file-input` in `defaul
 blur into `slotProps.focus()` and `slotProps.blur()`. `df-date-time` puts one or two `v-text-field`s in `default` -
 plain variant, no details and no clear button of their own - and routes their focus and blur the same way; the
 outer field renders the label, the hint and one clear button for both.
+
+### Accessibility
+
+The default slot's `props` (`InputBaseControlProps`) are the attributes of the element the user operates:
+
+| Attribute | Value |
+|-----------|-------|
+| id | The id the field label's `for` names |
+| class | `'v-field__input'` |
+| aria-labelledby | The id of the field label |
+| aria-label | The field label as plain text, `undefined` when it is empty |
+| aria-describedby | The id of the message row, while it is rendered |
+| aria-invalid | `'true'` while errors are shown, `undefined` otherwise |
+| aria-required | `'true'` where the bound control carries a `Validators.Required` validator, `undefined` otherwise |
+
+`aria-labelledby` takes precedence over `aria-label` in the accessible name. `aria-label` holds the same text for
+checkers that count only visible referenced text while the field label is hidden, as the non-floating label of an
+active field is. A control bound with `id` is labelled by the field label; one bound with `aria-labelledby` is named
+by it whatever other labels point at it. The message row holds the hint, the shown errors, and the hint again,
+visually hidden, while errors are shown (see [df-input-hint](/examples/df-input-hint)).
+
+The library's components bind them as follows:
+
+- `df-date-time`: the first input takes `id`. Each input is named by the field label followed by `Date` or `Time`
+  (translation keys `Date` and `Time`, see [Localisation](/examples/localisation)), and is `aria-invalid` while an
+  error other than the other input's own unreadable-value error is shown. The inputs carry a `name` only where the
+  field has one: `<name>-date` and `<name>-time`.
+- `df-file`: the native file input takes `id` and the ARIA attributes. The name of the file the value holds is shown
+  in the file input's own label while no file is picked; the field label names the input, and the file name is added
+  to its `aria-describedby`.
+- `df-image`: the native file input takes `id` and the ARIA attributes, so the drop prompt and the replace button,
+  whose `<label>`s also point at it, do not name it.
+- `df-rtf-editor`: the editable element takes `id`, the ARIA attributes, `aria-multiline="true"`, and
+  `aria-readonly="true"` while the field accepts no input. It is not a labelable element, so a click on the field label
+  moves the focus into it through a click handler.
+
+The components that bind a Vuetify input directly (`df-input`, `df-text-area`, `df-checkbox`, `df-select`,
+`df-color`) get the label and message row association from Vuetify, and `aria-invalid` and `aria-required` from
+`vuetifyBindings`.
 
 ```vue
 <template>
@@ -413,7 +454,7 @@ const { value, shownErrors } = useInputBase<string>(props, emits, () =>
 | densityClass | `ComputedRef<string>` | `` `df-density-${density}` ``, to bind on the root element |
 | vuetifyBindings | `ComputedRef<Record<string, any>>` | Everything to `v-bind` on the Vuetify input, see below |
 
-`placeholder`, `helpText`, `hint`, `cssClass` and the resolved `variant` are not returned separately; they reach the
+`placeholder`, `hint`, `cssClass` and the resolved `variant` are not returned separately; they reach the
 component through `vuetifyBindings`.
 
 A control may hold a different value than the one written (a `ValueChangedAction` that normalises it) or refuse the
@@ -438,11 +479,17 @@ value the field holds.
 | hint | The `hint` prop, `''` when unset |
 | persistentHint | Always `true` |
 | hideDetails | Always `'auto'`, so the details area disappears when there is nothing to show |
-| helpText | The `helpText` prop, `''` when unset |
+| aria-invalid | `'true'` while errors are shown, `undefined` otherwise |
+| aria-required | `'true'` where the bound control carries a `Validators.Required` validator, `undefined` otherwise |
 
 `errorMessages` is a single space, not the messages: it puts the Vuetify control into its error state, and
 `DfInputHint` renders the messages from `shownErrors`. An error therefore renders as the content the
 [`errorText` setting](/examples/configuration) returns for its `code`: plain text, markdown, HTML or a component.
+
+Vuetify passes `aria-invalid` and `aria-required`, which are not its props, on to the native control. `required`
+is not set, so the browser runs no validation of its own. `aria-required` reads the control's validators when the
+control is bound and whenever its validity changes: a `Required` validator registered or unregistered later is
+reflected at the next change of validity, which its registration or removal causes while the value is empty.
 
 `passthroughAttrs` is spread into this object last and replaces any key above; see
 [passthroughAttrs](#passthroughattrs).
@@ -464,7 +511,9 @@ with `defaultBaseProps`, calls `useInputBase()` and binds the result.
       @blur="touched = true"
     >
       <template #label><df-label :label="label" /></template>
-      <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
+      <template #message="{ message }">
+        <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      </template>
     </v-slider>
   </div>
 </template>
@@ -504,6 +553,8 @@ InputBase is built from Vuetify components. All input components share:
 
 - Field label display
 - Error handling and error message display
+- The label, the message row, the error state and a `Required` validator exposed to assistive technology (see
+  [Accessibility](#accessibility))
 - Responsive design
 - Support for value clearing
 - Support for disabled and read-only modes

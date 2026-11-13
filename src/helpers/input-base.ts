@@ -1,4 +1,4 @@
-import Form, { ValidationError } from '@dynamicforms/vue-forms';
+import Form, { ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { isEmpty } from 'lodash-es';
 import { computed, type ComputedRef, inject, nextTick, type Ref, ref, shallowRef, toRaw } from 'vue';
 
@@ -71,11 +71,28 @@ export interface BaseProps<T = any> {
 
 export const defaultBaseProps = { enabled: undefined, clearable: true };
 
+/** The attributes `InputBase` gives its control. */
+export interface InputBaseControlProps {
+  /** The id the field label's `for` names. */
+  id: string;
+  class: string;
+  /** The id of the field label. */
+  'aria-labelledby': string;
+  /** The field label as plain text, `undefined` when empty; `aria-labelledby` takes precedence over it. */
+  'aria-label'?: string;
+  /** The id of the hint and error row, while it is rendered. */
+  'aria-describedby'?: string;
+  /** `'true'` while errors are shown. */
+  'aria-invalid'?: 'true';
+  /** `'true'` where the bound control carries a `Validators.Required` validator. */
+  'aria-required'?: 'true';
+}
+
 /** What `InputBase`'s `default` slot receives: Vuetify's `v-field` slot props. `prepend-inner` receives them without
  * `props`. */
 export interface InputBaseSlotProps {
-  /** Attributes for the control: its `id`, `class` and ARIA attributes. */
-  props: Record<string, unknown>;
+  /** Attributes for the control the user operates. */
+  props: InputBaseControlProps;
   isActive: Ref<boolean>;
   isFocused: Ref<boolean>;
   iconColor: ComputedRef<string | undefined>;
@@ -84,6 +101,15 @@ export interface InputBaseSlotProps {
   focus: () => void;
   /** Clears the field's focused state. */
   blur: () => void;
+}
+
+/**
+ * Whether `control` carries a `Validators.Required` validator. vue-forms keeps the registered actions in a protected
+ * map, read here without creating it.
+ */
+function isRequired(control: Form.FieldBase | undefined): boolean {
+  const actions = (control as unknown as { boundActions?: { validators: unknown[] } } | undefined)?.boundActions;
+  return !!actions?.validators.some((validator) => validator instanceof Validators.Required);
 }
 
 export interface BaseEmits<T = any> {
@@ -173,6 +199,12 @@ export function useInputBase<T = any>(
     ),
   );
   const anyErrors = computed(() => (shownErrors.value.length > 0 ? ' ' : undefined));
+  // vue-forms keeps the actions out of reactivity: a validator registered or removed later is read when the
+  // control's errors change, which its registration does on an empty value
+  const required = computed(() => {
+    void props.control?.valid;
+    return isRequired(props.control);
+  });
   // effectiveEnabled is false where the element or any container above it accepts no input, so the inputs of a
   // 'readonly' or disabled section accept none either
   const enabled = computed(() => (props.control ? props.control.effectiveEnabled : props.enabled !== false));
@@ -206,7 +238,6 @@ export function useInputBase<T = any>(
     return stated instanceof Label ? stated : new Label(stated ?? '');
   });
   const placeholder = computed(() => props.placeholder ?? extra.value.placeholder ?? '');
-  const helpText = computed(() => props.helpText ?? extra.value.helpText ?? '');
   const hint = computed(() => props.hint ?? extra.value.hint ?? '');
   const cssClass = computed(() => props.cssClass ?? extra.value.cssClass ?? '');
 
@@ -254,7 +285,10 @@ export function useInputBase<T = any>(
       hint: hint.value,
       persistentHint: true, // we want persistent hint always
       hideDetails: <boolean | 'auto' | undefined>'auto', // we want to hide the hint element when hint isn't there
-      helpText: helpText.value,
+
+      // the control's state for assistive technology; Vuetify passes unknown attributes on to the native control
+      'aria-invalid': <'true' | undefined>(shownErrors.value.length > 0 ? 'true' : undefined),
+      'aria-required': <'true' | undefined>(required.value ? 'true' : undefined),
 
       ...(props.passthroughAttrs || {}),
     })),

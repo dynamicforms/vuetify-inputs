@@ -12,8 +12,9 @@
     <template #default="slotProps">
       <div class="d-flex w-100 position-relative df-input-wrapper" :class="density">
         <v-file-input
+          :id="slotProps.props.id"
           v-model="selectedFile"
-          :label="fileLabel"
+          :label="storedName"
           density="compact"
           variant="plain"
           :readonly="vuetifyBindings.readonly"
@@ -24,7 +25,7 @@
           :multiple="false"
           :style="currentFile && progress < 100 ? 'visibility: hidden' : ''"
           :clearable="false"
-          v-bind="passthroughAttrs"
+          v-bind="{ ...fileInputAria(slotProps.props), ...passthroughAttrs }"
           prepend-icon=""
           @update:model-value="handleFileChange"
           @focus="slotProps.focus()"
@@ -41,6 +42,9 @@
               <cached-icon name="mdi-download" />
             </button>
           </template>
+          <template v-if="storedName" #label>
+            <span :id="storedNameId">{{ storedName }}</span>
+          </template>
         </v-file-input>
       </div>
     </template>
@@ -48,11 +52,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useId, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfFileProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, InputBase, translate, useInputBase } from './helpers';
+import { BaseEmits, defaultBaseProps, InputBase, type InputBaseControlProps, translate, useInputBase } from './helpers';
+import { controlAria } from './helpers/control-aria';
 import { useFileUpload } from './helpers/use-file-upload';
 
 const props = withDefaults(defineProps<DfFileProps>(), defaultBaseProps);
@@ -76,12 +81,16 @@ watch(currentFile, (file) => {
   if (!file) selectedFile.value = null;
 });
 
-const fileLabel = computed(() => {
-  if (!selectedFile.value && value.value) {
-    return value.value;
-  }
-  return '';
-});
+// the file the value holds, shown in v-file-input's label while no file is picked; the field label names the input
+// (aria-labelledby takes precedence over label[for]) and the file name describes it
+const storedName = computed(() => (!selectedFile.value && value.value ? String(value.value) : ''));
+const storedNameId = useId();
+
+function fileInputAria(controlProps: InputBaseControlProps) {
+  const aria = controlAria(controlProps);
+  const describedBy = [aria['aria-describedby'], storedName.value ? storedNameId : undefined].filter(Boolean);
+  return { ...aria, 'aria-describedby': describedBy.join(' ') || undefined };
+}
 
 const canDownload = computed(() => !selectedFile.value && !!value.value && !!props.comms.getDownloadUrl);
 

@@ -532,7 +532,7 @@ describe('input-base', () => {
         expect(label.value.text).toBe('From the field');
         expect(vuetifyBindings.value.hint).toBe('A hint');
         expect(vuetifyBindings.value.placeholder).toBe('Type here');
-        expect(vuetifyBindings.value.helpText).toBe('Help');
+        expect(vuetifyBindings.value).not.toHaveProperty('helpText');
         expect(vuetifyBindings.value.class).toBe('from-field');
       });
 
@@ -663,7 +663,7 @@ describe('input-base', () => {
         const result = useInputBase(props, emit);
 
         expect(result.vuetifyBindings.value.placeholder).toBe('Enter value');
-        expect(result.vuetifyBindings.value.helpText).toBe('This is help');
+        expect(result.vuetifyBindings.value).not.toHaveProperty('helpText');
         expect(result.vuetifyBindings.value.hint).toBe('This is hint');
         expect(result.vuetifyBindings.value.class).toBe('custom-class');
       });
@@ -675,7 +675,6 @@ describe('input-base', () => {
         const result = useInputBase(props, emit);
 
         expect(result.vuetifyBindings.value.placeholder).toBe('');
-        expect(result.vuetifyBindings.value.helpText).toBe('');
         expect(result.vuetifyBindings.value.hint).toBe('');
         expect(result.vuetifyBindings.value.class).toBe('');
       });
@@ -852,7 +851,9 @@ describe('input-base', () => {
         expect(bindings.hint).toBe('Test hint');
         expect(bindings.persistentHint).toBe(true);
         expect(bindings.hideDetails).toBe('auto');
-        expect(bindings.helpText).toBe('Test help');
+        expect(bindings).not.toHaveProperty('helpText');
+        expect(bindings['aria-invalid']).toBeUndefined();
+        expect(bindings['aria-required']).toBeUndefined();
         // @ts-expect-error vuetifyBindings doesn't have a declaration for passthroughAttrs
         expect(bindings['data-test']).toBe('value');
       });

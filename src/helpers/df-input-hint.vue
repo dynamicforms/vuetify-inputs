@@ -1,5 +1,6 @@
 <template>
   <messages-widget :message="widgetMessage" :classes="widgetClasses" />
+  <div v-if="hiddenHint" class="df-sr-only"><messages-widget :message="hiddenHint" /></div>
 </template>
 
 <script setup lang="ts">
@@ -15,6 +16,7 @@ const props = withDefaults(defineProps<DfInputHintProps>(), {
   message: '',
   errorClasses: 'text-error',
   messageClasses: '',
+  hint: '',
 });
 
 const isError = computed(() => {
@@ -27,12 +29,15 @@ const isError = computed(() => {
   return false;
 });
 
-const widgetMessage = computed(() => {
-  if (isError.value) return props.errors;
-  const message = props.message;
+function asWidgetMessage(message: DfInputHintProps['message']) {
   if (typeof message === 'string' || Array.isArray(message)) return message;
   return [new RenderableValue(message as Exclude<typeof message, readonly RenderableValue[]>)];
-});
+}
+
+const widgetMessage = computed(() => (isError.value ? props.errors : asWidgetMessage(props.message)));
+
+// the hint the errors replace on screen stays in the row, which the control's aria-describedby references
+const hiddenHint = computed(() => (isError.value && props.hint ? asWidgetMessage(props.hint) : null));
 
 const widgetClasses = computed(() => {
   return isError.value ? props.errorClasses : props.messageClasses;

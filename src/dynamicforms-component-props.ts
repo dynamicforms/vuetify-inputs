@@ -115,6 +115,9 @@ export interface DfInputHintProps {
   errorClasses?: ClassTypes;
   /** Classes for the rendered message. Defaults to no class. */
   messageClasses?: ClassTypes;
+  /** The field's hint. While errors are rendered, it is rendered visually hidden after them, for assistive
+   * technology. */
+  hint?: RenderContentRef;
 }
 
 export interface DfLabelProps {

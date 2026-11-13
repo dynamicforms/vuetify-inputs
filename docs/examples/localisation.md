@@ -53,6 +53,7 @@ translation function reads, such as the locale.
 | `ImagePaste` | `Paste image from clipboard` | `<df-image>`'s paste-from-clipboard button tooltip and aria-label |
 | `ImageDownload` | `Download image` | `<df-image>`'s download button tooltip and aria-label |
 | `FileDownload` | `Download file` | `<df-file>`'s download button tooltip and aria-label |
+| `Date`, `Time` | `Date`, `Time` | `<df-date-time>`: appended to the field label in the accessible name of the date and the time input |
 | `Table` | `Table` | `<df-rtf-editor>` toolbar button tooltip |
 | `TableInsert` | `Insert table` | `<df-rtf-editor>` table menu |
 | `TableAddRowAbove`, `TableAddRowBelow`, `TableDeleteRow` | `Add row above`, `Add row below`, `Delete row` | `<df-rtf-editor>` table menu |

@@ -7,7 +7,9 @@
     readonly
   >
     <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
-    <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
+    <template #message="{ message }">
+      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+    </template>
   </v-text-field>
   <component
     :is="taggable ? 'v-combobox' : 'v-autocomplete'"
@@ -30,7 +32,6 @@
     :multiple="multiple"
     :loading="loading"
     :hide-selected="false"
-    :aria-describedby="vuetifyBindings.helpText ? `${vuetifyBindings.name}-help` : null"
     :menu-props="{ maxHeight: '400' }"
     :search="searchText"
     v-bind="vuetifyBindings"
@@ -84,7 +85,7 @@
       <v-progress-linear :active="isActive" :color="color" height="2" indeterminate :aria-label="t('Loading')" />
     </template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="shownErrors" />
+      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
     </template>
     <template v-if="$slots['append-inner']" #append-inner="props">
       <slot name="append-inner" v-bind="props" />
