@@ -10,21 +10,6 @@
     "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
-    "color-contrast: df-input-group \"df-input-group\" > div.df-label",
-    "color-contrast: df-input-group \"df-input-group\" > div.df-label",
-    "color-contrast: df-input-group \"df-input-group\" > div.df-label",
-    "color-contrast: df-select-single \"Select Variant\" > div.df-label",
-    "color-contrast: df-select-single \"df-select\" > div.df-label",
-    "color-contrast: df-select-single \"df-select\" > div.df-label",
-    "color-contrast: df-select-single \"df-select\" > div.df-label",
-    "color-contrast: df-select-single \"df-select\" > div.df-label",
-    "color-contrast: div.v-input \"df-date-time\" > div.df-label",
-    "color-contrast: v-text-field \"df-color\" > div.df-label",
-    "color-contrast: v-text-field \"df-color\" > span",
-    "color-contrast: v-text-field \"df-input\" > div.df-label",
-    "color-contrast: v-text-field \"df-input\" > div.df-label",
-    "color-contrast: v-text-field \"df-input\" > div.df-label",
-    "color-contrast: v-text-field \"df-input\" > div.df-label",
     "label: df-datetime-date > input",
     "label: df-datetime-date > input",
     "label: df-datetime-date > input",
@@ -39,10 +24,7 @@
     "color-contrast: df-select-single \"Button size\" > div.df-label"
   ],
   "df-checkbox": [
-    "aria-conditional-attr: v-checkbox \"Ternary checkbox should wrap all the way\" > input",
-    "color-contrast: v-checkbox \"Auto-toggling every second\" > span",
-    "color-contrast: v-checkbox \"Binary checkbox\" > span",
-    "color-contrast: v-checkbox \"Ternary checkbox should wrap all the way\" > span"
+    "aria-conditional-attr: v-checkbox \"Ternary checkbox should wrap all the way\" > input"
   ],
   "df-color": [
     "aria-allowed-attr: v-text-field \"15 levels\" > div.v-field",
@@ -52,16 +34,7 @@
     "aria-allowed-attr: v-text-field \"Choose a color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"Direct v-model color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"Full lightness range\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Web-safe color\" > div.v-field",
-    "color-contrast: v-text-field \"15 levels\" > div.df-label",
-    "color-contrast: v-text-field \"2 levels\" > div.df-label",
-    "color-contrast: v-text-field \"21 levels\" > div.df-label",
-    "color-contrast: v-text-field \"6 levels\" > div.df-label",
-    "color-contrast: v-text-field \"Choose a color\" > div.df-label",
-    "color-contrast: v-text-field \"Choose a color\" > span",
-    "color-contrast: v-text-field \"Direct v-model color\" > em",
-    "color-contrast: v-text-field \"Full lightness range\" > div.df-label",
-    "color-contrast: v-text-field \"Web-safe color\" > div.df-label"
+    "aria-allowed-attr: v-text-field \"Web-safe color\" > div.v-field"
   ],
   "df-color: hexagon palette open": [
     "aria-allowed-attr: v-text-field \"15 levels\" > div.v-field",
@@ -71,10 +44,7 @@
     "aria-allowed-attr: v-text-field \"Choose a color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"Direct v-model color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"Full lightness range\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Web-safe color\" > div.v-field",
-    "color-contrast: v-text-field \"15 levels\" > div.df-label",
-    "color-contrast: v-text-field \"Full lightness range\" > div.df-label",
-    "color-contrast: v-text-field \"Web-safe color\" > div.df-label"
+    "aria-allowed-attr: v-text-field \"Web-safe color\" > div.v-field"
   ],
   "df-color: picker open": [
     "aria-allowed-attr: v-text-field \"15 levels\" > div.v-field",
@@ -84,13 +54,7 @@
     "aria-allowed-attr: v-text-field \"Choose a color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"Direct v-model color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"Full lightness range\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Web-safe color\" > div.v-field",
-    "color-contrast: v-text-field \"15 levels\" > div.df-label",
-    "color-contrast: v-text-field \"2 levels\" > div.df-label",
-    "color-contrast: v-text-field \"21 levels\" > div.df-label",
-    "color-contrast: v-text-field \"6 levels\" > div.df-label",
-    "color-contrast: v-text-field \"Full lightness range\" > div.df-label",
-    "color-contrast: v-text-field \"Web-safe color\" > div.df-label"
+    "aria-allowed-attr: v-text-field \"Web-safe color\" > div.v-field"
   ],
   "df-datetime": [
     "aria-allowed-attr: df-datetime-date > div.v-field",
@@ -99,14 +63,6 @@
     "aria-allowed-attr: df-datetime-time > div.v-field",
     "aria-allowed-attr: df-datetime-time > div.v-field",
     "aria-allowed-attr: df-datetime-time > div.v-field",
-    "color-contrast: div.v-input \"Izberite datum in čas\" > div.df-label",
-    "color-contrast: div.v-input \"Izberite datum in čas\" > span",
-    "color-contrast: div.v-input \"Select date and time\" > div.df-label",
-    "color-contrast: div.v-input \"Select date and time\" > span",
-    "color-contrast: div.v-input \"Select date\" > div.df-label",
-    "color-contrast: div.v-input \"Select date\" > span",
-    "color-contrast: div.v-input \"Select time\" > div.df-label",
-    "color-contrast: div.v-input \"Select time\" > span",
     "label: df-datetime-date > input",
     "label: df-datetime-date > input",
     "label: df-datetime-date > input",
@@ -121,10 +77,6 @@
     "aria-allowed-attr: df-datetime-time > div.v-field",
     "aria-allowed-attr: df-datetime-time > div.v-field",
     "aria-allowed-attr: df-datetime-time > div.v-field",
-    "color-contrast: div.v-input \"Izberite datum in čas\" > div.df-label",
-    "color-contrast: div.v-input \"Izberite datum in čas\" > span",
-    "color-contrast: div.v-input \"Select time\" > div.df-label",
-    "color-contrast: div.v-input \"Select time\" > span",
     "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
     "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
     "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
@@ -137,69 +89,11 @@
     "label: df-datetime-time > input",
     "label: df-datetime-time > input"
   ],
-  "df-file": [
-    "color-contrast: div.v-input \"Upload Document\" > div.df-label",
-    "color-contrast: div.v-input \"Upload Document\" > span"
-  ],
   "df-image": [
-    "color-contrast: df-image-field \"Profile picture\" > div.df-label",
-    "color-contrast: df-image-field \"Profile picture\" > span",
     "image-alt: df-image-field \"Profile picture\" > img.v-img__img"
   ],
-  "df-input": [
-    "color-contrast: df-select-single \"Select Input Type\" > div.df-label",
-    "color-contrast: v-text-field \"Input Field\" > div.df-label",
-    "color-contrast: v-text-field \"Input Field\" > span",
-    "color-contrast: v-text-field \"Price\" > div.df-label",
-    "color-contrast: v-text-field \"Price\" > span",
-    "color-contrast: v-text-field \"Quantity\" > div.df-label",
-    "color-contrast: v-text-field \"Quantity\" > span"
-  ],
-  "df-input-group": [
-    "color-contrast: df-input-group \"Days\" > div.df-label",
-    "color-contrast: df-input-group \"Days\" > span",
-    "color-contrast: df-select-single \"Density\" > div.df-label",
-    "color-contrast: df-select-single \"Direction\" > div.df-label",
-    "color-contrast: df-select-single \"Variant\" > div.df-label",
-    "color-contrast: v-text-field \"Course\" > div.df-label",
-    "color-contrast: v-text-field \"Hours\" > div.df-label"
-  ],
-  "df-input-hint": [
-    "color-contrast: df-select-single \"What the errors prop holds\" > div.df-label",
-    "color-contrast: v-text-field \"Email\" > div.df-label",
-    "color-contrast: v-text-field \"Email\" > span",
-    "color-contrast: v-text-field \"Password\" > div.df-label",
-    "color-contrast: v-text-field \"Repeat password\" > div.df-label"
-  ],
   "df-rtf-editor": [
-    "aria-input-field-name: div.v-input \"Content\" > div.tiptap[role=textbox]",
-    "color-contrast: df-select-single \"Toolbar button size\" > div.df-label",
-    "color-contrast: div.v-input \"Content\" > div.df-label",
-    "color-contrast: div.v-input \"Content\" > span"
-  ],
-  "df-select": [
-    "color-contrast: df-select-single \"Country\" > div.df-label",
-    "color-contrast: df-select-single \"Programming languages\" > div.df-label",
-    "color-contrast: v-text-field \"Age\" > div.df-label",
-    "color-contrast: v-text-field \"Choose your fruit\" > div.df-label",
-    "color-contrast: v-text-field \"First Name\" > div.df-label",
-    "color-contrast: v-text-field \"Last Name\" > div.df-label"
-  ],
-  "df-select: menu open": [
-    "color-contrast: df-select-single \"Country\" > div.df-label",
-    "color-contrast: v-text-field \"Age\" > div.df-label",
-    "color-contrast: v-text-field \"First Name\" > div.df-label",
-    "color-contrast: v-text-field \"Last Name\" > div.df-label"
-  ],
-  "df-text-area": [
-    "color-contrast: v-textarea \"Description\" > div.df-label",
-    "color-contrast: v-textarea \"Description\" > span"
-  ],
-  "groups": [
-    "color-contrast: v-checkbox \"Book a second traveller\" > span",
-    "color-contrast: v-text-field \"Extras\" > div.df-label",
-    "color-contrast: v-text-field \"Flights\" > div.df-label",
-    "color-contrast: v-text-field \"Hotel\" > div.df-label"
+    "aria-input-field-name: div.v-input \"Content\" > div.tiptap[role=textbox]"
   ],
   "localisation": [
     "aria-allowed-attr: df-datetime-date > div.v-field",
@@ -208,20 +102,5 @@
     "color-contrast: div.v-input \"Izberite datum in čas\" > span",
     "label: df-datetime-date > input",
     "label: df-datetime-time > input"
-  ],
-  "validators": [
-    "color-contrast: df-select-single \"Language of the errors\" > div.df-label",
-    "color-contrast: df-select-single \"Role\" > div.df-label",
-    "color-contrast: v-text-field \"Age\" > div.df-label",
-    "color-contrast: v-text-field \"Email\" > div.df-label",
-    "color-contrast: v-text-field \"Email\" > span",
-    "color-contrast: v-text-field \"Username\" > div.df-label",
-    "color-contrast: v-text-field \"Username\" > span",
-    "color-contrast: v-textarea \"Bio\" > div.df-label",
-    "color-contrast: v-textarea \"Bio\" > span"
-  ],
-  "validators: errors shown": [
-    "color-contrast: df-select-single \"Language of the errors\" > div.df-label",
-    "color-contrast: df-select-single \"Role\" > div.df-label"
   ]
 }

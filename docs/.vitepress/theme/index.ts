@@ -22,7 +22,9 @@ export default {
       components,
       directives,
       theme: {
-        defaultTheme: 'light'
+        defaultTheme: 'light',
+        // labels and hints reach a 4.5:1 contrast on the light surface (Vuetify's default is 0.60)
+        themes: { light: { variables: { 'medium-emphasis-opacity': 0.62 } } },
       }
     })
 
