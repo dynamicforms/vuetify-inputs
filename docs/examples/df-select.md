@@ -29,6 +29,8 @@ Choices loaded by `fetchChoices`, and icons:
 - Icons in choices
 - Chips for selected values. With `multiple` and `allowNull`, chips that wrap onto more rows put the clear button
   above the menu arrow; the layout follows the field's width.
+- A chip's close button is labelled `Remove <text>` and removes the chip on a click, Enter or Space; focus then moves
+  to the close button of the next chip, or to the input when no closable chip remains
 - A `null` selection under `allowNull`, and an empty array for a multiple select
 - Search with filtering
 
@@ -83,9 +85,10 @@ loading choices and a value set from outside leave the value as it is: `null` st
 empty array, and a value the select would show differently - a single id for a multiple select, an array for a single
 one - is shown as the select needs it and written in that form only with the user's next edit.
 
-An id of the value that no choice covers is shown with a choice whose text is the id, and stays in the value. Once
-choices that cover it are loaded or given, the select shows that choice instead. With `allowTags`, such an id is shown
-as it is.
+An id of the value that no choice covers is shown with a choice whose text is the id, and stays in the value. An id
+that is empty or blank, such as `''`, gets no such choice: the select shows no selection for it, and in a multiple
+select the user's edits keep it in the value until the clear button empties the value. Once choices that cover an id
+are loaded or given, the select shows that choice instead. With `allowTags`, such an id is shown as it is.
 
 ## Dynamic Option Loading
 

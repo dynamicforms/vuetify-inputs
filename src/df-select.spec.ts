@@ -395,6 +395,174 @@ describe('DfSelect', () => {
     });
   });
 
+  describe('accessibility', () => {
+    const ICON_CHOICES: SelectChoice[] = [1, 2, 3].map((id) => ({ id, text: `Choice ${id}`, icon: 'mdi-account' }));
+
+    it('labels each chip close button with the chip text', async () => {
+      const wrapper = mountSelect({ control: new Field({ value: [1, 2] }), multiple: true, choices: ALL_CHOICES });
+      await flushPromises();
+
+      const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
+      expect(labels).toEqual(['Remove Choice 1', 'Remove Choice 2']);
+    });
+
+    it.each(['Enter', ' '])('removes a chip with %j on its close button and focuses the next one', async (key) => {
+      const control = new Field<number[] | null>({ value: [1, 2, 3] });
+      const wrapper = mount(DfSelect, {
+        props: { label: 'Select', control, multiple: true, choices: ALL_CHOICES },
+        global: { plugins: [vuetify] },
+        attachTo: document.body,
+      });
+      await flushPromises();
+
+      const button = wrapper.findAll('.v-chip__close')[1];
+      (button.element as HTMLElement).focus();
+      const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+      button.element.dispatchEvent(event);
+      await flushPromises();
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(control.value).toEqual([1, 3]);
+      expect(wrapper.findComponent(VAutocomplete).props('menu')).toBe(false);
+      expect(document.activeElement?.getAttribute('aria-label')).toBe('Remove Choice 3');
+      wrapper.unmount();
+    });
+
+    it('removes no chip on a repeated Space keydown and keeps it from the autocomplete', async () => {
+      const control = new Field<number[] | null>({ value: [1, 2, 3] });
+      const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
+      await flushPromises();
+      const onParentKeydown = vi.fn();
+      wrapper.find('.v-chip').element.addEventListener('keydown', onParentKeydown);
+
+      const event = new KeyboardEvent('keydown', { key: ' ', repeat: true, bubbles: true, cancelable: true });
+      wrapper.find('.v-chip__close').element.dispatchEvent(event);
+      await flushPromises();
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(onParentKeydown).not.toHaveBeenCalled();
+      expect(control.value).toEqual([1, 2, 3]);
+    });
+
+    it('labels a close button with a choice text holding a placeholder as it is', async () => {
+      const choices: SelectChoice[] = [
+        { id: 1, text: 'Size {0}' },
+        { id: 2, text: 'Size {choice}' },
+      ];
+      const wrapper = mountSelect({ control: new Field({ value: [1, 2] }), multiple: true, choices });
+      await flushPromises();
+
+      const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
+      expect(labels).toEqual(['Remove Size {0}', 'Remove Size {choice}']);
+    });
+
+    it('removes a chip on a click on its close button', async () => {
+      const control = new Field<number[] | null>({ value: [1, 2] });
+      const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
+      await flushPromises();
+
+      await wrapper.find('.v-chip__close').trigger('click');
+      await flushPromises();
+
+      expect(control.value).toEqual([2]);
+      expect(wrapper.findAll('.v-chip')).toHaveLength(1);
+    });
+
+    it('focuses the input once no closable chip remains', async () => {
+      const control = new Field<number[] | null>({ value: [1, 2] });
+      const wrapper = mount(DfSelect, {
+        props: { label: 'Select', control, multiple: true, allowNull: false, choices: ALL_CHOICES },
+        global: { plugins: [vuetify] },
+        attachTo: document.body,
+      });
+      await flushPromises();
+
+      wrapper
+        .find('.v-chip__close')
+        .element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await flushPromises();
+
+      expect(control.value).toEqual([2]);
+      expect(document.activeElement).toBe(wrapper.find('input').element);
+      wrapper.unmount();
+    });
+
+    it('leaves other keys on a chip to the autocomplete', async () => {
+      const control = new Field<number[] | null>({ value: [1, 2] });
+      const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
+      await flushPromises();
+
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true, cancelable: true });
+      wrapper.find('.v-chip__close').element.dispatchEvent(event);
+      await flushPromises();
+
+      expect(event.defaultPrevented).toBe(false);
+      expect(control.value).toEqual([1, 2]);
+    });
+
+    it('hides choice icons in chips and options from assistive technology', async () => {
+      const wrapper = mount(DfSelect, {
+        props: { label: 'Select', control: new Field({ value: [1] }), multiple: true, choices: ICON_CHOICES },
+        global: { plugins: [vuetify] },
+        attachTo: document.body,
+      });
+      await flushPromises();
+
+      const chipIcons = wrapper.findAll('.v-chip .cached-icon-wrapper');
+      expect(chipIcons).toHaveLength(1);
+      expect(chipIcons[0].attributes('aria-hidden')).toBe('true');
+
+      await wrapper.find('.v-field').trigger('mousedown');
+      await flushPromises();
+      const optionIcons = document.querySelectorAll('.v-overlay-container .v-list-item .cached-icon-wrapper');
+      expect(optionIcons).toHaveLength(ICON_CHOICES.length);
+      optionIcons.forEach((icon) => expect(icon.getAttribute('aria-hidden')).toBe('true'));
+      wrapper.unmount();
+    });
+
+    it.each(['', '  '])('gives a blank id outside the choices no choice and keeps it (%j)', async (blank) => {
+      const control = new Field<any>({ value: blank });
+      const onDisplay = vi.fn();
+      const wrapper = mount(DfSelect, {
+        props: { label: 'Select', control, choices: ALL_CHOICES, 'onUpdate:modelValueDisplay': onDisplay },
+        global: { plugins: [vuetify] },
+      });
+      await flushPromises();
+
+      const items = wrapper.findComponent(VAutocomplete).props('items') as { title: string }[];
+      expect(items.map((item) => item.title)).toEqual(ALL_CHOICES.map((choice) => choice.text));
+      expect(wrapper.findAll('.v-chip')).toHaveLength(0);
+      expect(onDisplay).toHaveBeenLastCalledWith([]);
+      expect(control.value).toBe(blank);
+    });
+
+    it('keeps a blank id of a multiple value through chip removal and selection', async () => {
+      const control = new Field<any>({ value: [1, ''] });
+      const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
+      await flushPromises();
+      expect(wrapper.findAll('.v-chip').map((chip) => chip.text())).toEqual(['Choice 1']);
+
+      await wrapper.find('.v-chip__close').trigger('click');
+      await flushPromises();
+      expect(control.value).toEqual(['']);
+
+      wrapper.findComponent(VAutocomplete).vm.$emit('update:modelValue', [2]);
+      await flushPromises();
+      expect(control.value).toEqual([2, '']);
+    });
+
+    it('names the progress bar shown while choices are fetched', async () => {
+      const { fetchChoices, release } = deferredFetchChoices();
+      const wrapper = mountSelect({ control: new Field({ value: 2 }), fetchChoices });
+      await flushPromises();
+
+      const bar = wrapper.find('.v-field__loader [role="progressbar"]');
+      expect(bar.attributes('aria-label')).toBe('Loading');
+      expect(bar.attributes('aria-hidden')).toBe('false');
+      await release();
+    });
+  });
+
   it('renders the autocomplete once mounted where Vuetify is created for server-side rendering', async () => {
     const ssrVuetify = createVuetify({ ssr: true, components });
     const choices = [{ id: 1, text: 'One' }];

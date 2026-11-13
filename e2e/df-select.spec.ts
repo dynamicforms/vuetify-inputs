@@ -44,3 +44,28 @@ test('the layout settles at every width', async ({ page }) => {
     expect(new Set(classes.slice(2)).size, `width ${width}: ${classes}`).toBe(1);
   }
 });
+
+test('Enter and Space on a chip close button remove that chip only and move focus to the next one', async ({ page }) => {
+  await page.goto('/examples/df-select');
+  await pickFruits(page);
+  const chips = basicSelect(page).locator('.v-chip');
+  await expect(chips).toHaveText(['Apple', 'Banana', 'Cherry', 'Durian', 'Elderflower']);
+
+  await basicSelect(page).getByRole('button', { name: 'Remove Apple' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(chips).toHaveText(['Banana', 'Cherry', 'Durian', 'Elderflower']);
+  await expect(page.getByRole('button', { name: 'Remove Banana' })).toBeFocused();
+  await expect(basicSelect(page).locator('input')).toHaveAttribute('aria-expanded', 'false');
+
+  await page.keyboard.press(' ');
+  await expect(chips).toHaveText(['Cherry', 'Durian', 'Elderflower']);
+  await expect(page.getByRole('button', { name: 'Remove Cherry' })).toBeFocused();
+
+  // a held Space sends repeated keydowns and removes one chip
+  await page.keyboard.down(' ');
+  await page.keyboard.down(' ');
+  await page.keyboard.down(' ');
+  await page.keyboard.up(' ');
+  await expect(chips).toHaveText(['Durian', 'Elderflower']);
+  await expect(page.getByRole('button', { name: 'Remove Durian' })).toBeFocused();
+});

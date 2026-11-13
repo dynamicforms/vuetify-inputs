@@ -6,6 +6,7 @@
         v-if="currentFile && progress < 100"
         :model-value="progress"
         :indeterminate="progress === -1"
+        :aria-label="t('Uploading')"
       />
     </template>
     <template #default="slotProps">

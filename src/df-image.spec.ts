@@ -79,6 +79,15 @@ describe('DfImage', () => {
     expect(link.attributes('href')).toBe('https://example.com/existing.png');
   });
 
+  it('names the progress bar shown while an image uploads', async () => {
+    comms.upload = vi.fn(() => new Promise<string>(() => {}));
+    const wrapper = mountImage();
+
+    await pickImage(wrapper, pngFile());
+
+    expect(wrapper.find('.v-field__loader [role="progressbar"]').attributes('aria-label')).toBe('Uploading');
+  });
+
   it('uploads a picked image and reflects the returned identifier as modelValue', async () => {
     const wrapper = mountImage();
 
