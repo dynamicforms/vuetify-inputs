@@ -21,6 +21,8 @@
         'd-none': action.action.visibility === 'hidden',
         invisible: action.action.visibility === 'invisible',
       }"
+      :aria-label="action.showLabel ? undefined : action.accessibleLabel"
+      :title="action.showLabel ? undefined : action.accessibleLabel"
       v-bind="action.passthroughAttrs"
       @click.stop="(event: MouseEvent) => action.action.execute(event)"
     >

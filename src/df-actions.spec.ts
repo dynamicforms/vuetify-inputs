@@ -7,7 +7,7 @@ import { createVuetify } from 'vuetify';
 import { VBtn } from 'vuetify/components';
 
 import DfActions from '@/df-actions.vue';
-import { Action } from '@/helpers';
+import { Action, HtmlString } from '@/helpers';
 
 describe('DfActions', () => {
   let vuetify: any;
@@ -555,6 +555,82 @@ describe('DfActions', () => {
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('color')).toBe('error');
+    });
+  });
+  describe('accessible name', () => {
+    const mountActions = (actions: Action[]) =>
+      mount(DfActions, { props: { actions }, global: { plugins: [vuetify] } });
+
+    it('names an icon-only button with aria-label and title', () => {
+      const action = createMockAction('save', 'Save', 'save-outline');
+      action.value.showLabel = false;
+
+      const button = mountActions([action]).find('button');
+      expect(button.text()).not.toContain('Save');
+      expect(button.attributes('aria-label')).toBe('Save');
+      expect(button.attributes('title')).toBe('Save');
+    });
+
+    it('sets neither aria-label nor title on a button that shows its label', () => {
+      const button = mountActions([createMockAction('save', 'Save', 'save-outline')]).find('button');
+
+      expect(button.text()).toContain('Save');
+      expect(button.attributes('aria-label')).toBeUndefined();
+      expect(button.attributes('title')).toBeUndefined();
+    });
+
+    it('names the button at a breakpoint that hides the label', () => {
+      const action = new Action({
+        value: {
+          name: 'save',
+          label: 'Save',
+          icon: 'save-outline',
+          showLabel: true,
+          showIcon: true,
+          xs: { showLabel: false },
+        },
+      });
+
+      const button = mountActions([action]).find('button');
+      expect(button.attributes('aria-label')).toBe('Save');
+      expect(button.attributes('title')).toBe('Save');
+    });
+
+    it('lets passthroughAttrs override aria-label and title', () => {
+      const action = createMockAction('save', 'Save', 'save-outline');
+      action.value.showLabel = false;
+      action.value.passthroughAttrs = { 'aria-label': 'Save the document', title: 'Ctrl+S' };
+
+      const button = mountActions([action]).find('button');
+      expect(button.attributes('aria-label')).toBe('Save the document');
+      expect(button.attributes('title')).toBe('Ctrl+S');
+    });
+
+    it('takes the plain text of a rich label', () => {
+      const action = new Action({
+        value: {
+          label: new HtmlString('<b>Save</b> &amp; close') as unknown as string,
+          icon: 'save-outline',
+          showLabel: false,
+          showIcon: true,
+        },
+      });
+
+      const button = mountActions([action]).find('button');
+      expect(button.attributes('aria-label')).toBe('Save & close');
+      expect(button.attributes('title')).toBe('Save & close');
+    });
+
+    it('reads a label given as a function', () => {
+      const action = new Action({ value: { label: () => 'Save', icon: 'save-outline', showLabel: false } });
+
+      expect(mountActions([action]).find('button').attributes('aria-label')).toBe('Save');
+    });
+
+    it('sets no aria-label where the action has no label', () => {
+      const action = new Action({ value: { icon: 'save-outline', showIcon: true } });
+
+      expect(mountActions([action]).find('button').attributes('aria-label')).toBeUndefined();
     });
   });
 });

@@ -2,6 +2,8 @@ import { ActionValue } from '@dynamicforms/vue-forms';
 import { isBoolean, isEmpty, isObjectLike, isPlainObject, isString } from 'lodash-es';
 import { type MaybeRefOrGetter, toValue } from 'vue';
 
+import { renderContentText } from '../render-content';
+
 import {
   type ActionDisplayStyle,
   actionDisplayStyles,
@@ -45,7 +47,8 @@ export interface ActionRenderOptions extends ActionValue {
   defaultReject?: boolean;
   /** Additional props/attrs forwarded verbatim to the rendered `<v-btn>` (e.g. `color`, `loading`, `density`,
    * `rounded`, `block`, `prependIcon`, ...), taking precedence over `<df-actions>`'s own computed bindings
-   * (`variant`, `color`, `disabled`). Mirrors the `passthroughAttrs` convention used by `df-input`/`df-file`/etc
+   * (`variant`, `color`, `disabled`, `loading`, and the `aria-label` and `title` of a button that does not show its
+   * label). Mirrors the `passthroughAttrs` convention used by `df-input`/`df-file`/etc
    * (see `helpers/input-base.ts`); it has to live on the action's value here because `<df-actions>` renders a
    * whole array of buttons, not just one. */
   passthroughAttrs?: Record<string, any>;
@@ -95,7 +98,12 @@ export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<Actio
 }
 
 /** `ActionRenderOptions` with the label read: a string. */
-export type ResolvedActionRenderOptions = Omit<ActionRenderOptions, 'label'> & { label?: string };
+export type ResolvedActionRenderOptions = Omit<ActionRenderOptions, 'label'> & {
+  label?: string;
+  /** The text of the label whether it is shown or not, as an `aria-label` takes it; `undefined` where the label is
+   * missing or empty. */
+  accessibleLabel?: string;
+};
 
 /**
  * What one action renders as at `breakpoint`, read off the value of any `Action`. The members
@@ -105,6 +113,7 @@ export type ResolvedActionRenderOptions = Omit<ActionRenderOptions, 'label'> & {
  *
  * `label` and `icon` come back only where the matching flag says they are shown, and the flags come back false
  * where there is no text or name to show, so a caller renders each member on its own flag and never on emptiness.
+ * `accessibleLabel` is the plain text of the label regardless of `showLabel`, to name a button that does not show it.
  */
 export function getRenderOptionsForBreakpoint(
   value: ActionValue,
@@ -114,9 +123,11 @@ export function getRenderOptionsForBreakpoint(
   const partial = options.getOptionsForBreakpoint(breakpoint);
   // cleanBreakpoint stored the label read
   const label = partial.label as string | undefined;
+  const accessibleLabel = isString(label) ? renderContentText(label) : undefined;
   return {
     name: partial.name,
     label: partial.showLabel ? label : undefined,
+    accessibleLabel: accessibleLabel || undefined,
     icon: partial.showIcon ? partial.icon : undefined,
     renderAs: partial.renderAs,
     showLabel: isString(label) && !isEmpty(label) ? partial.showLabel : false,

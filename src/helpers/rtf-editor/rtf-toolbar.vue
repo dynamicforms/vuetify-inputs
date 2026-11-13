@@ -297,7 +297,6 @@ function setAlign(value: unknown) {
 
 interface ToolbarActionSync {
   action: Action<ActionRenderOptions>;
-  title: () => string;
   disabled: () => boolean;
   active?: () => boolean;
 }
@@ -308,7 +307,8 @@ const toolbarActionSyncs: ToolbarActionSync[] = [];
 // button is a self-contained `Action`, so its look (size, rounded corners, active/disabled state) is drawn
 // from its own value rather than from props a parent component may or may not forward to it.
 //
-// `title`/`disabled`/`active` are getters, not one-off values, because an `Action`'s `value`/`enabled` are plain
+// `title` is the action's hidden label, which `<df-actions>` renders as the button's `aria-label` and `title`.
+// `disabled`/`active` are getters, not one-off values, because an `Action`'s `value`/`enabled` are plain
 // assignments rather than bindings to a computed - the `watchEffect` below re-runs them on every reactive change
 // and writes the result into the action it was registered against.
 function toolbarAction(
@@ -319,7 +319,7 @@ function toolbarAction(
   active?: () => boolean,
 ): Action<ActionRenderOptions> {
   const action = new Action<ActionRenderOptions>({
-    value: { icon, renderAs: 'text', showIcon: true, showLabel: false },
+    value: { icon, label: title, renderAs: 'text', showIcon: true, showLabel: false },
     actions: [
       new ExecuteAction((a, supr, params) => {
         onClick();
@@ -327,12 +327,12 @@ function toolbarAction(
       }),
     ],
   });
-  toolbarActionSyncs.push({ action, title, disabled, active });
+  toolbarActionSyncs.push({ action, disabled, active });
   return action;
 }
 
-function syncToolbarAction({ action, title, disabled, active }: ToolbarActionSync) {
-  const wantAttrs: Record<string, unknown> = { title: title(), icon: true };
+function syncToolbarAction({ action, disabled, active }: ToolbarActionSync) {
+  const wantAttrs: Record<string, unknown> = { icon: true };
   if (active) wantAttrs.active = active();
   if (!isEqual(action.value.passthroughAttrs ?? {}, wantAttrs)) {
     action.value = { ...action.value, passthroughAttrs: wantAttrs };
