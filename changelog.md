@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `df-actions` prop `simple`: the actions render as native `<button>` elements without background or border, in the
   surrounding text colour and font, instead of `v-btn`. Icon, label, accessible name, `passthroughAttrs`, disabling,
-  visibility and execution follow the same rules; a run in flight sets `aria-busy`.
+  `aria-busy` during a run, visibility and execution follow the same rules; a run shows no spinner.
 
 ### Removed
 

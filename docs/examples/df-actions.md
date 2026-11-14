@@ -381,13 +381,14 @@ The same as in the Vuetify mode:
 - a button that does not show its label has the label's plain text as its `aria-label` and `title`;
 - `passthroughAttrs` are bound to the `<button>` and override the attributes `<df-actions>` sets (`disabled`,
   `aria-busy`, `aria-label`, `title`), so they take HTML attributes here, not `v-btn` props;
-- the button is disabled where the action is not `executable`;
+- the button is disabled where the action is not `executable`, which includes a run in flight, and carries
+  `aria-busy="true"` during the run;
 - a click calls `execute(event)`;
 - `visibility` applies the same classes, and `'suppress'` removes the button.
 
 Different from the Vuetify mode:
 
-- a run in flight sets `aria-busy="true"` on the button, which is disabled meanwhile; there is no spinner;
+- a run in flight shows no spinner;
 - `renderAs`, the `defaultConfirm` / `defaultReject` colours, `buttonSize` and `buttonDensity` do not apply.
 
 `showAsGroup` applies in simple mode as well: `'grouped'` and `'grouped-no-borders'` join the buttons without gaps
