@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.16.0] - 2026-11-14
 
+### Added
+
+- `df-actions` prop `simple`: each action renders as one native `<button>` instead of a `v-btn`, for the smallest DOM
+  and the fastest render where many actions show at once (an action column in a grid). The button has no background
+  or border and takes the surrounding text colour and font. Icon, label, accessible name, `passthroughAttrs`, disabling,
+  `aria-busy` during a run, visibility and execution follow the same rules; a run shows no spinner.
+
 ### Removed
 
 - `helpText` (prop and `Extras` property): no component rendered it; the field description is `hint`.

@@ -14,6 +14,7 @@ A row of actions:
 - Supports responsive display based on screen size
 - Icon and label shown per `showIcon` / `showLabel`; a button that does not show its label is named by it
 - Grouped button layouts
+- Simple mode: one native button per action, the smallest DOM for many actions on a page
 - Renders `@dynamicforms/vue-forms` actions
 - `defaultConfirm` / `defaultReject` actions are colored `primary` / `secondary`
 
@@ -23,7 +24,9 @@ A row of actions:
 |------|------|---------|-------------|
 | `actions` | `Action[]` or `Ref<Action[]>` | required | Array of Action objects to render - this library's `Action`, or a bare `@dynamicforms/vue-forms` one |
 | `buttonSize` | `string` or `number` | `'default'` | Size of buttons (see Vuetify's v-btn size prop) |
+| `buttonDensity` | `'default'` \| `'comfortable'` \| `'compact'` | `'default'` | Forwarded to each button's `density` (see Vuetify's v-btn density prop) |
 | `showAsGroup` | `'no'` \| `'grouped'` \| `'grouped-no-borders'` | `'no'` | Controls how buttons are grouped |
+| `simple` | `boolean` | `false` | Renders each action as one native `<button>` instead of a `v-btn`, for the smallest DOM and the fastest render; see [Simple mode](#simple-mode) |
 
 ## Action Object
 
@@ -39,7 +42,7 @@ interface ActionBreakpointOptions {
   showLabel?: boolean;              // Whether to show the label
   defaultConfirm?: boolean;         // Marks the action as the "confirm" one - colored primary by default
   defaultReject?: boolean;          // Marks the action as the "reject/dismiss" one - colored secondary by default
-  passthroughAttrs?: Record<string, any>; // Extra props forwarded straight to the rendered <v-btn>
+  passthroughAttrs?: Record<string, any>; // Extra props forwarded straight to the rendered <v-btn> (HTML attributes of the <button> with `simple`)
   // Responsive breakpoints
   xs?: ActionBreakpointRenderOptions;
   sm?: ActionBreakpointRenderOptions;
@@ -112,9 +115,9 @@ The `value` object defines the visual appearance and behavior:
 | `renderAs` | `ActionDisplayStyle` | How to render: `'button'` or `'text'` |
 | `showIcon` | `boolean` | Whether to display the icon |
 | `showLabel` | `boolean` | Whether to display the label. A button that does not display it has the label's plain text as its `aria-label` and `title` |
-| `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the button `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
-| `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the button `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
-| `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>`, overriding `<df-actions>`'s own computed props |
+| `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the `v-btn` `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`); no colour in [simple mode](#simple-mode) |
+| `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the `v-btn` `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`); no colour in [simple mode](#simple-mode) |
+| `passthroughAttrs` | `Record<string, any>` | Extra props/attrs forwarded to the rendered `<v-btn>` (e.g. `color`, `density`, `rounded`, `block`, `prependIcon`), overriding `<df-actions>`'s own computed props; in [simple mode](#simple-mode) HTML attributes of the `<button>` (e.g. `class`, `style`, `aria-describedby`), where `v-btn` props have no effect |
 
 Every one of these but `name`, `defaultConfirm` and `defaultReject` can also be stated per breakpoint.
 
@@ -361,6 +364,40 @@ With this configuration:
 - `'no'`: Buttons are displayed as separate elements
 - `'grouped'`: Buttons are grouped with borders
 - `'grouped-no-borders'`: Buttons are grouped without borders
+
+## Simple mode
+
+Simple mode exists for render speed: it keeps the DOM of each action as small as possible. Each action is one
+native `<button type="button">` holding the icon and the label, with no Vuetify component; a `v-btn` is a component
+instance with overlay, underlay and content elements around the same icon and label. Use it where many actions render
+at once, such as an action column in a grid.
+
+The button is inline, without background or border, in the colour and font of the surrounding text, with a
+`:focus-visible` outline.
+
+```vue
+<df-actions :actions="actions" simple />
+```
+
+The same as in the Vuetify mode:
+
+- the icon and the label are shown per `showIcon` / `showLabel` at the current breakpoint;
+- a button that does not show its label has the label's plain text as its `aria-label` and `title`;
+- `passthroughAttrs` are bound to the `<button>` and override the attributes `<df-actions>` sets (`disabled`,
+  `aria-busy`, `aria-label`, `title`), so they take HTML attributes here, not `v-btn` props;
+- the button is disabled where the action is not `executable`, which includes a run in flight, and carries
+  `aria-busy="true"` during the run;
+- a click calls `execute(event)`;
+- `visibility` applies the same classes, and `'suppress'` removes the button.
+
+Different from the Vuetify mode:
+
+- a run in flight shows no spinner;
+- `renderAs`, the `defaultConfirm` / `defaultReject` colours, `buttonSize` and `buttonDensity` do not apply.
+
+`showAsGroup` applies in simple mode as well: `'grouped'` and `'grouped-no-borders'` join the buttons without gaps
+inside a container with rounded corners, and `'grouped'` draws a border in the text colour around the container and
+between the buttons.
 
 ## Usage with DynamicForms
 
