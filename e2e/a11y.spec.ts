@@ -33,6 +33,7 @@ const states = {
   colorPicker: 'df-color: picker open',
   colorPalette: 'df-color: hexagon palette open',
   validatorErrors: 'validators: errors shown',
+  actionsSimple: 'df-actions: simple',
 };
 // every baseline key the suite produces
 const keys = new Set<string>([...pages, ...Object.values(states)]);
@@ -159,6 +160,13 @@ test('df-color with the hexagon palette open', async ({ page }) => {
   await page.locator('.v-card', { hasText: 'Hexagon Palette Example' }).first().locator('input').first().click();
   await expect(page.locator('.v-overlay-container .v-overlay--active .df-hexagon-palette')).toBeVisible();
   check(states.colorPalette, await scan(page));
+});
+
+test('df-actions in simple mode', async ({ page }) => {
+  await open(page, 'df-actions');
+  await page.locator('.actions-demo .v-checkbox', { hasText: 'Simple' }).locator('input').check();
+  await expect(page.locator('.actions-demo .df-action-simple').first()).toBeVisible();
+  check(states.actionsSimple, await scan(page));
 });
 
 test('validators with errors shown', async ({ page }) => {

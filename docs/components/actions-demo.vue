@@ -4,6 +4,7 @@
       <div class="mb-0">
         <div><strong>Current breakpoint:</strong> {{ currentBreakpoint }}</div>
         <df-checkbox v-model="sectionEnabled" label="Section enabled" />
+        <df-checkbox v-model="simple" label="Simple" />
       </div>
       <div class="d-flex align-center">
         <df-select
@@ -17,7 +18,7 @@
     </div>
 
     <div class="actions-container mt-4" :class="{ 'd-inline-block': showAsGroup !== 'no' }">
-      <df-actions :actions="actions" :button-size="buttonSize" :show-as-group="showAsGroup" />
+      <df-actions :actions="actions" :button-size="buttonSize" :show-as-group="showAsGroup" :simple="simple" />
     </div>
   </div>
 </template>
@@ -43,6 +44,7 @@ const sizeOptions = [
   'x-large',
 ].map((id) => ({ id, text: id }));
 const selectedSize = ref('default');
+const simple = ref(false);
 const buttonSize = computed(() => {
   const words = selectedSize.value.trim().split(/\s+/);
   return words[words.length - 1];
