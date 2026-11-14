@@ -349,6 +349,8 @@ outer field renders the label, the hint and one clear button for both.
 
 ### Accessibility
 
+What the library provides as a whole is on the [Accessibility](/guide/accessibility) page.
+
 The default slot's `props` (`InputBaseControlProps`) are the attributes of the element the user operates:
 
 | Attribute | Value |

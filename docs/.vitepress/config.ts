@@ -45,6 +45,7 @@ export default defineConfig({
             { text: 'Using without DynamicForms', link: '/guide/getting-started#using-without-dynamicforms' },
             { text: 'Available Components', link: '/guide/getting-started#available-components' },
             { text: 'Server-side rendering', link: '/guide/ssr' },
+            { text: 'Accessibility', link: '/guide/accessibility' },
           ]
         },
         {
