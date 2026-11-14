@@ -42,7 +42,7 @@ interface ActionBreakpointOptions {
   showLabel?: boolean;              // Whether to show the label
   defaultConfirm?: boolean;         // Marks the action as the "confirm" one - colored primary by default
   defaultReject?: boolean;          // Marks the action as the "reject/dismiss" one - colored secondary by default
-  passthroughAttrs?: Record<string, any>; // Extra props forwarded straight to the rendered <v-btn> (<button> with `simple`)
+  passthroughAttrs?: Record<string, any>; // Extra props forwarded straight to the rendered <v-btn> (HTML attributes of the <button> with `simple`)
   // Responsive breakpoints
   xs?: ActionBreakpointRenderOptions;
   sm?: ActionBreakpointRenderOptions;
@@ -115,9 +115,9 @@ The `value` object defines the visual appearance and behavior:
 | `renderAs` | `ActionDisplayStyle` | How to render: `'button'` or `'text'` |
 | `showIcon` | `boolean` | Whether to display the icon |
 | `showLabel` | `boolean` | Whether to display the label. A button that does not display it has the label's plain text as its `aria-label` and `title` |
-| `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the button `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
-| `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the button `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`) |
-| `passthroughAttrs` | `Record<string, any>` | Extra props/attrs (e.g. `color`, `density`, `rounded`, `block`, `prependIcon`) forwarded to the rendered `<v-btn>` (the `<button>` in [simple mode](#simple-mode)), overriding `<df-actions>`'s own computed props |
+| `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the `v-btn` `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`); no colour in [simple mode](#simple-mode) |
+| `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the `v-btn` `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`); no colour in [simple mode](#simple-mode) |
+| `passthroughAttrs` | `Record<string, any>` | Extra props/attrs forwarded to the rendered `<v-btn>` (e.g. `color`, `density`, `rounded`, `block`, `prependIcon`), overriding `<df-actions>`'s own computed props; in [simple mode](#simple-mode) HTML attributes of the `<button>` (e.g. `class`, `style`, `aria-describedby`), where `v-btn` props have no effect |
 
 Every one of these but `name`, `defaultConfirm` and `defaultReject` can also be stated per breakpoint.
 
