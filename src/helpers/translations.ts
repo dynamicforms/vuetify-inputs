@@ -57,6 +57,8 @@ const defaults = {
   ImagePaste: 'Paste image from clipboard',
   ImageDownload: 'Download image',
   FileDownload: 'Download file',
+  Date: 'Date',
+  Time: 'Time',
   Table: 'Table',
   TableInsert: 'Insert table',
   TableAddRowAbove: 'Add row above',

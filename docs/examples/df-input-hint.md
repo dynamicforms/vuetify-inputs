@@ -16,11 +16,16 @@ input, e.g. a group's errors, a section caption or a table row.
 | message        | `RenderContentRef \| RenderableValue[]`            | `''`           | Rendered while there is no error, typically the field's hint    |
 | errorClasses   | `ClassTypes`                                       | `'text-error'` | Classes of each rendered message while there are errors           |
 | messageClasses | `ClassTypes`                                       | `''`           | Classes of each rendered message while there are none             |
+| hint           | `RenderContentRef`                                 | `''`           | The field's hint. While errors are rendered, it is also rendered visually hidden after them |
 
 The component renders one row. It renders `errors` when `errors` is a non-empty array or a string with at least one
 non-whitespace character, and `message` otherwise. A whitespace-only string is not an error, so a blank string passed
 to keep a Vuetify message slot rendered shows the hint. The classes are `errorClasses` while the row renders errors and
 `messageClasses` while it renders the message.
+
+While the row renders errors and `hint` is not empty, the hint is rendered after them in an element with the
+`df-sr-only` class: it takes no space on screen and stays in the text of the row, which the control's
+`aria-describedby` references, so assistive technology reads the hint together with the errors.
 
 `message` is content in any of its forms (see [Render content](#render-content)) or an array of `RenderableValue`s. A
 string is passed to `MessagesWidget` as it is; any other content is passed as a single `RenderableValue`, so a ref or a
@@ -118,7 +123,9 @@ as written, an `HtmlString` without its tags, a component as the text of its chi
 Every input component in the library overrides the Vuetify `#message` slot of the control it wraps with the same line:
 
 ```vue
-<template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
+<template #message="{ message }">
+  <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+</template>
 ```
 
 `message` is what Vuetify passes to the slot, the `hint` prop. The inputs bind `persistent-hint` and
@@ -126,7 +133,7 @@ Every input component in the library overrides the Vuetify `#message` slot of th
 the field's errors that is shown now (see [Shown errors](/examples/input-base#shown-errors)): an error of origin
 `'server'` immediately, every other once the field is touched. The field's errors are `control.errors` when a control is
 bound, and otherwise the `errors` prop, each error as it was given. While `shownErrors` is empty, the row shows the
-hint. `helpText` is not part of this row.
+hint; while it is not, the row shows the errors and keeps the hint visually hidden.
 
 While a touched field is invalid, the inputs also pass a single blank error message to Vuetify. It sets the control's
 error state and keeps the message row rendered; the text in the row is rendered by `DfInputHint`.

@@ -33,7 +33,9 @@
         </div>
       </template>
     </v-field>
-    <template #message="{ message }"><df-input-hint :message="message" :errors="groupErrors" /></template>
+    <template #message="{ message }">
+      <df-input-hint :message="message" :errors="groupErrors" :hint="vuetifyBindings.hint" />
+    </template>
   </v-input>
 </template>
 

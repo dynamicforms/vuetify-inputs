@@ -9,16 +9,7 @@
     "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
     "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
-    "label: df-datetime-date > input",
-    "label: df-datetime-date > input",
-    "label: df-datetime-date > input",
-    "label: df-datetime-date > input",
-    "label: df-datetime-date > input",
-    "label: v-file-input > input",
-    "label: v-file-input > input",
-    "label: v-file-input > input",
-    "label: v-file-input > input"
+    "aria-allowed-attr: v-text-field \"df-color\" > div.v-field"
   ],
   "df-actions": [
     "color-contrast: df-select-single \"Button size\" > div.df-label"
@@ -62,13 +53,7 @@
     "aria-allowed-attr: df-datetime-date > div.v-field",
     "aria-allowed-attr: df-datetime-time > div.v-field",
     "aria-allowed-attr: df-datetime-time > div.v-field",
-    "aria-allowed-attr: df-datetime-time > div.v-field",
-    "label: df-datetime-date > input",
-    "label: df-datetime-date > input",
-    "label: df-datetime-date > input",
-    "label: df-datetime-time > input",
-    "label: df-datetime-time > input",
-    "label: df-datetime-time > input"
+    "aria-allowed-attr: df-datetime-time > div.v-field"
   ],
   "df-datetime: picker open": [
     "aria-allowed-attr: df-datetime-date > div.v-field",
@@ -81,26 +66,15 @@
     "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
     "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
     "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
-    "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
-    "label: df-datetime-date > input",
-    "label: df-datetime-date > input",
-    "label: df-datetime-date > input",
-    "label: df-datetime-time > input",
-    "label: df-datetime-time > input",
-    "label: df-datetime-time > input"
+    "color-contrast: menu div.v-sheet > div.v-date-picker-month__day"
   ],
   "df-image": [
     "image-alt: df-image-field \"Profile picture\" > img.v-img__img"
-  ],
-  "df-rtf-editor": [
-    "aria-input-field-name: div.v-input \"Content\" > div.tiptap[role=textbox]"
   ],
   "localisation": [
     "aria-allowed-attr: df-datetime-date > div.v-field",
     "aria-allowed-attr: df-datetime-time > div.v-field",
     "color-contrast: div.v-input \"Izberite datum in čas\" > div.df-label",
-    "color-contrast: div.v-input \"Izberite datum in čas\" > span",
-    "label: df-datetime-date > input",
-    "label: df-datetime-time > input"
+    "color-contrast: div.v-input \"Izberite datum in čas\" > span"
   ]
 }

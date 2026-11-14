@@ -61,8 +61,17 @@ const props = withDefaults(
     readonly?: boolean;
     toolbarButtonSize?: VuetifyButtonSize;
     fontFamily?: string;
+    /** Attributes of the editable element, such as its ARIA attributes; an undefined value sets none. */
+    contentAttributes?: Record<string, string | undefined>;
   }>(),
-  { modelValue: '', minHeight: '7em', readonly: false, toolbarButtonSize: 'small', fontFamily: 'inherit' },
+  {
+    modelValue: '',
+    minHeight: '7em',
+    readonly: false,
+    toolbarButtonSize: 'small',
+    fontFamily: 'inherit',
+    contentAttributes: () => ({}),
+  },
 );
 
 const emit = defineEmits<{
@@ -103,6 +112,16 @@ watch(
 );
 onBeforeUnmount(() => toolbarResizeObserver?.disconnect());
 
+// ProseMirror writes every attribute it is given, an undefined one as the text "undefined"
+const editableAttributes = computed(() => {
+  const attributes: Record<string, string> = { class: 'rtf-content', 'aria-multiline': 'true' };
+  if (props.readonly) attributes['aria-readonly'] = 'true';
+  Object.entries(props.contentAttributes).forEach(([name, attrValue]) => {
+    if (attrValue !== undefined) attributes[name] = attrValue;
+  });
+  return attributes;
+});
+
 const editor = useEditor({
   content: props.modelValue,
   editable: !props.readonly,
@@ -131,7 +150,8 @@ const editor = useEditor({
     MediaEmbed,
   ],
   editorProps: {
-    attributes: { class: 'rtf-content' },
+    // read at every view update; the watch below makes one when they change
+    attributes: () => editableAttributes.value,
     transformPastedHTML: (html: string) => stripWordArtifacts(html),
     handlePaste: createImagePasteHandler(() => editor.value),
   },
@@ -163,6 +183,17 @@ watch(
   (readonly) => editor.value?.setEditable(!readonly, false),
 );
 watch(editor, (instance) => instance?.setEditable(!props.readonly, false));
+
+watch(editableAttributes, () => {
+  const instance = editor.value;
+  if (instance && !instance.isDestroyed) instance.view.updateState(instance.state);
+});
+
+/** Moves the focus into the editable element. */
+function focus() {
+  editor.value?.commands.focus();
+}
+defineExpose({ focus });
 
 const bubbleButtonProps = { icon: true, size: 'small', density: 'comfortable', variant: 'text' } as const;
 

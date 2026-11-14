@@ -10,7 +10,9 @@
       @blur="touched = true"
     >
       <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
-      <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
+      <template #message="{ message }">
+        <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      </template>
     </v-textarea>
   </div>
 </template>

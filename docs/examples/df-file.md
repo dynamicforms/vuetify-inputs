@@ -45,6 +45,9 @@ The component stores and emits a string identifier for the file, not the file it
 2. Used in subsequent operations (delete, touch) to reference the file
 3. Stored in the form data when using DynamicForms
 
+While no file is picked, the field shows the identifier it holds. The field label names the file input, and the
+identifier is part of the input's description.
+
 A started upload completes when the field is disabled while it runs: the identifier is still written into it and touched
 from then on. A later upload, a clear of the field or a value set on the field while an upload runs supersedes that
 upload: it writes nothing into the field, and the identifier it returns is deleted through `comms.delete`.

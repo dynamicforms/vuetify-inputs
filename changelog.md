@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.15.7] - 2026-11-13
+## [0.16.0] - 2026-11-14
+
+### Removed
+
+- `helpText` (prop and `Extras` property): no component rendered it; the field description is `hint`.
 
 ### Fixed
 
@@ -20,6 +24,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `df-select`: an id of the value that no choice covers and that is blank (such as `''`) no longer adds an option and a
   chip without text; a multiple select keeps it in the value through the user's edits.
 - `df-select`, `df-file`, `df-image`: the progress bar has an accessible label (`Loading`, `Uploading`).
+- `InputBase` gives its `v-field` the `v-input`'s id: the field label of `df-date-time`, `df-file`, `df-image` and
+  `df-rtf-editor` names the control the user operates, and the control's `aria-describedby` references the hint and
+  error row. The default slot's `props` carry `aria-labelledby`, `aria-label`, `aria-describedby` and `aria-invalid`
+  (`InputBaseControlProps`).
+- `df-date-time`: the date and the time input are named by the field label followed by `Date` or `Time` (new
+  translation keys `Date` and `Time`), and carry a `name` only where the field has one.
+- `df-file`: the field label names the file input, and the stored file's name describes it.
+- `df-rtf-editor`: the editable element carries the field label, the hint and error row, `aria-multiline`, and
+  `aria-readonly` while the field accepts no input; it is the element the field label's `for` names, and a click on
+  the field label focuses it.
+- `df-select` keeps Vuetify's link from the input to the hint and error row.
+- Every input sets `aria-invalid="true"` while errors are shown.
+- While errors are shown, the hint stays in the message row, visually hidden, so assistive technology reads it with
+  the errors (`DfInputHint` prop `hint`).
+- `df-checkbox` no longer passes `variant`, `bg-color`, `placeholder` and `persistent-placeholder` to the native
+  checkbox.
 
 ## [0.15.6] - 2026-11-11
 

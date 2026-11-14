@@ -18,8 +18,11 @@
         ]"
         @keydown.capture="onKeydown"
       >
+        <span v-if="inputType !== 'time'" :id="partNameId('date')" class="df-sr-only">{{ t('Date') }}</span>
+        <span v-if="inputType !== 'date'" :id="partNameId('time')" class="df-sr-only">{{ t('Time') }}</span>
         <v-text-field
           v-if="['date', 'datetime'].includes(inputType)"
+          :id="slotProps.props.id"
           v-model="dateText"
           class="df-datetime-date"
           style="flex-grow: 4"
@@ -29,9 +32,9 @@
           :hide-details="true"
           :readonly="vuetifyBindings.readonly"
           :disabled="vuetifyBindings.disabled"
-          :name="`${vuetifyBindings.name}-date`"
+          :name="partName('date')"
+          v-bind="{ ...partAttrs('date', slotProps.props), ...passthroughAttrs }"
           :placeholder="vuetifyBindings.placeholder"
-          v-bind="passthroughAttrs"
           @update:model-value="closeMenu('date')"
           @click="dropdown = 'date'"
           @mousedown="markPointerFocus"
@@ -75,6 +78,7 @@
 
         <v-text-field
           v-if="['time', 'datetime'].includes(inputType)"
+          :id="inputType === 'time' ? slotProps.props.id : undefined"
           v-model="timeText"
           class="df-datetime-time"
           style="flex-grow: 3"
@@ -84,9 +88,9 @@
           :hide-details="true"
           :readonly="vuetifyBindings.readonly"
           :disabled="vuetifyBindings.disabled"
-          :name="`${vuetifyBindings.name}-time`"
+          :name="partName('time')"
+          v-bind="{ ...partAttrs('time', slotProps.props), ...passthroughAttrs }"
           :placeholder="inputType === 'time' ? vuetifyBindings.placeholder : undefined"
-          v-bind="passthroughAttrs"
           @update:model-value="closeMenu('time')"
           @click="dropdown = 'time'"
           @mousedown="markPointerFocus"
@@ -146,7 +150,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
-import { ref, computed, inject, watch, toRefs, unref, type Ref } from 'vue';
+import { ref, computed, inject, watch, toRefs, unref, useId, type Ref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
 import {
@@ -154,12 +158,15 @@ import {
   DateTimeLocaleConfig,
   defaultBaseProps,
   InputBase,
+  type InputBaseControlProps,
+  translate,
   useInputBase,
   type VuetifyInputsSettings,
   vuetifyInputsSettingsKey,
 } from './helpers';
 import { useClientRendered } from './helpers/client-rendered';
 import ConfirmActions from './helpers/confirm-actions.vue';
+import { controlAria } from './helpers/control-aria';
 import { parseDateInput, parseTimeInput, setInputError } from './helpers/date-time-input';
 import { namespaced } from './helpers/error-namespace';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
@@ -189,10 +196,35 @@ const inputErrors = () => [
   ...(timeInvalid.value ? [invalidTimeError] : []),
 ];
 
-const { density, densityClass, touched, value, vuetifyBindings } = useInputBase<string | null>(props, emits);
+const { density, densityClass, shownErrors, touched, value, vuetifyBindings } = useInputBase<string | null>(
+  props,
+  emits,
+  inputErrors,
+);
+const t = translate;
 // without a control, input-base shows the errors it is given; a bound control holds them in its own errors
 const shownInputErrors = computed(() => [...(props.errors ?? []), ...inputErrors()]);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
+
+// Each part is named by the field label and its own name; the field label's `for` is the first part's id.
+const nameId = useId();
+const partNameId = (which: 'date' | 'time') => `${nameId}-${which}`;
+const partName = (which: 'date' | 'time') =>
+  vuetifyBindings.value.name ? `${vuetifyBindings.value.name}-${which}` : undefined;
+const partErrorCodes = { date: invalidDateError.code, time: invalidTimeError.code };
+
+// a part is invalid while an error is shown that is not the other part's own
+function partAttrs(which: 'date' | 'time', controlProps: InputBaseControlProps) {
+  const otherCode = partErrorCodes[which === 'date' ? 'time' : 'date'];
+  const invalid = shownErrors.value.some((error) => (error as ValidationError).code !== otherCode);
+  const aria = controlAria(controlProps);
+  return {
+    ...aria,
+    'aria-labelledby': `${aria['aria-labelledby']} ${partNameId(which)}`,
+    'aria-label': [aria['aria-label'], t(which === 'date' ? 'Date' : 'Time')].filter(Boolean).join(' '),
+    'aria-invalid': invalid ? 'true' : undefined,
+  };
+}
 
 const dropdown = ref('');
 const clientRendered = useClientRendered();

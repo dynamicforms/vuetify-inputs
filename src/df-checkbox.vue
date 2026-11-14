@@ -7,17 +7,19 @@
     :indeterminate="indeterminate"
     :false-value="false"
     :true-value="true"
-    v-bind="vuetifyBindings as any"
+    v-bind="checkboxBindings as any"
     @change="change"
     @blur="touched = true"
   >
     <template #label="labelData"><df-label :allow-wrap="true" :data="labelData as any" :label="label" /></template>
-    <template #message="{ message }"><df-input-hint :message="message" :errors="shownErrors" /></template>
+    <template #message="{ message }">
+      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+    </template>
   </v-checkbox>
 </template>
 
 <script setup lang="ts">
-import { clone } from 'lodash-es';
+import { clone, omit } from 'lodash-es';
 import { computed } from 'vue';
 
 import { DfCheckboxProps } from './dynamicforms-component-props';
@@ -36,6 +38,11 @@ const { densityClass, isRendered, label, shownErrors, touched, value, visibility
 // v-checkbox takes no variant: the class lets the label line up with the text of plain and underlined fields
 const variantClass = computed(() =>
   ['plain', 'underlined'].includes(vuetifyBindings.value.variant) ? 'df-variant-plain-underlined' : '',
+);
+
+// the bindings v-checkbox takes: the rest would reach the native checkbox as attributes
+const checkboxBindings = computed(() =>
+  omit(vuetifyBindings.value, ['variant', 'bgColor', 'placeholder', 'persistent-placeholder']),
 );
 
 const indeterminate = computed(() => props.allowNull && value.value == null);

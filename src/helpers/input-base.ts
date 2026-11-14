@@ -44,7 +44,6 @@ declare module '@dynamicforms/vue-forms' {
   interface Extras {
     label?: RenderContentNonCallable | Label;
     placeholder?: string;
-    helpText?: string;
     hint?: string;
     cssClass?: string;
     density?: FieldDensity;
@@ -58,7 +57,6 @@ export interface BaseProps<T = any> {
   label?: RenderContentNonCallable | Label;
   errors?: ErrorInput[];
   placeholder?: string;
-  helpText?: string;
   hint?: string;
   enabled?: boolean;
   visibility?: Form.Visibility;
@@ -71,11 +69,26 @@ export interface BaseProps<T = any> {
 
 export const defaultBaseProps = { enabled: undefined, clearable: true };
 
+/** The attributes `InputBase` gives its control. */
+export interface InputBaseControlProps {
+  /** The id the field label's `for` names. */
+  id: string;
+  class: string;
+  /** The id of the field label. */
+  'aria-labelledby': string;
+  /** The field label as plain text, `undefined` when empty; `aria-labelledby` takes precedence over it. */
+  'aria-label'?: string;
+  /** The id of the hint and error row, while it is rendered. */
+  'aria-describedby'?: string;
+  /** `'true'` while errors are shown. */
+  'aria-invalid'?: 'true';
+}
+
 /** What `InputBase`'s `default` slot receives: Vuetify's `v-field` slot props. `prepend-inner` receives them without
  * `props`. */
 export interface InputBaseSlotProps {
-  /** Attributes for the control: its `id`, `class` and ARIA attributes. */
-  props: Record<string, unknown>;
+  /** Attributes for the control the user operates. */
+  props: InputBaseControlProps;
   isActive: Ref<boolean>;
   isFocused: Ref<boolean>;
   iconColor: ComputedRef<string | undefined>;
@@ -206,7 +219,6 @@ export function useInputBase<T = any>(
     return stated instanceof Label ? stated : new Label(stated ?? '');
   });
   const placeholder = computed(() => props.placeholder ?? extra.value.placeholder ?? '');
-  const helpText = computed(() => props.helpText ?? extra.value.helpText ?? '');
   const hint = computed(() => props.hint ?? extra.value.hint ?? '');
   const cssClass = computed(() => props.cssClass ?? extra.value.cssClass ?? '');
 
@@ -254,7 +266,9 @@ export function useInputBase<T = any>(
       hint: hint.value,
       persistentHint: true, // we want persistent hint always
       hideDetails: <boolean | 'auto' | undefined>'auto', // we want to hide the hint element when hint isn't there
-      helpText: helpText.value,
+
+      // the control's state for assistive technology; Vuetify passes unknown attributes on to the native control
+      'aria-invalid': <'true' | undefined>(shownErrors.value.length > 0 ? 'true' : undefined),
 
       ...(props.passthroughAttrs || {}),
     })),
