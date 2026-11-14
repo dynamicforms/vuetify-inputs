@@ -522,7 +522,6 @@ describe('input-base', () => {
           label: 'From the field',
           hint: 'A hint',
           placeholder: 'Type here',
-          helpText: 'Help',
           cssClass: 'from-field',
         });
         const emit = vi.fn();
@@ -532,7 +531,6 @@ describe('input-base', () => {
         expect(label.value.text).toBe('From the field');
         expect(vuetifyBindings.value.hint).toBe('A hint');
         expect(vuetifyBindings.value.placeholder).toBe('Type here');
-        expect(vuetifyBindings.value).not.toHaveProperty('helpText');
         expect(vuetifyBindings.value.class).toBe('from-field');
       });
 
@@ -650,11 +648,10 @@ describe('input-base', () => {
       });
     });
 
-    describe('placeholder, helpText, hint, cssClass', () => {
+    describe('placeholder, hint, cssClass', () => {
       it('returns provided values', () => {
         const props: BaseProps = {
           placeholder: 'Enter value',
-          helpText: 'This is help',
           hint: 'This is hint',
           cssClass: 'custom-class',
         };
@@ -663,7 +660,6 @@ describe('input-base', () => {
         const result = useInputBase(props, emit);
 
         expect(result.vuetifyBindings.value.placeholder).toBe('Enter value');
-        expect(result.vuetifyBindings.value).not.toHaveProperty('helpText');
         expect(result.vuetifyBindings.value.hint).toBe('This is hint');
         expect(result.vuetifyBindings.value.class).toBe('custom-class');
       });
@@ -827,7 +823,6 @@ describe('input-base', () => {
           label: 'Test Label',
           placeholder: 'Enter text',
           hint: 'Test hint',
-          helpText: 'Test help',
           cssClass: 'custom-class',
           density: 'compact',
           variant: 'outlined',
@@ -851,9 +846,7 @@ describe('input-base', () => {
         expect(bindings.hint).toBe('Test hint');
         expect(bindings.persistentHint).toBe(true);
         expect(bindings.hideDetails).toBe('auto');
-        expect(bindings).not.toHaveProperty('helpText');
         expect(bindings['aria-invalid']).toBeUndefined();
-        expect(bindings['aria-required']).toBeUndefined();
         // @ts-expect-error vuetifyBindings doesn't have a declaration for passthroughAttrs
         expect(bindings['data-test']).toBe('value');
       });

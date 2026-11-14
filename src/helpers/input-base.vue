@@ -77,7 +77,6 @@ function controlProps(fieldProps: Record<string, unknown>, id: string): InputBas
     'aria-labelledby': `${id}-label`,
     'aria-label': vuetifyBindings.value.label || undefined,
     'aria-invalid': vuetifyBindings.value['aria-invalid'],
-    'aria-required': vuetifyBindings.value['aria-required'],
   };
 }
 

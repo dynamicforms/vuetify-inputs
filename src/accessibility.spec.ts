@@ -167,46 +167,6 @@ describe.each(cases)('$name', (testCase) => {
       expect(element.hasAttribute('aria-invalid')).toBe(false);
     });
   });
-
-  it('sets aria-required where the control carries a Required validator', async () => {
-    const required = await mountCase(testCase, requiredField(testCase.empty));
-    controlsOf(required, testCase.controls).forEach((element) => {
-      expect(element.getAttribute('aria-required')).toBe('true');
-    });
-    required.unmount();
-    mounted.splice(mounted.indexOf(required), 1);
-
-    const optional = await mountCase(testCase, new Field({ value: testCase.empty }));
-    controlsOf(optional, testCase.controls).forEach((element) => {
-      expect(element.hasAttribute('aria-required')).toBe(false);
-    });
-  });
-
-  it('follows a Required validator registered and removed after mounting', async () => {
-    const control = new Field({ value: testCase.empty });
-    const wrapper = await mountCase(testCase, control);
-    const validator = new Validators.Required();
-
-    control.registerAction(validator);
-    await flushPromises();
-    controlsOf(wrapper, testCase.controls).forEach((element) => {
-      expect(element.getAttribute('aria-required')).toBe('true');
-    });
-
-    control.unregisterAction(validator);
-    await flushPromises();
-    controlsOf(wrapper, testCase.controls).forEach((element) => {
-      expect(element.hasAttribute('aria-required')).toBe(false);
-    });
-  });
-
-  it('carries no help text attribute', async () => {
-    const wrapper = await mountCase(testCase, new Field({ value: testCase.empty }), { helpText: 'Help' });
-
-    controlsOf(wrapper, testCase.controls).forEach((element) => {
-      expect(element.hasAttribute('helptext')).toBe(false);
-    });
-  });
 });
 
 describe('df-datetime parts', () => {

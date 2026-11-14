@@ -7,6 +7,5 @@ export function controlAria(controlProps: InputBaseControlProps) {
     'aria-label': controlProps['aria-label'],
     'aria-describedby': controlProps['aria-describedby'],
     'aria-invalid': controlProps['aria-invalid'],
-    'aria-required': controlProps['aria-required'],
   };
 }

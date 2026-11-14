@@ -1,4 +1,4 @@
-import Form, { ValidationError, Validators } from '@dynamicforms/vue-forms';
+import Form, { ValidationError } from '@dynamicforms/vue-forms';
 import { isEmpty } from 'lodash-es';
 import { computed, type ComputedRef, inject, nextTick, type Ref, ref, shallowRef, toRaw } from 'vue';
 
@@ -44,7 +44,6 @@ declare module '@dynamicforms/vue-forms' {
   interface Extras {
     label?: RenderContentNonCallable | Label;
     placeholder?: string;
-    helpText?: string;
     hint?: string;
     cssClass?: string;
     density?: FieldDensity;
@@ -58,7 +57,6 @@ export interface BaseProps<T = any> {
   label?: RenderContentNonCallable | Label;
   errors?: ErrorInput[];
   placeholder?: string;
-  helpText?: string;
   hint?: string;
   enabled?: boolean;
   visibility?: Form.Visibility;
@@ -84,8 +82,6 @@ export interface InputBaseControlProps {
   'aria-describedby'?: string;
   /** `'true'` while errors are shown. */
   'aria-invalid'?: 'true';
-  /** `'true'` where the bound control carries a `Validators.Required` validator. */
-  'aria-required'?: 'true';
 }
 
 /** What `InputBase`'s `default` slot receives: Vuetify's `v-field` slot props. `prepend-inner` receives them without
@@ -101,15 +97,6 @@ export interface InputBaseSlotProps {
   focus: () => void;
   /** Clears the field's focused state. */
   blur: () => void;
-}
-
-/**
- * Whether `control` carries a `Validators.Required` validator. vue-forms keeps the registered actions in a protected
- * map, read here without creating it.
- */
-function isRequired(control: Form.FieldBase | undefined): boolean {
-  const actions = (control as unknown as { boundActions?: { validators: unknown[] } } | undefined)?.boundActions;
-  return !!actions?.validators.some((validator) => validator instanceof Validators.Required);
 }
 
 export interface BaseEmits<T = any> {
@@ -199,12 +186,6 @@ export function useInputBase<T = any>(
     ),
   );
   const anyErrors = computed(() => (shownErrors.value.length > 0 ? ' ' : undefined));
-  // vue-forms keeps the actions out of reactivity: a validator registered or removed later is read when the
-  // control's errors change, which its registration does on an empty value
-  const required = computed(() => {
-    void props.control?.valid;
-    return isRequired(props.control);
-  });
   // effectiveEnabled is false where the element or any container above it accepts no input, so the inputs of a
   // 'readonly' or disabled section accept none either
   const enabled = computed(() => (props.control ? props.control.effectiveEnabled : props.enabled !== false));
@@ -288,7 +269,6 @@ export function useInputBase<T = any>(
 
       // the control's state for assistive technology; Vuetify passes unknown attributes on to the native control
       'aria-invalid': <'true' | undefined>(shownErrors.value.length > 0 ? 'true' : undefined),
-      'aria-required': <'true' | undefined>(required.value ? 'true' : undefined),
 
       ...(props.passthroughAttrs || {}),
     })),
