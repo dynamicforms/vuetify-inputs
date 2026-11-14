@@ -9,8 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `df-actions` prop `simple`: the actions render as native `<button>` elements without background or border, in the
-  surrounding text colour and font, instead of `v-btn`. Icon, label, accessible name, `passthroughAttrs`, disabling,
+- `df-actions` prop `simple`: each action renders as one native `<button>` instead of a `v-btn`, for the smallest DOM
+  and the fastest render where many actions show at once (an action column in a grid). The button has no background
+  or border and takes the surrounding text colour and font. Icon, label, accessible name, `passthroughAttrs`, disabling,
   `aria-busy` during a run, visibility and execution follow the same rules; a run shows no spinner.
 
 ### Removed

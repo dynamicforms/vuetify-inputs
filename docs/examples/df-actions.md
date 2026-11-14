@@ -14,7 +14,7 @@ A row of actions:
 - Supports responsive display based on screen size
 - Icon and label shown per `showIcon` / `showLabel`; a button that does not show its label is named by it
 - Grouped button layouts
-- Simple mode: light native buttons in the surrounding text colour and font
+- Simple mode: one native button per action, the smallest DOM for many actions on a page
 - Renders `@dynamicforms/vue-forms` actions
 - `defaultConfirm` / `defaultReject` actions are colored `primary` / `secondary`
 
@@ -26,7 +26,7 @@ A row of actions:
 | `buttonSize` | `string` or `number` | `'default'` | Size of buttons (see Vuetify's v-btn size prop) |
 | `buttonDensity` | `'default'` \| `'comfortable'` \| `'compact'` | `'default'` | Forwarded to each button's `density` (see Vuetify's v-btn density prop) |
 | `showAsGroup` | `'no'` \| `'grouped'` \| `'grouped-no-borders'` | `'no'` | Controls how buttons are grouped |
-| `simple` | `boolean` | `false` | Renders native `<button>` elements without background or border instead of `v-btn`; see [Simple mode](#simple-mode) |
+| `simple` | `boolean` | `false` | Renders each action as one native `<button>` instead of a `v-btn`, for the smallest DOM and the fastest render; see [Simple mode](#simple-mode) |
 
 ## Action Object
 
@@ -367,9 +367,13 @@ With this configuration:
 
 ## Simple mode
 
-With `simple`, each action renders as a native `<button type="button">` instead of a `v-btn`: inline, without
-background or border, in the colour and font of the surrounding text, with a `:focus-visible` outline. It suits
-actions inside text, table cells and toolbars where a Vuetify button is too heavy.
+Simple mode exists for render speed: it keeps the DOM of each action as small as possible. Each action is one
+native `<button type="button">` holding the icon and the label, with no Vuetify component; a `v-btn` is a component
+instance with overlay, underlay and content elements around the same icon and label. Use it where many actions render
+at once, such as an action column in a grid.
+
+The button is inline, without background or border, in the colour and font of the surrounding text, with a
+`:focus-visible` outline.
 
 ```vue
 <df-actions :actions="actions" simple />
