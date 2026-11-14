@@ -14,7 +14,6 @@ All input components inherit the following properties:
 | modelValue       | `T`                           | `undefined`    | The field value (v-model) when used without control                                                |
 | label            | `RenderContentNonCallable \| Label` | `undefined`    | The label: a string, an `MdString`, an `HtmlString` or a `SimpleComponentDef`, or a `Label`, which adds an icon (see [Label](#label)) |
 | hint             | `string`                      | `undefined`    | Hint text displayed below the input field                                                          |
-| helpText         | `string`                      | `undefined`    | Not rendered by any component and not passed to Vuetify                                             |
 | placeholder      | `string`                      | `undefined`    | Placeholder text displayed when the input is empty                                                 |
 | errors           | `ErrorInput[]`                | `undefined`    | The errors, used only without a control: content in any of the four forms or error descriptions (see [df-input-hint](/examples/df-input-hint#props)) |
 | enabled          | `boolean`                     | `undefined`    | The input is enabled unless the prop is `false` (used only without control)                        |
@@ -44,7 +43,7 @@ A bound `control` carries the presentation the component renders it with. `label
 `cssClass`, `density` and `variant` are declared on
 [`Extras`](:vue-forms:/api/field-base.html#extended-properties), the augmentation point of `@dynamicforms/vue-forms`,
 so they are typed on every element in an application that installs this library, including fields written inline in
-a `Group` declaration. `helpText` is declared there too; no component renders it.
+a `Group` declaration.
 
 They are set where the field is declared:
 
@@ -360,7 +359,6 @@ The default slot's `props` (`InputBaseControlProps`) are the attributes of the e
 | aria-label | The field label as plain text, `undefined` when it is empty |
 | aria-describedby | The id of the message row, while it is rendered |
 | aria-invalid | `'true'` while errors are shown, `undefined` otherwise |
-| aria-required | `'true'` where the bound control carries a `Validators.Required` validator, `undefined` otherwise |
 
 `aria-labelledby` takes precedence over `aria-label` in the accessible name. `aria-label` holds the same text for
 checkers that count only visible referenced text while the field label is hidden, as the non-floating label of an
@@ -384,8 +382,7 @@ The library's components bind them as follows:
   moves the focus into it through a click handler.
 
 The components that bind a Vuetify input directly (`df-input`, `df-text-area`, `df-checkbox`, `df-select`,
-`df-color`) get the label and message row association from Vuetify, and `aria-invalid` and `aria-required` from
-`vuetifyBindings`.
+`df-color`) get the label and message row association from Vuetify, and `aria-invalid` from `vuetifyBindings`.
 
 ```vue
 <template>
@@ -480,16 +477,12 @@ value the field holds.
 | persistentHint | Always `true` |
 | hideDetails | Always `'auto'`, so the details area disappears when there is nothing to show |
 | aria-invalid | `'true'` while errors are shown, `undefined` otherwise |
-| aria-required | `'true'` where the bound control carries a `Validators.Required` validator, `undefined` otherwise |
 
 `errorMessages` is a single space, not the messages: it puts the Vuetify control into its error state, and
 `DfInputHint` renders the messages from `shownErrors`. An error therefore renders as the content the
 [`errorText` setting](/examples/configuration) returns for its `code`: plain text, markdown, HTML or a component.
 
-Vuetify passes `aria-invalid` and `aria-required`, which are not its props, on to the native control. `required`
-is not set, so the browser runs no validation of its own. `aria-required` reads the control's validators when the
-control is bound and whenever its validity changes: a `Required` validator registered or unregistered later is
-reflected at the next change of validity, which its registration or removal causes while the value is empty.
+Vuetify passes `aria-invalid`, which is not its prop, on to the native control.
 
 `passthroughAttrs` is spread into this object last and replaces any key above; see
 [passthroughAttrs](#passthroughattrs).

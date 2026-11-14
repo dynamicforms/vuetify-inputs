@@ -8,6 +8,15 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
+## Upgrading to v0.16.0 (from v0.15.x)
+
+### `helpText` is removed
+
+The `helpText` prop and the `helpText` property of vue-forms' `Extras` no longer exist. No component rendered them.
+Text that describes the field goes into `hint`, which renders below the field and is linked to the control with
+`aria-describedby`. Code that sets `helpText` on a component or through `setExtendedValues` stops compiling; move the
+text to `hint` or remove it.
+
 ## Upgrading to v0.15.0 (from v0.14.x)
 
 0.15.0 prefixes every error code the library raises with its namespace. It requires `@dynamicforms/vue-forms`
