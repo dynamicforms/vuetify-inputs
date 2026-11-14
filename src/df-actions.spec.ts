@@ -3,6 +3,7 @@ import { Action as FormAction, ExecuteAction, Field, Group, SubmitAction, Valida
 import { flushPromises, mount } from '@vue/test-utils';
 import { vi } from 'vitest';
 import { nextTick, Ref, ref } from 'vue';
+import { CachedIcon } from 'vue-cached-icon';
 import { createVuetify } from 'vuetify';
 import { VBtn } from 'vuetify/components';
 
@@ -631,6 +632,132 @@ describe('DfActions', () => {
       const action = new Action({ value: { icon: 'save-outline', showIcon: true } });
 
       expect(mountActions([action]).find('button').attributes('aria-label')).toBeUndefined();
+    });
+  });
+
+  describe('simple', () => {
+    const mountSimple = (actions: Action[], props: Record<string, unknown> = {}) =>
+      mount(DfActions, { props: { actions, simple: true, ...props }, global: { plugins: [vuetify] } });
+
+    it('renders native buttons instead of v-btn', () => {
+      const wrapper = mountSimple([createMockAction('save', 'Save'), createMockAction('cancel', 'Cancel')]);
+
+      expect(wrapper.findComponent(VBtn).exists()).toBe(false);
+      expect(wrapper.find('.v-btn').exists()).toBe(false);
+      const buttons = wrapper.findAll('button.df-action-simple');
+      expect(buttons).toHaveLength(2);
+      expect(buttons[0].attributes('type')).toBe('button');
+      expect(buttons[0].attributes('role')).toBeUndefined();
+      expect(wrapper.find('.df-actions').classes()).toContain('df-actions--simple');
+    });
+
+    it('shows the icon and the label', () => {
+      const button = mountSimple([createMockAction('save', 'Save', 'mdi-content-save')]).find('button');
+
+      expect(button.findComponent(CachedIcon).props('name')).toBe('mdi-content-save');
+      expect(button.text()).toBe('Save');
+      expect(button.attributes('aria-label')).toBeUndefined();
+      expect(button.attributes('title')).toBeUndefined();
+    });
+
+    it('honours showIcon and showLabel', () => {
+      const action = createMockAction('save', 'Save', 'mdi-content-save');
+      action.value.showIcon = false;
+
+      const button = mountSimple([action]).find('button');
+      expect(button.findComponent(CachedIcon).exists()).toBe(false);
+      expect(button.text()).toBe('Save');
+    });
+
+    it('names a button that does not show its label with aria-label and title', () => {
+      const action = new Action({
+        value: { label: 'Save', icon: 'mdi-content-save', showLabel: true, showIcon: true, xs: { showLabel: false } },
+      });
+
+      const button = mountSimple([action]).find('button');
+      expect(button.text()).toBe('');
+      expect(button.attributes('aria-label')).toBe('Save');
+      expect(button.attributes('title')).toBe('Save');
+    });
+
+    it('lets passthroughAttrs override aria-label and title', () => {
+      const action = createMockAction('save', 'Save', 'mdi-content-save');
+      action.value.showLabel = false;
+      action.value.passthroughAttrs = { 'aria-label': 'Save the document', title: 'Ctrl+S', 'data-test': 'save' };
+
+      const button = mountSimple([action]).find('button');
+      expect(button.attributes('aria-label')).toBe('Save the document');
+      expect(button.attributes('title')).toBe('Ctrl+S');
+      expect(button.attributes('data-test')).toBe('save');
+    });
+
+    it('is disabled where the action is not executable', () => {
+      const action = createMockAction('save', 'Save');
+      action.access = 'disabled';
+
+      expect(mountSimple([action]).find('button').attributes('disabled')).toBeDefined();
+    });
+
+    it('executes the action on click', async () => {
+      const action = createMockAction('save', 'Save');
+      const executeSpy = vi.spyOn(action, 'execute');
+
+      await mountSimple([action]).find('button').trigger('click');
+      expect(executeSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('is disabled and aria-busy while a run is in flight', async () => {
+      let release: () => void = () => {};
+      const pending = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      const action = new Action({ value: { label: 'Save' }, actions: [new ExecuteAction(() => pending)] });
+      const wrapper = mountSimple([action]);
+      const button = wrapper.find('button');
+      expect(button.attributes('aria-busy')).toBeUndefined();
+
+      const run = action.execute();
+      await nextTick();
+      expect(button.attributes('aria-busy')).toBe('true');
+      expect(button.attributes('disabled')).toBeDefined();
+
+      release();
+      await run;
+      await nextTick();
+      expect(button.attributes('aria-busy')).toBeUndefined();
+      expect(button.attributes('disabled')).toBeUndefined();
+    });
+
+    it('applies visibility', () => {
+      const hidden = createMockAction('hidden', 'Hidden');
+      hidden.visibility = 'hidden';
+      const invisible = createMockAction('invisible', 'Invisible');
+      invisible.visibility = 'invisible';
+      const suppressed = createMockAction('suppressed', 'Suppressed');
+      suppressed.visibility = 'suppress';
+
+      const buttons = mountSimple([hidden, invisible, suppressed]).findAll('button');
+      expect(buttons).toHaveLength(2);
+      expect(buttons[0].classes()).toContain('d-none');
+      expect(buttons[1].classes()).toContain('invisible');
+    });
+
+    it('keeps the grouping classes on the container', () => {
+      const wrapper = mountSimple([createMockAction('save', 'Save')], { showAsGroup: 'grouped' });
+
+      expect(wrapper.find('.df-actions').classes()).toEqual(
+        expect.arrayContaining(['button-group', 'with-border', 'df-actions--simple']),
+      );
+    });
+
+    it('renders a bare vue-forms Action', async () => {
+      const execute = vi.fn();
+      const action = new FormAction({ value: { label: 'Cancel' }, actions: [new ExecuteAction(execute)] });
+
+      const button = mountSimple([action as Action]).find('button');
+      expect(button.text()).toBe('Cancel');
+      await button.trigger('click');
+      expect(execute).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -34,6 +34,10 @@ The strings the components add (`Date`, `Time`, `RemoveChoice`, `Loading`, `Uplo
 - `df-select`: a chip's close button is a native button named `Remove <choice>`. A click, Enter or Space removes the
   chip (a held Space removes one), Enter does not open the menu, and focus moves to the next chip's close button, or to
   the input when no closable chip remains.
+- `df-actions` with `simple`: each action is a native `<button type="button">`, so Tab reaches it, Enter and Space
+  activate it, and it has the native button role. Its name is its label, or the label's plain text in `aria-label`
+  where the label is not shown. It has a visible `:focus-visible` outline, is disabled while the action is not
+  executable and carries `aria-busy="true"` while a run is in flight. [df-actions](/examples/df-actions#simple-mode)
 
 ## Contrast
 

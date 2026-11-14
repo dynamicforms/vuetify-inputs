@@ -26,6 +26,10 @@ export interface DfActionsProps {
   /** Forwarded to each button's `density` prop. See https://vuetifyjs.com/en/api/v-btn/#props-density */
   buttonDensity?: VuetifyDensity;
   showAsGroup?: ShowAsGroup;
+  /** Renders each action as a native `<button>` without background or border, showing its icon and label in the
+   *  surrounding text colour and font, instead of a `v-btn`. `renderAs`, the confirm / reject colours, `buttonSize` and
+   *  `buttonDensity` do not apply. Default `false`. */
+  simple?: boolean;
 }
 
 export interface DfCheckboxProps extends BaseProps {

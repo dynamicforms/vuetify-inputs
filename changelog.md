@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.16.0] - 2026-11-14
 
+### Added
+
+- `df-actions` prop `simple`: the actions render as native `<button>` elements without background or border, in the
+  surrounding text colour and font, instead of `v-btn`. Icon, label, accessible name, `passthroughAttrs`, disabling,
+  visibility and execution follow the same rules; a run in flight sets `aria-busy`.
+
 ### Removed
 
 - `helpText` (prop and `Extras` property): no component rendered it; the field description is `hint`.
