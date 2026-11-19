@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.17.0] - 2026-11-19
+## [0.16.1] - 2026-11-19
 
 ### Changed
 
-- **Breaking:** the package is ESM-only. The `require` condition, the `main` field and the UMD artifact
+- The package is ESM-only. The `require` condition, the `main` field and the UMD artifact
   (`dynamicforms-vuetify-inputs.umd.cjs` and its map) are gone; `exports` resolves one build. A CommonJS consumer
   reaches the library through `require()` of an ES module, which Node supports from 20.19 and 22.12. `exports` also
   publishes `./package.json`.

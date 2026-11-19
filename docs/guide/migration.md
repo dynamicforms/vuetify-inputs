@@ -8,15 +8,6 @@ exists.
 
 <!-- New releases go directly below this comment, above the previous one, as `## Upgrading to vX.Y.Z (from vA.B.x)`. -->
 
-## Upgrading to v0.17.0 (from v0.16.x)
-
-### The package is ESM-only
-
-The UMD build (`dynamicforms-vuetify-inputs.umd.cjs`), the `main` field and the `require` condition of `exports` no
-longer exist. A bundler or Node resolves the ES module. CommonJS code that loads the package with `require()` needs
-Node 20.19 or 22.12 or newer, which load an ES module through `require()`; a `<script>` tag that read the UMD global
-has to load the package as a module instead.
-
 ## Upgrading to v0.16.0 (from v0.15.x)
 
 ### `helpText` is removed
