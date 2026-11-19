@@ -119,12 +119,8 @@ export function useInputBase<T = any>(
   const injectedVariant = inject<FieldVariant | null>('field-variant', null);
   const internalValue = ref<T | null>(null);
 
-  // A write is not a statement about what the control ends up holding. A ValueChangedAction may write a different value
-  // back, and a handler that throws unwinds it. The rendered control has the written value in its DOM by then, so it is
-  // the read here that has to correct it - and where the value the control ends up holding is the one it started with,
-  // as under a rule that puts back the five characters a six-character write exceeded, the read does not move and Vue
-  // schedules no render at all. Holding the written value for one tick makes the read change twice, so the repaint that
-  // restores what the control holds happens.
+  // The written value is held for one tick, so the read changes twice and Vue re-renders the control even when an
+  // action or a throwing handler puts back the value it held before the write.
   const pendingWrite = shallowRef<{ value: T } | null>(null);
 
   const value = computed({

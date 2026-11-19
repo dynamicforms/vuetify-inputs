@@ -39,7 +39,7 @@ A component for checkbox / ternary selection.
 
 ### [df-color](./df-color)
 
-A color input.
+A colour input.
 
 ### [df-date-time](./df-datetime)
 
@@ -56,6 +56,10 @@ A component for image uploads, with a preview, drag & drop, and a browse dialog.
 ### [df-input](./df-input)
 
 A component for general data entry.
+
+### [df-input-group](./df-input-group)
+
+One field's frame, label and message row around several inputs, e.g. a set of checkboxes.
 
 ### [df-input-hint](./df-input-hint)
 

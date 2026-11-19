@@ -16,13 +16,13 @@ function measureRows(page: Page) {
       const box = input.getBoundingClientRect();
       const style = getComputedStyle(input);
       const top = box.top + parseFloat(style.paddingTop);
-      const textCentre = (top + box.bottom - parseFloat(style.paddingBottom)) / 2;
+      const textCenter = (top + box.bottom - parseFloat(style.paddingBottom)) / 2;
       const range = document.createRange();
       range.selectNodeContents(cells[i + 2].querySelector('label')!);
       const label = range.getBoundingClientRect();
       rows.push({
-        textCentre: Math.round(textCentre),
-        labelCentre: Math.round(label.top + label.height / 2),
+        textCenter: Math.round(textCenter),
+        labelCenter: Math.round(label.top + label.height / 2),
         inputHeight: Math.round(cells[i].firstElementChild!.getBoundingClientRect().height),
         checkboxHeight: Math.round(cells[i + 2].firstElementChild!.getBoundingClientRect().height),
       });
@@ -39,7 +39,7 @@ for (const variant of ['outlined', 'underlined', 'plain']) {
     await selectVariant(page, variant);
 
     for (const row of await measureRows(page)) {
-      expect(row.labelCentre).toBe(row.textCentre);
+      expect(row.labelCenter).toBe(row.textCenter);
       expect(row.checkboxHeight).toBe(row.inputHeight);
     }
   });

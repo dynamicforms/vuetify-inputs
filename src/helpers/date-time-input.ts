@@ -176,8 +176,7 @@ export function parseDateInput(text: string, displayFormat: string, locale: Loca
 
 /**
  * Writes `error` as the control's error of `code` with origin `'application'`, or removes that error where `error` is
- * null. Kept outside the component's own script so the write to `control.errors` isn't seen as a `.vue` component
- * mutating its own prop.
+ * null.
  */
 export function setInputError(control: Form.FieldBase, code: string, error: ValidationError | null) {
   const others = control.errors.filter((e) => !(e.code === code && e.origin === 'application'));

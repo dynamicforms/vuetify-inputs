@@ -31,8 +31,8 @@ options.getOptionsForBreakpoint('sm'); // { cols: 12, offset: 2 } - offset carri
 The object merge is **shallow**: a nested object is replaced as a whole.
 
 ```typescript
-// base: { style: { color: 'red', margin: 10 } }, sm: { style: { color: 'blue' } }
-options.getOptionsForBreakpoint('sm'); // { style: { color: 'blue' } } - margin is gone
+// base: { props: { style: { color: 'red', margin: 10 } } }, sm: { props: { style: { color: 'blue' } } }
+options.getOptionsForBreakpoint('sm'); // { props: { style: { color: 'blue' } } } - margin is gone
 ```
 
 Only plain objects merge. A `Date`, a `Map`, a `Set` or a class instance is replaced; merging it would produce a plain
@@ -40,7 +40,7 @@ copy of its own properties without its prototype.
 
 ## Writing a subclass
 
-A subclass declares the shape of its options and implements `cleanBreakpoint()`, which normalizes the options of one
+A subclass declares the shape of its options and implements `cleanBreakpoint()`, which normalises the options of one
 breakpoint: it validates them and drops unsupported ones.
 
 ```typescript
@@ -74,7 +74,7 @@ options.getOptionsForBreakpoint('sm'); // items: ['a', 'b']
 options.getOptionsForBreakpoint('md'); // items: []
 ```
 
-A class field initialized to a collection, e.g. `items: string[] = []`, sets an empty list on every breakpoint object,
+A class field initialised to a collection, e.g. `items: string[] = []`, sets an empty list on every breakpoint object,
 so every breakpoint clears the list instead of inheriting it. Such a field is declared optional and assigned when an
 item is added.
 

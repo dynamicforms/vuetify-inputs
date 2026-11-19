@@ -23,7 +23,7 @@ async function touch(wrapper: ReturnType<typeof mountColor>) {
 }
 
 describe('DfColor', () => {
-  it('reports an invalid_hex_color error for a value that is not a hex color, once touched', async () => {
+  it('reports an invalid_hex_color error for a value that is not a hex colour, once touched', async () => {
     const wrapper = mountColor({ modelValue: 'red' });
     expect(wrapper.text()).not.toContain('Not a valid hex string.');
 
@@ -84,14 +84,14 @@ describe('DfColor', () => {
   describe('normalize', () => {
     const upper = (value: string) => value.toUpperCase();
 
-    it('shows the normalized color in the swatch', () => {
+    it('shows the normalised colour in the swatch', () => {
       const wrapper = mountColor({ modelValue: '#abcdef', normalize: upper });
 
       expect(wrapper.find('.v-field__prepend-inner div').attributes('style')).toContain('rgb(171, 205, 239)');
       expect(wrapper.find('input').element.value).toBe('#abcdef');
     });
 
-    it('writes a typed valid color normalized when the field loses focus', async () => {
+    it('writes a typed valid colour normalised when the field loses focus', async () => {
       const control = new Field<string>({ value: '#000' });
       const wrapper = mountColor({ control, normalize: upper });
 
@@ -141,7 +141,7 @@ describe('DfColor', () => {
       return wrapper;
     }
 
-    it('writes a picked color when OK confirms it, and marks the field touched', async () => {
+    it('writes a picked colour when OK confirms it, and marks the field touched', async () => {
       const control = new Field<string>({ value: '#f00' });
       const wrapper = await openPicker(control);
 
@@ -183,7 +183,7 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
-    it('writes a picked color on a double-click on the canvas', async () => {
+    it('writes a picked colour on a double-click on the canvas', async () => {
       const control = new Field<string>({ value: '#f00' });
       const wrapper = await openPicker(control);
 
@@ -221,7 +221,7 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
-    it('keeps the raw color in the picker and writes it normalized on OK', async () => {
+    it('keeps the raw colour in the picker and writes it normalised on OK', async () => {
       const control = new Field<string>({ value: '#ff0000' });
       const wrapper = await openPicker(control, { normalize: (value: string) => value.toUpperCase() });
       const picker = wrapper.findComponent(ColorPickerStub);
@@ -237,7 +237,7 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
-    it('emits the pending color as preview on opening and on every change, and null on closing', async () => {
+    it('emits the pending colour as preview on opening and on every change, and null on closing', async () => {
       const control = new Field<string>({ value: '#ff0000' });
       const wrapper = await openPicker(control, { normalize: (value: string) => value.toUpperCase() });
       expect(wrapper.emitted('preview')).toEqual([['#FF0000']]);
@@ -255,7 +255,7 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
-    it('renders the picker-prepend slot above the picker with the pending color', async () => {
+    it('renders the picker-prepend slot above the picker with the pending colour', async () => {
       const wrapper = mount(DfColor, {
         props: { control: new Field<string>({ value: '#ff0000' }), normalize: (value: string) => value.toUpperCase() },
         slots: {
@@ -280,7 +280,7 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
-    it('makes a color selected through the picker-prepend slot pending, written by OK', async () => {
+    it('makes a colour selected through the picker-prepend slot pending, written by OK', async () => {
       const control = new Field<string>({ value: '#ff0000' });
       const wrapper = mount(DfColor, {
         props: { control, normalize: (value: string) => value.toUpperCase() },
@@ -306,7 +306,7 @@ describe('DfColor', () => {
       wrapper.unmount();
     });
 
-    it("shows only the picker-prepend slot under picker 'none', and save writes the pending color", async () => {
+    it("shows only the picker-prepend slot under picker 'none', and save writes the pending colour", async () => {
       const control = new Field<string>({ value: '#ff0000' });
       const wrapper = mount(DfColor, {
         props: { control, picker: 'none' },
@@ -562,12 +562,12 @@ describe('DfColor', () => {
       it('moves the focus with the arrow keys and picks with Enter', async () => {
         const control = new Field<string>({ value: hexagonCells(5, 0.6)[0].color });
         const wrapper = await openPicker(control, hexagon);
-        const centre = cellsOf(wrapper)[0];
+        const center = cellsOf(wrapper)[0];
 
-        await centre.trigger('keydown', { key: 'ArrowRight' });
+        await center.trigger('keydown', { key: 'ArrowRight' });
         const focused = cellsOf(wrapper).find((cell) => cell.attributes('tabindex') === '0')!;
         expect(focused.element).toBe(document.activeElement);
-        expect(focused.element).not.toBe(centre.element);
+        expect(focused.element).not.toBe(center.element);
 
         await focused.trigger('keydown', { key: 'Enter' });
         await okButton(wrapper).trigger('click');

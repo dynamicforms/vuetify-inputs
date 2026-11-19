@@ -64,7 +64,7 @@ Each choice implements this interface:
 interface SelectChoice {
   id: any;        // Unique identifier/value for the option
   text: any;      // Display text
-  icon?: string;  // Optional icon name (Ionicons format)
+  icon?: string;  // Optional vue-cached-icon name (ion-…, mdi-…, fa-…), URL or SVG
 }
 ```
 
@@ -178,9 +178,9 @@ import { Group, Field, ValidationError, Validators } from '@dynamicforms/vue-for
 import { DfSelect } from '@dynamicforms/vuetify-inputs';
 
 const categories = [
-  { id: 1, text: 'Electronics', icon: 'flash-outline' },
-  { id: 2, text: 'Books', icon: 'book-outline' },
-  { id: 3, text: 'Clothing', icon: 'shirt-outline' }
+  { id: 1, text: 'Electronics', icon: 'ion-flash-outline' },
+  { id: 2, text: 'Books', icon: 'ion-book-outline' },
+  { id: 3, text: 'Clothing', icon: 'ion-shirt-outline' }
 ];
 
 const form = new Group({

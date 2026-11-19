@@ -42,10 +42,7 @@ function focusFromLabel(event: MouseEvent) {
 
 <style>
 .rtf-editor .v-field:not(.v-field--active) .v-label.v-field-label:not(.v-field-label--floating) {
-  /* `--rtf-toolbar-height` is set by editor-core.vue's own `ResizeObserver`, straight onto this `.v-field`; the
-     3em fallback only matters before that first measurement lands or if it never does (a non-browser render).
-     The added 0.5em is the gap between the toolbar's bottom edge and the label's own baseline - without it the
-     label sits flush against the toolbar instead of inside the content area's padding. */
+  /* below the toolbar: its height (3em until measured) plus 1em */
   transform: translate(0.5em, calc(var(--rtf-toolbar-height, 3em) + 1em));
 }
 

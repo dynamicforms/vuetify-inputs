@@ -6,7 +6,7 @@ import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings
 const defaults = {
   Cancel: 'Cancel',
   Ok: 'OK',
-  ColorPalette: 'Color palette',
+  ColorPalette: 'Colour palette',
   Lightness: 'Lightness {level}',
   LightnessRange: 'Lightness',
   Loading: 'Loading',
@@ -41,7 +41,7 @@ const defaults = {
   Outdent: 'Decrease indent',
   Indent: 'Increase indent',
   AlignLeft: 'Align left',
-  AlignCenter: 'Align center',
+  AlignCenter: 'Align centre',
   AlignRight: 'Align right',
   AlignJustify: 'Justify',
   Link: 'Link',

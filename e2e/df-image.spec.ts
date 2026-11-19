@@ -38,8 +38,7 @@ test('a large image is scaled to the field instead of cropped, and the field doe
 
   await expect(img).toHaveCSS('object-fit', 'contain');
 
-  // the field's own bounds must not creep into the next control (regression: the field used to grow to the
-  // uploaded image's natural size and visually cover whatever followed it)
+  // the field's bounds end above the next control
   const disableButton = page.getByRole('button', { name: /disable field/i });
   const disableBox = await disableButton.boundingBox();
   expect(disableBox!.y).toBeGreaterThanOrEqual(boxAfter!.y + boxAfter!.height);

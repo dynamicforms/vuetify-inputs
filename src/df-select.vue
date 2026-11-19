@@ -237,14 +237,9 @@ function setResultingValue(newValue: any) {
   try {
     resultingValue.value = newValue;
   } finally {
-    // The guard suppresses the watch that pushes the model's value back into `selected`. A write the control does not
-    // take verbatim - a ValueChangedAction that writes another value back, a handler that throws and unwinds it - never
-    // reaches that watch, so the chips would go on showing a selection the control never took. Comparing what the
-    // control holds against what was written is what restores it, and it needs a deep comparison: for multiple
-    // selection the value reads back as a different array holding the same items. The comparison waits for the next
-    // tick: under v-model the parent passes the written value back as modelValue only when it re-renders, and a read
-    // before that sees the previous value, reverts the selection and emits it, which the parent passes back in turn -
-    // the two keep swapping values without end.
+    // A write the control does not take verbatim never reaches the guarded watch: restore the chips from what the
+    // control holds. Deep comparison: multiple selection reads back as a new array. Next tick: under v-model the parent
+    // passes modelValue back on re-render; an earlier read reverts the write, and the two swap values without end.
     nextTick(() => {
       const current = multipleCompliantValue(resultingValue.value, multiple.value);
       if (!isEqual(current, newValue)) {
@@ -287,7 +282,7 @@ function checkMultiline() {
 }
 
 function onMouseDown(event: MouseEvent) {
-  // če je klik na close ikoni ali njenem childu
+  // a mousedown on a chip's close button or inside it
   const target = event.target;
   if (target instanceof HTMLElement && target.closest('.v-chip__close')) {
     event.stopPropagation();

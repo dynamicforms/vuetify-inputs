@@ -91,7 +91,7 @@ class RenderableValue {
 |---|---|
 | `string` | a `<div>` holding the text |
 | `MdString` | markdown, through `vue-markdown-render` with the string's `options` and `plugins` |
-| `HtmlString` | a `<div>` with the string as its inner HTML. The string is not sanitized: text from a user or a server is escaped or sanitized before it is wrapped |
+| `HtmlString` | a `<div>` with the string as its inner HTML. The string is not sanitised: text from a user or a server is escaped or sanitised before it is wrapped |
 | `SimpleComponentDef` | the component named by `componentName`, with `componentProps` as its props and `children` as its content. A common HTML element name renders as that element; any other name is resolved as a globally registered component. An `innerHTML` prop is dropped |
 
 A listener of a `SimpleComponentDef` is a prop named `on` and the event: `{ componentName: 'v-btn', componentProps:
@@ -135,7 +135,7 @@ the field's errors that is shown now (see [Shown errors](/examples/input-base#sh
 bound, and otherwise the `errors` prop, each error as it was given. While `shownErrors` is empty, the row shows the
 hint; while it is not, the row shows the errors and keeps the hint visually hidden.
 
-While a touched field is invalid, the inputs also pass a single blank error message to Vuetify. It sets the control's
+While `shownErrors` is not empty, the inputs also pass a single blank error message to Vuetify. It sets the control's
 error state and keeps the message row rendered; the text in the row is rendered by `DfInputHint`.
 
 ## Standalone use

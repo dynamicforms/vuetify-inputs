@@ -25,7 +25,7 @@ In addition to [common props from InputBase](./input-base), this component requi
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | comms | `FileComms` | **Required** | Object with methods for file operations |
-| touchInterval | `number` | `60000` | Milliseconds between keep-alive touches. See [Configuration](/examples/configuration) for setting this application-wide instead |
+| touchInterval | `number` | `undefined`: the plugin's `defaultTouchInterval`, else `60000` | Milliseconds between keep-alive touches. See [Configuration](/examples/configuration) for setting this application-wide instead |
 
 ### Inherited Props
 
@@ -119,8 +119,7 @@ class FileGoneError extends Error {
 
 During an upload the component shows a progress bar from the values passed to `progressCallback` of `upload`.
 
-A temporary upload is touched every `touchInterval` milliseconds (60 seconds by default), so the backend keeps it. If a
-touch rejects with a `FileGoneError` while the field still holds the touched identifier, the field is cleared, a
+If a touch rejects with a `FileGoneError` while the field still holds the touched identifier, the field is cleared, a
 disabled one as well, and, where a `control` is bound, its errors are replaced with one `ValidationError` of code
 `vuetify-inputs.file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the [`errorText`
 setting](/examples/localisation#translating-errors) can render another text for the code. Under vue-forms' default

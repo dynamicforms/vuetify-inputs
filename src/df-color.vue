@@ -101,8 +101,8 @@ interface Emits extends BaseEmits {
 const emits = defineEmits<Emits>();
 defineSlots<{
   /**
-   * Content above the picker in the menu, or in its place under `picker: 'none'`: `color` is the pending color,
-   * `select` makes a color the pending one, `save` writes the pending color to the field and closes the menu.
+   * Content above the picker in the menu, or in its place under `picker: 'none'`: `color` is the pending colour,
+   * `select` makes a colour the pending one, `save` writes the pending colour to the field and closes the menu.
    */
   'picker-prepend'?: (props: { color: string | null; select: (color: string) => void; save: () => void }) => any;
 }>();
@@ -112,12 +112,12 @@ const opaqueHexColor = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/;
 // the picker's modes without an alpha channel, offered under `alpha: false`
 const opaqueModes = ['hex', 'rgb', 'hsl'] as const;
 
-/** Whether `color` is a hex color of the format the `alpha` prop allows. */
+/** Whether `color` is a hex colour of the format the `alpha` prop allows. */
 function isValidColor(color: string | null | undefined): color is string {
   return (props.alpha ? hexColor : opaqueHexColor).test(color ?? '');
 }
 
-/** `color` as `normalize` returns it, for a valid color; any other value as it is. */
+/** `color` as `normalize` returns it, for a valid colour; any other value as it is. */
 function normalized(color: string | null | undefined): string | null {
   if (!color) return null;
   return props.normalize && isValidColor(color) ? props.normalize(color) : color;
@@ -149,7 +149,7 @@ const { saveOnDoubleClick } = usePickerDoubleClick();
 
 const swatchColor = computed(() => normalized(value.value) ?? undefined);
 
-// a typed value is written as typed; it is normalized when the field loses focus or Enter commits it
+// a typed value is written as typed; it is normalised when the field loses focus or Enter commits it
 function commitTyped() {
   touched.value = true;
   const val = value.value;
@@ -157,12 +157,12 @@ function commitTyped() {
   if (committed !== null && committed !== val) value.value = committed;
 }
 
-// the picker's model keeps the raw color, so its handle stays under the pointer; the saved value is normalized
+// the picker's model keeps the raw colour, so its handle stays under the pointer; the saved value is normalised
 function commitPicked(color: string | null) {
   value.value = (normalized(color) ?? color) as string;
 }
 
-// the pending color while the picker is open, normalized; null while it is closed
+// the pending colour while the picker is open, normalised; null while it is closed
 const pendingColor = ref<string | null>(null);
 
 function previewPicked(color: string | null) {
@@ -171,7 +171,7 @@ function previewPicked(color: string | null) {
   emits('preview', pendingColor.value);
 }
 
-// select() of the picker-prepend slot: sets the pending color like a pick in the picker
+// select() of the picker-prepend slot: sets the pending colour like a pick in the picker
 function selectPending(proxyModel: { value: string | null }, color: string) {
   proxyModel.value = color;
   previewPicked(color);

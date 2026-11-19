@@ -4,39 +4,6 @@ Vuetify input components with guaranteed visual consistency across all form fiel
 globally configurable, with inline mode for table cells. Built for
 [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
 
-## Introduction
-
-`@dynamicforms/vuetify-inputs` provides input components for data entry, built so that every one of them matches
-every other.
-
-Hand a component an element of [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms) and that element
-owns the value, the validation, the enabled state and the visibility, and the component renders what it holds. Every
-component also works with a plain `v-model`, or with no binding. The density and variant system and the inline mode
-for table cells are the same in all three cases.
-
-## Design Goals
-
-The primary goal of this library is **visual consistency**: every input component should look and behave the same
-regardless of which component is used or where it appears in the application. This means that mixing `df-input`,
-`df-select`, `df-checkbox`, `df-date-time`, and others on the same form row should produce a coherent, aligned result
-without any per-component tweaking.
-
-To achieve this, the library introduces a **density/variant system** that applies uniformly to all components:
-
-- **Density** controls the vertical compactness of a component and can be set globally, injected per-section, or
-  overridden per-component. Supported values are `default`, `comfortable`, `compact`, and `inline`.
-- **Variant** controls the visual style (e.g. `outlined`, `underlined`, `filled`, `solo`, …) and follows the same
-  hierarchy.
-- The `inline` density is a custom extension beyond standard Vuetify — it strips labels and decorations so components
-  render cleanly inside table cells.
-
-Global defaults can be set once at application startup via `VuetifyInputsSettings` and propagated down through Vue's
-provide/inject, so the entire application can switch density or variant with a single change.
-
-The [density example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/density.html) in the documentation
-demonstrates all components rendered side-by-side across every density and variant combination to verify alignment and
-consistent appearance.
-
 ## What matters most
 
 - **Every field matches every other**: one shared base, so a row mixing a text field, a select, a checkbox and a
@@ -49,13 +16,16 @@ consistent appearance.
   css class, density and variant it is drawn with, so a form declared in code needs no presentation attributes on
   the tags that draw it
 
+The [density example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/density.html) renders every component
+side by side in every density and variant.
+
 ## Everything else it does
 
-- **Twelve components**: `df-input`, `df-text-area`, `df-select`, `df-checkbox`, `df-color`, `df-date-time`,
-  `df-file`, `df-image`, `df-rtf-editor`, `df-actions`, `df-input-hint` and `df-input-group`
+- **Thirteen components**: `df-input`, `df-text-area`, `df-select`, `df-checkbox`, `df-color`, `df-date-time`,
+  `df-file`, `df-image`, `df-rtf-editor`, `df-actions`, `df-input-hint`, `df-input-group` and `df-label`
 - **A control, a v-model, or neither**: a bound element owns the value, validity, touched, enabled and visibility;
   `v-model` reports changes to the parent; neither keeps the value internally
-- **Errors, hints and help text** in one row, rendered through the library's own `MessagesWidget`; an error
+- **Errors and hints** in one row, rendered through the library's own `MessagesWidget`; an error
   renders as the plain text, markdown or component the application's `errorText` setting returns for its code and
   params, or as its English `detail`, and is shown by one rule an application can replace — the server's at once,
   every other once the field is touched
@@ -64,8 +34,8 @@ consistent appearance.
 - **Visibility** — `'full'`, `'invisible'`, `'hidden'`, `'suppress'` — and enablement that follows the
   containing section
 - **`passthroughAttrs`**: any prop of the underlying Vuetify component, without this library declaring it
-- **Actions**: the `Action` class with render options, `defaultConfirm` / `defaultReject`, the ready-made
-  close/yes/no factories, and per-breakpoint render options from `xs` to `xl`
+- **Actions**: the `Action` class with render options, `defaultConfirm` / `defaultReject`, and per-breakpoint render
+  options from `xs` to `xl`
 - **Selection**: static choices or an async `fetchChoices`, single or multiple, chips with icons, free values with
   `allowTags`
 - **Uploads**: a `FileComms` object with upload progress, delete and a periodic touch
@@ -166,12 +136,12 @@ Detailed documentation is available at [https://docs.velis.si/dynamicforms/vueti
 
 ## Available Components
 
-- **InputBase**: The base component for all input elements
+- **InputBase**: The field frame that df-date-time, df-file, df-image and df-rtf-editor place their control in
 - **DfLabel**: Renders a label - plain text, markdown, HTML or a component, with an icon - the way every input renders
   its own
 - **df-actions**: An actions group.
 - **df-checkbox**: A checkbox component.
-- **df-color**: A color input.
+- **df-color**: A colour input.
 - **df-date-time**: A date and time selection component with configurable format and type.
 - **df-file**: A file upload component with progress indication
 - **df-image**: An image upload with a preview, drag and drop and paste

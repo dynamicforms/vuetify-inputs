@@ -171,7 +171,7 @@ describe('RtfToolbar button groups', () => {
     const wrapper = mountToolbar(editor);
 
     for (const [title, name] of [
-      ['Align center', 'center'],
+      ['Align centre', 'center'],
       ['Align right', 'right'],
       ['Justify', 'justify'],
       ['Align left', 'left'],

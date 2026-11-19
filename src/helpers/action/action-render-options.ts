@@ -21,12 +21,7 @@ export interface ActionRenderOptions extends ActionValue {
   /** The icon of the action, a name `vue-cached-icon` resolves, rendered when {@link showIcon} is set and the
    * name is not empty. Typed here for the same reason `label` is. */
   icon?: string;
-  /** Unique identifier for the action. Purely informational to `<df-actions>` itself - it is not used for
-   * rendering - but by convention should match the key under which the action is registered in a
-   * `FormActions` (`Record<string, Action>`) map passed to `@dynamicforms/vuetify-modal-form-kit`'s
-   * `modal.message()`/`modal.yesNo()`/etc. That map key (or the action's `fieldName`, when it's part of a
-   * `Form.Group`) - not this `name` field - is what the modal's promise actually resolves with; keeping them
-   * in sync is what lets callers do e.g. `if (await modal.yesNo(...) === 'yes')`. */
+  /** Identifier of the action; not used for rendering. */
   name?: string;
   /** How the action is rendered: `'button'` for a tonal `<v-btn>`, or `'text'` for a text-variant `<v-btn>`. */
   renderAs?: ActionDisplayStyle;
@@ -34,23 +29,19 @@ export interface ActionRenderOptions extends ActionValue {
   showLabel?: boolean;
   /** Whether the icon is shown. If `icon` is empty, the icon is never shown regardless of this flag. */
   showIcon?: boolean;
-  /** Marks this as the action to trigger on Enter when rendered inside `<df-modal>` (see that component's
-   * `onKeydown` in `@dynamicforms/vuetify-modal-form-kit`) - e.g. a "Save" or "Yes" action. In `<df-actions>` it
-   * also colors the button `primary`, unless overridden via `passthroughAttrs.color`. At most one action in a
-   * given set should set this. */
+  /** The action triggered on Enter in a modal, e.g. "Save" or "Yes". In the `<v-btn>` rendering of `<df-actions>`
+   * it colours the button `primary` unless `passthroughAttrs.color` is set. At most one action in a set should set
+   * this. */
   defaultConfirm?: boolean;
-  /** Marks this as the action to trigger on Escape when rendered inside `<df-modal>` (see that component's
-   * `onKeydown` in `@dynamicforms/vuetify-modal-form-kit`) - e.g. a "Cancel" or "No" action. In `<df-actions>` it
-   * also colors the button `secondary`, unless overridden via `passthroughAttrs.color`. At most one action in a
-   * given set should set this (a single Close action may set both `defaultConfirm` and `defaultReject` so it fires
-   * on either key). */
+  /** The action triggered on Escape in a modal, e.g. "Cancel" or "No". In the `<v-btn>` rendering of
+   * `<df-actions>` it colours the button `secondary` unless `passthroughAttrs.color` is set. At most one action in a
+   * set should set this; a single Close action may set both `defaultConfirm` and `defaultReject` to fire on either
+   * key. */
   defaultReject?: boolean;
-  /** Additional props/attrs forwarded verbatim to the rendered `<v-btn>` (e.g. `color`, `loading`, `density`,
-   * `rounded`, `block`, `prependIcon`, ...), taking precedence over `<df-actions>`'s own computed bindings
-   * (`variant`, `color`, `disabled`, `loading`, and the `aria-label` and `title` of a button that does not show its
-   * label). Mirrors the `passthroughAttrs` convention used by `df-input`/`df-file`/etc
-   * (see `helpers/input-base.ts`); it has to live on the action's value here because `<df-actions>` renders a
-   * whole array of buttons, not just one. */
+  /** Props and attributes bound to the rendered `<v-btn>` (e.g. `color`, `loading`, `density`, `rounded`, `block`,
+   * `prependIcon`), or to the native `<button>` in `simple` mode. They take precedence over `<df-actions>`'s own
+   * bindings: `variant`, `color`, `disabled`, `loading`, `elevation`, `size`, `density`, `aria-busy`, and the
+   * `aria-label` and `title` of a button that does not show its label. */
   passthroughAttrs?: Record<string, any>;
 }
 /**

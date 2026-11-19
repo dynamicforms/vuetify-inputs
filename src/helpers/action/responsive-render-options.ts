@@ -51,7 +51,7 @@ export abstract class ResponsiveRenderOptions<T extends Record<string, any>> {
   }
 
   /**
-   * Normalizes one breakpoint's options. The merge reads `null` and `undefined` as "this breakpoint says
+   * Normalises one breakpoint's options. The merge reads `null` and `undefined` as "this breakpoint says
    * nothing about that field", so a field the breakpoint does not state has to come back as `undefined` rather
    * than as an empty value - an empty array or string returned here reads as a breakpoint deliberately emptying
    * what it inherited.

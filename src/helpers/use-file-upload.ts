@@ -142,9 +142,7 @@ export function useFileUpload({ value, touched, comms, touchInterval, control }:
 }
 
 /**
- * Reports a {@link FileGoneError}'s message on `control`, where one is bound. Kept outside the component's own
- * script so the write to `control.errors` isn't seen as a `.vue` component mutating its own prop — the write
- * goes through `Form.FieldBase`'s own setter, the same way `useInputBase`'s `touched` does.
+ * Reports a {@link FileGoneError}'s message on `control`, where one is bound.
  */
 export function setFileGoneError(control: Form.FieldBase | undefined, errorText: string) {
   if (control) control.errors = [new ValidationError(namespaced('file_gone'), {}, errorText, 'server')];

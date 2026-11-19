@@ -78,13 +78,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void;
 }>();
 
-// `<df-rtf-editor>`'s label is positioned by a fixed `translate()` in its own stylesheet, tuned around a
-// single-row toolbar - it has no other way to know the toolbar's actual height, since the label (drawn by
-// `v-field`'s `#label` slot) and the toolbar (drawn by this component, inside `v-field`'s default slot) are
-// siblings, not ancestor/descendant. Publishing the toolbar's measured height as a CSS custom property on their
-// shared `.v-field` ancestor lets that `translate()` read a real value instead of guessing one - it still needs
-// to reach up past this component's own root to a DOM node it doesn't otherwise touch, which is what the
-// `.closest()` below is for.
+// publishes the toolbar's height as --rtf-toolbar-height on the enclosing .v-field
 // a function ref: a template ref by name would put the toolbar's types into the declarations this component emits
 const toolbarRef = ref<ComponentPublicInstance | null>(null);
 function setToolbar(el: unknown) {
@@ -156,7 +150,7 @@ const editor = useEditor({
     handlePaste: createImagePasteHandler(() => editor.value),
   },
   // ProseMirror's schema never lets the document itself be empty - a cleared editor still holds one empty
-  // paragraph, whose serialized HTML is '<p></p>'. Emitting that instead of '' would make a `required` rule
+  // paragraph, whose serialised HTML is '<p></p>'. Emitting that instead of '' would make a `required` rule
   // checking for a falsy modelValue pass on a field the user never actually typed or pasted anything into.
   onUpdate: ({ editor: instance }) => {
     emit('update:modelValue', instance.isEmpty ? '' : instance.getHTML());
@@ -176,7 +170,7 @@ watch(
   },
 );
 
-// setEditable emits an `update` unless told not to: it would write the editor's serialization of the value, which
+// setEditable emits an `update` unless told not to: it would write the editor's serialisation of the value, which
 // differs from the value as written (`<b>` read back as `<strong>`), into the field the user has not edited
 watch(
   () => props.readonly,
@@ -209,10 +203,7 @@ const bubbleState = computed(() => {
   };
 });
 
-// A NodeSelection (an image, a table, a horizontal rule - anything selected as a whole rather than as text) is
-// excluded: bold/italic/link/list toggles don't apply to a selected node, so showing this text-formatting bubble
-// over one is just noise sitting on top of whatever selection UI that node has of its own (an image's resize
-// handles, for instance).
+// not shown for a NodeSelection (image, table, rule): text formatting does not apply to a selected node
 function bubbleShouldShow({ state }: { state: { selection: { empty: boolean } } }) {
   return !state.selection.empty && !(state.selection instanceof NodeSelection);
 }
@@ -260,9 +251,7 @@ function toggleBubbleLink() {
   margin: 0 0 1em;
 }
 
-/* ProseMirror's list/table schemas wrap every block of text in a <p>, list item or cell content included, so
-   without this every list item and table cell would carry the same margin ordinary paragraphs do - list items
-   readable as double-spaced lines, cells with dead space above and below their text. */
+/* paragraphs inside list items and table cells have no margin */
 .rtf-content li p,
 .rtf-content td p,
 .rtf-content th p {
@@ -320,9 +309,7 @@ function toggleBubbleLink() {
   cursor: nesw-resize;
 }
 
-/* Holding Shift while dragging a handle locks the aspect ratio (ResizableNodeView's own behaviour, not
-   something this component adds) - a one-off tooltip on the corner handle most people reach for first is enough
-   to surface it, rather than a whole toolbar for a modifier key. */
+/* hint: Shift keeps the aspect ratio while resizing */
 .rtf-content [data-resize-handle='bottom-right']:hover::after {
   content: 'Hold Shift to keep the aspect ratio';
   position: absolute;

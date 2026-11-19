@@ -29,7 +29,7 @@ In addition to [common props from InputBase](./input-base), this component requi
 | Prop  | Type        | Default      | Description                            |
 |-------|-------------|--------------|-----------------------------------------|
 | comms | `FileComms` | **Required** | Object with methods for image operations |
-| touchInterval | `number` | `60000` | Milliseconds between keep-alive touches. See [Configuration](/examples/configuration) for setting this application-wide instead |
+| touchInterval | `number` | `undefined`: the plugin's `defaultTouchInterval`, else `60000` | Milliseconds between keep-alive touches. See [Configuration](/examples/configuration) for setting this application-wide instead |
 
 ### Inherited Props
 
@@ -116,10 +116,9 @@ the URL.
 
 During an upload the component shows a progress bar from the values passed to `progressCallback` of `upload`.
 
-A temporary upload is touched every `touchInterval` milliseconds (60 seconds by default), so the backend keeps it. If a
-touch rejects with a `FileGoneError` while the field still holds the touched URL, the field and preview are cleared, a
-disabled field as well, and, where a `control` is bound, its errors are replaced with one `ValidationError` of code
-`vuetify-inputs.file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the [`errorText`
+If a touch rejects with a `FileGoneError` while the field still holds the touched URL, the field and preview are
+cleared, a disabled field as well, and, where a `control` is bound, its errors are replaced with one `ValidationError`
+of code `vuetify-inputs.file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the [`errorText`
 setting](/examples/localisation#translating-errors) can render another text for the code. Under vue-forms' default
 [`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy) the field drops the error when a new image is uploaded. Any
 other rejection is ignored by the component and left to the application.

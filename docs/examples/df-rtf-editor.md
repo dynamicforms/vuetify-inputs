@@ -12,15 +12,8 @@ so it uses the application's theme and this library's translated strings.
 ## Features
 
 - Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
-- Headings, bold, italic, block quotes, bulleted and numbered lists
-- Images: insert by URL, upload, or paste directly from the clipboard, embedded as base64 `data:` URIs, with
-  drag-handle resizing
-- Tables, with row and column insertion/deletion
-- Links, with an optional `download` attribute
-- Pasting a Word or Google Docs selection: formatted text, embedded images and tables are pasted as structured
-  content, without the source application's markup
-- A "Style" dropdown applying named, class-based styles to the current block or selection
-- Media embeds: paste a YouTube or Vimeo URL to insert a responsive player
+- Text formatting, lists, tables, links, images, media embeds, named block styles and pasting from Word or Google
+  Docs (see [Toolbar Features](#toolbar-features))
 
 ## Props
 
@@ -29,6 +22,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | minHeight | `string` | `'7em'` | Minimum height of the editing area |
+| toolbarButtonSize | `VuetifyButtonSize` | `'small'` | Size of the toolbar buttons (Vuetify `v-btn` `size`) |
 | fontFamily | `string` | `'inherit'` | `font-family` of the editing area and its named block styles. The component loads no font of its own; pass a value here (and load the font itself, if needed) to use something other than the surrounding page's font |
 
 ### Inherited Props
@@ -64,7 +58,7 @@ This component inherits all common props from [InputBase](./input-base), includi
     removes it on a second click
   
 - **Alignment**
-  - Left, center, right, justify
+  - Left, centre, right, justify
   
 - **Utilities**
   - Undo/redo, select all
@@ -80,7 +74,7 @@ This component emits all [common events from InputBase](./input-base):
 
 ## Working with HTML Content
 
-The value is HTML, and the component does not sanitize it. An application that displays HTML entered by users sanitizes
+The value is HTML, and the component does not sanitise it. An application that displays HTML entered by users sanitises
 it first, to prevent XSS.
 
 List items and table cells save their text wrapped in a paragraph (`<li><p>...</p></li>`, `<td><p>...</p></td>`),

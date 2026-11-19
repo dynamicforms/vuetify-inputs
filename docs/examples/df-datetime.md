@@ -140,7 +140,7 @@ the field nor marks it as changed.
 
 ## Display Format
 
-Dates and times are displayed with [date-fns format patterns](https://date-fns.org/v2.29.3/docs/format):
+Dates and times are displayed with [date-fns format patterns](https://date-fns.org/docs/format):
 
 - Default date format: `'P'` (locale-specific date representation)
 - Default time format: `'p'` (locale-specific time representation)

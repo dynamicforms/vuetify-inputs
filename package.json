@@ -4,7 +4,7 @@
   "version": "0.16.0",
   "type": "module",
   "description": "Vuetify input components with guaranteed visual consistency across all form fields — unified density/variant system, globally configurable, with inline mode for table cells. Built for @dynamicforms/vue-forms.",
-  "author": "Jure Erznožnik",
+  "author": "Jure Erznožnik <jure.erznoznik@velis.si>",
   "files": [
     "dist/*"
   ],

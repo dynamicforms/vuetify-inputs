@@ -2,9 +2,9 @@ export type FileProgressCallback = (loaded: number, total: number) => void;
 
 /**
  * Thrown by `FileComms.touch` or `FileComms.delete` when the backend confirms the file identifier no longer
- * exists there (e.g. its keep-alive TTL expired). The component reacts to this specific type by clearing the
- * field and, where a `control` is bound, showing `errorText` as a validation error. Any other thrown error is
- * treated as transient and left entirely to the consumer.
+ * exists there (e.g. its keep-alive TTL expired). When `touch` throws it while the field still holds the touched
+ * identifier, the field is cleared and, where a `control` is bound, `errorText` is shown as a validation error. When
+ * `delete` throws it, it is ignored. Any other error thrown by `touch` is ignored; one thrown by `delete` propagates.
  */
 export class FileGoneError extends Error {
   constructor(public errorText: string) {

@@ -1,4 +1,3 @@
-// df-actions.spec.ts
 import { Action as FormAction, ExecuteAction, Field, Group, SubmitAction, Validators } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
 import { vi } from 'vitest';
@@ -14,7 +13,7 @@ describe('DfActions', () => {
   let vuetify: any;
 
   beforeEach(() => {
-    vuetify = createVuetify({ components: { VBtn } }); // eksplicitno registriraj komponente
+    vuetify = createVuetify({ components: { VBtn } });
   });
 
   const createMockAction = (name: string, label: string, icon?: string): Action => {
@@ -32,7 +31,7 @@ describe('DfActions', () => {
     });
   };
 
-  it('renderira pravilno število gumbov', () => {
+  it('renders one button per action', () => {
     const actions = [
       createMockAction('save', 'Save', 'save-outline'),
       createMockAction('cancel', 'Cancel', 'close-outline'),
@@ -46,7 +45,7 @@ describe('DfActions', () => {
     expect(wrapper.findAll('.v-btn')).toHaveLength(2);
   });
 
-  it('prikaže pravilno besedilo in ikone', () => {
+  it('shows the label and the icon', () => {
     const actions = [createMockAction('save', 'Save', 'save-outline')];
 
     const wrapper = mount(DfActions, {
@@ -59,7 +58,7 @@ describe('DfActions', () => {
     expect(button.find('[data-icon="save-outline"]')).toBeTruthy();
   });
 
-  it('pokliče execute ob kliku', async () => {
+  it('calls execute on click', async () => {
     const mockExecute = vi.fn();
     const action = createMockAction('save', 'Save');
     action.execute = mockExecute;
@@ -73,7 +72,7 @@ describe('DfActions', () => {
     expect(mockExecute).toHaveBeenCalledTimes(1);
   });
 
-  it('ne prikaže ničesar če ni akcij', () => {
+  it('renders nothing without actions', () => {
     const wrapper = mount(DfActions, {
       props: { actions: [] },
       global: { plugins: [vuetify] },
@@ -82,7 +81,7 @@ describe('DfActions', () => {
     expect(wrapper.find('.v-btn').exists()).toBe(false);
   });
 
-  it('uporablja button-group razred ko je showAsGroup nastavljen', () => {
+  it('uses the button-group class when showAsGroup is set', () => {
     const actions = [createMockAction('save', 'Save')];
 
     const wrapper = mount(DfActions, {
@@ -94,7 +93,7 @@ describe('DfActions', () => {
     expect(wrapper.find('.with-border').exists()).toBe(true);
   });
 
-  it('nastavi pravilno velikost gumbov', () => {
+  it('sets the button size', () => {
     const actions = [createMockAction('save', 'Save')];
 
     const wrapper = mount(DfActions, {
@@ -105,9 +104,8 @@ describe('DfActions', () => {
     const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
     expect(buttonComponent.props('size')).toBe('large');
   });
-  it('renderira gumb kot text variant', () => {
+  it('renders the button as the text variant', () => {
     const action = createMockAction('save', 'Save');
-    // Nastavi renderAs na TEXT
     action.value.renderAs = 'text';
 
     const wrapper = mount(DfActions, {
@@ -127,7 +125,7 @@ describe('DfActions', () => {
     expect(button.attributes('data-variant')).toBe('text');
   });
 
-  it('prikaže spacer med ikono in besedilom', () => {
+  it('shows a spacer between the icon and the label', () => {
     const action = createMockAction('save', 'Save', 'save-outline');
 
     const wrapper = mount(DfActions, {
@@ -135,12 +133,11 @@ describe('DfActions', () => {
       global: { plugins: [vuetify] },
     });
 
-    // Išči span z width: .5rem
     const spacer = wrapper.find('span[style*="width: 0.5rem"]');
     expect(spacer.exists()).toBe(true);
   });
 
-  it('ne prikaže spacer-ja če ni ikone ali besedila', () => {
+  it('shows no spacer without an icon or a label', () => {
     const actionOnlyIcon = createMockAction('save', '', 'save-outline');
 
     const wrapper = mount(DfActions, {
@@ -152,7 +149,7 @@ describe('DfActions', () => {
     expect(spacer.exists()).toBe(false);
   });
 
-  it('nastavi pravilne CSS klase za grupiranje', () => {
+  it('sets the grouping CSS classes', () => {
     const actions = [createMockAction('save', 'Save')];
 
     const wrapper = mount(DfActions, {
@@ -164,7 +161,7 @@ describe('DfActions', () => {
     expect(container.classes()).toContain('button-group');
     expect(container.classes()).not.toContain('with-border');
   });
-  it('reagira na spremembe v actions prop-u (reaktivnost)', async () => {
+  it('follows changes to the actions prop', async () => {
     const initialActions = [createMockAction('save', 'Save')];
 
     const wrapper = mount(DfActions, {
@@ -172,25 +169,20 @@ describe('DfActions', () => {
       global: { plugins: [vuetify] },
     });
 
-    // Začetno stanje - 1 gumb
     expect(wrapper.findAll('.v-btn')).toHaveLength(1);
 
-    // Dodaj novo akcijo v array
     const newActions = [...initialActions, createMockAction('delete', 'Delete', 'trash-outline')];
 
-    // Posodobi prop
     await wrapper.setProps({ actions: newActions });
 
-    // Preveri, da se je renderiral nov gumb
     expect(wrapper.findAll('.v-btn')).toHaveLength(2);
 
-    // Preveri, da so besedila pravilna
     const buttons = wrapper.findAll('.v-btn');
     expect(buttons[0].text()).toContain('Save');
     expect(buttons[1].text()).toContain('Delete');
   });
 
-  it('reagira na odstranitev akcij', async () => {
+  it('follows removed actions', async () => {
     const initialActions = [
       createMockAction('save', 'Save'),
       createMockAction('delete', 'Delete'),
@@ -204,13 +196,12 @@ describe('DfActions', () => {
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(3);
 
-    // Odstrani eno akcijo
     await wrapper.setProps({ actions: initialActions.slice(0, 2) });
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(2);
   });
 
-  it('se skrije, ko se vsi actions odstranijo', async () => {
+  it('hides when all actions are removed', async () => {
     const initialActions = [createMockAction('save', 'Save')];
 
     const wrapper = mount(DfActions, {
@@ -220,14 +211,13 @@ describe('DfActions', () => {
 
     expect(wrapper.find('.v-btn').exists()).toBe(true);
 
-    // Odstrani vse actions
     await wrapper.setProps({ actions: [] });
 
-    // Komponenta se mora skriti (v-if="actionsRef.length > 0")
+    // with no actions the component renders nothing
     expect(wrapper.find('.v-btn').exists()).toBe(false);
     expect(wrapper.find('div').exists()).toBe(false);
   });
-  it('reagira na spremembe v reaktivnem actions ref-u', async () => {
+  it('follows changes to a reactive actions ref', async () => {
     const actionsRef = <Ref<Action[]>>ref([createMockAction('save', 'Save')]);
 
     const wrapper = mount(DfActions, {
@@ -235,18 +225,15 @@ describe('DfActions', () => {
       global: { plugins: [vuetify] },
     });
 
-    // Začetno stanje - 1 gumb
     expect(wrapper.findAll('.v-btn')).toHaveLength(1);
 
-    // Dodaj akcijo v reaktivni ref
     actionsRef.value.push(createMockAction('delete', 'Delete', 'trash-outline'));
     await wrapper.vm.$nextTick();
 
-    // Bi se moral avtomatsko posodobiti render
     expect(wrapper.findAll('.v-btn')).toHaveLength(2);
   });
 
-  it('reagira na splice operacije', async () => {
+  it('follows splice operations', async () => {
     const actionsRef = <Ref<Action[]>>(
       ref([
         createMockAction('save', 'Save'),
@@ -262,7 +249,6 @@ describe('DfActions', () => {
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(3);
 
-    // Odstrani srednjo akcijo
     actionsRef.value.splice(1, 1);
     await wrapper.vm.$nextTick();
 
@@ -271,8 +257,8 @@ describe('DfActions', () => {
     expect(wrapper.findAll('.v-btn')[1].text()).toContain('Cancel');
   });
 
-  describe('defaultConfirm / defaultReject color', () => {
-    it('obarva gumb primary, ko je defaultConfirm nastavljen', () => {
+  describe('defaultConfirm / defaultReject colour', () => {
+    it('colours the button primary when defaultConfirm is set', () => {
       const action = createMockAction('save', 'Save');
       action.value.defaultConfirm = true;
 
@@ -285,7 +271,7 @@ describe('DfActions', () => {
       expect(buttonComponent.props('color')).toBe('primary');
     });
 
-    it('obarva gumb secondary, ko je defaultReject nastavljen', () => {
+    it('colours the button secondary when defaultReject is set', () => {
       const action = createMockAction('cancel', 'Cancel');
       action.value.defaultReject = true;
 
@@ -298,7 +284,7 @@ describe('DfActions', () => {
       expect(buttonComponent.props('color')).toBe('secondary');
     });
 
-    it('defaultConfirm ima prednost pred defaultReject, če sta oba nastavljena', () => {
+    it('defaultConfirm takes precedence over defaultReject when both are set', () => {
       const action = createMockAction('close', 'Close');
       action.value.defaultConfirm = true;
       action.value.defaultReject = true;
@@ -312,7 +298,7 @@ describe('DfActions', () => {
       expect(buttonComponent.props('color')).toBe('primary');
     });
 
-    it('gumb je brez barve, ko ne defaultConfirm ne defaultReject nista nastavljena', () => {
+    it('leaves the button without a colour when neither defaultConfirm nor defaultReject is set', () => {
       const action = createMockAction('neutral', 'Neutral');
 
       const wrapper = mount(DfActions, {
@@ -326,7 +312,7 @@ describe('DfActions', () => {
   });
 
   describe('enabled / disabled', () => {
-    it('gumb je onemogočen, ko je action.enabled false', () => {
+    it('disables the button when action.enabled is false', () => {
       const action = createMockAction('save', 'Save');
       action.access = 'disabled';
 
@@ -339,7 +325,7 @@ describe('DfActions', () => {
       expect(buttonComponent.props('disabled')).toBe(true);
     });
 
-    it('gumb je omogočen, ko je action.enabled true (privzeto)', () => {
+    it('enables the button when action.enabled is true (default)', () => {
       const action = createMockAction('save', 'Save');
 
       const wrapper = mount(DfActions, {
@@ -351,7 +337,7 @@ describe('DfActions', () => {
       expect(buttonComponent.props('disabled')).toBe(false);
     });
 
-    it('gumb je onemogočen, ko je onemogočena skupina, ki akcijo drži', () => {
+    it('disables the button when the group holding the action is disabled', () => {
       const action = createMockAction('save', 'Save');
       const form = new Group({ save: action });
       form.access = 'disabled';
@@ -366,7 +352,7 @@ describe('DfActions', () => {
       expect(buttonComponent.props('disabled')).toBe(true);
     });
 
-    it('gumb je onemogočen, ko ga handler zavrne s canExecute()', async () => {
+    it('disables the button when a handler rejects it with canExecute()', async () => {
       const name = new Field({ value: '', validators: [new Validators.Required()] });
       const save = new Action({
         value: { name: 'save', label: 'Save', showLabel: true },
@@ -403,7 +389,7 @@ describe('DfActions', () => {
       return [action, release];
     };
 
-    it('gumb je onemogočen in se vrti, dokler zagon ne obstane', async () => {
+    it('disables the button and shows it loading until the run settles', async () => {
       const [action, release] = pendingAction();
 
       const wrapper = mount(DfActions, {
@@ -427,7 +413,7 @@ describe('DfActions', () => {
       expect(buttonComponent.props('loading')).toBe(false);
     });
 
-    it('klik na akcijo, ki teče, ne požene drugega zagona', async () => {
+    it('a click on a running action starts no second run', async () => {
       const [action, release] = pendingAction();
       const executeSpy = vi.spyOn(action, 'execute');
 
@@ -448,7 +434,7 @@ describe('DfActions', () => {
   });
 
   describe('bare vue-forms Action', () => {
-    it('nariše akcijo, ki nosi le oznako', () => {
+    it('renders an action that carries only a label', () => {
       const action = new FormAction({ value: { label: 'Save' } });
 
       const wrapper = mount(DfActions, {
@@ -462,7 +448,7 @@ describe('DfActions', () => {
       expect(buttonComponent.props('disabled')).toBe(false);
     });
 
-    it('izvede akcijo, ki nosi le oznako, ob kliku', async () => {
+    it('executes an action that carries only a label on click', async () => {
       const executed = vi.fn();
       const action = new FormAction({ value: { label: 'Save' }, actions: [new ExecuteAction(executed)] });
 
@@ -477,7 +463,7 @@ describe('DfActions', () => {
   });
 
   describe('visibility', () => {
-    it('doda razred d-none, ko je visibility HIDDEN', () => {
+    it('adds the d-none class when visibility is HIDDEN', () => {
       const action = createMockAction('save', 'Save');
       action.visibility = 'hidden';
 
@@ -489,7 +475,7 @@ describe('DfActions', () => {
       expect(wrapper.find('.v-btn').classes()).toContain('d-none');
     });
 
-    it('doda razred invisible, ko je visibility invisible', () => {
+    it('adds the invisible class when visibility is invisible', () => {
       const action = createMockAction('save', 'Save');
       action.visibility = 'invisible';
 
@@ -501,7 +487,7 @@ describe('DfActions', () => {
       expect(wrapper.find('.v-btn').classes()).toContain('invisible');
     });
 
-    it('ne prikaže gumba, ko je visibility SUPPRESS', () => {
+    it('renders no button when visibility is SUPPRESS', () => {
       const shownAction = createMockAction('save', 'Save');
       const suppressedAction = createMockAction('secret', 'Secret');
       suppressedAction.visibility = 'suppress';
@@ -516,7 +502,7 @@ describe('DfActions', () => {
       expect(buttons[0].text()).toContain('Save');
     });
 
-    it('gumb nima dodatnih razredov, ko je visibility FULL (privzeto)', () => {
+    it('adds no classes when visibility is FULL (default)', () => {
       const action = createMockAction('save', 'Save');
 
       const wrapper = mount(DfActions, {
@@ -530,7 +516,7 @@ describe('DfActions', () => {
   });
 
   describe('passthroughAttrs', () => {
-    it('posreduje dodatne atribute na v-btn', () => {
+    it('passes extra attributes to v-btn', () => {
       const action = createMockAction('save', 'Save');
       action.value.passthroughAttrs = { block: true, rounded: 'lg' };
 
@@ -544,7 +530,7 @@ describe('DfActions', () => {
       expect(buttonComponent.props('rounded')).toBe('lg');
     });
 
-    it('passthroughAttrs.color prevlada nad izračunano barvo iz defaultConfirm', () => {
+    it('passthroughAttrs.color overrides the colour derived from defaultConfirm', () => {
       const action = createMockAction('save', 'Save');
       action.value.defaultConfirm = true;
       action.value.passthroughAttrs = { color: 'error' };
