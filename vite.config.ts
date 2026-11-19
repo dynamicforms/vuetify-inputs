@@ -48,9 +48,8 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: resolve(import.meta.dirname, 'src/index.ts'),
-      formats: ['umd', 'es'],
+      formats: ['es'],
       fileName: 'dynamicforms-vuetify-inputs',
-      name: 'dynamicforms-vuetify-inputs.[name]',
     },
     rollupOptions: {
       external: [
@@ -78,9 +77,6 @@ export default defineConfig({
         'vuetify',
         /^vuetify\/.*/,
       ],
-      output: {
-        globals: (id: string) => id, // all external modules are currently not aliased to anything but their own names
-      }
     }
   },
   test: {
