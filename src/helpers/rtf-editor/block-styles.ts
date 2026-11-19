@@ -68,15 +68,8 @@ export const STYLE_DEFS: StyleDef[] = [
   { key: 'CodeBright', kind: 'codeBlock', className: 'fancy-code fancy-code-bright' },
 ];
 
-// `editor.isActive(type, attrs)` requires every node touched by the current selection to match, so a
-// selection that spans a styled block plus the empty trailing paragraph TipTap keeps after it (or, after
-// `selectAll` on a single-block document, the whole document) reports no match even though the block the
-// selection starts in carries the style. Reading off the selection's anchor node instead answers the question
-// the dropdown actually asks: "does the block/mark the selection starts in carry this style".
-//
-// `$from` for a whole-document `AllSelection` resolves at depth 0 (the boundary before the first child, not
-// inside it), so a depth-0 anchor is re-resolved one position in - a position guaranteed to sit inside the
-// document's first block.
+// The style is read from the block at the selection's anchor; a depth-0 anchor (`AllSelection`) is resolved one
+// position in, inside the document's first block.
 function anchorPos(editor: Editor) {
   const { state } = editor;
   const { $from } = state.selection;
@@ -129,11 +122,8 @@ export function isStyleActive(editor: Editor, def: StyleDef): boolean {
 export function applyStyle(editor: Editor, def: StyleDef): void {
   const chain = editor.chain().focus();
 
-  // `lift` (which `unsetBlockquote` calls) only acts when every node the selection touches matches the target
-  // type - a whole-document `AllSelection` (as `selectAll` produces) also touches the trailing empty paragraph
-  // TipTap keeps after the last block, so it never matches and the command silently no-ops. Collapsing such a
-  // selection down to the anchor block first keeps every block command below scoped to the block the dropdown
-  // means. The two marks are left alone - they need the real selection range to wrap the marked text in.
+  // a whole-document selection is collapsed to its anchor block (`lift` acts only when every touched node
+  // matches); marks keep the real range
   const { $from } = editor.state.selection;
   if (def.kind !== 'mark' && $from.depth === 0 && editor.state.doc.content.size > 0) {
     chain.setTextSelection(anchorPos(editor).pos);

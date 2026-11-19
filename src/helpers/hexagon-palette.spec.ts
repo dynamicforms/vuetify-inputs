@@ -26,7 +26,7 @@ describe('hex and sRGB', () => {
     expect(hexToRgb(hex)).toEqual(rgb);
   });
 
-  it('reads no color from a string that is not hex', () => {
+  it('reads no colour from a string that is not hex', () => {
     expect(hexToRgb('red')).toBeNull();
     expect(hexToOkLab('#12345')).toBeNull();
   });
@@ -117,7 +117,7 @@ describe('hexagonCells', () => {
     outer.forEach((cell, i) => {
       const h = (i / outer.length) * 360;
       const lch = okLabToOkLch(hexToOkLab(cell.color)!);
-      // the 8-bit rounding of the cell's color moves it by less than 0.01 in chroma
+      // the 8-bit rounding of the cell's colour moves it by less than 0.01 in chroma
       expect(lch.C).toBeCloseTo(maxChromaInGamut(L, h), 1);
       expect(Math.abs(lch.C - maxChromaInGamut(L, h))).toBeLessThan(0.01);
       expect(isInGamut({ L, C: maxChromaInGamut(L, h) + 0.002, h })).toBe(false);
@@ -146,7 +146,7 @@ describe('hexagonPoints', () => {
 describe('nearestCell and nearestLevel', () => {
   const cells = hexagonCells(5, 0.6);
 
-  it('finds a cell by its own color', () => {
+  it('finds a cell by its own colour', () => {
     expect(nearestCell(cells, cells[17].color)).toBe(cells[17]);
   });
 
@@ -164,12 +164,12 @@ describe('nearestCell and nearestLevel', () => {
     cells.forEach((cell) => expect(distance(found.color)).toBeLessThanOrEqual(distance(cell.color)));
   });
 
-  it('finds no cell for a value that is not a hex color', () => {
+  it('finds no cell for a value that is not a hex colour', () => {
     expect(nearestCell(cells, 'red')).toBeUndefined();
     expect(nearestCell(cells, null)).toBeUndefined();
   });
 
-  it('finds the level nearest to the lightness of the color', () => {
+  it('finds the level nearest to the lightness of the colour', () => {
     expect(nearestLevel([0.45, 0.6, 0.75], '#000000')).toBe(0);
     expect(nearestLevel([0.45, 0.6, 0.75], '#ffffff')).toBe(2);
     expect(nearestLevel([0.45, 0.6, 0.75], okLabToHex({ L: 0.62, a: 0, b: 0 }))).toBe(1);

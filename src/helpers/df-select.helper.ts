@@ -16,16 +16,9 @@ export function convertItems(items: SelectChoice[]) {
  * @param multiple indicator for multiple selection
  */
 export function multipleCompliantValue(value: any, multiple: boolean): any {
-  // Če je vrednost null ali undefined
   if (value == null) return null;
-
-  // Prazno polje: pri multiple ostane prazno polje, pri single ni izbire
   if (isArray(value) && value.length === 0) return multiple ? [] : null;
-
-  // Za multiple vedno vrni polje
   if (multiple) return castArray(value);
-
-  // Za single vrni prvo vrednost ali vrednost samo
   return isArray(value) ? (first(value) ?? null) : value;
 }
 

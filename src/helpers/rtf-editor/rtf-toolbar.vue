@@ -303,14 +303,8 @@ interface ToolbarActionSync {
 
 const toolbarActionSyncs: ToolbarActionSync[] = [];
 
-// Static button clusters rendered through `<df-actions>` rather than `<v-btn-group>`/`<v-btn-toggle>`: each
-// button is a self-contained `Action`, so its look (size, rounded corners, active/disabled state) is drawn
-// from its own value rather than from props a parent component may or may not forward to it.
-//
-// `title` is the action's hidden label, which `<df-actions>` renders as the button's `aria-label` and `title`.
-// `disabled`/`active` are getters, not one-off values, because an `Action`'s `value`/`enabled` are plain
-// assignments rather than bindings to a computed - the `watchEffect` below re-runs them on every reactive change
-// and writes the result into the action it was registered against.
+// Toolbar buttons are `Action`s rendered by `<df-actions>`; `disabled`/`active` are getters that the
+// `watchEffect` below writes into the action.
 function toolbarAction(
   icon: string,
   onClick: () => void,
@@ -532,9 +526,7 @@ function insertMediaEmbed() {
   opacity: 0.6;
 }
 
-/* Mirrors `<df-actions>`'s own `button-group` look for the one cluster it can't render (it has no slot for a
-   `v-menu` activator): a plain flex row rather than Vuetify's `v-btn-group`, whose child buttons are sized by a
-   different formula than a standalone (or `<df-actions>`-rendered) icon button of the same `size`. */
+/* df-actions' button-group look for the cluster with a v-menu activator */
 .rtf-toolbar-group {
   display: flex;
 }

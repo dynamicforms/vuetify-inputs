@@ -35,7 +35,7 @@ This component inherits all common props from [InputBase](./input-base), includi
 - `hint` - Hint text
 - And more...
 
-## Auto-Growing Behavior
+## Auto-Growing Behaviour
 
 The textarea grows with its content only when `maxRows` is a positive value; the growth stops at `maxRows`.
 

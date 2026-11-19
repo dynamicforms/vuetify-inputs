@@ -13,8 +13,8 @@ export class MdString extends String {
 }
 
 /**
- * A string rendered as HTML: it is set as the `innerHTML` of a `div`. It is not sanitized, so a string holding text
- * from a user or a server is escaped or sanitized before it is wrapped.
+ * A string rendered as HTML: it is set as the `innerHTML` of a `div`. It is not sanitised, so a string holding text
+ * from a user or a server is escaped or sanitised before it is wrapped.
  */
 export class HtmlString extends String {}
 
@@ -145,8 +145,8 @@ export type RenderContentKind = 'string' | 'md' | 'html' | 'component';
  * `'template'` for plain text, `'vue-markdown'` for markdown, `'html'` for an `HtmlString` and the component's name
  * for a `SimpleComponentDef`; `componentBody` is the text of plain text and the HTML of an `HtmlString`.
  *
- * `MessagesWidget` renders it, and so does any component that reads those five members. A reference or a function as
- * the content is read on every render, so what it answers reaches the screen without the value being built again.
+ * A reference or a function as the content is read on every render, so what it answers reaches the screen without
+ * the value being built again.
  */
 export class RenderableValue {
   // an ordinary property rather than a #private one: a value held in reactive state is read through its proxy, and a

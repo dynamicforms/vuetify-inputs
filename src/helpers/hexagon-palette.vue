@@ -105,7 +105,7 @@ import { translate } from './translations';
  * The hexagon palette of `<df-color picker="hexagon">`: the cells of one lightness, and the control that selects it.
  * `levels` `null` offers any lightness from 0 to 1 with a slider; an array of more than one level offers those levels,
  * with a grid of level buttons below `segmentedFrom` levels and a segmented bar from it on. A click on a cell, or
- * Enter or Space on a focused one, writes its color.
+ * Enter or Space on a focused one, writes its colour.
  */
 const props = defineProps<{ modelValue: string | null | undefined; rings: number; levels: number[] | null }>();
 const emits = defineEmits<{ (e: 'update:modelValue', value: string): void }>();

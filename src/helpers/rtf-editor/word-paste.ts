@@ -1,15 +1,7 @@
-// Content copied from Word or Google Docs carries mso-* inline styles, Mso*-prefixed classes, namespaced tags
-// (o:p, w:sdt, v:shape...), and conditional-compilation comments that are meaningless outside their originating
-// document. Left in place, they either render as visible clutter or silently defeat the mark/heading detection
-// the editor's own paste parsing relies on (an inline `mso-bidi-font-weight` next to a real `font-weight:bold`
-// is harmless, but a class name colliding with one this library uses for content styling would not be).
 const NAMESPACED_TAG = /^[a-z][a-z0-9]*:[a-z]/i;
 const MSO_STYLE_PROPERTY = /mso-[a-z-]+\s*:[^;]+;?/gi;
 const MSO_CLASS = /^Mso/i;
-// Word's own cell/table shading (Automatic/theme colours resolved at copy time, not necessarily what the
-// document visibly showed) rides along as a plain, non-mso `background`/`background-color` - stripped so a
-// pasted table adopts the editor's own theme instead of carrying the source document's shading. Foreground
-// `color` is left alone: unlike background shading, it is usually deliberate content styling worth keeping.
+// background shading is stripped; foreground `color` is kept
 const BACKGROUND_STYLE_PROPERTY = /background(?:-color)?\s*:[^;]+;?/gi;
 
 function stripComments(root: Element) {

@@ -38,13 +38,13 @@ export interface DfCheckboxProps extends BaseProps {
 
 export interface DfColorProps extends BaseProps {
   allowNull?: boolean;
-  /** Whether the color has an alpha channel. `false` runs the picker in `hex` mode without the alpha slider and
+  /** Whether the colour has an alpha channel. `false` runs the picker in `hex` mode without the alpha slider and
    *  accepts only `#rgb` and `#rrggbb`. Default `true`. */
   alpha?: boolean;
-  /** Maps a valid color to the value the component writes and shows in its swatch and `preview` events. The picker
-   *  itself works on the unmapped color. */
+  /** Maps a valid colour to the value the component writes and shows in its swatch and `preview` events. The picker
+   *  itself works on the unmapped colour. */
   normalize?: (value: string) => string;
-  /** The picker in the menu: `'generic'`, Vuetify's color picker, `'hexagon'`, a palette of hexagon cells, or
+  /** The picker in the menu: `'generic'`, Vuetify's colour picker, `'hexagon'`, a palette of hexagon cells, or
    *  `'none'`, only the `picker-prepend` slot. Default `'generic'`. */
   picker?: 'generic' | 'hexagon' | 'none';
   /** The number of rings of the hexagon palette, the centre cell counted as the first: `1 + 3·n·(n − 1)` cells.

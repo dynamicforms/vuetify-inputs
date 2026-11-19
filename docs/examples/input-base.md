@@ -21,19 +21,19 @@ All input components inherit the following properties:
 | cssClass         | `string`                      | `undefined`    | Additional CSS classes                                                                             |
 | clearable        | `boolean`                     | `true`         | Whether the value can be cleared                                                                   |
 | passthroughAttrs | `Record<string, any>`         | `undefined`    | Additional attributes to pass through to the underlying Vuetify component                          |
-| variant          | `FieldVariant`                | `'underlined'` | Input field variant (outlined, filled, underlined, plain, solo, solo-inverted, solo-filled)        |
+| variant          | `FieldVariant`                | `'underlined'` | Input field variant (outlined, filled, underlined, plain, solo, solo-inverted, solo-filled, inverted) |
 | density          | `FieldDensity`                | `'default'`    | Input field density (default, comfortable, compact, inline)                                        |
 
 A prop that is left out is `undefined`, and [useInputBase()](#useinputbase) reads it as an empty string for the text
 props and as an empty array for `errors`. `clearable` is defaulted by `defaultBaseProps`, which every component
 spreads into its own `withDefaults`; `variant` and `density` fall back through inject and the plugin settings, as
-described under [Density](#density).
+described under [Where density and variant come from](/examples/configuration#where-density-and-variant-come-from).
 
 When a `control` is bound, it is the source of the value, the touched flag, the errors, the validity, the enabled
 state and the visibility. The `modelValue`, `errors`, `enabled` and `visibility` props are then ignored.
 
-`clearable` is read where the field renders its own clear button: `df-date-time` passes the prop through to
-`InputBase`, while `df-file` always renders the button. `df-select` and `df-color` render theirs from their own
+`clearable` is read where the field renders its own clear button: `df-date-time`, `df-file` and `df-image` pass the
+prop through to `InputBase`. `df-select` and `df-color` render theirs from their own
 `allowNull` prop. `df-rtf-editor` binds its whole prop set to `InputBase`, so the button is rendered, but the component
 handles no `click:clear`; pressing it leaves the text unchanged.
 
@@ -76,7 +76,7 @@ of the field's. For `density` and `variant` the element is second in the order, 
 `field-density` / `field-variant` and the plugin defaults.
 
 `enabled`, `visibility`, `errors` and the value are members of the element and are read from it, not from these
-seven extended properties.
+six extended properties.
 
 ### Density
 
@@ -88,23 +88,9 @@ export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
 `inline` is a density in addition to Vuetify's. It hides the outline and the floating label and removes the margins
 and padding of the remaining elements, so the control takes the least space.
 
-#### Support for setting variant and density on groups of inputs
-
-Every input component takes `variant` and `density` props, and also reads them from the sources below, in
-descending priority:
-
-- props: a component with `variant` and/or `density` props uses exactly those values
-- the bound element: a `control` carries `density` and `variant` among its
-  [extended properties](#presentation-carried-by-the-element), and they apply where the props state nothing
-- provide: any ancestor component may `provide` `'field-variant'` and/or `'field-density'`. They apply where neither
-  the props nor the element set a value.
-- global defaults, set when installing the library:
-  `app.use(DynamicFormsInputs, { defaultVariant: 'your variant', defaultDensity: 'your density' })`
-- baked-in defaults (when nothing is specified):
-  - density: `'default'`
-  - variant: `'underlined'`
-
-The [demo](./density.md) renders every density under every variant.
+The order in which a field's density and variant are resolved is described under
+[Where density and variant come from](/examples/configuration#where-density-and-variant-come-from). The
+[demo](./density.md) renders every density under every variant.
 
 ## Events
 
@@ -315,10 +301,10 @@ It emits `BaseEmits` plus one event of its own:
 
 The root element is a `v-input`, rendered only when the visibility is not `'suppress'`, carrying the `name`,
 `density`, `hint`, `persistent-hint`, `hide-details` and `errorMessages` bindings together with the `cssClass` prop
-and the visibility classes. Its `message` slot renders `DfInputHint` with the errors of a touched field and the hint.
+and the visibility classes. Its `message` slot renders `DfInputHint` with the [shown errors](#shown-errors) and the hint.
 Inside it, a `v-field` takes the `v-input`'s id, as Vuetify's own text field does: the field label's `for` is that id,
 the label's own id is the id with `-label` appended, and while the message row is rendered its id is the id with
-`-messages` appended. The `v-field` carries the `variant`, `density`, `label` and `disabled` bindings, is `dirty`
+`-messages` appended. The `v-field` carries the `variant`, `bg-color`, `density`, `label` and `disabled` bindings, is `dirty`
 while there is a value or a placeholder, is `active` while the hosted control has focus, and takes `loading` from the
 prop. The field's `label` slot renders `DfLabel`, so an icon label and an `MdString` label render as on the components
 that bind a Vuetify input directly. The density class is not applied here: the host binds `:class="densityClass"` on
@@ -466,16 +452,17 @@ value the field holds.
 | Key | Value |
 |-----|-------|
 | name | `control.fieldName`, so the field's name inside its `Group`; `undefined` without a control |
-| class | The `cssClass` prop |
+| class | The `cssClass` prop, else the bound element's `cssClass` extended property, `''` when neither is set |
 | density | The resolved density, with `inline` mapped to `default` - `inline` is carried by `densityClass` instead |
-| variant | The resolved variant |
+| variant | The resolved variant, with `inverted` mapped to `solo` |
+| bgColor | `'surface-variant'` for the `inverted` variant, `undefined` otherwise |
 | label | `renderContentText(label.text)` |
-| errorMessages | A single space when the field is touched and has errors, `undefined` otherwise |
+| errorMessages | A single space while `shownErrors` is not empty (see [Shown errors](#shown-errors)), `undefined` otherwise |
 | readonly | `!enabled` |
 | disabled | `true` where `control.effectiveAccess` is `'disabled'` or `'disabled-null'`; `!enabled` without a control |
-| placeholder | The `placeholder` prop, `''` when unset |
+| placeholder | The `placeholder` prop, else the bound element's `placeholder` extended property, `''` when neither is set |
 | persistent-placeholder | `true` when a placeholder is set |
-| hint | The `hint` prop, `''` when unset |
+| hint | The `hint` prop, else the bound element's `hint` extended property, `''` when neither is set |
 | persistentHint | Always `true` |
 | hideDetails | Always `'auto'`, so the details area disappears when there is nothing to show |
 | aria-invalid | `'true'` while errors are shown, `undefined` otherwise |
@@ -542,13 +529,13 @@ const { densityClass, isRendered, label, shownErrors, touched, value, visibility
 The resulting component takes a `control` or a `v-model`, applies the visibility a `ConditionalVisibilityAction`
 sets, uses the application's density and variant, shows its errors once touched, and accepts `passthroughAttrs`.
 
-## Appearance and Behavior
+## Appearance and Behaviour
 
 InputBase is built from Vuetify components. All input components share:
 
 - Field label display
 - Error handling and error message display
-- The label, the message row, the error state and a `Required` validator exposed to assistive technology (see
+- The label, the message row and the error state exposed to assistive technology (see
   [Accessibility](#accessibility))
 - Responsive design
 - Support for value clearing

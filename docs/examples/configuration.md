@@ -60,6 +60,7 @@ resolves those names in kebab-case as well, which is how the examples in this do
 | `DfFile` | `<df-file>` | [df-file](/examples/df-file) |
 | `DfImage` | `<df-image>` | [df-image](/examples/df-image) |
 | `DfInput` | `<df-input>` | [df-input](/examples/df-input) |
+| `DfInputGroup` | `<df-input-group>` | [df-input-group](/examples/df-input-group) |
 | `DfInputHint` | `<df-input-hint>` | [df-input-hint](/examples/df-input-hint) |
 | `DfLabel` | `<df-label>` | [input base: Label](/examples/input-base#label) |
 | `DfRtfEditor` | `<df-rtf-editor>` | [df-rtf-editor](/examples/df-rtf-editor) |
@@ -82,7 +83,7 @@ component set has them registered. One that registers Vuetify components selecti
 `VAutocomplete`, `VBtn`, `VBtnGroup`, `VBtnToggle`, `VCard`, `VCardActions`, `VCheckbox`, `VChip`, `VCol`,
 `VColorPicker`, `VCombobox`, `VConfirmEdit`, `VDatePicker`, `VDivider`, `VField`, `VFileInput`, `VIcon`, `VImg`,
 `VInput`, `VList`, `VListItem`, `VListItemTitle`, `VMenu`, `VNumberInput`, `VProgressLinear`, `VRow`, `VSelect`,
-`VSwitch`, `VTextarea`, `VTextField`, `VTimePicker`.
+`VSlider`, `VSwitch`, `VTextarea`, `VTextField`, `VTimePicker`.
 
 The same set is exported as `VuetifyComponents`, for registering it under names of the application's choice:
 
@@ -165,6 +166,7 @@ A value provided or changed later does not apply to existing fields.
 | Where | How | Applies to | Takes precedence over |
 |---|---|---|---|
 | Component | `density` / `variant` prop | that one field | everything below |
+| Bound element | `density` / `variant` extended property | that one field | everything below |
 | Ancestor component | `provide('field-density' / 'field-variant', value)` | the subtree below it | plugin options |
 | Plugin install | `defaultDensity` / `defaultVariant` option | the whole application | the baked-in values |
 | Built in | — | anything left unset | — (`'default'` and `'underlined'`) |

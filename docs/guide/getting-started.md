@@ -144,10 +144,11 @@ const categoryOptions = [
 
 ## Available Components
 
-- [**InputBase**](/examples/input-base): The base component for all input elements
+- [**InputBase**](/examples/input-base): The field frame that df-date-time, df-file, df-image and df-rtf-editor place
+  their control in.
 - [**df-actions**](/examples/df-actions): An actions group.
 - [**df-checkbox**](/examples/df-checkbox): A checkbox component.
-- [**df-color**](/examples/df-color): A color input.
+- [**df-color**](/examples/df-color): A colour input.
 - [**df-date-time**](/examples/df-datetime): A date and time selection component with configurable format and type.
 - [**df-file**](/examples/df-file): A file upload component with progress indication.
 - [**df-image**](/examples/df-image): An image upload with a preview, drag and drop and paste.
@@ -163,7 +164,8 @@ const categoryOptions = [
 ## Localisation
 
 The library renders a few English strings of its own: the labels of the RTF editor's toolbar, the buttons of the
-pickers, and the upload and download prompts of `<df-image>` and `<df-file>`.
+pickers, the upload and download prompts of `<df-image>` and `<df-file>`, and accessible names such as those of the
+colour palette, progress bars, chip close buttons and date and time inputs.
 `translateStrings()`, or the `translate` setting per app, connects them to the application's translation function.
 Errors render as the `errorText` setting converts them, and `DateTimeLocaleConfig`, or the `dateTimeLocale` setting
 per app, sets the date-fns locale `<df-date-time>` formats and parses with.

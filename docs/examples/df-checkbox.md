@@ -35,13 +35,6 @@ This component inherits all common props from [InputBase](./input-base), includi
 - `enabled` - Whether the input is enabled
 - And more...
 
-## State Cycling Behavior
-
-When clicked, the checkbox cycles through states in the following order:
-
-- With `allowNull: false`: true → false → true
-- With `allowNull: true`: true → null → false → true
-
 ## Events
 
 This component emits all [common events from InputBase](./input-base):

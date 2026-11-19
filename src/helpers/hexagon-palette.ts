@@ -1,11 +1,11 @@
-/** A color in OKLab: lightness `L` (0..1) and the opponent axes `a` and `b`. */
+/** A colour in OKLab: lightness `L` (0..1) and the opponent axes `a` and `b`. */
 export interface OkLab {
   L: number;
   a: number;
   b: number;
 }
 
-/** A color in OKLCH: lightness `L` (0..1), chroma `C` and hue `h` in degrees. */
+/** A colour in OKLCH: lightness `L` (0..1), chroma `C` and hue `h` in degrees. */
 export interface OkLch {
   L: number;
   C: number;
@@ -73,13 +73,13 @@ function okLabToLinear({ L, a, b }: OkLab): [number, number, number] {
   ];
 }
 
-/** The OKLab coordinates of a hex color; `null` for a string that is not one. */
+/** The OKLab coordinates of a hex colour; `null` for a string that is not one. */
 export function hexToOkLab(hex: string): OkLab | null {
   const rgb = hexToRgb(hex);
   return rgb ? linearToOkLab(rgb.map(toLinear) as [number, number, number]) : null;
 }
 
-/** `#rrggbb` of an OKLab color; channels outside sRGB are clamped. */
+/** `#rrggbb` of an OKLab colour; channels outside sRGB are clamped. */
 export function okLabToHex(lab: OkLab): string {
   return rgbToHex(okLabToLinear(lab).map(fromLinear) as [number, number, number]);
 }
@@ -94,7 +94,7 @@ export function okLchToOkLab({ L, C, h }: OkLch): OkLab {
   return { L, a: C * Math.cos(rad), b: C * Math.sin(rad) };
 }
 
-/** Whether an OKLCH color lies inside sRGB. */
+/** Whether an OKLCH colour lies inside sRGB. */
 export function isInGamut(lch: OkLch): boolean {
   return okLabToLinear(okLchToOkLab(lch)).every(
     (channel) => channel >= -gamutTolerance && channel <= 1 + gamutTolerance,
@@ -121,7 +121,7 @@ const directionY = (degrees: number) => Math.sin((degrees * Math.PI) / 180);
  * The centre is the grey of lightness `L`. Ring `r` holds `6·r` cells: it starts `r` cells up and to the left of the
  * centre and runs clockwise along six sides of `r` cells. Cell `i` of side `a` has the hue `(a + i/r) / 6` of a full
  * turn and the chroma `r / (rings − 1)` of the largest chroma that hue has inside sRGB at `L`, so the outer ring holds
- * the most saturated color of each hue. `y` grows downwards, as in SVG; the cells are pointy-top hexagons.
+ * the most saturated colour of each hue. `y` grows downwards, as in SVG; the cells are pointy-top hexagons.
  */
 export function hexagonCells(rings: number, L: number): HexagonCell[] {
   const cells: HexagonCell[] = [{ index: 0, ring: 0, x: 0, y: 0, color: okLabToHex({ L, a: 0, b: 0 }) }];
@@ -153,7 +153,7 @@ export function hexagonPoints(x: number, y: number, radius = hexagonCellRadius):
 
 const okLabDistance = (one: OkLab, other: OkLab) => Math.hypot(one.L - other.L, one.a - other.a, one.b - other.b);
 
-/** The cell nearest to the hex color `color` by OKLab distance; `undefined` for a value that is not a hex color. */
+/** The cell nearest to the hex colour `color` by OKLab distance; `undefined` for a value that is not a hex colour. */
 export function nearestCell(cells: HexagonCell[], color: string | null | undefined): HexagonCell | undefined {
   const target = color ? hexToOkLab(color) : null;
   if (!target) return undefined;

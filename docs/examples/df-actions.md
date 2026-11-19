@@ -16,7 +16,7 @@ A row of actions:
 - Grouped button layouts
 - Simple mode: one native button per action, the smallest DOM for many actions on a page
 - Renders `@dynamicforms/vue-forms` actions
-- `defaultConfirm` / `defaultReject` actions are colored `primary` / `secondary`
+- `defaultConfirm` / `defaultReject` actions are coloured `primary` / `secondary`
 
 ## Props
 
@@ -40,8 +40,8 @@ interface ActionBreakpointOptions {
   renderAs?: ActionDisplayStyle;    // 'button' or 'text'
   showIcon?: boolean;               // Whether to show the icon
   showLabel?: boolean;              // Whether to show the label
-  defaultConfirm?: boolean;         // Marks the action as the "confirm" one - colored primary by default
-  defaultReject?: boolean;          // Marks the action as the "reject/dismiss" one - colored secondary by default
+  defaultConfirm?: boolean;         // Marks the action as the "confirm" one - coloured primary by default
+  defaultReject?: boolean;          // Marks the action as the "reject/dismiss" one - coloured secondary by default
   passthroughAttrs?: Record<string, any>; // Extra props forwarded straight to the rendered <v-btn> (HTML attributes of the <button> with `simple`)
   // Responsive breakpoints
   xs?: ActionBreakpointRenderOptions;
@@ -73,7 +73,7 @@ import { Action } from '@dynamicforms/vue-forms';
 const cancel = new Action({ value: { label: 'Cancel' }, actions: [cancelHandler] });
 ```
 
-The subclass is needed for breakpoint options, the text-link style and the confirm / reject colors; they are members
+The subclass is needed for breakpoint options, the text-link style and the confirm / reject colours; they are members
 of `ActionRenderOptions`, which only it declares.
 
 `getRenderOptionsForBreakpoint(value, breakpoint)` returns the `ResolvedActionRenderOptions` a value renders as at one
@@ -94,7 +94,7 @@ const saveAction = new Action({
   value: {
     name: 'save',
     label: 'Save',
-    icon: 'save-outline',
+    icon: 'ion-save-outline',
     renderAs: 'button',
     showIcon: true,
     showLabel: true
@@ -105,7 +105,7 @@ const saveAction = new Action({
 
 ### Action Value Configuration
 
-The `value` object defines the visual appearance and behavior:
+The `value` object defines the visual appearance and behaviour:
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -115,8 +115,8 @@ The `value` object defines the visual appearance and behavior:
 | `renderAs` | `ActionDisplayStyle` | How to render: `'button'` or `'text'` |
 | `showIcon` | `boolean` | Whether to display the icon |
 | `showLabel` | `boolean` | Whether to display the label. A button that does not display it has the label's plain text as its `aria-label` and `title` |
-| `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colors the `v-btn` `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`); no colour in [simple mode](#simple-mode) |
-| `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colors the `v-btn` `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`); no colour in [simple mode](#simple-mode) |
+| `defaultConfirm` | `boolean` | Marks this as the "confirm" action of the set; colours the `v-btn` `primary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`); no colour in [simple mode](#simple-mode) |
+| `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colours the `v-btn` `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`); no colour in [simple mode](#simple-mode) |
 | `passthroughAttrs` | `Record<string, any>` | Extra props/attrs forwarded to the rendered `<v-btn>` (e.g. `color`, `density`, `rounded`, `block`, `prependIcon`), overriding `<df-actions>`'s own computed props; in [simple mode](#simple-mode) HTML attributes of the `<button>` (e.g. `class`, `style`, `aria-describedby`), where `v-btn` props have no effect |
 
 Every one of these but `name`, `defaultConfirm` and `defaultReject` can also be stated per breakpoint.
@@ -156,14 +156,14 @@ returns whether a value is one of the two, and `actionDisplayStyles` lists them.
 
 ### Responsive Breakpoints
 
-Actions support responsive behavior through breakpoint-specific configurations:
+Actions support responsive behaviour through breakpoint-specific configurations:
 
 ```typescript
 const responsiveAction = new Action({
   value: {
     name: 'save',
     label: 'Save Document',
-    icon: 'save-outline',
+    icon: 'ion-save-outline',
     renderAs: 'button',
     showIcon: false,      // Default: no icon
     showLabel: true,      // Default: show label
@@ -192,8 +192,7 @@ const responsiveAction = new Action({
 it takes the value of `md`, or of the closest smaller breakpoint that sets it. The base values (outside any
 breakpoint) apply to the smallest breakpoint.
 
-Every option except `passthroughAttrs` is a single value, which a breakpoint replaces. `passthroughAttrs` is an object
-and merges key by key, so a breakpoint sets the attrs it changes and inherits the rest. The class behind the
+Every option except `passthroughAttrs` is a single value, which a breakpoint replaces. The class behind the
 inheritance, `ResponsiveRenderOptions`, also supports list options for subclasses; see
 [responsive options](/examples/responsive-render-options).
 
@@ -252,11 +251,11 @@ regardless, and an action that refuses an overlapping run does so in its own han
 ### Default Confirm / Reject Actions
 
 `defaultConfirm` and `defaultReject` mark the "confirm" action of a set (e.g. Save, Yes, OK) and the "reject/dismiss"
-one (e.g. Cancel, No). `<df-actions>` colors them `primary` and `secondary` by default:
+one (e.g. Cancel, No). `<df-actions>` colours them `primary` and `secondary` by default:
 
 ```typescript
-const yes = new Action({ value: { name: 'yes', label: 'Yes', defaultConfirm: true } }); // colored primary
-const no = new Action({ value: { name: 'no', label: 'No', defaultReject: true } });     // colored secondary
+const yes = new Action({ value: { name: 'yes', label: 'Yes', defaultConfirm: true } }); // coloured primary
+const no = new Action({ value: { name: 'no', label: 'No', defaultReject: true } });     // coloured secondary
 
 // A single close action can be both
 const close = new Action({ value: { name: 'close', label: 'Close', defaultConfirm: true, defaultReject: true } });
@@ -267,7 +266,7 @@ At most one action in a given set should set `defaultConfirm`, and at most one s
 > [`<df-modal>`](:vuetify-modal-form-kit:/api/df-modal.html#keyboard-shortcuts) of
 > [`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:) reads the same flags from the actions in its
 > `actions` prop to select the actions of Enter and Escape. Its `actions` slot renders through `<df-actions>`, so the
-> keyboard shortcut and the button color are set by the same flag.
+> keyboard shortcut and the button colour are set by the same flag.
 
 ### Passthrough Attributes
 
@@ -280,7 +279,7 @@ const deleteAction = new Action({
   value: {
     name: 'delete',
     label: 'Delete',
-    icon: 'trash-outline',
+    icon: 'ion-trash-outline',
     renderAs: 'button',
     showIcon: true,
     showLabel: true,
@@ -308,7 +307,7 @@ const submitAction = new Action({
   value: {
     name: 'submit',
     label: 'Submit Form',
-    icon: 'checkmark-outline',
+    icon: 'ion-checkmark-outline',
     renderAs: 'button',
     showIcon: false,
     showLabel: true,
@@ -331,7 +330,7 @@ member's `access` sets what `value` contains for it; `visibility` affects neithe
 
 The presentation (the `Action` and its render options) is separate from the logic (the `ExecuteAction` handlers).
 
-## Responsive Behavior
+## Responsive Behaviour
 
 The component applies the options of the current breakpoint:
 
@@ -340,7 +339,7 @@ const saveAction = new Action({
   value: {
     name: 'save',
     label: 'Save',
-    icon: 'save-outline',
+    icon: 'ion-save-outline',
     renderAs: 'button',
     showIcon: true,
     showLabel: false,
@@ -423,7 +422,7 @@ between the buttons.
       value: {
         name: 'save',
         label: 'Save',
-        icon: 'save-outline',
+        icon: 'ion-save-outline',
         renderAs: 'button',
         showIcon: true,
         showLabel: true
@@ -435,7 +434,7 @@ between the buttons.
       value: {
         name: 'cancel',
         label: 'Cancel',
-        icon: 'close-outline',
+        icon: 'ion-close-outline',
         renderAs: 'button',
         showIcon: true,
         showLabel: true

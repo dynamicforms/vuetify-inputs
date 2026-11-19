@@ -1,6 +1,6 @@
 # df-color Component
 
-`df-color` is a hex color field with a swatch and Vuetify's color picker.
+`df-color` is a hex colour field with a swatch and Vuetify's colour picker.
 
 ## Basic Usage
 
@@ -11,22 +11,22 @@
 ## Features
 
 - Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
-- Vuetify's color picker in a menu
-- Hex color input
-- A swatch of the current color
+- Vuetify's colour picker in a menu
+- Hex colour input
+- A swatch of the current colour
 - Built-in hex format check for the uncontrolled (v-model) case, reported as a `vuetify-inputs.invalid_hex_color` error
   (`vuetify-inputs.invalid_opaque_hex_color` under `alpha: false`)
-- Colors with or without an alpha channel (`alpha`)
-- Mapping of the chosen color to the stored value (`normalize`)
-- A `preview` event with the pending color while the picker is open
-- `picker-prepend` slot with read and write access to the pending color; `picker="none"` shows only the slot
-- A hexagon palette of OKLCH colors in place of Vuetify's picker (`picker="hexagon"`)
+- Colours with or without an alpha channel (`alpha`)
+- Mapping of the chosen colour to the stored value (`normalize`)
+- A `preview` event with the pending colour while the picker is open
+- `picker-prepend` slot with read and write access to the pending colour; `picker="none"` shows only the slot
+- A hexagon palette of OKLCH colours in place of Vuetify's picker (`picker="hexagon"`)
 - Clearing the value under `allowNull`
 
 ## Picking a value
 
-A color chosen in the picker is written to the field when it is confirmed: with OK, or with a double-click on the
-color area. Cancel and closing the menu leave the field as it was. A confirmed color marks the field
+A colour chosen in the picker is written to the field when it is confirmed: with OK, or with a double-click on the
+colour area. Cancel and closing the menu leave the field as it was. A confirmed colour marks the field
 touched. A value typed into the field is written as it is typed.
 
 The menu is as wide as the picker, independent of the width of the field.
@@ -38,9 +38,9 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | allowNull | `boolean` | `false` | Whether to allow null (empty) values |
-| alpha | `boolean` | `true` | Whether the color has an alpha channel. `true`: the picker runs in `hexa` mode with the alpha slider. `false`: the picker runs in `hex` mode, offers only the `hex`, `rgb` and `hsl` modes, has no alpha slider, and the format check accepts only 3 or 6 hex digits |
-| normalize | `(value: string) => string` | `undefined` | Maps a valid color to the value the component stores and shows (see [Normalizing the color](#normalizing-the-color)) |
-| picker | `'generic' \| 'hexagon' \| 'none'` | `'generic'` | The picker in the menu: `'generic'` is Vuetify's color picker, `'hexagon'` the [hexagon palette](#hexagon-palette), `'none'` only the [`picker-prepend` slot](#slots) |
+| alpha | `boolean` | `true` | Whether the colour has an alpha channel. `true`: the picker runs in `hexa` mode with the alpha slider. `false`: the picker runs in `hex` mode, offers only the `hex`, `rgb` and `hsl` modes, has no alpha slider, and the format check accepts only 3 or 6 hex digits |
+| normalize | `(value: string) => string` | `undefined` | Maps a valid colour to the value the component stores and shows (see [Normalising the colour](#normalising-the-colour)) |
+| picker | `'generic' \| 'hexagon' \| 'none'` | `'generic'` | The picker in the menu: `'generic'` is Vuetify's colour picker, `'hexagon'` the [hexagon palette](#hexagon-palette), `'none'` only the [`picker-prepend` slot](#slots) |
 | hexagonRings | `number` | `5` | The number of rings of the hexagon palette, the centre cell counted as the first: `1 + 3·n·(n − 1)` cells (3 → 19, 4 → 37, 5 → 61) |
 | lightnessLevels | `number \| number[]` | `undefined` | The OKLCH lightness (0..1) the hexagon palette offers: the full range, `n` evenly spaced levels, or the given levels (see [Lightness](#lightness)) |
 
@@ -49,29 +49,29 @@ In addition to [common props from InputBase](./input-base), this component suppo
 This component inherits all common props from [InputBase](./input-base), including:
 
 - `control` - DynamicForms field object
-- `modelValue` - The color value in hex format
+- `modelValue` - The colour value in hex format
 - `label` - Input label
 - `hint` - Hint text
 - And more...
 
-## Color Format
+## Colour Format
 
-The component accepts and outputs color values in hex format (e.g., `#FF0000` for red). With `alpha` (the default) it
+The component accepts and outputs colour values in hex format (e.g., `#FF0000` for red). With `alpha` (the default) it
 also supports the alpha channel (e.g., `#FF0000FF`); with `alpha: false` the value has no alpha channel.
 
 ## Hexagon palette
 
-With `picker="hexagon"` the menu shows a palette of hexagon cells in place of Vuetify's color picker. The cells
+With `picker="hexagon"` the menu shows a palette of hexagon cells in place of Vuetify's colour picker. The cells
 of one lightness are shown at a time:
 
 - the centre cell is the grey (OKLCH chroma 0) of the lightness;
 - ring `r` holds `6·r` cells; ring `r` starts `r` cells up and to the left of the centre and runs clockwise. Cell `i`
   of side `a` (0..5) has the hue `(a + i/r) / 6 × 360°`;
 - a cell of ring `r` has the chroma `r / (hexagonRings − 1)` of the largest chroma its hue has inside sRGB at the
-  lightness, so the outer ring holds the most saturated color of each hue. At lightness 0 every cell is black, at 1
+  lightness, so the outer ring holds the most saturated colour of each hue. At lightness 0 every cell is black, at 1
   every cell is white.
 
-A cell's color is written as `#rrggbb`. A click on a cell makes it the pending color; OK writes it, Cancel leaves the
+A cell's colour is written as `#rrggbb`. A click on a cell makes it the pending colour; OK writes it, Cancel leaves the
 field as it was, and a double-click on a cell writes it at once. `normalize` and `preview` apply to the cells as to
 the generic picker. When the menu opens, the palette marks the cell nearest to the value by OKLab distance.
 
@@ -93,13 +93,13 @@ filled with the level's grey, at most as high as a cell. Both are a `radiogroup`
 click selects a level; the arrow keys select the neighbouring level and Home and End the first and the last one.
 
 When the menu opens, the palette shows the exact OKLCH lightness of the value on the slider, or the level nearest to
-it. A change of the lightness moves a selected cell to the same place at the new lightness, so the pending color
+it. A change of the lightness moves a selected cell to the same place at the new lightness, so the pending colour
 follows the slider or the level.
 
 ### Accessibility
 
 The palette is a `radiogroup` of `radio` cells, each labelled with its hex value. The arrow keys move the focus
-between neighbouring cells, and Enter or Space makes the focused cell the pending color. The labels are the library's
+between neighbouring cells, and Enter or Space makes the focused cell the pending colour. The labels are the library's
 strings (see [The strings the library owns](/examples/localisation#the-strings-the-library-owns)): `ColorPalette`
 for the palette, `LightnessRange` for the slider and the level selectors, and `Lightness` for a level button or
 segment.
@@ -118,18 +118,18 @@ segment.
 
 Without `lightnessLevels` the same palette offers the full lightness range with a slider.
 
-## Normalizing the color
+## Normalising the colour
 
-`normalize` receives a color that passes the format check of the current `alpha` setting and returns the color the
+`normalize` receives a colour that passes the format check of the current `alpha` setting and returns the colour the
 component uses in its place:
 
 - the swatch in the field shows `normalize(value)`;
-- a color confirmed in the picker is written as `normalize(color)`;
-- a color typed into the field is written as typed, and replaced with `normalize(value)` when the field loses focus or
+- a colour confirmed in the picker is written as `normalize(color)`;
+- a colour typed into the field is written as typed, and replaced with `normalize(value)` when the field loses focus or
   Enter is pressed;
 - `preview` events carry `normalize(color)`.
 
-The picker's own model keeps the color as the user picks it, so the handle stays under the pointer while dragging. A
+The picker's own model keeps the colour as the user picks it, so the handle stays under the pointer while dragging. A
 value that does not pass the format check is not passed to `normalize`.
 
 <color-normalize/>
@@ -138,7 +138,7 @@ value that does not pass the format check is not passed to `normalize`.
 <template>
   <df-color
     v-model="color"
-    label="Web-safe color"
+    label="Web-safe colour"
     :alpha="false"
     :normalize="webSafe"
     @preview="previewColor = $event"
@@ -194,13 +194,13 @@ const colorField = new Field({
 
 This component emits all [common events from InputBase](./input-base):
 
-- `update:modelValue` - When the color value changes
+- `update:modelValue` - When the colour value changes
 
 In addition:
 
 | Event | Payload | Description |
 |-------|---------|-------------|
-| preview | `string \| null` | While the picker is open: the pending color, once when the picker opens and on every change in the picker; normalized when `normalize` is given. `null` when the picker closes, by OK, Cancel, a double-click or a click outside |
+| preview | `string \| null` | While the picker is open: the pending colour, once when the picker opens and on every change in the picker; normalised when `normalize` is given. `null` when the picker closes, by OK, Cancel, a double-click or a click outside |
 
 ## Slots
 
@@ -210,14 +210,14 @@ Rendered in the menu above the picker. With `picker="none"` the picker is not re
 
 | Slot prop | Type | Description |
 |-----------|------|-------------|
-| color | `string \| null` | Pending color. Same value as the payload of the last `preview` event |
-| select | `(color: string) => void` | Sets the pending color. Updates the picker and emits `preview`. The field value is unchanged until OK |
-| save | `() => void` | Writes the pending color to the field and closes the menu. Same as OK |
+| color | `string \| null` | Pending colour. Same value as the payload of the last `preview` event |
+| select | `(color: string) => void` | Sets the pending colour. Updates the picker and emits `preview`. The field value is unchanged until OK |
+| save | `() => void` | Writes the pending colour to the field and closes the menu. Same as OK |
 
-Pending color preview and preset colors:
+Pending colour preview and preset colours:
 
 ```vue
-<df-color v-model="color" label="Group color" :alpha="false">
+<df-color v-model="color" label="Group colour" :alpha="false">
   <template #picker-prepend="{ color: pending, select }">
     <div class="pa-2" :style="{ backgroundColor: pending ?? undefined }">Group name</div>
     <div class="d-flex ga-1 pa-2">
@@ -234,10 +234,10 @@ Pending color preview and preset colors:
 </df-color>
 ```
 
-`picker="none"` with preset colors; a click selects and saves:
+`picker="none"` with preset colours; a click selects and saves:
 
 ```vue
-<df-color v-model="color" label="Brand color" picker="none">
+<df-color v-model="color" label="Brand colour" picker="none">
   <template #picker-prepend="{ select, save }">
     <div class="d-flex ga-1 pa-2">
       <v-btn
@@ -260,7 +260,7 @@ Pending color preview and preset colors:
   <df-color
     :control="colorField"
     label="Brand Color"
-    hint="Select a color from the brand palette"
+    hint="Select a colour from the brand palette"
   />
 </template>
 
@@ -277,7 +277,7 @@ const colorField = new Field({
     new Validators.Validator((value) => {
       if (!value) return null;
       if (!brandColors.includes(value)) {
-        return [new ValidationError('app.not_brand_color', { allowedValues: brandColors }, 'Please select a color from the brand palette')];
+        return [new ValidationError('app.not_brand_color', { allowedValues: brandColors }, 'Please select a colour from the brand palette')];
       }
       return null;
     })

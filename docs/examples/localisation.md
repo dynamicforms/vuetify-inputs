@@ -23,7 +23,7 @@ translation function reads, such as the locale.
 |-----|-----------------|-------------------|
 | `Cancel` | `Cancel` | The Cancel button of `<df-date-time>`'s and `<df-color>`'s pickers |
 | `Ok` | `OK` | The OK button of `<df-date-time>`'s and `<df-color>`'s pickers |
-| `ColorPalette` | `Color palette` | `<df-color picker="hexagon">`, the accessible label of the palette |
+| `ColorPalette` | `Colour palette` | `<df-color picker="hexagon">`, the accessible label of the palette |
 | `Lightness` | `Lightness {level}` | `<df-color picker="hexagon">`, the accessible label of a lightness level button or segment; `level` counts from 1 |
 | `LightnessRange` | `Lightness` | `<df-color picker="hexagon">`, the accessible label of the lightness slider and of the level selectors |
 | `Loading` | `Loading` | `<df-select>`, the accessible label of the progress bar shown while choices are being fetched |
@@ -38,7 +38,7 @@ translation function reads, such as the locale.
 | `Blockquote` | `Block quote` | `<df-rtf-editor>` toolbar button tooltip |
 | `BulletedList` / `NumberedList` | `Bulleted list` / `Numbered list` | `<df-rtf-editor>` toolbar button tooltips |
 | `Outdent` / `Indent` | `Decrease indent` / `Increase indent` | `<df-rtf-editor>` toolbar button tooltips |
-| `AlignLeft`, `AlignCenter`, `AlignRight`, `AlignJustify` | `Align left`, `Align center`, `Align right`, `Justify` | `<df-rtf-editor>` toolbar button tooltips |
+| `AlignLeft`, `AlignCenter`, `AlignRight`, `AlignJustify` | `Align left`, `Align centre`, `Align right`, `Justify` | `<df-rtf-editor>` toolbar button tooltips |
 | `Link` | `Link` | `<df-rtf-editor>` toolbar button tooltip |
 | `LinkUrl` | `URL` | `<df-rtf-editor>` link menu's URL field label, and the bubble menu's `window.prompt()` for a link over selected text |
 | `LinkApply` | `Apply` | `<df-rtf-editor>` link menu, the apply button |

@@ -96,8 +96,8 @@ describe('input-base', () => {
         const control = new Form.Field<string>({ value: 'initial' });
         control.registerAction(
           new Form.ValueChangedAction<string>((field, supr, newValue, oldValue) => {
-            const normalised = (newValue ?? '').toUpperCase();
-            if (normalised !== newValue) field.value = normalised;
+            const normalized = (newValue ?? '').toUpperCase();
+            if (normalized !== newValue) field.value = normalized;
             return supr(field, newValue, oldValue);
           }),
         );
