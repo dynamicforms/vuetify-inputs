@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, toRefs, unref, watch } from 'vue';
+import { computed, nextTick, shallowRef, toRefs, unref, watch } from 'vue';
 
 import { DfInputProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
@@ -98,11 +98,23 @@ function onNumberFocus(event: FocusEvent) {
     before !== '' && input.value === before && input.selectionStart === 0 && input.selectionEnd === before.length;
   const state = { input, before, whole: isWhole() };
   pendingSelection = state;
-  // a programmatic select() before focus() shows its selection only after the focus handlers
-  queueMicrotask(() => {
+  // A programmatic select() before focus() shows its selection only after the focus handlers. A pre-flush watcher
+  // reads it before v-number-input renders the trimmed text, also when a render is already pending at focus.
+  wholeCheck.value = () => {
     state.whole ||= isWhole();
-  });
+  };
 }
+
+const wholeCheck = shallowRef<(() => void) | null>(null);
+watch(
+  wholeCheck,
+  (check) => {
+    if (!check) return;
+    wholeCheck.value = null;
+    check();
+  },
+  { flush: 'pre' },
+);
 
 async function keepWholeSelection(event: FocusEvent) {
   const state = pendingSelection;
