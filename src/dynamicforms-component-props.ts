@@ -89,6 +89,12 @@ export interface DfInputProps extends BaseProps {
   step?: number;
   min?: number;
   max?: number;
+  /**
+   * For `inputType: 'number'`: both `.` and `,` act as the decimal separator. A typed one inserts the decimal
+   * separator of the number input's locale; pasted text keeps its last `.` or `,` as the decimal separator and drops
+   * the others as thousands separators. Defaults to the `anyDecimalSeparator` setting, else `false`.
+   */
+  anyDecimalSeparator?: boolean;
 }
 
 /** How `DfInputGroup` lays out its children: on one row, on rows that wrap, or in a column. */

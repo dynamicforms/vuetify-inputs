@@ -55,3 +55,33 @@ test('typing over a selected value replaces it when leaving another field re-ren
 
   await expect(price).toHaveValue('7');
 });
+
+test.describe('with anyDecimalSeparator', () => {
+  function amountInput(page: Page): Locator {
+    return page.locator('.v-number-input', { hasText: 'Amount' }).locator('input');
+  }
+
+  test('a typed comma is the decimal separator and a second separator is ignored', async ({ page }) => {
+    const amount = amountInput(page);
+
+    await amount.click();
+    await page.keyboard.type('3,2.5');
+
+    await expect(amount).toHaveValue('3.25');
+    await expect(page.locator('.value-item', { hasText: 'Amount:' })).toContainText('3.25');
+  });
+
+  test('pasted text keeps its last separator as the decimal separator', async ({ page }) => {
+    const amount = amountInput(page);
+    await amount.click();
+
+    await amount.evaluate((input) => {
+      const clipboardData = new DataTransfer();
+      clipboardData.setData('text/plain', '1.234,56');
+      input.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }));
+    });
+
+    await expect(amount).toHaveValue('1234.56');
+    await expect(page.locator('.value-item', { hasText: 'Amount:' })).toContainText('1234.56');
+  });
+});

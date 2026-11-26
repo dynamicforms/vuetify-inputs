@@ -44,6 +44,8 @@ export interface VuetifyInputsSettings {
    * `DateTimeLocaleConfig.dateTimeLocale`. A component's `locale` prop takes precedence.
    */
   dateTimeLocale?: MaybeRef<Locale>;
+  /** The default of `<df-input>`'s `anyDecimalSeparator` prop: `.` and `,` both act as a number's decimal separator. */
+  anyDecimalSeparator?: boolean;
 }
 
 export const vuetifyInputsSettingsKey = Symbol('vuetifyInputsSettingsKey');
