@@ -46,3 +46,12 @@ test('typing after a click appends to the value', async ({ page }) => {
 
   await expect(price).toHaveValue('125');
 });
+
+test('typing over a selected value replaces it when leaving another field re-renders the form', async ({ page }) => {
+  const price = priceInput(page);
+  await page.locator('.v-number-input', { hasText: 'Quantity' }).locator('input').fill('3');
+
+  await price.fill('7');
+
+  await expect(price).toHaveValue('7');
+});

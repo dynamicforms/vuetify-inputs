@@ -80,6 +80,27 @@ describe('DfInput', () => {
         expect([input.selectionStart, input.selectionEnd]).toEqual([0, 1]);
       });
 
+      it('selects the whole text again when a render is pending at focus', async () => {
+        const wrapper = mount(DfInput, {
+          props: { control: new Field<number | null>({ value: 0 }), inputType: 'number', precision: 2 },
+          global: { plugins: [vuetify] },
+          attachTo: document.body,
+        });
+        await flushPromises();
+        const input = wrapper.find('input').element as HTMLInputElement;
+        expect(input.value).toBe('0.00');
+        // the browser shows a selection made before focus() only after the focus handlers of the field
+        input.setSelectionRange(0, 0);
+        input.addEventListener('focus', () => input.setSelectionRange(0, input.value.length), { once: true });
+        wrapper.setProps({ label: 'Quantity' });
+
+        input.focus();
+        await flushPromises();
+
+        expect(input.value).toBe('0');
+        expect([input.selectionStart, input.selectionEnd]).toEqual([0, 1]);
+      });
+
       it('leaves the selection of a text that is not trimmed', async () => {
         const { input } = await focusSelected(12.34, { precision: 2 });
 
