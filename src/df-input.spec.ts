@@ -55,6 +55,38 @@ describe('DfInput', () => {
       await flushPromises();
       expect(control.value).toBe(50);
     });
+
+    describe('on focus with the whole text selected', () => {
+      const focusSelected = async (value: number, props: Record<string, any>) => {
+        const wrapper = mount(DfInput, {
+          props: { control: new Field<number | null>({ value }), inputType: 'number', ...props },
+          global: { plugins: [vuetify] },
+          attachTo: document.body,
+        });
+        await flushPromises();
+        const input = wrapper.find('input').element as HTMLInputElement;
+        const before = input.value;
+        input.setSelectionRange(0, before.length);
+        input.focus();
+        await flushPromises();
+        return { input, before };
+      };
+
+      it('selects the whole text again when the trailing zeros are trimmed', async () => {
+        const { input, before } = await focusSelected(1, { precision: 2 });
+
+        expect(before).toBe('1.00');
+        expect(input.value).toBe('1');
+        expect([input.selectionStart, input.selectionEnd]).toEqual([0, 1]);
+      });
+
+      it('leaves the selection of a text that is not trimmed', async () => {
+        const { input } = await focusSelected(12.34, { precision: 2 });
+
+        expect(input.value).toBe('12.34');
+        expect([input.selectionStart, input.selectionEnd]).toEqual([0, 5]);
+      });
+    });
   });
 
   it.each(['text', 'number'] as const)('marks its control touched on blur, as a %s input', async (inputType) => {
