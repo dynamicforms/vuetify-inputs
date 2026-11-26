@@ -99,7 +99,7 @@ function onNumberFocus(event: FocusEvent) {
   const state = { input, before, whole: isWhole() };
   pendingSelection = state;
   // a programmatic select() before focus() shows its selection only after the focus handlers
-  Promise.resolve().then(() => {
+  queueMicrotask(() => {
     state.whole ||= isWhole();
   });
 }
