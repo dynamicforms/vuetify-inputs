@@ -66,9 +66,10 @@ character. With `anyDecimalSeparator`, `.` and `,` both act as the decimal separ
 
 - A typed `.` or `,` inserts the decimal separator. A number has one decimal separator: a `.` or `,` typed while the
   text already has one outside the selection is ignored.
-- Pasted text keeps its last `.` or `,` as the decimal separator; the earlier ones are taken for thousands separators
-  and dropped. `1.234,56` and `1,234.56` both give 1234.56. A text with only thousands separators is read the same
-  way: `1.234.567` gives 1234.567 and `1,234` gives 1.234.
+- Pasted text with the same separator more than once and no other one has only thousands separators, which are
+  dropped: `1.000.000` and `1,000,000` give 1000000. Otherwise the last `.` or `,` is the decimal separator and the
+  earlier ones are dropped as thousands separators: `1.234,56` and `1,234.56` give 1234.56, `1.000.000,5` gives
+  1000000.5. A single separator is the decimal separator: `1,234` gives 1.234.
 - The resulting text passes `v-number-input`'s own checks: characters other than digits, `-` and the decimal separator
   are removed, and `precision` limits the decimals (with `precision` 0 the separator is dropped).
 

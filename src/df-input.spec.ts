@@ -198,7 +198,10 @@ describe('DfInput', () => {
       it.each([
         { pasted: '1.234,56', value: 1234.56 },
         { pasted: '1,234.56', value: 1234.56 },
-        { pasted: '1.234.567', value: 1234.567 },
+        { pasted: '1.000.000', value: 1000000 },
+        { pasted: '1,000,000', value: 1000000 },
+        { pasted: '1.000.000,5', value: 1000000.5 },
+        { pasted: '1,234', value: 1.234 },
         { pasted: '1,5', value: 1.5 },
         { pasted: ' 42 ', value: 42 },
       ])('pastes "$pasted" as $value', async ({ pasted, value }) => {

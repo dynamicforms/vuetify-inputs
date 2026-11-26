@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `DfInput` with `input-type="number"`: prop `anyDecimalSeparator` and plugin option of the same name (default off).
   `.` and `,` both act as the decimal separator: a typed one inserts the decimal separator `v-number-input` uses, a
-  second one is ignored, and pasted text keeps its last `.` or `,` as the decimal separator and drops the earlier ones
+  second one is ignored. In pasted text, a separator repeated with no other one is a thousands separator
+  (`1.000.000` gives 1000000); otherwise the last `.` or `,` is the decimal separator and the earlier ones are dropped
   as thousands separators (`1.234,56` and `1,234.56` give 1234.56).
 
 ## [0.16.3] - 2026-11-26
