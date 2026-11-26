@@ -15,7 +15,7 @@
           <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ descriptionField.enabled ? 'Disable' : 'Enable' }} Field
           </v-btn>
-          <v-btn color="secondary" @click="resetField"> Reset Field </v-btn>
+          <v-btn color="secondary" @click="resetField">Reset Field</v-btn>
         </div>
 
         <div class="mt-4">

@@ -25,7 +25,7 @@
           <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ contentField.enabled ? 'Disable' : 'Enable' }} Editor
           </v-btn>
-          <v-btn color="secondary" @click="resetField"> Reset Content </v-btn>
+          <v-btn color="secondary" @click="resetField">Reset Content</v-btn>
         </div>
 
         <div class="mt-4">

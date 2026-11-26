@@ -39,7 +39,8 @@
           </v-card>
 
           <div class="mt-4">
-            <strong>Total:</strong> {{ total }} € of {{ budgetLimit }} €
+            <strong>Total:</strong>
+            {{ total }} € of {{ budgetLimit }} €
             <v-chip :color="form.valid ? 'success' : 'error'" size="small" class="ml-2">
               {{ form.valid ? 'Within budget' : 'Over budget' }}
             </v-chip>

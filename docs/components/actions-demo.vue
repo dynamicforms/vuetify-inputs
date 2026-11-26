@@ -2,7 +2,10 @@
   <div class="actions-demo pa-4">
     <div class="d-flex align-center justify-space-between mb-4">
       <div class="mb-0">
-        <div><strong>Current breakpoint:</strong> {{ currentBreakpoint }}</div>
+        <div>
+          <strong>Current breakpoint:</strong>
+          {{ currentBreakpoint }}
+        </div>
         <df-checkbox v-model="sectionEnabled" label="Section enabled" />
         <df-checkbox v-model="simple" label="Simple" />
       </div>

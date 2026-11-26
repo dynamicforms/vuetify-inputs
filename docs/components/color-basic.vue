@@ -17,7 +17,7 @@
           <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ colorField.enabled ? 'Disable' : 'Enable' }} Field
           </v-btn>
-          <v-btn color="secondary" class="mr-2" @click="resetField"> Reset Field </v-btn>
+          <v-btn color="secondary" class="mr-2" @click="resetField">Reset Field</v-btn>
           <v-btn-group>
             <v-btn color="red" @click="setColor('#FF0000')">Red</v-btn>
             <v-btn color="green" @click="setColor('#00FF00')">Green</v-btn>

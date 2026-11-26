@@ -13,7 +13,7 @@
           <v-btn color="primary" class="mr-2" @click="toggleEnabled">
             {{ dateTimeField.enabled ? 'Disable' : 'Enable' }} field
           </v-btn>
-          <v-btn color="secondary" @click="resetField"> Reset field </v-btn>
+          <v-btn color="secondary" @click="resetField">Reset field</v-btn>
         </div>
 
         <div class="mt-4">
