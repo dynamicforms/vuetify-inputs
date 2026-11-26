@@ -46,8 +46,8 @@
       </v-card-text>
 
       <v-card-actions class="justify-end">
-        <v-btn color="secondary" @click="resetForm"> Reset </v-btn>
-        <v-btn color="primary" :disabled="!formValid"> Submit </v-btn>
+        <v-btn color="secondary" @click="resetForm">Reset</v-btn>
+        <v-btn color="primary" :disabled="!formValid">Submit</v-btn>
       </v-card-actions>
     </v-card>
 

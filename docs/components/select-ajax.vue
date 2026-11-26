@@ -18,7 +18,10 @@
           :label="new Label('Programming languages', 'mdi-abacus')"
         />
 
-        <div class="mt-4"><strong>Selected value:</strong> {{ selectedLanguages }}</div>
+        <div class="mt-4">
+          <strong>Selected value:</strong>
+          {{ selectedLanguages }}
+        </div>
       </v-card-text>
     </v-card>
   </div>

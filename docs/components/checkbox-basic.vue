@@ -14,14 +14,17 @@
               />
 
               <div class="mt-4">
-                <v-btn color="primary" size="small" class="mr-2" @click="toggleBinary"> Toggle Value </v-btn>
+                <v-btn color="primary" size="small" class="mr-2" @click="toggleBinary">Toggle Value</v-btn>
                 <v-btn color="secondary" size="small" @click="toggleEnabled(form.fields.binaryField)">
                   {{ form.fields.binaryField.enabled ? 'Disable' : 'Enable' }}
                   Field
                 </v-btn>
               </div>
 
-              <div class="mt-4"><strong>Value:</strong> {{ form.fields.binaryField.value }}</div>
+              <div class="mt-4">
+                <strong>Value:</strong>
+                {{ form.fields.binaryField.value }}
+              </div>
             </v-card>
           </v-col>
 
@@ -67,7 +70,10 @@
                 </v-btn>
               </div>
 
-              <div class="mt-4"><strong>Value:</strong> {{ form.fields.autoToggleField.value }}</div>
+              <div class="mt-4">
+                <strong>Value:</strong>
+                {{ form.fields.autoToggleField.value }}
+              </div>
             </v-card>
           </v-col>
         </v-row>

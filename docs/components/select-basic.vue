@@ -5,7 +5,10 @@
       <v-card-text>
         <df-select v-model="selectedFruit" :choices="fruits" label="Choose your fruit" :multiple="true" />
 
-        <div class="mt-4"><strong>Selected value:</strong> {{ selectedFruit }}</div>
+        <div class="mt-4">
+          <strong>Selected value:</strong>
+          {{ selectedFruit }}
+        </div>
       </v-card-text>
     </v-card>
   </div>

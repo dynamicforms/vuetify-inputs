@@ -32,7 +32,7 @@
 
         <div class="mt-4">
           <v-btn-group>
-            <v-btn color="primary" class="mr-2" @click="increaseQuantity"> Increase Quantity </v-btn>
+            <v-btn color="primary" class="mr-2" @click="increaseQuantity">Increase Quantity</v-btn>
             <v-btn color="secondary" :disabled="quantityField.value <= 1" @click="decreaseQuantity">
               Decrease Quantity
             </v-btn>
@@ -43,19 +43,24 @@
           <df-checkbox v-model="allowNull" label="Allow null values" />
         </div>
 
-        <div class="mt-4"><strong>Total:</strong> {{ calculateTotal() }}</div>
+        <div class="mt-4">
+          <strong>Total:</strong>
+          {{ calculateTotal() }}
+        </div>
 
         <div class="values-display mt-4">
           <h3>Current Values:</h3>
           <div class="value-item">
-            <strong>Quantity:</strong> {{ quantityField.value }}
+            <strong>Quantity:</strong>
+            {{ quantityField.value }}
             <v-chip :color="quantityField.valid ? 'success' : 'error'" size="small" class="ml-2">
               {{ quantityField.valid ? 'Valid' : 'Invalid' }}
             </v-chip>
           </div>
 
           <div class="value-item">
-            <strong>Price:</strong> {{ priceField.value }}
+            <strong>Price:</strong>
+            {{ priceField.value }}
             <v-chip :color="priceField.valid ? 'success' : 'error'" size="small" class="ml-2">
               {{ priceField.valid ? 'Valid' : 'Invalid' }}
             </v-chip>

@@ -11,7 +11,10 @@
         <df-input :control="email" label="Email" hint="We use it for the receipt only" />
 
         <div class="mt-2">
-          <strong>touched:</strong> {{ email.touched }} &nbsp; <strong>errors:</strong> {{ email.errors.length }}
+          <strong>touched:</strong>
+          {{ email.touched }} &nbsp;
+          <strong>errors:</strong>
+          {{ email.errors.length }}
         </div>
       </v-card-text>
     </v-card>
@@ -36,8 +39,9 @@
         </div>
 
         <p class="mt-4 mb-0">
-          The middle option passes three spaces. An <code>errors</code> string of whitespace only is no error, so the
-          message is shown.
+          The middle option passes three spaces. An
+          <code>errors</code>
+          string of whitespace only is no error, so the message is shown.
         </p>
       </v-card-text>
     </v-card>
@@ -47,8 +51,10 @@
       <v-card-text>
         <p class="mb-4">
           The rule spans two fields, so its error sits on the group. One
-          <code>df-input-hint</code> renders it under the pair, with <code>errorClasses</code> naming a colour of its
-          own.
+          <code>df-input-hint</code>
+          renders it under the pair, with
+          <code>errorClasses</code>
+          naming a colour of its own.
         </p>
 
         <v-row>
