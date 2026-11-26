@@ -3,7 +3,8 @@
     v-if="isRendered"
     class="df-input-container"
     :class="[densityClass, visibilityClass]"
-    @focusin="onEnter"
+    @focus.capture="onNumberFocus"
+    @focusin="onFocusIn"
     @pointerdown.capture="onEnter"
   >
     <v-text-field
@@ -36,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, toRefs, unref, watch } from 'vue';
+import { computed, nextTick, toRefs, unref, watch } from 'vue';
 
 import { DfInputProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
@@ -82,6 +83,40 @@ function onEnter() {
   const held = heldCorrection;
   heldCorrection = null;
   if (held) value.value = held.value;
+}
+
+// v-number-input trims trailing zeros of the text when it gains focus ("1.00" -> "1"). Replacing the text drops a
+// selection of the whole text, so typing appends to the value instead of replacing it. When the whole text was
+// selected and v-number-input left the replaced text without a selection, the whole text is selected again.
+let pendingSelection: { input: HTMLInputElement; before: string; whole: boolean } | null = null;
+
+function onNumberFocus(event: FocusEvent) {
+  const input = event.target;
+  if (!isNumber.value || !(input instanceof HTMLInputElement)) return;
+  const before = input.value;
+  const isWhole = () =>
+    before !== '' && input.value === before && input.selectionStart === 0 && input.selectionEnd === before.length;
+  const state = { input, before, whole: isWhole() };
+  pendingSelection = state;
+  // a programmatic select() before focus() shows its selection only after the focus handlers
+  queueMicrotask(() => {
+    state.whole ||= isWhole();
+  });
+}
+
+async function keepWholeSelection(event: FocusEvent) {
+  const state = pendingSelection;
+  pendingSelection = null;
+  if (!state || state.input !== event.target) return;
+  await nextTick();
+  const { input } = state;
+  const lost = input.value !== state.before && input.selectionStart === input.selectionEnd;
+  if (state.whole && lost && document.activeElement === input) input.select();
+}
+
+function onFocusIn(event: FocusEvent) {
+  onEnter();
+  keepWholeSelection(event);
 }
 
 // a value set from outside replaces the one the held correction was made for
