@@ -38,6 +38,7 @@ flags.
 | `translateNamespace` | `string` | unset | The namespace `translate` looks the library's keys up under |
 | `dateTimeLocale` | `MaybeRef<Locale>` | unset, so `DateTimeLocaleConfig.dateTimeLocale` applies | The date-fns locale `<df-date-time>` formats and parses with in this app; a component's `locale` prop takes precedence |
 | `errorText` | `ErrorText`: `(error: ErrorDescription) => RenderContentNonCallable \| undefined` | unset | The content an error renders as: a string, an `MdString` for markdown, an `HtmlString` for HTML or a `SimpleComponentDef` for a component. `undefined` renders the error's `detail`. It runs while the errors are rendered, and what it reads reactively is tracked. See [Translating errors](/examples/localisation#translating-errors) |
+| `anyDecimalSeparator` | `boolean` | unset, so `false` applies | Whether `.` and `,` both act as the decimal separator of `<df-input input-type="number">` in this app; a component's `anyDecimalSeparator` prop takes precedence. See [Any decimal separator](/examples/df-input#any-decimal-separator) |
 
 `FieldDensity` is `'default' | 'comfortable' | 'compact' | 'inline'`, `FieldVariant` is
 `'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled' | 'inverted'`. `'inverted'` is

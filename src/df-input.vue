@@ -4,6 +4,8 @@
     class="df-input-container"
     :class="[densityClass, visibilityClass]"
     @focus.capture="onNumberFocus"
+    @beforeinput.capture="onNumberBeforeInput"
+    @paste.capture="onNumberPaste"
     @focusin="onFocusIn"
     @pointerdown.capture="onEnter"
   >
@@ -37,10 +39,20 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, shallowRef, toRefs, unref, watch } from 'vue';
+import { computed, inject, nextTick, shallowRef, toRefs, unref, watch } from 'vue';
+import { useLocale } from 'vuetify';
 
 import { DfInputProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
+import {
+  BaseEmits,
+  defaultBaseProps,
+  DfInputHint,
+  DfLabel,
+  useInputBase,
+  type VuetifyInputsSettings,
+  vuetifyInputsSettingsKey,
+} from './helpers';
+import { normalizeDecimalSeparators } from './helpers/decimal-separator';
 
 const props = withDefaults(defineProps<DfInputProps>(), {
   ...defaultBaseProps,
@@ -49,6 +61,7 @@ const props = withDefaults(defineProps<DfInputProps>(), {
   step: undefined,
   min: undefined,
   max: undefined,
+  anyDecimalSeparator: undefined,
 });
 
 interface Emits extends BaseEmits {}
@@ -60,6 +73,8 @@ const { densityClass, isRendered, label, shownErrors, touched, value, visibility
   emits,
 );
 const { inputType, max, min, precision, step } = toRefs(props);
+const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+const { decimalSeparator: localeDecimalSeparator } = useLocale();
 
 const isNumber = computed(() => inputType.value === 'number');
 const numberInputBindings = computed(() =>
@@ -129,6 +144,64 @@ async function keepWholeSelection(event: FocusEvent) {
 function onFocusIn(event: FocusEvent) {
   onEnter();
   keepWholeSelection(event);
+}
+
+// With anyDecimalSeparator, a typed "." or "," is replaced by the decimal separator v-number-input uses, and pasted
+// text is converted to it. The replacement text is dispatched as a beforeinput event, so v-number-input filters it
+// as it filters typed text.
+const anyDecimalSeparator = computed(
+  () => isNumber.value && (props.anyDecimalSeparator ?? settings.anyDecimalSeparator ?? false),
+);
+const decimalSeparator = computed<string>(() => {
+  const attrs = props.passthroughAttrs ?? {};
+  return (attrs.decimalSeparator ?? attrs['decimal-separator'])?.[0] || localeDecimalSeparator.value;
+});
+let forwarding = false;
+
+function editedInput(event: Event): HTMLInputElement | null {
+  const input = event.target;
+  if (forwarding || !anyDecimalSeparator.value || !(input instanceof HTMLInputElement)) return null;
+  return input.readOnly || input.disabled ? null : input;
+}
+
+function insertText(input: HTMLInputElement, text: string) {
+  const start = input.selectionStart ?? input.value.length;
+  const end = input.selectionEnd ?? input.value.length;
+  const before = new InputEvent('beforeinput', {
+    data: text,
+    inputType: 'insertText',
+    bubbles: true,
+    cancelable: true,
+  });
+  forwarding = true;
+  try {
+    input.dispatchEvent(before);
+  } finally {
+    forwarding = false;
+  }
+  if (before.defaultPrevented) return;
+  input.setRangeText(text, start, end, 'end');
+  input.dispatchEvent(new InputEvent('input', { data: text, inputType: 'insertText', bubbles: true }));
+}
+
+function onNumberBeforeInput(event: InputEvent) {
+  const input = editedInput(event);
+  if (!input || event.isComposing || (event.data !== '.' && event.data !== ',')) return;
+  const { value, selectionStart, selectionEnd } = input;
+  const kept = value.slice(0, selectionStart ?? value.length) + value.slice(selectionEnd ?? value.length);
+  const hasSeparator = kept.includes(decimalSeparator.value);
+  if (event.data === decimalSeparator.value && !hasSeparator) return;
+  event.preventDefault();
+  event.stopPropagation();
+  if (!hasSeparator) insertText(input, decimalSeparator.value);
+}
+
+function onNumberPaste(event: ClipboardEvent) {
+  const input = editedInput(event);
+  const text = event.clipboardData?.getData('text/plain').trim();
+  if (!input || !text) return;
+  event.preventDefault();
+  insertText(input, normalizeDecimalSeparators(text, decimalSeparator.value));
 }
 
 // a value set from outside replaces the one the held correction was made for

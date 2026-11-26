@@ -28,6 +28,17 @@
               hint="Enter a price between 0 and 1000"
             />
           </v-col>
+
+          <v-col cols="12" md="6">
+            <df-input
+              :control="amountField"
+              input-type="number"
+              :precision="2"
+              any-decimal-separator
+              label="Amount"
+              hint="Both . and , type the decimal separator"
+            />
+          </v-col>
         </v-row>
 
         <div class="mt-4">
@@ -56,6 +67,11 @@
             <v-chip :color="quantityField.valid ? 'success' : 'error'" size="small" class="ml-2">
               {{ quantityField.valid ? 'Valid' : 'Invalid' }}
             </v-chip>
+          </div>
+
+          <div class="value-item">
+            <strong>Amount:</strong>
+            {{ amountField.value }}
           </div>
 
           <div class="value-item">
@@ -93,6 +109,7 @@ const allowNull = ref(false);
 
 const quantityField = new Field({ value: 1 });
 const priceField = new Field({ value: 10.99 });
+const amountField = new Field({ value: null });
 
 // the range the inputs' min and max state, and an empty value refused unless null values are allowed
 function setValidators(field, min, max) {

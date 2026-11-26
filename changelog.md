@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.4] - 2026-11-26
+
+### Added
+
+- `DfInput` with `input-type="number"`: prop `anyDecimalSeparator` and plugin option of the same name (default off).
+  `.` and `,` both act as the decimal separator: a typed one inserts the decimal separator `v-number-input` uses, a
+  second one is ignored. In pasted text, a separator repeated with no other one is a thousands separator
+  (`1.000.000` gives 1000000); otherwise the last `.` or `,` is the decimal separator and the earlier ones are dropped
+  as thousands separators (`1.234,56` and `1,234.56` give 1234.56).
+
 ## [0.16.3] - 2026-11-26
 
 ### Fixed

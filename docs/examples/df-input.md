@@ -31,6 +31,7 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | max | `number` | `undefined` | Maximum value (for number inputs) |
 | step | `number` | `undefined` | Step value (for number inputs) |
 | precision | `number` \| `null` | `null` | Decimal precision (for number inputs) |
+| anyDecimalSeparator | `boolean` | the plugin's `anyDecimalSeparator`, else `false` | `.` and `,` both act as the decimal separator (for number inputs). See [Any decimal separator](#any-decimal-separator) |
 
 ### Inherited Props
 
@@ -56,6 +57,31 @@ that. `min` and `max` do not validate the field; a range the field refuses is a 
 A value outside `min` and `max`, or with more decimals than `precision`, is shown corrected from the start, and the
 corrected value is written when the user enters the field: focuses it or presses one of its step controls. Until then
 the field keeps its value.
+
+### Any decimal separator
+
+`v-number-input` accepts one decimal separator: its `decimalSeparator` prop (set through `passthroughAttrs`), or the
+one of Vuetify's current locale (`useLocale().decimalSeparator`, `,` for `sl`, `.` for `en`). It refuses the other
+character. With `anyDecimalSeparator`, `.` and `,` both act as the decimal separator:
+
+- A typed `.` or `,` inserts the decimal separator. A number has one decimal separator: a `.` or `,` typed while the
+  text already has one outside the selection is ignored.
+- Pasted text with the same separator more than once and no other one has only thousands separators, which are
+  dropped: `1.000.000` and `1,000,000` give 1000000. Otherwise the last `.` or `,` is the decimal separator and the
+  earlier ones are dropped as thousands separators: `1.234,56` and `1,234.56` give 1234.56, `1.000.000,5` gives
+  1000000.5. A single separator is the decimal separator: `1,234` gives 1.234.
+- The resulting text passes `v-number-input`'s own checks: characters other than digits, `-` and the decimal separator
+  are removed, and `precision` limits the decimals (with `precision` 0 the separator is dropped).
+
+The option is off by default. [`anyDecimalSeparator`](/examples/configuration#installing-the-plugin) in the plugin
+options turns it on for the whole application, and the prop sets it per field: `:any-decimal-separator="false"` turns
+it off for one field.
+
+```vue
+<df-input :control="form.fields.amount" input-type="number" :precision="2" any-decimal-separator label="Amount" />
+```
+
+The Amount field in the [number input example](#number-input) has the option on.
 
 The number input supports:
 
