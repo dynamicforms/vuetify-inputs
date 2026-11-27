@@ -76,7 +76,7 @@ looks like.
   `canExecute()`.
 - **`passthroughAttrs`**: a record merged last over the computed Vuetify bindings, so any prop of the underlying
   Vuetify component is reachable without this library declaring it.
-  [The escape hatch](/examples/input-base#passthroughattrs)
+  [passthroughAttrs](/examples/input-base#passthroughattrs)
 - **`useInputBase()` and `InputBase`**: the composable and the component the fields are built from, exported so a
   third party can build a field of its own on the same base. [InputBase](/examples/input-base)
 
