@@ -59,7 +59,7 @@ describe('useFileUpload', () => {
   beforeEach(() => {
     mockInjectValues.clear();
     vi.useFakeTimers();
-    // onBeforeUnmount warns when called outside a component instance, which every case here does by design
+    // the composable runs outside a component instance, where onBeforeUnmount warns
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
