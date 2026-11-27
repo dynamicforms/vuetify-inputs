@@ -67,8 +67,7 @@ export interface DfDateTimeProps extends BaseProps {
 
 interface FileUploadProps extends BaseProps {
   comms: FileComms;
-  /** Milliseconds between keep-alive touches. Overrides `defaultTouchInterval` from the plugin's
-   *  `VuetifyInputsSettings`, which in turn overrides the baked-in default of 60000. */
+  /** Milliseconds between keep-alive touches. Default: the `defaultTouchInterval` setting, else 60000. */
   touchInterval?: number;
 }
 
