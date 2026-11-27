@@ -1,28 +1,26 @@
 # @dynamicforms/vuetify-inputs
 
-Vuetify input components with guaranteed visual consistency across all form fields — unified density/variant system,
-globally configurable, with inline mode for table cells. Built for
+Vuetify input components that share one layout: one density and variant system, set for the application, a section
+or a field, with an inline density for table cells. Built for
 [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
 
-## What matters most
+## Main features
 
-- **Every field matches every other**: one shared base, so a row mixing a text field, a select, a checkbox and a
-  date picker comes out aligned with no per-component tweaking
+- **One layout for every field**: the components share one base, so a row mixing a text field, a select, a checkbox
+  and a date picker is aligned without per-component adjustments
 - **A density that fits a table cell**: `default`, `comfortable` and `compact` are Vuetify's; `inline` is this
-  library's own, and strips a field of its decoration until it fits inside a cell
+  library's own: it removes the outline, the floating label and the padding, so that a field fits inside a table cell
 - **Set the look once, override anywhere**: density and variant are read from the prop, then the field, then a
   `provide` from any ancestor, then the plugin defaults — most specific first
 - **The field carries its own presentation**: a `@dynamicforms/vue-forms` field holds the label, hint, placeholder,
-  css class, density and variant it is drawn with, so a form declared in code needs no presentation attributes on
-  the tags that draw it
+  css class, density and variant it is rendered with, so a form declared in code needs no presentation attributes
+  on the tags that render it
 
 The [density example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/density.html) renders every component
 side by side in every density and variant.
 
-## Everything else it does
+## Further features
 
-- **Thirteen components**: `df-input`, `df-text-area`, `df-select`, `df-checkbox`, `df-color`, `df-date-time`,
-  `df-file`, `df-image`, `df-rtf-editor`, `df-actions`, `df-input-hint`, `df-input-group` and `df-label`
 - **A control, a v-model, or neither**: a bound element owns the value, validity, touched, enabled and visibility;
   `v-model` reports changes to the parent; neither keeps the value internally
 - **Errors and hints** in one row, rendered through the library's own `MessagesWidget`; an error
@@ -70,7 +68,7 @@ app.use(DynamicFormsInputs, { registerComponents: true, registerVuetifyComponent
 
 ## Basic Usage Example
 
-The library offers various components, including:
+A form with a select, a text area and a file upload bound to vue-forms fields:
 
 ```vue
 <template>
@@ -137,7 +135,7 @@ Detailed documentation is available at [https://docs.velis.si/dynamicforms/vueti
 ## Available Components
 
 - **InputBase**: The field frame that df-date-time, df-file, df-image and df-rtf-editor place their control in
-- **DfLabel**: Renders a label - plain text, markdown, HTML or a component, with an icon - the way every input renders
+- **df-label**: Renders a label - plain text, markdown, HTML or a component, with an icon - the way every input renders
   its own
 - **df-actions**: An actions group.
 - **df-checkbox**: A checkbox component.

@@ -89,9 +89,7 @@ const addTraveller = new Field({ value: false });
 
 const travelling = new Statement(addTraveller, Operator.EQUALS, true);
 
-// A nested group: its fields are addressed as traveller.fields.name, and while it is sent its value is a member of
-// form.value. Two actions on it, over one statement: visibility decides whether the template draws the section,
-// access whether the form sends it - and validates it
+// nested group: visibility drives the v-if, access decides whether it is sent and validated
 const traveller = new Group(
   { name: new Field({ value: '' }), ticket: new Field({ value: 400 }) },
   {
@@ -132,7 +130,7 @@ form.registerAction(
   }),
 );
 
-// group.value is reactive, so both the total and the JSON dump follow every keystroke
+// recomputed when an amount, the second ticket or the addTraveller checkbox changes
 const total = computed(() => tripTotal());
 
 // the group's own errors, shown by the rule the inputs follow

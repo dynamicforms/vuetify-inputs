@@ -14,16 +14,12 @@ export class FileGoneError extends Error {
 
 export interface FileComms {
   /**
-   * upload is called when a file is added to the input and needs to be uploaded to the backend for storage
-   * the component will then set its modelValue to the file identifier returned by this function. when the form
-   * is posted, only the identifier will be sent to the backend
+   * Uploads a file added to the field (picked, dropped or, in `df-image`, pasted). The identifier it resolves to
+   * becomes the field's value. A rejection is an upload failure.
    *
-   * the method may throw an exception which will mean upload failure
-   *
-   * @param file the file to be uploaded
-   * @param progressCallback callback function to call with current upload progress data.
-   *  See e.g. axios onUploadProgress for axios post method
-   * @return file id
+   * @param file the file to upload
+   * @param progressCallback called with upload progress (e.g. from axios `onUploadProgress`)
+   * @return the file identifier
    */
   upload: (file: File, progressCallback?: FileProgressCallback) => Promise<string>;
 
@@ -40,13 +36,12 @@ export interface FileComms {
   delete: (fileIdentifier: string) => Promise<void>;
 
   /**
-   * touch is called at a regular interval (see the `touchInterval` prop / `defaultTouchInterval` setting) for a
-   * temporary upload, to let the backend know that the file is still in play and must not be discarded. A temporary
-   * upload is the identifier this component's last upload returned, while the field holds it and it is not the bound
-   * control's `originalValue`
+   * touch is called every `touchInterval` milliseconds (the `defaultTouchInterval` setting by default) for a
+   * temporary upload, so the backend keeps the file. A temporary upload is the identifier the component's last upload
+   * returned, while the field holds it and it is not the bound control's `originalValue`.
    *
-   * throw {@link FileGoneError} if the backend reports the file identifier no longer exists; any other thrown
-   * error is treated as a transient failure and left to the consumer to act on, if at all
+   * Throw {@link FileGoneError} when the backend no longer has the file: the field is cleared and the error's text is
+   * shown. Any other error is ignored.
    *
    * @param fileIdentifier the identifier that was returned by upload
    */

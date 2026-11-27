@@ -22,8 +22,7 @@ A click into the date or the time opens its picker. A choice in a picker is writ
 with OK, with Enter, or with a double-click on a day or on the clock. Cancel, Escape and closing the menu leave the
 field as it was. For 600 ms after the picker changes its view - a chosen hour switches the clock to the minutes, a
 chosen month or year switches to the days, a day of an adjacent month switches the calendar to that month - a
-double-click does not confirm, so the second click of a double-click that changed the view does not confirm a choice it
-landed on. A confirmed choice and a clear mark the field touched.
+double-click does not confirm. A confirmed choice and a clear mark the field touched.
 
 A click in the picker leaves the focus in the text field. The picker closes when text is typed into the field and when
 the field loses focus.

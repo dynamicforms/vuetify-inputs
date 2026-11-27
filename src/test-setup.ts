@@ -11,16 +11,14 @@ vi.mock('vue-cached-icon', () => ({
   },
 }));
 
-// jsdom implements no ResizeObserver, and Vuetify's progress circular - what a `loading` button draws - observes
-// its own size. A stub that never reports is enough for a component test: nothing here measures.
+// jsdom has no ResizeObserver, which Vuetify's progress circular (a loading button) uses; the stub never reports
 globalThis.ResizeObserver = class {
   observe() {}
   unobserve() {}
   disconnect() {}
 };
 
-// jsdom has no `visualViewport` at all - not even as an `undefined` property - so a bare reference to it (as
-// Vuetify's overlay positioning does) throws a ReferenceError instead of short-circuiting on optional chaining.
+// jsdom does not define visualViewport, and Vuetify's overlay positioning references it bare (a ReferenceError)
 globalThis.visualViewport = null;
 
 // every mount gets this Vuetify instance; a test that needs another one replaces config.global.plugins for its mount

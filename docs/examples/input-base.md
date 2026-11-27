@@ -117,6 +117,18 @@ Every input component applies the visibility to its own root element:
 Visibility is presentation only. Whether the bound element is sent and validated is set by its `access`; see
 [what a container serializes](https://docs.velis.si/dynamicforms/vue-forms/api/container#what-a-container-serializes).
 
+Without a control the visibility is the prop, `'full'` when it is not given; a `ConditionalVisibilityAction` on a
+bound control shows and hides the input without a `v-if`.
+
+The prop takes one of the four strings, exactly as vue-forms spells them:
+
+```vue
+<df-input v-model="secret" label="Secret" visibility="hidden" />
+```
+
+Any other value (a misspelled or upper-case name, a number) throws an `Error` naming the value. The visibility is read
+while the component renders, so the error is thrown during rendering.
+
 ## Access
 
 The component reads the bound element's access with the containers above it applied, as an HTML control does:
@@ -132,19 +144,6 @@ Without a `control`, `enabled: false` draws the input disabled.
 An input that accepts no input shows no clear button, and opens no picker menu (`df-color`, `df-date-time`). `df-file`
 uploads no file dropped on it, `df-image` takes neither a picked nor a dropped image, and `df-rtf-editor` is not
 editable and disables its toolbar.
-
-With a bound `control`, the visibility is `control.visibility` and the `visibility` prop is ignored. Without a
-control it is the prop, and `'full'` when neither is given. A `ConditionalVisibilityAction` registered on the control
-therefore shows and hides the input without a `v-if` in the template.
-
-The prop takes one of the four strings, exactly as vue-forms spells them:
-
-```vue
-<df-input v-model="secret" label="Secret" visibility="hidden" />
-```
-
-Any other value (a misspelled or upper-case name, a number) throws an `Error` naming the value. The visibility is read
-while the component renders, so the error is thrown during rendering.
 
 ## Shown errors
 
@@ -496,15 +495,3 @@ of the component they render in; a `label`, `errors` or `hint` prop given to the
 
 The resulting component takes a `control` or a `v-model`, applies the visibility a `ConditionalVisibilityAction`
 sets, uses the application's density and variant, shows its errors once touched, and accepts `passthroughAttrs`.
-
-## Appearance and Behaviour
-
-InputBase is built from Vuetify components. All input components share:
-
-- Field label display
-- Error handling and error message display
-- The label, the message row and the error state exposed to assistive technology (see
-  [Accessibility](#accessibility))
-- Responsive design
-- Support for value clearing
-- Support for disabled and read-only modes

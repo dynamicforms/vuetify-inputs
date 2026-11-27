@@ -59,7 +59,7 @@ describe('useFileUpload', () => {
   beforeEach(() => {
     mockInjectValues.clear();
     vi.useFakeTimers();
-    // onBeforeUnmount warns when called outside a component instance, which every case here does by design
+    // the composable runs outside a component instance, where onBeforeUnmount warns
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
@@ -69,7 +69,7 @@ describe('useFileUpload', () => {
   });
 
   describe('touching', () => {
-    it('touches an uploaded file at the baked-in 60s default when no prop or setting is given', async () => {
+    it('touches an uploaded file every 60000 ms when no prop or setting is given', async () => {
       const { comms, upload } = setup();
       await upload(file('a'));
       await nextTick();
@@ -80,7 +80,7 @@ describe('useFileUpload', () => {
       expect(comms.touch).toHaveBeenCalledWith('id-a');
     });
 
-    it('a touchInterval prop overrides the baked-in default', async () => {
+    it('a touchInterval prop overrides the default', async () => {
       const { comms, upload } = setup({ touchInterval: 5_000 });
       await upload(file('a'));
       await nextTick();

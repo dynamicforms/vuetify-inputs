@@ -14,13 +14,11 @@ import { BreakpointNames, BreakpointsJSON, ResponsiveRenderOptions } from './res
 import { shownFlag } from './shown-flag';
 
 export interface ActionRenderOptions extends ActionValue {
-  /** The text of the action, rendered when {@link showLabel} is set and the text is not empty. `ActionValue`
-   * types this `unknown`, leaving what a label is to the rendering library; here it is a string, a ref to one or a
-   * function returning one. A ref or a function is read while the action renders, so a label that follows the
-   * locale is `() => t('Save')`. */
+  /** The text of the action: a string, a ref to one or a function returning one, read while the action renders
+   * (e.g. `() => t('Save')`). Rendered when {@link showLabel} is set and the text is not empty. */
   label?: MaybeRefOrGetter<string>;
-  /** The icon of the action, a name `vue-cached-icon` resolves, rendered when {@link showIcon} is set and the
-   * name is not empty. Typed here for the same reason `label` is. */
+  /** The icon of the action, a name `vue-cached-icon` resolves. Rendered when {@link showIcon} is set and the name
+   * is not empty. */
   icon?: string;
   /** Identifier of the action; not used for rendering. */
   name?: string;
@@ -45,11 +43,8 @@ export interface ActionRenderOptions extends ActionValue {
    * `aria-label` and `title` of a button that does not show its label. */
   passthroughAttrs?: Record<string, any>;
 }
-/**
- * What one breakpoint of an action's value may state: the members that describe how the action is drawn.
- * `name`, `defaultConfirm` and `defaultReject` are not among them - which key a modal resolves with, and which
- * key fires the action, are properties of the action itself and do not depend on the width of the screen.
- */
+/** The members of an action's value a breakpoint may state: every render option except `name`, `defaultConfirm` and
+ * `defaultReject`. */
 export type ActionBreakpointRenderOptions = Omit<ActionRenderOptions, 'name' | 'defaultConfirm' | 'defaultReject'>;
 export type ActionBreakpointOptions = BreakpointsJSON<ActionRenderOptions, ActionBreakpointRenderOptions>;
 
@@ -66,7 +61,7 @@ export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<Actio
 
     if (bp) {
       if (bp.renderAs != null) {
-        // a style nobody defined is refused rather than drawn as the default
+        // a renderAs that is not a display style throws
         if (!isActionDisplayStyle(bp.renderAs)) {
           throw new Error(`'${bp.renderAs}' is not an action display style: ${actionDisplayStyles.join(', ')}`);
         }
@@ -103,9 +98,8 @@ export type ResolvedActionRenderOptions = Omit<ActionRenderOptions, 'label'> & {
  * not, so an action holding nothing but a label - which is all a `@dynamicforms/vue-forms` `Action` declares -
  * renders as a button showing that label.
  *
- * `label` and `icon` come back only where the matching flag says they are shown, and the flags come back false
- * where there is no text or name to show, so a caller renders each member on its own flag and never on emptiness.
- * `accessibleLabel` is the plain text of the label regardless of `showLabel`, to name a button that does not show it.
+ * `label` and `icon` are set only where `showLabel` / `showIcon` is true; each flag is false where the label or icon
+ * is empty. `accessibleLabel` is the plain text of the label regardless of `showLabel`.
  */
 export function getRenderOptionsForBreakpoint(
   value: ActionValue,

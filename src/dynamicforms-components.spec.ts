@@ -42,14 +42,12 @@ describe('dynamicforms-components', () => {
     expect(resolveFromTag(tag, registrationNames), `<${tag}> does not resolve`).not.toBe(tag);
   });
 
-  // the [Vue warn] this emits is the assertion: the registration name is deliberately mis-cased, so the tag
-  // resolves to nothing
+  // a mis-cased registration name: the tag does not resolve (Vue warns)
   it('reports a tag as unresolved when no registration name reaches it', () => {
     expect(resolveFromTag('df-input-hint', ['DFInputHint'])).toBe('df-input-hint');
   });
 
-  // the map is what a layout resolves a tag through, and the registration names are what Vue's own resolver
-  // reaches: a tag that is in one and not the other renders in one application and not in the next
+  // dfInputComponentsByTag holds the same tags as the kebab-case registration names
   describe('dfInputComponentsByTag', () => {
     it('holds every exported component, under its kebab-case tag', () => {
       expect(Object.keys(dfInputComponentsByTag).sort()).toEqual(registrationNames.map(kebab).sort());

@@ -117,7 +117,7 @@ render unaligned and `inline` density renders like `default`.
 
 ## Where density and variant come from
 
-Both values are resolved the same way, in one place, when the field is created:
+Both values are resolved the same way when the field is created:
 
 ```typescript
 const injectedDensity = inject<FieldDensity | null>('field-density', null);
@@ -135,7 +135,7 @@ const variant = computed(
 The density is the first value that is set, in this order: the component's `density` prop, the `density` among the
 bound element's [extended properties](/examples/input-base#presentation-carried-by-the-element), a `field-density`
 provided by any ancestor, `defaultDensity` from the plugin options, and `'default'`. The order for variant is the same
-and ends in `'underlined'`: the tag, then the field, then the section, then the application.
+and ends in `'underlined'`.
 
 A section, e.g. a dialog's form or a table's rows, sets its own values with `provide`:
 

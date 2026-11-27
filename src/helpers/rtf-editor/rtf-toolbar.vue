@@ -250,8 +250,7 @@ const editable = computed(() => {
   return !!props.editor?.isEditable;
 });
 
-// Shared across every standalone `<v-btn>`/`<df-actions>` in this toolbar, so a call site states only what
-// actually varies between buttons (icon, title, active/click handler) rather than repeating this on each one.
+// the bindings common to every button of the toolbar
 const toolbarButtonProps = computed(() => ({
   size: buttonSize.value,
   density: 'comfortable' as const,

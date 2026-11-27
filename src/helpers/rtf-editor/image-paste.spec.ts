@@ -84,9 +84,7 @@ describe('createImagePasteHandler', () => {
   });
 
   it('replaces an already-parsed <img> placeholder with the pasted file, in document order', async () => {
-    // The base document is what the editor already holds; the slice is the pasted content ProseMirror parsed
-    // from the clipboard HTML, still to be inserted - the two must stay independent or the placeholder's
-    // (correctly unmodified) copy in the base doc gets mistaken for the one the paste is meant to update.
+    // the placeholder is only in the pasted slice (parsed from the clipboard HTML); the editor's document is empty
     const placeholder = schema.node('image', { src: 'file:///word-temp/image1.png' });
     const view = fakeView(docWith());
     const slice = new Slice(Fragment.from(placeholder), 0, 0);

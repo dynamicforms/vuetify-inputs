@@ -152,8 +152,7 @@ Every input component in the library overrides the Vuetify `#message` slot of th
 `hide-details="auto"`, so the row is rendered when it has content and removed otherwise. `shownErrors` is the subset of
 the field's errors that is shown now (see [Shown errors](/examples/input-base#shown-errors)): an error of origin
 `'server'` immediately, every other once the field is touched. The field's errors are `control.errors` when a control is
-bound, and otherwise the `errors` prop, each error as it was given. While `shownErrors` is empty, the row shows the
-hint; while it is not, the row shows the errors and keeps the hint visually hidden.
+bound, and otherwise the `errors` prop, each error as it was given.
 
 While `shownErrors` is not empty, the inputs also pass a single blank error message to Vuetify. It sets the control's
 error state and keeps the message row rendered; the text in the row is rendered by `DfInputHint`.
@@ -202,7 +201,7 @@ The demo, without the cards it is laid out in:
 
 ## Key Features Demonstrated
 
-- **One row, two sources**: errors when there are any, the message otherwise
+- **Errors or message**: the row renders the errors when there are any, the message otherwise
 - **Whitespace is not an error**: a blank `errors` string leaves the message in place
 - **Per-state classes**: `errorClasses` and `messageClasses` apply to whichever value is rendered
 - **Rendering errors**: each error renders through `MessagesWidget`, as the `errorText` setting's content for it or
@@ -213,10 +212,9 @@ The demo, without the cards it is laid out in:
 
 Experiment with the demo by:
 
-1. Leaving the email field empty and clicking away, to watch the hint give up the row to the errors, which both
-   validators contribute to and which render one node each
-2. Typing an address without an `@` and leaving the field again, to see the second validator's message, which its
-   own `code` and `detail` replace
+1. Leaving the email field empty and clicking away: the row shows the `Required` error in place of the hint
+2. Typing an address without an `@` and leaving the field: the row shows the `Pattern` validator's
+   `app.invalid_email` error, with its own `detail` in place of the default pattern message
 3. Switching the standalone row between the empty string, three spaces and a message
 4. Typing two different passwords, to bring up the group's error under the pair
 

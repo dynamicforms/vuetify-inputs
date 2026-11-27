@@ -194,7 +194,7 @@ import { ExecuteAction } from '@dynamicforms/vue-forms';
 // Create the execution logic
 const saveFormAction = new ExecuteAction(async (action, supr, params) => {
   await saveDocument();
-  return supr(action, params); // Call the super method
+  return supr(action, params); // continue with the next handler in the chain
 });
 
 // Attach to Action
@@ -305,8 +305,6 @@ const submitAction = new Action({
 
 `form` here is a `Group`: `value` is what it sends, and `fullValue` what it holds, disabled members included. Each
 member's `access` sets what `value` contains for it; `visibility` affects neither.
-
-The presentation (the `Action` and its render options) is separate from the logic (the `ExecuteAction` handlers).
 
 ## Button Grouping
 

@@ -64,9 +64,7 @@ const props = withDefaults(defineProps<DfActionsProps>(), {
 
 const breakpoint = useBreakpoint();
 const actionsRef = computed(() => unref(props.actions).filter((action) => action.visibility !== 'suppress'));
-// What each button draws is read off the action's value rather than through the accessors this library's `Action`
-// adds over it, so an action declared as a `@dynamicforms/vue-forms` one - which declares none of them - is drawn
-// as well. The spread is that value resolved at the current breakpoint.
+// each action with its render options at the current breakpoint
 const actionsWithBreakpoint = computed(() =>
   actionsRef.value.map((action) => ({
     action,

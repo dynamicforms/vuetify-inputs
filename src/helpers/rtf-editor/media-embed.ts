@@ -1,9 +1,6 @@
 import { mergeAttributes, Node } from '@tiptap/core';
 
-/**
- * Recognises a YouTube or Vimeo watch/share URL and returns the equivalent embeddable player URL, or `null` for
- * anything else - the toolbar falls back to inserting the URL as a plain link when this returns `null`.
- */
+/** The embeddable player URL of a YouTube or Vimeo watch, share, embed or Shorts URL; `null` for any other URL. */
 export function toEmbedSrc(url: string): string | null {
   let parsed: URL;
   try {

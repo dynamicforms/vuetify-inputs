@@ -149,16 +149,13 @@ const editor = useEditor({
     transformPastedHTML: (html: string) => stripWordArtifacts(html),
     handlePaste: createImagePasteHandler(() => editor.value),
   },
-  // ProseMirror's schema never lets the document itself be empty - a cleared editor still holds one empty
-  // paragraph, whose serialised HTML is '<p></p>'. Emitting that instead of '' would make a `required` rule
-  // checking for a falsy modelValue pass on a field the user never actually typed or pasted anything into.
+  // a cleared document is one empty paragraph ('<p></p>'); it is emitted as '', which Required rejects
   onUpdate: ({ editor: instance }) => {
     emit('update:modelValue', instance.isEmpty ? '' : instance.getHTML());
   },
 });
 
-// External writes (a reset, a different record loaded into the same form) are applied without re-emitting: the
-// third `setContent` argument suppresses the `update` this would otherwise trigger straight back out.
+// a value set from outside is applied with setContent's emitUpdate: false, so it emits no update:modelValue
 watch(
   () => props.modelValue,
   (value) => {
@@ -267,8 +264,7 @@ function toggleBubbleLink() {
   height: auto;
 }
 
-/* TipTap's image resize NodeView (@tiptap/extension-image's `resize` option) builds the handle elements below
-   with no visual styling of their own - position only - so the consuming app is expected to supply the look. */
+/* the look of the resize handles that TipTap's image NodeView (`resize` option) creates; TipTap positions them only */
 .rtf-content [data-resize-handle] {
   background: rgb(var(--v-theme-primary));
   border: 1px solid rgb(var(--v-theme-surface));

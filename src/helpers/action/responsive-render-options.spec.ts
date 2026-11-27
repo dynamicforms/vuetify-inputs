@@ -15,9 +15,7 @@ interface TestOptions {
   marker?: Marker;
 }
 
-// ResponsiveActionRenderOptions merges scalars only; this is the shape a consumer subclass has - a list, an
-// object of options, a scalar and a class instance - and it is what the merge rules below are about. A field the
-// breakpoint says nothing about comes back undefined, which is the contract cleanBreakpoint documents.
+// options with a list, an object, a scalar and a class instance; a field the breakpoint does not state is undefined
 class TestRenderOptions extends ResponsiveRenderOptions<TestOptions> {
   protected cleanBreakpoint(bp?: TestOptions, defaultIfEmpty: boolean = false): TestOptions | null {
     if (!bp && !defaultIfEmpty) return null;
@@ -30,8 +28,7 @@ class TestRenderOptions extends ResponsiveRenderOptions<TestOptions> {
   }
 }
 
-// A subclass that returns only the fields it was given, so the base carries no key at all for a field that only
-// a breakpoint states. This is the shape ResponsiveActionRenderOptions has.
+// cleanBreakpoint returns only the fields a breakpoint states, as in ResponsiveActionRenderOptions
 class SparseRenderOptions extends ResponsiveRenderOptions<TestOptions> {
   protected cleanBreakpoint(bp?: TestOptions, defaultIfEmpty: boolean = false): TestOptions | null {
     if (!bp && !defaultIfEmpty) return null;

@@ -67,17 +67,15 @@ export interface DfDateTimeProps extends BaseProps {
 
 interface FileUploadProps extends BaseProps {
   comms: FileComms;
-  /** Milliseconds between keep-alive touches. Overrides `defaultTouchInterval` from the plugin's
-   *  `VuetifyInputsSettings`, which in turn overrides the baked-in default of 60000. */
+  /** Milliseconds between keep-alive touches. Default: the `defaultTouchInterval` setting, else 60000. */
   touchInterval?: number;
 }
 
 export interface DfFileProps extends FileUploadProps {}
 
 /**
- * `comms.upload` must resolve to a value directly usable as an `<img>` src (typically the URL your backend
- * serves the image from): the component has no separate lookup for turning an identifier into a display URL,
- * so it renders `modelValue` itself as the preview once a file has been uploaded.
+ * The field's value, including the identifier `comms.upload` resolves to, is the `src` of the preview image, such as
+ * the URL the backend serves the image from.
  */
 export interface DfImageProps extends FileUploadProps {}
 
@@ -153,9 +151,7 @@ export interface DfRtfEditorProps extends BaseProps {
    * `buttonSize` for the grouped clusters). See https://vuetifyjs.com/en/api/v-btn/#props-size */
   toolbarButtonSize?: VuetifyButtonSize;
   /** `font-family` of the editing area and its named block styles (Title, Subtitle, Info box, Side quote, article
-   * category). Defaults to `'inherit'`: the component loads no font of its own, so the editor renders in whatever
-   * font the surrounding page already set. Pass any valid CSS `font-family` value to override it; loading the
-   * font itself, if it isn't a system font, is the application's responsibility. */
+   * category). Default `'inherit'`. The component loads no font. */
   fontFamily?: string;
 }
 

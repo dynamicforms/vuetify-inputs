@@ -36,18 +36,14 @@ export type FieldVariant =
   'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled' | 'inverted';
 export type VuetifyDensity = 'default' | 'comfortable' | 'compact';
 export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
-/** Vuetify's own `size` prop (`v-btn`, `v-icon`, ...) also accepts an arbitrary CSS length or number, so this
- *  keeps that but still offers the named sizes for autocomplete: `(string & {})` is a plain `string` to the type
- *  checker (any string is still assignable) but not to a union with string literals, which is what makes an IDE
- *  suggest the literals instead of collapsing them into `string`. */
+/** Vuetify's `size`: a named size, or any CSS length or number. `(string & {})` keeps the named sizes in IDE
+ *  suggestions. */
 export type VuetifyButtonSize = 'x-small' | 'small' | 'default' | 'large' | 'x-large' | (string & {}) | number;
 
 /**
  * The presentation an element carries for the components in this library.
  *
- * Every one of these is also a prop, and the prop wins where both state something: a call site is more specific
- * than the element it renders. What the element carries is what a form declared in code says about itself, so a
- * field that names its own label needs no attribute at the tag that draws it.
+ * Every one of these is also a prop; where both are set, the prop takes precedence.
  *
  * `Extras` is @dynamicforms/vue-forms' augmentation point for exactly this, so these properties are typed on every
  * element in an application that installs this library, the fields written inline in a `Group` declaration
@@ -205,8 +201,7 @@ export function useInputBase<T = any>(
     const access = props.control.effectiveAccess;
     return access === 'disabled' || access === 'disabled-null';
   });
-  // A control states its own visibility - vue-forms refuses anything that is not one of the four. The prop is held to
-  // the same, so an unrecognised visibility is refused here as loudly as it is there.
+  // the visibility prop accepts only the four visibilities vue-forms accepts for a control; any other value throws
   const visibility = computed((): Form.Visibility => {
     if (props.control) return props.control.visibility;
     if (props.visibility == null) return Form.defaultVisibility;
@@ -256,8 +251,9 @@ export function useInputBase<T = any>(
     'persistent-placeholder': !isEmpty(placeholder.value),
 
     hint: hint.value,
-    persistentHint: true, // we want persistent hint always
-    hideDetails: <boolean | 'auto' | undefined>'auto', // we want to hide the hint element when hint isn't there
+    persistentHint: true,
+    // the messages row is rendered only while there is a hint or an error
+    hideDetails: <boolean | 'auto' | undefined>'auto',
 
     // the control's state for assistive technology; Vuetify passes unknown attributes on to the native control
     'aria-invalid': <'true' | undefined>(shownErrors.value.length > 0 ? 'true' : undefined),

@@ -16,8 +16,8 @@ export type ErrorText = (error: ErrorDescription) => RenderContentNonCallable | 
 export interface VuetifyInputsSettings {
   defaultVariant?: FieldVariant;
   defaultDensity?: FieldDensity;
-  /** Milliseconds between `<df-file>`/`<df-image>` keep-alive touches; overridable per field by their
-   *  `touchInterval` prop. Defaults to 60000 when neither is set. */
+  /** Milliseconds between `<df-file>` / `<df-image>` keep-alive touches where the field sets no `touchInterval`.
+   *  Default 60000. */
   defaultTouchInterval?: number;
   /**
    * The condition that decides whether an error is shown, asked for each error a component would show, with the

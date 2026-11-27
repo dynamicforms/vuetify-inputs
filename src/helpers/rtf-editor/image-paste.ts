@@ -4,7 +4,7 @@ import { Editor } from '@tiptap/vue-3';
 
 import { extractImageFiles } from '../image-files';
 
-/** Reads a `File` into a base64 `data:` URI - the same embedding an uploaded or dropped image goes through. */
+/** Reads a `File` into a base64 `data:` URI. */
 export function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

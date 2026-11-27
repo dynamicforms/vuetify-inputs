@@ -125,9 +125,8 @@ describe('input-base', () => {
         const written = [1, 2, 3];
         value.value = written;
 
-        // the element holds its state behind reactive(), so an array reads back as a proxy of what was written.
-        // The write stands, so the read answers with what the control holds from the moment it returns - a read
-        // answering with the array that was written is the composable treating an accepted write as refused
+        // the control holds the array behind reactive(): an accepted write reads back as the control's proxy,
+        // not as the written array
         expect(control.value).toEqual(written);
         expect(value.value).toBe(control.value);
         expect(value.value).not.toBe(written);

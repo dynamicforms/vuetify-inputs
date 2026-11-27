@@ -278,9 +278,8 @@ See [df-date-time](/examples/df-datetime) for the display format patterns and th
 
 ## Wiring it to vue-i18n
 
-The library's strings and the errors follow vue-i18n's locale without further code, because the library calls `t` on
-every read. The date-fns locale is set on every locale change, by a composable called once near the root of the
-component tree:
+The date-fns locale is set on every locale change by a composable called once near the root of the component
+tree:
 
 ```typescript
 // use-df-locale.ts

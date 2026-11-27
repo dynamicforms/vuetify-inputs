@@ -283,7 +283,7 @@ that marked fields touched after the server answered, to make its errors appear,
 is sent nowhere shows no error at all.
 
 ```typescript
-// before: the server's errors stayed out of sight until each field was marked touched
+// before: a server error was shown only once its field was touched
 field.errors.push(new ValidationErrorText(message));
 field.touched = true;
 
@@ -327,8 +327,8 @@ in a time zone with daylight saving time is an hour off for every date on the ot
 when.value;      // before: '2026-01-15T11:30:00+02:00' (10:30 local)   after: '2026-01-15T11:30:00+01:00'
 ```
 
-The same mismatch made the component rewrite its own value without end: a field bound to a date on the other side
-of the change from today stopped with "Maximum recursive updates exceeded" on mount. Records saved from such a form
+Before, the same mismatch also made a field bound to a date on the other side of the change from today rewrite its
+value in a loop and fail on mount with "Maximum recursive updates exceeded". Records saved from such a form
 by an earlier version, in a time zone with daylight saving time, may hold a time shifted by an hour or more; nothing
 in the upgrade corrects them.
 
@@ -436,28 +436,21 @@ translateStrings((key: string): string => {
 translateStrings((key, defaultValue) => myCatalogue[key] ?? defaultValue);
 ```
 
-The callback now receives the English default as a second argument, so there is no longer a need to fall back to
-it by hand or to widen a declined return past `string` with a cast. The behaviour on a declined key changes along
-with the signature: previously, a key the callback declined kept *whatever a previous `translateStrings` call had
-set it to* - so a locale switcher had to supply a complete catalogue, English included, or an entry could be left
-showing a stale translation from a locale the application had moved away from. Now, a declined key resets to its
-English default on that call, so every call to `translateStrings` is a complete statement of the current locale
-rather than a patch on top of the last one - a locale that only overrides a handful of keys behaves the same as
-one that overrides all of them.
+The callback receives the English default as its second argument, so a fallback by hand and a cast of a declined
+return are not needed. A key the callback declines resets to its English default on that call. In 0.10 it kept the
+value a previous `translateStrings` call set, so a locale switcher had to supply a complete catalogue, English
+included, or an entry kept the translation of the previous locale.
 
-If your own callback relied on the old accumulating behaviour - for instance, calling `translateStrings` once with
-a partial catalogue early and topping it up later without repeating the earlier keys - it now needs to supply
-every key it wants translated on every call.
+A callback that called `translateStrings` with a partial catalogue and later added keys without repeating the
+earlier ones must now return every key it translates on every call.
 
 ### `<df-rtf-editor>`'s toolbar no longer needs remounting
 
-`translatableStrings` reads used to be frozen at the moment a component last rendered, so an application working
-around that would remount `<df-rtf-editor>` on a locale change, typically by binding `:key` to the locale code. The
-toolbar (heading dropdown included) now reads the table reactively and updates on its own; a `:key` binding kept
-for this reason is no longer necessary, though it is harmless to leave in place. `Action.closeAction()`,
-`.yesAction()` and `.noAction()` are unaffected by this - they still copy the label into the action when the
-factory runs, so an application already rebuilding its actions on a locale change (as
-[Localisation](/examples/localisation) recommends) needs no change there.
+Before 0.11.0, a component read `translatableStrings` only when it rendered, so an application remounted
+`<df-rtf-editor>` on a locale change, typically by binding `:key` to the locale code. The toolbar, heading dropdown
+included, now reads `translatableStrings` reactively and follows a locale change; a `:key` bound to the locale to
+remount it can be removed. `Action.closeAction()`, `.yesAction()` and `.noAction()` still copy the label when the
+factory runs; rebuild them on a locale change as [Localisation](/examples/localisation) describes.
 
 ### Checklist for 0.11.0
 
@@ -465,17 +458,16 @@ factory runs, so an application already rebuilding its actions on a locale chang
    `null as unknown as string` cast, since the return type now properly includes `null`/`undefined`.
 2. If any callback relied on a declined key keeping a previous translation rather than the English default, make
    it supply every key it wants translated on every call instead.
-3. Drop a `:key="locale"`-style remount workaround on `<df-rtf-editor>` if you added one for this - it is no
-   longer needed, though leaving it in place is harmless.
+3. Remove a `:key="locale"` remount of `<df-rtf-editor>`.
 
 ## Upgrading to v0.10.0 (from v0.9.2)
 
 `<df-rtf-editor>` is built on [TipTap](https://tiptap.dev/) instead of CKEditor 5. CKEditor 5's core is
 dual-licensed GPL/commercial, which put every application built on this library under the same terms unless it
-paid for a commercial CKEditor licence; TipTap's core and the extensions this component uses are MIT. Three
-things follow from that swap: a peer dependency change, a removed API, and a change to the HTML the editor
-produces that reaches further than this library - the third is the one worth reading carefully even if you never
-touch this component's config. There is a [checklist](#checklist-for-0-10-0) at the end of this section.
+paid for a commercial CKEditor licence; TipTap's core and the extensions this component uses are MIT. The
+release changes the peer dependencies, removes `setCkEditorLanguage()`, and changes the saved HTML of list items and
+table cells, which affects every renderer of that HTML, also in applications that do not configure this component.
+There is a [checklist](#checklist-for-0-10-0) at the end of this section.
 
 ### The peer dependencies change
 
@@ -500,8 +492,7 @@ touch this component's config. There is a [checklist](#checklist-for-0-10-0) at 
 }
 ```
 
-Drop the two CKEditor packages from your own `package.json` and install this set instead. Nothing else in your
-project's use of `@dynamicforms/vuetify-inputs` needs to change on account of this swap by itself.
+Remove the two CKEditor packages from your `package.json` and install the TipTap packages above.
 
 ### `setCkEditorLanguage()` and `ckEditorLanguage` are removed
 
@@ -516,25 +507,19 @@ import deTranslations from 'ckeditor5/translations/de.js';
 setCkEditorLanguage('de', deTranslations);
 ```
 
-TipTap is headless: `<df-rtf-editor>`'s entire toolbar is built from this library's own Vuetify components, so
-every one of its labels is already a `translatableStrings` key, translated the same way as the rest of this
-library's text, through `translateStrings()` - see [Localisation](/examples/localisation). Drop the
-`setCkEditorLanguage` call and the translation-bundle import; nothing replaces them, because there is no longer a
-separate vendor UI language to configure.
+TipTap is headless: `<df-rtf-editor>`'s toolbar consists of this library's Vuetify components, and its labels are
+`translatableStrings` keys, translated through `translateStrings()` like the rest of this library's text (see
+[Localisation](/examples/localisation)). Remove the `setCkEditorLanguage` call and the translation-bundle import.
 
 ### List items and table cells wrap their text in a `<p>` now
 
-This is the one that reaches outside this library. CKEditor 5 saved a bulleted item as `<li>Text</li>` and a table
-cell as `<td>Text</td>`. TipTap's list and table schemas wrap block content in a paragraph even inside a list item
-or a cell, so the same content now saves as `<li><p>Text</p></li>` and `<td><p>Text</p></td>`.
+TipTap's list and table schemas wrap block content in a paragraph, so a list item saves as `<li><p>Text</p></li>`
+and a table cell as `<td><p>Text</p></td>`; CKEditor 5 saved `<li>Text</li>` and `<td>Text</td>`.
 
-Inside `<df-rtf-editor>` itself this is invisible - its own stylesheet zeroes the paragraph margin in that
-context, so a list reads as tightly spaced lines, not double-spaced ones. But `<df-rtf-editor>` only styles its
-own editing surface. **Anywhere else this saved HTML is rendered** - a public page built from the stored value, a
-PDF export, a templated email - inherits the browser's or renderer's default `<p>` margin on every list item and
-table cell, unless that renderer's own stylesheet accounts for it. A `<li>` that used to be one line becomes a
-`<li>` with a paragraph's worth of empty space above and below it; a table built for compact rows gets visibly taller
-ones. Add the same rule this library's own editor uses wherever else this HTML is displayed:
+`<df-rtf-editor>` sets the margin of these paragraphs to 0 in its own editing surface only. Any other renderer of the
+saved HTML (a public page built from the stored value, a PDF export, a templated email) applies its default `<p>`
+margin to every list item and table cell, which adds vertical space to list items and makes table rows taller, unless
+its stylesheet overrides it. Add the rule the editor uses to those renderers:
 
 ```css
 li p, td p, th p {
@@ -542,26 +527,23 @@ li p, td p, th p {
 }
 ```
 
-This is safe to apply everywhere you render content saved by this library, past or future: it only matches a
-`<p>` actually nested inside a list item or cell, so content saved before this upgrade - which has no such nested
-`<p>` - is simply not touched by it.
+The rule matches only a `<p>` inside a list item or a table cell; content saved by earlier versions has none, so the
+rule can be applied to all saved content.
 
 ### Checklist for 0.10.0
 
 1. Swap `@ckeditor/ckeditor5-vue` and `ckeditor5` for the `@tiptap/*` set above in your own `package.json`.
-2. Search your project for `setCkEditorLanguage` and drop the call and its translation-bundle import; if you
-   supplied per-locale editor language before, that concern no longer exists to configure.
+2. Remove `setCkEditorLanguage` calls and their translation-bundle imports.
 3. Find every place outside `<df-rtf-editor>` that renders HTML this component saved - marketing pages, PDF
    generation, **templated emails** - and add `li p, td p, th p { margin: 0; }` (or that renderer's equivalent) to
-   its stylesheet. Check a rendered list and a rendered table specifically; this is easy to miss until content
-   with a list or a table happens to go out through that particular renderer.
+   its stylesheet. Check a rendered list and a rendered table in each renderer.
 4. If your own styling targeted CKEditor-specific classes or DOM structure (rather than the semantic HTML this
    library always documented as its saved format), re-check it against the new output.
 
 ## Upgrading to v0.9.1 (from v0.9.0)
 
-Nothing this library exports is renamed or removed. What changes is that your compiler finally sees the package's
-declarations, and that `<df-actions>` draws two states it did not draw before. There is a
+Nothing this library exports is renamed or removed. The package's type declarations resolve, and `<df-actions>`
+renders two more states. There is a
 [checklist](#checklist-for-0-9-1) at the end of this section.
 
 ### The declarations reach your compiler
@@ -570,9 +552,8 @@ declarations, and that `<df-actions>` draws two states it did not draw before. T
 alone - the top-level `types` field is not consulted - so on `moduleResolution: "bundler"` or `"node16"` every import
 from this package was `any`.
 
-Expect the first build after the upgrade to report errors your project always had: a misspelled member of an
-`Action` value, a prop passed to a component that does not declare it, a `label` read as something other than a
-string. They are the checks that were never run, not new rules.
+The first build after the upgrade reports type errors in code that uses this package, e.g. a misspelled member of an
+`Action` value, a prop the component does not declare, or a `label` read as something other than a string.
 
 ### An action inside a disabled container is drawn disabled
 
@@ -597,13 +578,12 @@ watchEffect(() => { saveAction.enabled = !saveAction.busy; });
 // after: <df-actions> binds busy itself
 ```
 
-The write is not refused - it is `enabled` like any other - but it states the same thing the component already
-draws, and anything else that reads the action's `enabled` reads a run in flight rather than what the form declared.
+Remove the write: with it in place, code that reads the action's `enabled` gets `false` during a run instead of the
+value the form set.
 
 ### Checklist for 0.9.1
 
-1. Build once and work through the type errors that surface: they are your project's, and this release is the first
-   in which they are reported.
+1. Build once and fix the reported type errors.
 2. Load the forms that disable a whole section: the action buttons inside one now render disabled. Drop the
    per-action `enabled = false` writes that were there to achieve it.
 3. Drop the `watchEffect` (or equivalent) that mirrored `busy` into `enabled` on an action.
@@ -612,9 +592,9 @@ draws, and anything else that reads the action's `enabled` reads a run in flight
 
 ## Upgrading to v0.9.0 (from v0.8.x)
 
-This release follows `@dynamicforms/vue-forms` 0.17.0. Nothing this library exports is renamed or removed, so most
-projects compile untouched; the work is in your own use of the peer library, plus five points on this library's own
-surface. There is a [checklist](#checklist-for-0-9-0) at the end of this section.
+This release follows `@dynamicforms/vue-forms` 0.17.0. No export of this library is renamed or removed. The changes
+are in the peer library's API and in the eight points on this library's own surface below. There is a
+[checklist](#checklist-for-0-9-0) at the end of this section.
 
 ### The peer ranges and the node floor
 
@@ -637,19 +617,18 @@ The last two are the peer library's own floors, which this package now states as
 
 ### Your own use of vue-forms migrates at the same time
 
-Eleven releases of the peer library sit between 0.6.0 and 0.17.0, and this library re-exports none of the API they
-changed — every `Field`, `Group`, `List`, `Action` and validator your application builds is that library's, and it
-crosses all ten in one step here. Work through
-[the vue-forms migration guide](:vue-forms:/guide/migration.html), which is written for exactly this jump; the
-sections below cover only what that guide cannot know about, which is this package's own surface.
+This release moves vue-forms from 0.6.0 to 0.17.0, eleven releases. This library re-exports none of the API those
+releases changed: the `Field`, `Group`, `List`, `Action` and validators your application builds come from vue-forms.
+Work through [the vue-forms migration guide](:vue-forms:/guide/migration.html) for that API; the sections below cover
+this package.
 
-Four breaks are worth searching for before you upgrade rather than after. The first three announce nothing at all —
-no log, no throw — so the code keeps compiling and stops working:
+Search for these four changes before upgrading. Code affected by the first three compiles and fails without a log
+or an exception:
 
 - **`watch(element, cb)` no longer fires.** An element is no longer a Vue proxy of itself, so the deep traversal a
   reactive watch source starts stops immediately. Watch a getter over what you read: `watch(() => field.value, cb)`.
-- **`readonly(element)` protects nothing.** It hands the element straight back, and a write through the result
-  reaches the element. Hand out `element.value`, or a `computed` over it.
+- **`readonly(element)` returns the element itself**, so a write through the result reaches the element. Pass
+  `element.value`, or a `computed` over it.
 - **`isEqual` over two elements no longer compares their data.** It answered `true` for any two elements of the same
   class, and answers `false` now unless they are the same instance. Compare `a.value` with `b.value`.
 - **`clone()` is `bind(data, overrides)`.** The data comes first: `f.clone({ value: x, label: 'Name' })` is
@@ -670,12 +649,12 @@ name is read case-insensitively and a value naming no `DisplayMode` constant is 
 
 Both lines used to render the field fully: the prop was passed through untouched, and only an exact
 `DisplayMode` constant matched the comparisons the render decision and the `d-none` / `invisible` classes are made
-of. A misspelled name, and a mode a backend knows that this version does not, therefore did nothing and said
-nothing; they now throw where the field renders.
+of. A misspelled name, or a mode a backend defines that this version does not, therefore rendered the field in full
+without a warning; it now throws when the field renders.
 
 A prop that names nothing still resolves to `DisplayMode.FULL`, and a `control` prop still decides on its own
-`visibility`, which the peer library resolves the same way. Where a mode arrives from a payload and an unknown one
-has to be survivable, resolve it yourself before it reaches the prop:
+`visibility`, which the peer library resolves the same way. Where a mode comes from a payload and an unknown mode
+must not throw, resolve it before passing it to the prop:
 
 ```typescript
 const mode = Form.DisplayMode.isDefined(payload.visibility)
@@ -743,10 +722,9 @@ section.fields.amount.enabled;            // true - what was written to the fiel
 section.fields.amount.effectiveEnabled;   // false - and what <df-input> draws from
 ```
 
-Nothing about `enabled` moves: it still answers what was written to each element, a write to a member of a disabled
-container is still accepted, and what a container serializes is still decided by its members' own `enabled`. What
-changes is that the fields of a section your code disables now render disabled and read-only. Where an application
-disabled those fields one by one to get that, the per-field writes can go.
+`enabled` is unchanged: it returns the value written to each element, a write to a member of a disabled container is
+accepted, and what a container serialises follows each member's own `enabled`. Writes that disabled each field of a
+disabled section can be removed.
 
 ### An element carries its own presentation
 
@@ -766,9 +744,8 @@ const form = new Group({
 </template>
 ```
 
-Nothing is required of an existing form: a prop wins over what the element carries, so every attribute you have
-written goes on saying what it said. What an element carries wins over an injected `field-density` /
-`field-variant` and over the plugin defaults, which puts it second in the cascade, behind the prop alone.
+Existing forms need no change: a prop takes precedence over the element's value. The element's value takes
+precedence over an injected `field-density` / `field-variant` and over the plugin defaults.
 
 One thing to check: an application that already attached extended properties of these names to its elements — a
 `label` written with `setExtendedValues()` and rendered by the application's own template — now feeds the
@@ -776,7 +753,7 @@ components as well, and the component draws it where its tag states no `label`.
 
 ### `ActionRenderOptions` states `label` and `icon` as strings
 
-vue-forms 0.17.0 types both `unknown` on `ActionValue`, so a rendering library says what a label is; this one says
+vue-forms 0.17.0 types `label` and `icon` as `unknown` on `ActionValue`; `ActionRenderOptions` types them as
 `string`. An action of this library's own class is unaffected. Where your code declares a value type of its own
 over `ActionRenderOptions` it inherits the two as strings, and where it extends vue-forms' `ActionValue` directly it
 states them itself.
@@ -827,8 +804,8 @@ the answer keeps working. What moves is where a failure surfaces: a handler that
 call that neither awaits nor catches leaves an unhandled rejection. A `@click="save.execute()"` in a template needs
 no change — Vue attaches its own catch and routes the error to `app.config.errorHandler`.
 
-`Action.busy` comes with it: `true` from the call to `execute()` until the run settles, however it settles. It is
-what a button asks while its own handler runs.
+`Action.busy` comes with it: `true` from the call to `execute()` until the run settles, however it settles. Bind
+it to a button's `disabled` or `loading` to block a second run while the handler runs.
 
 ```vue
 <v-btn :disabled="!save.enabled || save.busy" @click="save.execute()">{{ save.renderedLabel }}</v-btn>
@@ -875,8 +852,6 @@ const save = Action.create({ value: { label: 'Save' } });
 const save = new Action({ value: { label: 'Save' } });
 ```
 
-For most projects the whole change is a search and replace of `Action.create(` → `new Action(`.
-
 The factory took a type argument constrained to `ActionBreakpointOptions`; the class takes none, because it extends
 vue-forms' `Action` with that type already applied. Drop the argument — `new Action({ ... })` checks its parameter
 against `Partial<IFieldConstructorParams<ActionBreakpointOptions>>`, which is what the constrained factory checked
@@ -908,8 +883,7 @@ If you only pass a `Field`, a `Group` or an `Action` into `control`, nothing cha
 wrote the type out yourself — a wrapper component that declares its own `control` prop, a helper that takes a field
 as a parameter, or a variable annotated before it is handed to a component.
 
-What the components accept at runtime is exactly what they always accepted: they guard with `instanceof FieldBase`,
-so the value passed in has to derive from that class, as it always did.
+At runtime the components check `control instanceof FieldBase`, as before.
 
 ### `DFInputHint` is spelled `DfInputHint`
 
@@ -949,9 +923,9 @@ repaint in an application built on this library that never repainted before:
 
 See [Groups](/examples/groups) for worked examples of the first two.
 
-One limit is worth stating precisely: `enabled` and `visibility` do **not** cascade from a group to the fields
-inside it. Each field carries its own, and hiding or disabling a group does not disable the fields it holds — it
-only affects what you render off the group itself. This library adds no cascade of its own.
+In 0.8, `enabled` and `visibility` do **not** cascade from a group to the fields inside it. Each field carries its
+own; hiding or disabling a group affects only what the template renders from the group itself. This library adds no
+cascade of its own.
 
 ### Checklist for 0.8.0
 
