@@ -30,7 +30,7 @@
             </div>
             <div style="grid-column: 1/10; border-top: 1px solid rgba(var(--v-theme-on-surface), 0.4)" />
             <!-- Density rows -->
-            <template v-for="density in densityOptions" :key="density">
+            <template v-for="density in fieldDensities" :key="density">
               <div class="grid-row">
                 <div class="density-label">{{ density }}</div>
                 <div v-for="component in components" :key="`${density}-${component.name}`" class="component-cell">
@@ -107,23 +107,13 @@ import { ref } from 'vue';
 
 import { DfInput, DfInputGroup, DfSelect, DfCheckbox, DfDateTime, DfFile, DfTextArea, DfColor } from '../../src';
 
+import { choicesOf, fieldDensities, fieldVariants } from './demo-choices';
 import { mockFileComms } from './demo-file-comms';
 
 const selectedVariant = ref('outlined');
 const fullscreen = ref(false);
 
-const variantOptions = [
-  { text: 'Outlined', id: 'outlined' },
-  { text: 'Filled', id: 'filled' },
-  { text: 'Underlined', id: 'underlined' },
-  { text: 'Plain', id: 'plain' },
-  { text: 'Solo', id: 'solo' },
-  { text: 'Solo Inverted', id: 'solo-inverted' },
-  { text: 'Solo Filled', id: 'solo-filled' },
-  { text: 'Inverted', id: 'inverted' },
-];
-
-const densityOptions = ['default', 'compact', 'comfortable', 'inline'];
+const variantOptions = choicesOf(fieldVariants);
 
 const formData = ref({
   input: 'Sample text',

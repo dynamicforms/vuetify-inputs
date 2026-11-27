@@ -58,14 +58,15 @@ import {
   type FieldVariant,
 } from '../../src';
 
+import { choicesOf, fieldDensities, fieldVariants } from './demo-choices';
+
 const variant = ref<FieldVariant>('outlined');
 const density = ref<FieldDensity>('default');
 const direction = ref<DfInputComponentProps.DfInputGroupDirection>('wrap');
 
-const variants = ['outlined', 'filled', 'underlined', 'plain', 'solo', 'solo-inverted', 'solo-filled', 'inverted'].map(
-  (id) => ({ id, text: id }),
-);
-const densities = ['default', 'comfortable', 'compact'].map((id) => ({ id, text: id }));
+const variants = choicesOf(fieldVariants);
+// the densities Vuetify's fields take
+const densities = choicesOf(fieldDensities.filter((id) => id !== 'inline'));
 const directions = ['row', 'wrap', 'column'].map((id) => ({ id, text: id }));
 
 const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
