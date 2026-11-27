@@ -27,8 +27,16 @@ function withPlugins<T>(plugins: typeof config.global.plugins, mountFn: () => T)
 
 describe('DfInput', () => {
   describe('as a number input', () => {
-    const mountNumber = (control: Field<number | null>, props: Record<string, any>) =>
-      mount(DfInput, { props: { control, inputType: 'number', ...props } });
+    const mountNumber = (
+      control: Field<number | null>,
+      props: Record<string, any>,
+      { attach = false, settings }: { attach?: boolean; settings?: Record<string, any> } = {},
+    ) =>
+      mount(DfInput, {
+        props: { control, inputType: 'number', ...props },
+        global: settings ? { provide: { [vuetifyInputsSettingsKey]: settings } } : {},
+        attachTo: attach ? document.body : undefined,
+      });
 
     it.each([
       { name: 'above max', value: 150, props: { max: 100 }, corrected: 100 },
@@ -73,10 +81,7 @@ describe('DfInput', () => {
 
     describe('on focus with the whole text selected', () => {
       const focusSelected = async (value: number, props: Record<string, any>) => {
-        const wrapper = mount(DfInput, {
-          props: { control: new Field<number | null>({ value }), inputType: 'number', ...props },
-          attachTo: document.body,
-        });
+        const wrapper = mountNumber(new Field<number | null>({ value }), props, { attach: true });
         await flushPromises();
         const input = wrapper.find('input').element as HTMLInputElement;
         const before = input.value;
@@ -95,10 +100,7 @@ describe('DfInput', () => {
       });
 
       it('selects the whole text again when a render is pending at focus', async () => {
-        const wrapper = mount(DfInput, {
-          props: { control: new Field<number | null>({ value: 0 }), inputType: 'number', precision: 2 },
-          attachTo: document.body,
-        });
+        const wrapper = mountNumber(new Field<number | null>({ value: 0 }), { precision: 2 }, { attach: true });
         await flushPromises();
         const input = wrapper.find('input').element as HTMLInputElement;
         expect(input.value).toBe('0.00');
@@ -133,11 +135,7 @@ describe('DfInput', () => {
       ) => {
         const control = new Field<number | null>({ value });
         const wrapper = withPlugins([vuetifyFor(locale)], () =>
-          mount(DfInput, {
-            props: { control, inputType: 'number', ...props },
-            global: { provide: { [vuetifyInputsSettingsKey]: settings } },
-            attachTo: document.body,
-          }),
+          mountNumber(control, props, { attach: true, settings }),
         );
         await flushPromises();
         const input = wrapper.find('input').element as HTMLInputElement;
