@@ -820,8 +820,8 @@ the answer keeps working. What moves is where a failure surfaces: a handler that
 call that neither awaits nor catches leaves an unhandled rejection. A `@click="save.execute()"` in a template needs
 no change — Vue attaches its own catch and routes the error to `app.config.errorHandler`.
 
-`Action.busy` comes with it: `true` from the call to `execute()` until the run settles, however it settles. It is
-what a button asks while its own handler runs.
+`Action.busy` comes with it: `true` from the call to `execute()` until the run settles, however it settles. Bind
+it to a button's `disabled` or `loading` to block a second run while the handler runs.
 
 ```vue
 <v-btn :disabled="!save.enabled || save.busy" @click="save.execute()">{{ save.renderedLabel }}</v-btn>
