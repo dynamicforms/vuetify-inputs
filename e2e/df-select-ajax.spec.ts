@@ -58,14 +58,14 @@ test('an option and the chip show the language name with its typing discipline o
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean);
-  expect(await lines(python.locator('.v-list-item-title'))).toEqual(['Python', 'Dynamically typed']);
+  await expect.poll(() => lines(python.locator('.v-list-item-title'))).toEqual(['Python', 'Dynamically typed']);
 
   await python.click();
 
   await expect(selectedValue(page)).toHaveText(/Selected value:\s*py\s*$/);
   const chip = select.locator('.v-chip');
   await expect(chip.locator('br')).toHaveCount(1);
-  expect(await lines(chip)).toEqual(['Python', 'Dynamically typed']);
+  await expect.poll(() => lines(chip)).toEqual(['Python', 'Dynamically typed']);
 });
 
 test('a chosen value is replaced with the keyboard only, without the old name ending up in the typed text', async ({
