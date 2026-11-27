@@ -236,49 +236,11 @@ export class Label {
 Supported icon types are `v-icon`, `v-img` and any other component which takes a single `src: string` parameter.
 A component that needs several parameters is wrapped in one that takes them as a JSON string in `src`.
 
-## Integration with DynamicForms forms
+## Binding
 
-Each component binds a vue-forms element through the `control` prop:
-
-```vue
-<template>
-  <df-input
-    :control="form.fields.name"
-    label="Name"
-    hint="Enter your name"
-  />
-</template>
-
-<script setup>
-import { Group, Field } from '@dynamicforms/vue-forms';
-import { DfInput } from '@dynamicforms/vuetify-inputs';
-
-const form = new Group({
-  name: new Field({ value: '' })
-});
-</script>
-```
-
-## Usage Without DynamicForms
-
-Each component also works with `v-model`:
-
-```vue
-<template>
-  <df-input
-    v-model="name"
-    label="Name"
-    hint="Enter your name"
-  />
-</template>
-
-<script setup>
-import { ref } from 'vue';
-import { DfInput } from '@dynamicforms/vuetify-inputs';
-
-const name = ref('');
-</script>
-```
+Each component binds a vue-forms element through the `control` prop or a value through `v-model`; both are shown in
+[Using with DynamicForms](/guide/getting-started#using-with-dynamicforms) and
+[Using without DynamicForms](/guide/getting-started#using-without-dynamicforms).
 
 ## The InputBase component
 
