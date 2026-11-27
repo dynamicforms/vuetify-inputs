@@ -152,8 +152,7 @@ Every input component in the library overrides the Vuetify `#message` slot of th
 `hide-details="auto"`, so the row is rendered when it has content and removed otherwise. `shownErrors` is the subset of
 the field's errors that is shown now (see [Shown errors](/examples/input-base#shown-errors)): an error of origin
 `'server'` immediately, every other once the field is touched. The field's errors are `control.errors` when a control is
-bound, and otherwise the `errors` prop, each error as it was given. While `shownErrors` is empty, the row shows the
-hint; while it is not, the row shows the errors and keeps the hint visually hidden.
+bound, and otherwise the `errors` prop, each error as it was given.
 
 While `shownErrors` is not empty, the inputs also pass a single blank error message to Vuetify. It sets the control's
 error state and keeps the message row rendered; the text in the row is rendered by `DfInputHint`.
