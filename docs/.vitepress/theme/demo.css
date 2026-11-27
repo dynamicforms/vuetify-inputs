@@ -26,3 +26,16 @@
 .demo-container .v-number-input hr {
   margin: 0 !important;
 }
+
+/* a swatch of the colour a df-color holds or previews */
+.demo-color-preview {
+  height: 56px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  color: #fff;
+  text-shadow: 0 0 2px #000;
+}

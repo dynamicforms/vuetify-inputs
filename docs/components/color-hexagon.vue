@@ -26,7 +26,7 @@
             <df-color v-model="barColor" label="21 levels" picker="hexagon" :lightness-levels="21" />
           </v-col>
           <v-col cols="12" md="6">
-            <div class="preview" :style="{ backgroundColor: previewColor ?? color }">
+            <div class="demo-color-preview" :style="{ backgroundColor: previewColor ?? color }">
               {{ previewColor ?? color }}
             </div>
           </v-col>
@@ -48,17 +48,3 @@ const barColor = ref('#4f81bd');
 const fifteenColor = ref('#9bbb59');
 const twoColor = ref('#8064a2');
 </script>
-
-<style scoped>
-.preview {
-  height: 56px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: monospace;
-  color: #fff;
-  text-shadow: 0 0 2px #000;
-}
-</style>

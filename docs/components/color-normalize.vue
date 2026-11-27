@@ -14,7 +14,7 @@
             />
           </v-col>
           <v-col cols="12" md="6">
-            <div class="preview" :style="{ backgroundColor: previewColor ?? color }">
+            <div class="demo-color-preview" :style="{ backgroundColor: previewColor ?? color }">
               {{ previewColor ?? 'No preview' }}
             </div>
           </v-col>
@@ -45,17 +45,3 @@ function webSafe(value: string): string {
   return `#${channels.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
 }
 </script>
-
-<style scoped>
-.preview {
-  height: 56px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: monospace;
-  color: #fff;
-  text-shadow: 0 0 2px #000;
-}
-</style>
