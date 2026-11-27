@@ -4,27 +4,32 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 
 import type { DfInputHintProps } from '../dynamicforms-component-props';
 
+import { inputContextKey } from './input-context';
 import MessagesWidget from './messages-widget.vue';
 import { RenderableValue } from './render-content';
 
 const props = withDefaults(defineProps<DfInputHintProps>(), {
-  errors: '',
+  errors: undefined,
   message: '',
   errorClasses: 'text-error',
   messageClasses: '',
-  hint: '',
+  hint: undefined,
 });
 
+const input = inject(inputContextKey, null);
+const errors = computed(() => props.errors ?? input?.shownErrors.value ?? '');
+const hint = computed(() => props.hint ?? input?.hint.value ?? '');
+
 const isError = computed(() => {
-  if (props.errors) {
-    if (typeof props.errors === 'string') {
-      return props.errors.trim().length > 0;
+  if (errors.value) {
+    if (typeof errors.value === 'string') {
+      return errors.value.trim().length > 0;
     }
-    return props.errors.length > 0;
+    return errors.value.length > 0;
   }
   return false;
 });
@@ -34,10 +39,10 @@ function asWidgetMessage(message: DfInputHintProps['message']) {
   return [new RenderableValue(message as Exclude<typeof message, readonly RenderableValue[]>)];
 }
 
-const widgetMessage = computed(() => (isError.value ? props.errors : asWidgetMessage(props.message)));
+const widgetMessage = computed(() => (isError.value ? errors.value : asWidgetMessage(props.message)));
 
 // the hint the errors replace on screen stays in the row, which the control's aria-describedby references
-const hiddenHint = computed(() => (isError.value && props.hint ? asWidgetMessage(props.hint) : null));
+const hiddenHint = computed(() => (isError.value && hint.value ? asWidgetMessage(hint.value) : null));
 
 const widgetClasses = computed(() => {
   return isError.value ? props.errorClasses : props.messageClasses;

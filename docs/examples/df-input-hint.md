@@ -12,11 +12,15 @@ input, e.g. a group's errors, a section caption or a table row.
 
 | Prop           | Type                                               | Default        | Description                                                       |
 |----------------|----------------------------------------------------|----------------|-------------------------------------------------------------------|
-| errors         | `string \| (RenderableValue \| ErrorInput)[]` | `''`           | The errors to render. When not empty, rendered instead of `message` |
+| errors         | `string \| (RenderableValue \| ErrorInput)[]` | the enclosing input's shown errors, else `''` | The errors to render. When not empty, rendered instead of `message` |
 | message        | `RenderContentRef \| RenderableValue[]`            | `''`           | Rendered while there is no error, typically the field's hint    |
 | errorClasses   | `ClassTypes`                                       | `'text-error'` | Classes of each rendered message while there are errors           |
 | messageClasses | `ClassTypes`                                       | `''`           | Classes of each rendered message while there are none             |
-| hint           | `RenderContentRef`                                 | `''`           | The field's hint. While errors are rendered, it is also rendered visually hidden after them |
+| hint           | `RenderContentRef`                                 | the enclosing input's hint, else `''` | The field's hint. While errors are rendered, it is also rendered visually hidden after them |
+
+Inside a component that calls `useInputBase()` - every input of the library, `InputBase` and a field built on it -
+`errors` defaults to the input's [shown errors](/examples/input-base#shown-errors) and `hint` to the `hint` binding of
+its `vuetifyBindings`. Outside one, both default to `''`.
 
 The component renders one row. It renders `errors` when `errors` is a non-empty array or a string with at least one
 non-whitespace character, and `message` otherwise. A whitespace-only string is not an error, so a blank string passed
@@ -138,9 +142,11 @@ Every input component in the library overrides the Vuetify `#message` slot of th
 
 ```vue
 <template #message="{ message }">
-  <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+  <df-input-hint :message="message" />
 </template>
 ```
+
+`errors` and `hint` are not given, so the row takes the input's `shownErrors` and hint.
 
 `message` is what Vuetify passes to the slot, the `hint` prop. The inputs bind `persistent-hint` and
 `hide-details="auto"`, so the row is rendered when it has content and removed otherwise. `shownErrors` is the subset of

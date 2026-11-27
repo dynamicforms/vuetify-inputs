@@ -120,7 +120,7 @@ export interface MessagesWidgetProps {
 
 export interface DfInputHintProps {
   /** The errors to render, in place of {@link message} whenever there is one. A string is text in the user's
-   * language; an error description may lack any member. */
+   * language; an error description may lack any member. Defaults to the errors the enclosing input shows. */
   errors?: string | readonly (RenderableValue | ErrorInput)[];
   /** The message to render, shown while there is no error: content in any of its forms, or the items to render. */
   message?: RenderContentRef | readonly RenderableValue[];
@@ -129,7 +129,7 @@ export interface DfInputHintProps {
   /** Classes for the rendered message. Defaults to no class. */
   messageClasses?: ClassTypes;
   /** The field's hint. While errors are rendered, it is rendered visually hidden after them, for assistive
-   * technology. */
+   * technology. Defaults to the enclosing input's hint. */
   hint?: RenderContentRef;
 }
 
@@ -137,8 +137,9 @@ export interface DfLabelProps {
   /** The slot data Vuetify hands a `#label` slot. Its `label`, the label's text, is rendered where {@link label} has
    * no content. */
   data?: { label?: string; props?: Record<string, unknown> };
-  /** The label to render: its content in any of the four forms, and the icon it carries. */
-  label: Label;
+  /** The label to render: its content in any of the four forms, and the icon it carries. Defaults to the enclosing
+   * input's label. */
+  label?: Label;
   /** Whether the label wraps over several lines. It is rendered on one line by default. */
   allowWrap?: boolean;
 }

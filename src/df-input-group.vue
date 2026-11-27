@@ -20,7 +20,7 @@
       :active="true"
       :focused="focused"
     >
-      <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+      <template #label="labelData"><df-label :data="labelData" /></template>
       <template #default="{ props: fieldProps }">
         <div
           v-bind="fieldProps"
@@ -34,7 +34,7 @@
       </template>
     </v-field>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="groupErrors" :hint="vuetifyBindings.hint" />
+      <df-input-hint :message="message" :errors="groupErrors" />
     </template>
   </v-input>
 </template>
@@ -51,7 +51,7 @@ const props = withDefaults(defineProps<DfInputGroupProps>(), { enabled: undefine
 const emits = defineEmits<{ (e: 'update:modelValue', value: any): void; (e: 'click:clear'): void }>();
 
 const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
-const { densityClass, isRendered, label, shownErrors, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
+const { densityClass, isRendered, shownErrors, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 
 // the children render inside this field's frame, without frames, labels or message rows of their own
 provide('field-variant', 'plain');

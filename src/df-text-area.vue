@@ -8,9 +8,9 @@
       v-bind="vuetifyBindings as any"
       @blur="touched = true"
     >
-      <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+      <template #label="labelData"><df-label :data="labelData" /></template>
       <template #message="{ message }">
-        <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+        <df-input-hint :message="message" />
       </template>
     </v-textarea>
   </div>
@@ -29,8 +29,5 @@ const props = withDefaults(defineProps<DfTextAreaProps>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
-  props,
-  emits,
-);
+const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 </script>

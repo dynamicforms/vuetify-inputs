@@ -6,9 +6,9 @@
     v-bind="vuetifyBindings"
     readonly
   >
-    <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+    <template #label="labelData"><df-label :data="labelData" /></template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      <df-input-hint :message="message" />
     </template>
   </v-text-field>
   <component
@@ -16,11 +16,7 @@
     v-else-if="isRendered"
     ref="dfSelectRef"
     v-model="selected"
-    :class="[
-      densityClass,
-      visibilityClass,
-      { 'df-select-multirow': isMultiline, 'df-select-single': !multiple },
-    ]"
+    :class="[densityClass, visibilityClass, { 'df-select-multirow': isMultiline, 'df-select-single': !multiple }]"
     :style="{ '--df-select-search-width': `${(searchText?.length ?? 0) + 1}ch` }"
     :items="options"
     :return-object="false"
@@ -73,7 +69,7 @@
       </v-chip>
     </template>
     <template #label="labelData">
-      <df-label :data="labelData" :label="label" />
+      <df-label :data="labelData" />
     </template>
 
     <template #item="{ props: prps, item }">
@@ -97,7 +93,7 @@
       <v-progress-linear :active="isActive" :color="color" height="2" indeterminate :aria-label="t('Loading')" />
     </template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      <df-input-hint :message="message" />
     </template>
     <template v-if="$slots['append-inner']" #append-inner="props">
       <slot name="append-inner" v-bind="props" />
@@ -192,8 +188,6 @@ const dfSelectRef = ref<InstanceType<typeof VAutocomplete> | InstanceType<typeof
 const {
   densityClass,
   isRendered,
-  label,
-  shownErrors,
   touched,
   value: resultingValue,
   visibilityClass,

@@ -9,9 +9,9 @@
     @blur="commitTyped"
     @keydown.enter="commitTyped"
   >
-    <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+    <template #label="labelData"><df-label :data="labelData" /></template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      <df-input-hint :message="message" />
     </template>
     <template #prepend-inner>
       <div
@@ -135,7 +135,7 @@ function hexColorErrors(): ValidationError[] {
   return [new ValidationError(namespaced('invalid_opaque_hex_color'), {}, detail, 'validator')];
 }
 
-const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
+const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
   props,
   emits,
   hexColorErrors,

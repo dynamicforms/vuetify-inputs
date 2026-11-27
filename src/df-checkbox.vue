@@ -11,9 +11,9 @@
     @change="change"
     @blur="touched = true"
   >
-    <template #label="labelData"><df-label :allow-wrap="true" :data="labelData as any" :label="label" /></template>
+    <template #label="labelData"><df-label :allow-wrap="true" :data="labelData as any" /></template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      <df-input-hint :message="message" />
     </template>
   </v-checkbox>
 </template>
@@ -30,10 +30,7 @@ const props = withDefaults(defineProps<DfCheckboxProps>(), { ...defaultBaseProps
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
-  props,
-  emits,
-);
+const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 
 // v-checkbox takes no variant: the class lets the label line up with the text of plain and underlined fields
 const variantClass = computed(() =>

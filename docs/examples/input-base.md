@@ -492,10 +492,8 @@ with `defaultBaseProps`, calls `useInputBase()` and binds the result.
       v-bind="vuetifyBindings as any"
       @blur="touched = true"
     >
-      <template #label><df-label :label="label" /></template>
-      <template #message="{ message }">
-        <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
-      </template>
+      <template #label="labelData"><df-label :data="labelData" /></template>
+      <template #message="{ message }"><df-input-hint :message="message" /></template>
     </v-slider>
   </div>
 </template>
@@ -521,10 +519,15 @@ const props = withDefaults(defineProps<MySliderProps>(), { ...defaultBaseProps, 
 interface Emits extends BaseEmits<number> {}
 const emits = defineEmits<Emits>();
 
-const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } =
-  useInputBase<number>(props, emits);
+const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase<number>(
+  props,
+  emits,
+);
 </script>
 ```
+
+`DfLabel` and `DfInputHint` in the slots take the label, the shown errors and the hint from the `useInputBase()` call
+of the component they render in; a `label`, `errors` or `hint` prop given to them replaces it.
 
 The resulting component takes a `control` or a `v-model`, applies the visibility a `ConditionalVisibilityAction`
 sets, uses the application's density and variant, shows its errors once touched, and accepts `passthroughAttrs`.
