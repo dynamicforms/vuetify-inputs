@@ -77,13 +77,12 @@ export function updateSelectedFromValue(
     return;
   }
 
+  // a taggable select keeps any value; otherwise the value is reduced to the given choices
   if (taggable) {
-    // taggable (can add new items not in choices): keep the value as-is
     selected.value = mcValue;
     return;
   }
 
-  // when not taggable, the value is filtered to the given choices
   if (multiple) {
     selected.value = getSelectedChoices(choices, mcValue).map((choice) => choice.id);
   } else {
