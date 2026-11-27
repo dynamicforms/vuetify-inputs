@@ -10,7 +10,8 @@ Basic demo with a fixed options list:
 
 ## Advanced Features
 
-Choices loaded by `fetchChoices`, and icons:
+Choices loaded by `fetchChoices` with two-line text and icons, a debounced search, a "no data" text and an optional
+minimum query length:
 
 <select-ajax/>
 
@@ -33,6 +34,9 @@ Choices loaded by `fetchChoices`, and icons:
   to the close button of the next chip, or to the input when no closable chip remains
 - A `null` selection under `allowNull`, and an empty array for a multiple select
 - Search with filtering
+- A text in the menu when there are no choices to show, and a minimum length of the search text before choices are
+  fetched for it
+- Choice text as plain text, markdown, HTML or a component
 
 ## Props
 
@@ -45,6 +49,10 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | multiple | `boolean` | `false` | Whether multiple selection is allowed |
 | allowTags | `boolean` | `false` | Whether custom values can be entered |
 | allowNull | `boolean` | `true` | Whether the user can empty the selection. With `false`, the select offers no clear button and no close on the last chip of a multiple select; it selects no default, and an empty value stays empty until the user selects a choice |
+| noDataText | `RenderContent` | translatable `NoChoices` ("No choices") | Shown in the menu when there are no choices to show. While choices are being fetched, or a debounced fetch is waiting, the menu shows the translatable `Loading` instead. A select with `allowTags` opens no menu without choices |
+| minQueryLength | `number` | `0` | With `fetchChoices`: the length the search text must reach before `fetchChoices` is called for it. See [Dynamic Option Loading](#dynamic-option-loading) |
+| minQueryText | `RenderContent` | translatable `MinQuery` ("Type at least {count} characters", `count` = `minQueryLength`) | Shown in the menu in place of `noDataText` while the search text is shorter than `minQueryLength` |
+| fetchDebounce | `number` | `0` | With `fetchChoices`: milliseconds the search text must stay unchanged before `fetchChoices` is called for it. Only the last search text is fetched. `0` calls it at once |
 
 ### Inherited Props
 
@@ -63,10 +71,21 @@ Each choice implements this interface:
 ```typescript
 interface SelectChoice {
   id: any;        // Unique identifier/value for the option
-  text: any;      // Display text
+  text: any;      // RenderContent, or a function answering it; any other value is shown as String(value)
   icon?: string;  // Optional vue-cached-icon name (ion-…, mdi-…, fa-…), URL or SVG
 }
 ```
+
+`text` is [`RenderContent`](./df-input-hint): a string, an `MdString`, an `HtmlString`, a `SimpleComponentDef`, or a
+function answering one of them, so that it can follow the locale. A function is read on every render. `null` and
+`undefined` show as an empty text, and any other value, such as a number, as `String(value)`.
+
+The menu's option and the chip render the content. Where only text is taken, the select uses its text
+(`renderContentText`, of an `MdString` once rendered as markdown, so `**Java**` reads as "Java"): the title the
+select's search filters by, the read-only text field the select renders on the server and until it renders in the
+browser, and the label of a chip's close button. An option whose text is not a string is named by the text of its
+rendered content, a line break and a block read as a space: `Java<br>Statically typed` is named "Java Statically
+typed". `update:modelValueDisplay` carries the choices as they were given.
 
 ## Value Format
 
@@ -106,6 +125,18 @@ When using the `fetchChoices` prop instead of static `choices`, the component:
 Until that call resolves, no chip shows the ids. Once it has resolved, an id the call returned no choice for is shown
 with a choice whose text is the id, as with static `choices`. The value is unchanged either way. A call that rejects is
 logged with `console.error` and leaves the loaded choices as they are.
+
+With `minQueryLength`, a search text shorter than it is not passed to the function: the loaded choices are reduced to
+those of the value and the selection, results of an earlier longer search text are dropped, and the menu shows
+`minQueryText` in place of `noDataText` when it has no choices to show. The setup call is not made for an empty value
+then; a taggable select's setup call that passes its value as idValue is made, and only the returned choices of the
+value are kept. Clearing the search text after a selection follows the same rule. Loading the choices for the value's
+ids is not affected.
+
+With `fetchDebounce`, a search text is passed to the function once it has not changed for that many milliseconds, and
+only the last one is. An empty search text, the calls that load the choices for the value's ids and the setup call
+are made at once. A waiting call is dropped when the component unmounts or becomes read-only. The results of a search
+text are dropped once a later search text is fetched or cut short by `minQueryLength`.
 
 ```typescript
 const fetchChoices = async (query?: string, idValue?: any): Promise<SelectChoice[]> => {

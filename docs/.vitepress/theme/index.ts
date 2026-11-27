@@ -8,7 +8,6 @@ import * as directives from 'vuetify/directives'
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import { DynamicFormsInputs } from '../../../src';
-import VueMarkdown from 'vue-markdown-render'; // or your preferred markdown component
 import '../../../src/helpers/global.css';
 import { errorText } from '../../components/demo-error-text';
 // import DynamicFormsInputsVuetify from '../../../src/vuetify-components';
@@ -30,7 +29,6 @@ export default {
 
     app.use(vuetify);
     app.use(DynamicFormsInputs, { errorText });
-    app.component('VueMarkdown', VueMarkdown); // make sure it's not vue-markdown
 
     // app.use(DynamicFormsInputsVuetify);
   },

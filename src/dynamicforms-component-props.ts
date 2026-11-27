@@ -9,6 +9,7 @@ import {
   FileComms,
   Label,
   type RenderableValue,
+  type RenderContent,
   type RenderContentRef,
   SelectChoice,
   SelectFetchChoices,
@@ -159,6 +160,16 @@ export interface DfSelectProps extends BaseProps {
   allowTags?: boolean;
   allowNull?: boolean;
   fetchChoices?: SelectFetchChoices;
+  /** Shown in the menu when there are no choices to show. Defaults to the translatable `NoChoices`. */
+  noDataText?: RenderContent;
+  /** With `fetchChoices`: the length the search text must reach before `fetchChoices` is called for it. */
+  minQueryLength?: number;
+  /** Shown in the menu in place of `noDataText` while the search text is shorter than `minQueryLength`. Defaults to
+   * the translatable `MinQuery`, with `count` = `minQueryLength`. */
+  minQueryText?: RenderContent;
+  /** With `fetchChoices`: milliseconds the search text must stay unchanged before it is fetched; `0` fetches it at
+   * once. */
+  fetchDebounce?: number;
 }
 
 export interface DfTextAreaProps extends BaseProps {

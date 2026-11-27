@@ -7,6 +7,7 @@
           <df-checkbox v-model="multiple" label="Multiple choice" />
           <df-checkbox v-model="allowNull" label="Allow null" />
           <df-checkbox v-model="allowTags" label="Allow new value entry" />
+          <df-checkbox v-model="minQuery" label="Minimum query of two letters" />
         </div>
 
         <df-select
@@ -15,6 +16,10 @@
           :multiple="multiple"
           :allow-null="allowNull"
           :allow-tags="allowTags"
+          :min-query-length="minQuery ? 2 : 0"
+          min-query-text="Type at least two letters of the language name."
+          no-data-text="No languages found."
+          :fetch-debounce="300"
           :label="new Label('Programming languages', 'mdi-abacus')"
         />
 
@@ -30,11 +35,12 @@
 <script setup>
 import { ref, watch } from 'vue';
 
-import { DfCheckbox, DfSelect, Label } from '../../src';
+import { DfCheckbox, DfSelect, HtmlString, Label } from '../../src';
 
 const multiple = ref(false);
 const allowNull = ref(true);
 const allowTags = ref(false);
+const minQuery = ref(false);
 const selectedLanguages = ref(null);
 
 // Reset selected value when toggling multiple
@@ -43,17 +49,20 @@ watch(multiple, (newValue) => {
 });
 
 const programmingLanguages = [
-  { id: 'js', text: 'JavaScript', icon: 'mdi-language-javascript' },
-  { id: 'ts', text: 'TypeScript', icon: 'mdi-language-typescript' },
-  { id: 'py', text: 'Python', icon: 'mdi-language-python' },
-  { id: 'java', text: 'Java', icon: 'mdi-language-java' },
-  { id: 'csharp', text: 'C#', icon: 'mdi-language-csharp' },
-  { id: 'cpp', text: 'C++', icon: 'mdi-language-cpp' },
-  { id: 'go', text: 'Go', icon: 'mdi-language-go' },
-  { id: 'ruby', text: 'Ruby', icon: 'mdi-language-ruby' },
-  { id: 'php', text: 'PHP', icon: 'mdi-language-php' },
-  { id: 'swift', text: 'Swift', icon: 'mdi-language-swift' },
+  { id: 'js', name: 'JavaScript', typing: 'Dynamically typed', icon: 'mdi-language-javascript' },
+  { id: 'ts', name: 'TypeScript', typing: 'Statically typed', icon: 'mdi-language-typescript' },
+  { id: 'py', name: 'Python', typing: 'Dynamically typed', icon: 'mdi-language-python' },
+  { id: 'java', name: 'Java', typing: 'Statically typed', icon: 'mdi-language-java' },
+  { id: 'csharp', name: 'C#', typing: 'Statically typed', icon: 'mdi-language-csharp' },
+  { id: 'cpp', name: 'C++', typing: 'Statically typed', icon: 'mdi-language-cpp' },
+  { id: 'go', name: 'Go', typing: 'Statically typed', icon: 'mdi-language-go' },
+  { id: 'ruby', name: 'Ruby', typing: 'Dynamically typed', icon: 'mdi-language-ruby' },
+  { id: 'php', name: 'PHP', typing: 'Dynamically typed', icon: 'mdi-language-php' },
+  { id: 'swift', name: 'Swift', typing: 'Statically typed', icon: 'mdi-language-swift' },
 ];
+
+// the name on the first line, the typing discipline on the second
+const toChoice = ({ id, name, typing, icon }) => ({ id, icon, text: new HtmlString(`${name}<br>${typing}`) });
 
 // Simulate AJAX loading
 const fetchLanguages = async (query) => {
@@ -62,9 +71,8 @@ const fetchLanguages = async (query) => {
   // Simulate server delay
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
-  if (!query) return programmingLanguages;
-
-  return programmingLanguages.filter((lang) => lang.text.toLowerCase().includes(query.toLowerCase()));
+  const search = (query ?? '').toLowerCase();
+  return programmingLanguages.filter((lang) => lang.name.toLowerCase().includes(search)).map(toChoice);
 };
 </script>
 

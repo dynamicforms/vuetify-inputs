@@ -1,6 +1,6 @@
 import { computed, ComputedRef, Ref, unref } from 'vue';
 
-/** A string rendered as markdown by `vue-markdown-render`, with its `options` and `plugins`. */
+/** A string rendered as markdown by `markdown-it`, with its `options` and `plugins`. */
 export class MdString extends String {
   plugins?: any[];
   options?: any;
