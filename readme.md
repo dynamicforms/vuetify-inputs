@@ -68,7 +68,7 @@ app.use(DynamicFormsInputs, { registerComponents: true, registerVuetifyComponent
 
 ## Basic Usage Example
 
-The library offers various components, including:
+A form with a select, a text area and a file upload bound to vue-forms fields:
 
 ```vue
 <template>
