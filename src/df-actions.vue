@@ -53,6 +53,7 @@ import {
   type ResolvedActionRenderOptions,
   useBreakpoint,
 } from './helpers';
+import { visibilityClasses } from './helpers/visibility-classes';
 
 const props = withDefaults(defineProps<DfActionsProps>(), {
   buttonSize: 'default',
@@ -73,17 +74,13 @@ const actionsWithBreakpoint = computed(() =>
   })),
 );
 
-function visibilityClasses({ action }: { action: Action }) {
-  return { 'd-none': action.visibility === 'hidden', invisible: action.visibility === 'invisible' };
-}
-
 // the bindings both kinds of button take; passthroughAttrs override them, its class, style and listeners add up
 function actionAttrs(options: ResolvedActionRenderOptions & { action: Action }) {
   const accessibleLabel = options.showLabel ? undefined : options.accessibleLabel;
   return mergeProps(
     {
       disabled: !options.action.executable,
-      class: visibilityClasses(options),
+      class: visibilityClasses(options.action.visibility),
       'aria-label': accessibleLabel,
       title: accessibleLabel,
     },

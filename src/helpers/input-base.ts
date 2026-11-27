@@ -18,6 +18,7 @@ import { inputContextKey } from './input-context';
 import { type RenderContentNonCallable, renderContentText } from './render-content';
 import { selectShownErrors } from './shown-errors';
 import { useSettings } from './use-settings';
+import { visibilityClasses } from './visibility-classes';
 
 /** A field's label: its content, and an icon shown before it. */
 export class Label {
@@ -215,10 +216,7 @@ export function useInputBase<T = any>(
     return props.visibility;
   });
   const isRendered = computed(() => visibility.value !== 'suppress');
-  const visibilityClass = computed(() => ({
-    'd-none': visibility.value === 'hidden',
-    invisible: visibility.value === 'invisible',
-  }));
+  const visibilityClass = computed(() => visibilityClasses(visibility.value));
   // the presentation the bound element carries: what a prop does not state is taken from here before any default
   const extra = computed(() => props.control?.extra ?? {});
 
