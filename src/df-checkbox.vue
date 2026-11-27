@@ -24,6 +24,7 @@ import { computed } from 'vue';
 
 import { DfCheckboxProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
+import { isFramelessVariant } from './helpers/frameless-variant';
 
 const props = withDefaults(defineProps<DfCheckboxProps>(), { ...defaultBaseProps, allowNull: false });
 
@@ -34,7 +35,7 @@ const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindin
 
 // v-checkbox takes no variant: the class lets the label line up with the text of plain and underlined fields
 const variantClass = computed(() =>
-  ['plain', 'underlined'].includes(vuetifyBindings.value.variant) ? 'df-variant-plain-underlined' : '',
+  isFramelessVariant(vuetifyBindings.value.variant) ? 'df-variant-plain-underlined' : '',
 );
 
 // the bindings v-checkbox takes: the rest would reach the native checkbox as attributes

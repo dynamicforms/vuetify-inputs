@@ -12,7 +12,7 @@
         :class="[
           'd-flex',
           'w-100',
-          ['plain', 'underlined'].includes(vuetifyBindings.variant) ? undefined : 'ml-4',
+          isFramelessVariant(vuetifyBindings.variant) ? undefined : 'ml-4',
           'df-input-wrapper',
           density,
         ]"
@@ -141,6 +141,7 @@ import ConfirmActions from './helpers/confirm-actions.vue';
 import { controlAria } from './helpers/control-aria';
 import { parseDateInput, parseTimeInput, setInputError } from './helpers/date-time-input';
 import { namespaced } from './helpers/error-namespace';
+import { isFramelessVariant } from './helpers/frameless-variant';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 import { useSettings } from './helpers/use-settings';
 
