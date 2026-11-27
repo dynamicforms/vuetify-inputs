@@ -722,10 +722,9 @@ section.fields.amount.enabled;            // true - what was written to the fiel
 section.fields.amount.effectiveEnabled;   // false - and what <df-input> draws from
 ```
 
-Nothing about `enabled` moves: it still answers what was written to each element, a write to a member of a disabled
-container is still accepted, and what a container serializes is still decided by its members' own `enabled`. What
-changes is that the fields of a section your code disables now render disabled and read-only. Where an application
-disabled those fields one by one to get that, the per-field writes can go.
+`enabled` is unchanged: it returns the value written to each element, a write to a member of a disabled container is
+accepted, and what a container serialises follows each member's own `enabled`. Writes that disabled each field of a
+disabled section can be removed.
 
 ### An element carries its own presentation
 
