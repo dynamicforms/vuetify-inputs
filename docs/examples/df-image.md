@@ -33,8 +33,8 @@ In addition to [common props from InputBase](./input-base), this component requi
 
 ## Value and Backend
 
-The value is the string `comms.upload` resolves to, and the component renders it as the image's `src`. There is no
-lookup from an identifier to a URL, so it must be a URL the browser can load. The same URL is passed to `comms.delete`
+The value is the string `comms.upload` resolves to: a URL the browser can load, used unchanged as the image's `src`.
+The same URL is passed to `comms.delete`
 and `comms.touch`, and is stored in the form data when using DynamicForms.
 
 Otherwise df-file's [FileComms interface](/examples/df-file#filecomms-interface), its rules for an upload that runs
