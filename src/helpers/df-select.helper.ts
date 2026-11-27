@@ -53,6 +53,12 @@ export function getSelectedChoices(loadedChoices: SelectChoice[], multipleCplian
   return loadedChoices.filter((choice) => mcValue.some((val: any) => val === choice.id));
 }
 
+/** The ids of a multiple-compliant value that none of the choices has as its id. */
+export function uncoveredIds(choices: SelectChoice[], multipleCompliantVal: any): any[] {
+  if (multipleCompliantVal == null) return [];
+  return castArray(multipleCompliantVal).filter((val) => !choices.some((choice) => choice.id === val));
+}
+
 /**
  * updateSelectedFromValue ensures that the actual select component receives model-value formatted to its needs. It
  * only sets what the select shows: the value itself is not written.

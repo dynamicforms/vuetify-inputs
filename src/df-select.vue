@@ -131,6 +131,7 @@ import {
   convertItems,
   getSelectedChoices,
   multipleCompliantValue,
+  uncoveredIds,
   updateSelectedFromValue,
 } from './helpers/df-select.helper';
 
@@ -228,9 +229,7 @@ const displayChoices = computed<SelectChoice[]>(() => {
   const loadedList = loadedChoices.value;
   const mcVal = currentValue();
   if (taggable.value || mcVal == null || valueChoicesPending.value) return loadedList;
-  const unknown = castArray(mcVal).filter(
-    (val) => String(val).trim() !== '' && !loadedList.some((choice) => choice.id === val),
-  );
+  const unknown = uncoveredIds(loadedList, mcVal).filter((val) => String(val).trim() !== '');
   if (!unknown.length) return loadedList;
   return [...loadedList, ...unknown.map((val): SelectChoice => ({ id: val, text: String(val) }))];
 });
@@ -240,9 +239,7 @@ const displayChoices = computed<SelectChoice[]>(() => {
 function withHiddenIds(ids: any[]): any[] {
   const mcVal = currentValue();
   if (taggable.value || !multiple.value || mcVal == null) return ids;
-  const hidden = castArray(mcVal).filter(
-    (val) => !ids.includes(val) && !displayChoices.value.some((choice) => choice.id === val),
-  );
+  const hidden = uncoveredIds(displayChoices.value, mcVal).filter((val) => !ids.includes(val));
   return hidden.length ? [...ids, ...hidden] : ids;
 }
 
@@ -586,7 +583,7 @@ async function fetchQuery(queryValue: any, idValue: any, chosenOnly = false): Pr
 function resolveValueChoices(mcVal: any): Promise<void> | null {
   const fetchChoices = propsWithDefaults.fetchChoices;
   if (fetchChoices === undefined || taggable.value || mcVal == null) return null;
-  const unresolved = castArray(mcVal).filter((val) => !loadedChoices.value.some((choice) => choice.id === val));
+  const unresolved = uncoveredIds(loadedChoices.value, mcVal);
   if (!unresolved.length) return null;
   resolvingValue.value++;
   return (async () => {
