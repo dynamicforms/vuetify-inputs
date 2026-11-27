@@ -284,14 +284,20 @@ const pad2 = (n: number) => n.toString().padStart(2, '0');
 const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, 'HH:mm')}:00`;
 
 const valueISOFull = ref<string | null>(null);
+// the date part and the time part without fractional seconds of an ISO string
+function isoParts(value: string): [string, string] {
+  const [date, time = ''] = value.split(/[TZ]/g);
+  return [date, time.split('.')[0]];
+}
+
 // the date and time parts of `base` with one of them replaced by the same part of `newISOValue`
 function mergeParts(base: string, newISOValue: string, dateOrTimeIdx: number) {
-  const vif = base.split(/[TZ]/g);
-  vif[dateOrTimeIdx] = newISOValue.split(/[TZ]/g)[dateOrTimeIdx];
+  const vif = isoParts(base);
+  vif[dateOrTimeIdx] = isoParts(newISOValue)[dateOrTimeIdx];
   return vif;
 }
 
-const naiveFromParts = (vif: string[]) => formatNaive(new Date(`${vif[0]}T${vif[1].split('.')[0]}`));
+const naiveFromParts = (vif: string[]) => formatNaive(new Date(`${vif[0]}T${vif[1]}`));
 
 // Reading the field's value (dateOrTimeIdx -1) only sets what the control shows: the field keeps the string it holds
 // until the user edits the date or the time. parseISO reads a date without a time as local midnight, where the Date
@@ -332,9 +338,7 @@ const valueAsDate = computed({
 const valueAsTimeString = computed({
   get() {
     const val = unref(valueISOFull);
-    if (val == null) return '';
-    const vif = val.split(/[TZ]/g);
-    return vif[1].split('.')[0];
+    return val == null ? '' : isoParts(val)[1];
   },
   set(newValue: string) {
     setValueISOFull(`T${newValue}`, 1);
