@@ -1,5 +1,5 @@
 import { Field, ValidationError } from '@dynamicforms/vue-forms';
-import { flushPromises, mount } from '@vue/test-utils';
+import { DOMWrapper, flushPromises, mount } from '@vue/test-utils';
 import { ja } from 'date-fns/locale';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -15,6 +15,12 @@ describe('DfDateTime', () => {
 
   const inputs = (wrapper: ReturnType<typeof mountDateTime>) =>
     wrapper.findAll('input').map((input) => (input.element as HTMLInputElement).value);
+
+  const typeAndLeave = async (input: DOMWrapper<HTMLInputElement>, text: string) => {
+    await input.setValue(text);
+    await input.trigger('blur');
+    await flushPromises();
+  };
 
   describe('in a time zone with daylight saving time, in summer', () => {
     beforeAll(() => {
@@ -47,9 +53,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '2026-01-15T10:00:00+01:00' });
       const wrapper = mountDateTime({ control });
 
-      await wrapper.findAll('input')[1].setValue('11:30');
-      await wrapper.findAll('input')[1].trigger('blur');
-      await flushPromises();
+      await typeAndLeave(wrapper.findAll('input')[1], '11:30');
       expect(control.value).toBe('2026-01-15T11:30:00+01:00');
       expect(inputs(wrapper)[1]).toBe('11:30');
     });
@@ -58,9 +62,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '2026-07-15T10:00:00+02:00' });
       const wrapper = mountDateTime({ control });
 
-      await wrapper.findAll('input')[1].setValue('11:30');
-      await wrapper.findAll('input')[1].trigger('blur');
-      await flushPromises();
+      await typeAndLeave(wrapper.findAll('input')[1], '11:30');
       expect(control.value).toBe('2026-07-15T11:30:00+02:00');
     });
 
@@ -100,9 +102,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '10:00:00' });
       const wrapper = mountDateTime({ control, inputType: 'time' });
 
-      await wrapper.find('input').setValue(typed);
-      await wrapper.find('input').trigger('blur');
-      await flushPromises();
+      await typeAndLeave(wrapper.find('input'), typed);
       expect(control.value).toBe(expected);
     });
 
@@ -110,9 +110,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '10:00:00' });
       const wrapper = mountDateTime({ control, inputType: 'time' });
 
-      await wrapper.find('input').setValue(typed);
-      await wrapper.find('input').trigger('blur');
-      await flushPromises();
+      await typeAndLeave(wrapper.find('input'), typed);
       expect(control.value).toBe('10:00:00');
     });
   });
@@ -137,9 +135,7 @@ describe('DfDateTime', () => {
       expect(control.value).toBe('10:00:00');
       expect((input.element as HTMLInputElement).value).toBe('184');
 
-      await input.setValue('1843');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '1843');
       expect(control.value).toBe('18:43:00');
       expect((input.element as HTMLInputElement).value).toBe('18:43');
     });
@@ -160,9 +156,7 @@ describe('DfDateTime', () => {
       const wrapper = mountDateTime({ control, inputType: 'date', locale: ja });
       const input = wrapper.find('input');
 
-      await input.setValue('812');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '812');
       expect(control.value).toBe('2026-08-12');
     });
 
@@ -171,17 +165,13 @@ describe('DfDateTime', () => {
       const wrapper = mountDateTime({ control, inputType: 'date' });
       const input = wrapper.find('input');
 
-      await input.setValue('131');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '131');
       expect(control.value).toBe('2026-01-15');
       expect((input.element as HTMLInputElement).value).toBe('131');
       expect(control.errors.map((error) => error.code)).toEqual(['vuetify-inputs.invalid_date']);
       expect(control.valid).toBe(false);
 
-      await input.setValue('1301');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '1301');
       expect(control.value).toBe('2026-01-13');
       expect(control.errors).toEqual([]);
     });
@@ -191,14 +181,10 @@ describe('DfDateTime', () => {
       const wrapper = mountDateTime({ control, inputType: 'time' });
       const input = wrapper.find('input');
 
-      await input.setValue('99:99');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '99:99');
       expect(control.errors.map((error) => error.code)).toEqual(['vuetify-inputs.invalid_time']);
 
-      await input.setValue('10');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '10');
       expect(control.value).toBe('10:00:00');
       expect(control.errors).toEqual([]);
       expect((input.element as HTMLInputElement).value).toBe('10:00');
@@ -209,9 +195,7 @@ describe('DfDateTime', () => {
       const input = wrapper.find('input');
 
       await input.trigger('focus');
-      await input.setValue('abc');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, 'abc');
       expect(wrapper.text()).toContain('Not a valid time.');
     });
 
@@ -219,9 +203,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '2026-01-15T10:00:00+01:00' });
       const wrapper = mountDateTime({ control });
 
-      await wrapper.find('input').setValue('');
-      await wrapper.find('input').trigger('blur');
-      await flushPromises();
+      await typeAndLeave(wrapper.find('input'), '');
       expect(control.value).toBeNull();
     });
 
@@ -229,9 +211,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '2026-01-15' });
       const wrapper = mountDateTime({ control, inputType: 'date' });
       const input = wrapper.find('input');
-      await input.setValue('131');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '131');
 
       control.value = '2026-02-20';
       await flushPromises();
