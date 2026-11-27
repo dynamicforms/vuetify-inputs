@@ -106,10 +106,13 @@ export interface DfInputGroupProps extends Pick<
   direction?: DfInputGroupDirection;
 }
 
+/** A plain text, or the items to render, each in its own element: a `RenderableValue` as its content, an error as
+ * `errorText()` gives it. */
+export type MessageItems = string | readonly (RenderableValue | ErrorInput)[];
+
 export interface MessagesWidgetProps {
-  /** A plain text, or the items to render, each in its own element: a `RenderableValue` as its content, an error
-   * as `errorText()` gives it. */
-  message: string | readonly (RenderableValue | ErrorInput)[];
+  /** The text or the items to render. */
+  message: MessageItems;
   /** Classes for every rendered item, beside the item's own `extraClasses`. */
   classes?: ClassTypes;
   /** Attributes for the element of every rendered item, or a function that gives them per item (`index` is the
@@ -121,7 +124,7 @@ export interface MessagesWidgetProps {
 export interface DfInputHintProps {
   /** The errors to render, in place of {@link message} whenever there is one. A string is text in the user's
    * language; an error description may lack any member. Defaults to the errors the enclosing input shows. */
-  errors?: string | readonly (RenderableValue | ErrorInput)[];
+  errors?: MessageItems;
   /** The message to render, shown while there is no error: content in any of its forms, or the items to render. */
   message?: RenderContentRef | readonly RenderableValue[];
   /** Classes for the rendered errors. Defaults to `text-error`. */
