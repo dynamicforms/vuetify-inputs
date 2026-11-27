@@ -11,6 +11,15 @@ describe('DfDateTime', () => {
     vi.unstubAllEnvs();
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const useFakeDate = (at?: Date) => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    if (at) vi.setSystemTime(at);
+  };
+
   const mountDateTime = (props: Record<string, any>) => mount(DfDateTime, { props: { label: 'When', ...props } });
 
   const inputs = (wrapper: ReturnType<typeof mountDateTime>) =>
@@ -28,12 +37,7 @@ describe('DfDateTime', () => {
     });
 
     beforeEach(() => {
-      vi.useFakeTimers({ toFake: ['Date'] });
-      vi.setSystemTime(new Date('2026-07-01T12:00:00+02:00'));
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
+      useFakeDate(new Date('2026-07-01T12:00:00+02:00'));
     });
 
     it.each([['2026-01-15T10:00:00+01:00'], ['2026-01-15T09:00:00Z'], ['2026-07-15T10:00:00+02:00']])(
@@ -117,12 +121,7 @@ describe('DfDateTime', () => {
 
   describe('typed text', () => {
     beforeEach(() => {
-      vi.useFakeTimers({ toFake: ['Date'] });
-      vi.setSystemTime(new Date(2026, 9, 15, 12, 0));
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
+      useFakeDate(new Date(2026, 9, 15, 12, 0));
     });
 
     it('keeps the text as typed and the value as it is until the field loses focus', async () => {
@@ -388,7 +387,7 @@ describe('DfDateTime', () => {
     });
 
     it('does not save a day within viewSettleMs of a switch to another month', async () => {
-      vi.useFakeTimers({ toFake: ['Date'] });
+      useFakeDate();
       const control = new Field<string | null>({ value: '2026-01-15' });
       const wrapper = mountDateTime({ control, inputType: 'date' });
       await wrapper.find('input').trigger('click');
@@ -407,16 +406,11 @@ describe('DfDateTime', () => {
       await flushPromises();
 
       expect(control.value).toBe('2026-01-15');
-      vi.useRealTimers();
     });
 
     describe('a double-click on the clock', () => {
       beforeEach(() => {
-        vi.useFakeTimers({ toFake: ['Date'] });
-      });
-
-      afterEach(() => {
-        vi.useRealTimers();
+        useFakeDate();
       });
 
       async function chooseMinute() {
