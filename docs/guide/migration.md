@@ -528,7 +528,7 @@ li p, td p, th p {
 ```
 
 The rule matches only a `<p>` inside a list item or a table cell; content saved by earlier versions has none, so the
-rule applies to all saved content.
+rule can be applied to all saved content.
 
 ### Checklist for 0.10.0
 
