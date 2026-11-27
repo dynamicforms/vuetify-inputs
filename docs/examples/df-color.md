@@ -95,15 +95,7 @@ segment.
 
 <color-hexagon/>
 
-```vue
-<df-color
-  v-model="color"
-  label="6 levels"
-  picker="hexagon"
-  :lightness-levels="6"
-  @preview="previewColor = $event"
-/>
-```
+<<< @/components/color-hexagon.vue#six-levels{vue}
 
 Without `lightnessLevels` the same palette offers the full lightness range with a slider.
 
@@ -123,33 +115,9 @@ value that does not pass the format check is not passed to `normalize`.
 
 <color-normalize/>
 
-```vue
-<template>
-  <df-color
-    v-model="color"
-    label="Web-safe colour"
-    :alpha="false"
-    :normalize="webSafe"
-    @preview="previewColor = $event"
-  />
-</template>
+<<< @/components/color-normalize.vue#field{vue}
 
-<script setup lang="ts">
-import { ref } from 'vue';
-import { DfColor } from '@dynamicforms/vuetify-inputs';
-
-const color = ref('#336699');
-const previewColor = ref<string | null>(null);
-
-// rounds each channel to the nearest multiple of 0x33
-function webSafe(value: string): string {
-  let hex = value.replace('#', '');
-  if (hex.length === 3) hex = [...hex].map((digit) => digit + digit).join('');
-  const channels = [0, 2, 4].map((start) => Math.round(parseInt(hex.slice(start, start + 2), 16) / 0x33) * 0x33);
-  return `#${channels.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
-}
-</script>
-```
+<<< @/components/color-normalize.vue#setup{ts}
 
 ## Validation
 

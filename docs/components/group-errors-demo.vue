@@ -3,6 +3,7 @@
     <v-card class="mb-4">
       <v-card-title>Trip Budget</v-card-title>
       <v-card-text>
+        <!-- #region form -->
         <v-form @submit.prevent>
           <v-row>
             <v-col cols="12" md="4">
@@ -38,6 +39,7 @@
             </v-row>
           </v-card>
 
+          <!-- group.valid covers the group's own errors as well as its fields' -->
           <div class="mt-4">
             <strong>Total:</strong>
             {{ total }} € of {{ budgetLimit }} €
@@ -51,6 +53,7 @@
             <df-input-hint :errors="formErrors" />
           </div>
         </v-form>
+        <!-- #endregion form -->
       </v-card-text>
     </v-card>
 
@@ -64,6 +67,7 @@
 </template>
 
 <script setup>
+// #region setup
 import {
   ConditionalAccessAction,
   ConditionalVisibilityAction,
@@ -133,4 +137,5 @@ const total = computed(() => tripTotal());
 
 // the group's own errors, shown by the rule the inputs follow
 const formErrors = useShownErrors(form);
+// #endregion setup
 </script>

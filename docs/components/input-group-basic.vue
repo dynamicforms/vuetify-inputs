@@ -14,6 +14,7 @@
           </v-col>
         </v-row>
 
+        <!-- #region form -->
         <v-row class="demo-row">
           <v-col cols="12" md="3">
             <df-input :control="form.fields.name" label="Course" :variant="variant" :density="density" />
@@ -39,12 +40,14 @@
             <df-input :control="form.fields.hours" label="Hours" :variant="variant" :density="density" />
           </v-col>
         </v-row>
+        <!-- #endregion form -->
       </v-card-text>
     </v-card>
   </div>
 </template>
 
 <script setup lang="ts">
+// #region setup
 import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { ref } from 'vue';
 
@@ -82,4 +85,5 @@ const form = new Group({
   days,
   hours: new Field({ value: '17:00' }),
 });
+// #endregion setup
 </script>

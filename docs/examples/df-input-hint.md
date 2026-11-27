@@ -188,67 +188,11 @@ The demo, without the cards it is laid out in:
 
 ### JavaScript/TypeScript
 
-```ts
-import { computed, ref } from 'vue';
-import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
-import { DfInput, DfInputHint, DfSelect } from '@dynamicforms/vuetify-inputs';
-
-const email = new Field<string>({
-  value: '',
-  validators: [
-    new Validators.Required(),
-    new Validators.Pattern(/^[^@\s]+@[^@\s]+\.[^@\s]+$/, {
-      code: 'app.invalid_email',
-      detail: 'An address of the form name@example.com, please',
-    }),
-  ],
-});
-
-const errorSource = ref<'none' | 'blank' | 'text'>('none');
-
-// The middle option is three spaces: a whitespace-only errors string is no error
-const standaloneErrors = computed(() => {
-  if (errorSource.value === 'blank') return '   ';
-  if (errorSource.value === 'text') return 'The value is not one of the allowed ones';
-  return '';
-});
-
-const credentials = new Group({
-  password: new Field<string>({ value: '' }),
-  confirmation: new Field<string>({ value: '' }),
-});
-
-// A rule over two fields: its error belongs to the group, and one hint row renders it
-credentials.registerAction(
-  new Validators.Validator(() => {
-    const { password, confirmation } = credentials.fields;
-    if (!confirmation.value || password.value === confirmation.value) return null;
-    return [new ValidationError('app.passwords_differ', {}, 'The two entries do not match')];
-  }),
-);
-```
+<<< @/components/input-hint-basic.vue#setup{ts}
 
 ### Vue Template
 
-```vue
-<template>
-  <!-- The hint is shown until the field is touched and invalid -->
-  <df-input :control="email" label="Email" hint="We use it for the receipt only" />
-
-  <!-- Standalone, with a plain string in each of the two props -->
-  <df-input-hint
-    :errors="standaloneErrors"
-    message="Shown while there is no error"
-    message-classes="text-medium-emphasis"
-  />
-
-  <df-input :control="credentials.fields.password" input-type="password" label="Password" />
-  <df-input :control="credentials.fields.confirmation" input-type="password" label="Repeat password" />
-
-  <!-- The group's own errors, in a colour of their own -->
-  <df-input-hint :errors="credentials.errors" error-classes="text-warning font-weight-bold" />
-</template>
-```
+<<< @/components/input-hint-basic.vue#template{vue}
 
 ## Key Features Demonstrated
 

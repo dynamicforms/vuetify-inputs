@@ -5,6 +5,7 @@
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
+            <!-- #region six-levels -->
             <df-color
               v-model="color"
               label="6 levels"
@@ -12,6 +13,7 @@
               :lightness-levels="6"
               @preview="previewColor = $event"
             />
+            <!-- #endregion six-levels -->
           </v-col>
           <v-col cols="12" md="6">
             <df-color v-model="fullRangeColor" label="Full lightness range" picker="hexagon" />
