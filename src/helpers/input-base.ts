@@ -251,8 +251,9 @@ export function useInputBase<T = any>(
     'persistent-placeholder': !isEmpty(placeholder.value),
 
     hint: hint.value,
-    persistentHint: true, // we want persistent hint always
-    hideDetails: <boolean | 'auto' | undefined>'auto', // we want to hide the hint element when hint isn't there
+    persistentHint: true,
+    // the messages row is rendered only while there is a hint or an error
+    hideDetails: <boolean | 'auto' | undefined>'auto',
 
     // the control's state for assistive technology; Vuetify passes unknown attributes on to the native control
     'aria-invalid': <'true' | undefined>(shownErrors.value.length > 0 ? 'true' : undefined),
