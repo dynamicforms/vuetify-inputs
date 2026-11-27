@@ -769,7 +769,7 @@ components as well, and the component draws it where its tag states no `label`.
 
 ### `ActionRenderOptions` states `label` and `icon` as strings
 
-vue-forms 0.17.0 types both `unknown` on `ActionValue`, so a rendering library says what a label is; this one says
+vue-forms 0.17.0 types `label` and `icon` as `unknown` on `ActionValue`; `ActionRenderOptions` types them as
 `string`. An action of this library's own class is unaffected. Where your code declares a value type of its own
 over `ActionRenderOptions` it inherits the two as strings, and where it extends vue-forms' `ActionValue` directly it
 states them itself.
