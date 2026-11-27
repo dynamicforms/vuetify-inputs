@@ -121,8 +121,6 @@ The `value` object defines the visual appearance and behaviour:
 | `defaultReject` | `boolean` | Marks this as the "reject/dismiss" action of the set; colours the `v-btn` `secondary` in `<df-actions>` (unless overridden via `passthroughAttrs.color`); no colour in [simple mode](#simple-mode) |
 | `passthroughAttrs` | `Record<string, any>` | Extra props/attrs forwarded to the rendered `<v-btn>` (e.g. `color`, `density`, `rounded`, `block`, `prependIcon`), overriding `<df-actions>`'s own computed props; in [simple mode](#simple-mode) HTML attributes of the `<button>` (e.g. `class`, `style`, `aria-describedby`), where `v-btn` props have no effect |
 
-Every one of these but `name`, `defaultConfirm` and `defaultReject` can also be stated per breakpoint.
-
 `icon` is an accessor of `@dynamicforms/vue-forms`: it reads the member of the same name from the value, and a write
 to it is a value change. `label` is this subclass's accessor over the same member: it returns the string the member
 gives now, reading a ref or calling a function, and a write to it is a value change. `defaultConfirm` and
@@ -158,45 +156,32 @@ returns whether a value is one of the two, and `actionDisplayStyles` lists them.
 
 ### Responsive Breakpoints
 
-Actions support responsive behaviour through breakpoint-specific configurations:
+A breakpoint key holds the options that differ at that screen width:
 
 ```typescript
-const responsiveAction = new Action({
+const saveAction = new Action({
   value: {
     name: 'save',
-    label: 'Save Document',
+    label: 'Save',
     icon: 'ion-save-outline',
     renderAs: 'button',
-    showIcon: false,      // Default: no icon
-    showLabel: true,      // Default: show label
-    
-    // Small screens: only show icon
-    sm: { 
-      showIcon: true, 
-      showLabel: false 
-    },
-    
-    // Medium screens: show both
-    md: { 
-      showIcon: true, 
-      showLabel: true 
-    },
-    
-    // Large screens: render as text link
-    lg: { 
-      renderAs: 'text' 
-    }
-  }
+    showIcon: true,
+    showLabel: false,
+    md: { showLabel: true, showIcon: false },
+    lg: { showIcon: true },
+  },
+  actions: [formSaveAction],
 });
 ```
 
-**Breakpoint inheritance**: values are inherited from smaller to larger breakpoints. If `lg` does not set `showIcon`,
-it takes the value of `md`, or of the closest smaller breakpoint that sets it. The base values (outside any
-breakpoint) apply to the smallest breakpoint.
+With this configuration:
 
-Every option except `passthroughAttrs` is a single value, which a breakpoint replaces. The class behind the
-inheritance, `ResponsiveRenderOptions`, also supports list options for subclasses; see
-[responsive options](/examples/responsive-render-options).
+- `xs` and `sm`: only the icon is shown
+- `md`: only the label is shown
+- `lg` and `xl`: the icon and the label are shown
+
+A breakpoint inherits the options it does not set from the smaller ones; see
+[How a breakpoint is resolved](/examples/responsive-render-options#how-a-breakpoint-is-resolved).
 
 ### Action Execution
 
@@ -304,24 +289,15 @@ const submitFormAction = new ExecuteAction(async (action, supr, params) => {
   return supr(action, params);
 });
 
-// Responsive action configuration
+// Presentation
 const submitAction = new Action({
   value: {
     name: 'submit',
     label: 'Submit Form',
     icon: 'ion-checkmark-outline',
     renderAs: 'button',
-    showIcon: false,
+    showIcon: true,
     showLabel: true,
-    
-    // Mobile: icon only
-    xs: { showIcon: true, showLabel: false },
-    
-    // Tablet and up: both icon and label
-    md: { showIcon: true, showLabel: true },
-    
-    // Desktop: text link style
-    xl: { renderAs: 'text' }
   },
   actions: [submitFormAction]
 });
@@ -331,32 +307,6 @@ const submitAction = new Action({
 member's `access` sets what `value` contains for it; `visibility` affects neither.
 
 The presentation (the `Action` and its render options) is separate from the logic (the `ExecuteAction` handlers).
-
-## Responsive Behaviour
-
-The component applies the options of the current breakpoint:
-
-```javascript
-const saveAction = new Action({
-  value: {
-    name: 'save',
-    label: 'Save',
-    icon: 'ion-save-outline',
-    renderAs: 'button',
-    showIcon: true,
-    showLabel: false,
-    md: { showLabel: true, showIcon: false }, // Medium screens and up
-    lg: { showIcon: true }                    // Large screens and up
-  },
-  actions: [formSaveAction]
-});
-```
-
-With this configuration:
-
-- On small screens: Only the icon is shown
-- On medium screens: Only the label is shown
-- On large screens: Both icon and label are shown
 
 ## Button Grouping
 
