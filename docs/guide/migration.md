@@ -492,8 +492,7 @@ There is a [checklist](#checklist-for-0-10-0) at the end of this section.
 }
 ```
 
-Drop the two CKEditor packages from your own `package.json` and install this set instead. Nothing else in your
-project's use of `@dynamicforms/vuetify-inputs` needs to change on account of this swap by itself.
+Remove the two CKEditor packages from your `package.json` and install the TipTap packages above.
 
 ### `setCkEditorLanguage()` and `ckEditorLanguage` are removed
 
