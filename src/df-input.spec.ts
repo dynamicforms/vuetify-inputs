@@ -1,5 +1,5 @@
 import { Field, Validators } from '@dynamicforms/vue-forms';
-import { config, flushPromises, mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
@@ -13,17 +13,7 @@ import {
   type RenderContentNonCallable,
   vuetifyInputsSettingsKey,
 } from '@/helpers';
-
-// mounts in place of the Vuetify instance that test-setup registers for every mount
-function withPlugins<T>(plugins: typeof config.global.plugins, mountFn: () => T): T {
-  const shared = config.global.plugins;
-  config.global.plugins = plugins;
-  try {
-    return mountFn();
-  } finally {
-    config.global.plugins = shared;
-  }
-}
+import { withPlugins } from '@/test-utils/plugins';
 
 describe('DfInput', () => {
   describe('as a number input', () => {

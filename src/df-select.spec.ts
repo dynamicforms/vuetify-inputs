@@ -1,5 +1,5 @@
 import { Field, Group, ValueChangedAction } from '@dynamicforms/vue-forms';
-import { config, flushPromises, mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref, toRaw } from 'vue';
 import { createVuetify } from 'vuetify';
@@ -8,6 +8,7 @@ import { VAutocomplete } from 'vuetify/components';
 
 import DfSelect from '@/df-select.vue';
 import { HtmlString, MdString, SelectChoice } from '@/helpers';
+import { withPlugins } from '@/test-utils/plugins';
 
 const ALL_CHOICES: SelectChoice[] = [1, 2, 3, 4].map((id) => ({ id, text: `Choice ${id}` }));
 // A search returns at most this many choices, the way a paginated endpoint does: not every choice is loaded by one.
@@ -50,17 +51,6 @@ function recordWrites(control: Field<any>): unknown[] {
     }),
   );
   return writes;
-}
-
-// mounts in place of the Vuetify instance that test-setup registers for every mount
-function withPlugins<T>(plugins: typeof config.global.plugins, mountFn: () => T): T {
-  const shared = config.global.plugins;
-  config.global.plugins = plugins;
-  try {
-    return mountFn();
-  } finally {
-    config.global.plugins = shared;
-  }
 }
 
 describe('DfSelect', () => {
