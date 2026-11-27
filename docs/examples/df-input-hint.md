@@ -111,12 +111,26 @@ new value. `isRenderContent(value)`, `isSimpleComponentDef(content)` and `isCall
 apart. `renderContentText(content)` returns the text of content where only text is taken: a string and an `MdString`
 as written, an `HtmlString` without its tags, a component as the text of its children, joined.
 
-`MessagesWidget` takes two props:
+`MessagesWidget` takes these props:
 
 | Prop | Type | Description |
 |---|---|---|
 | message | `string \| (RenderableValue \| ErrorInput)[]` | A plain text, or the items to render, each in its own element |
 | classes | `ClassTypes` | Classes for every rendered item, beside the item's own `classes` |
+| itemAttrs | `Record<string, unknown> \| ((item: RenderableValue, index: number) => Record<string, unknown> \| undefined)` | Attributes for the element of every rendered item, or a function that gives them per item |
+
+`itemAttrs` is bound on the element each item renders as: the `span` of a plain text message (item 0), the `div` of a
+text or HTML item, the markdown wrapper, or the element or component of a component definition. The attributes merge
+with the item's own bindings as Vue merges props: classes, styles and listeners add up, any other attribute replaces
+the item's own. The function receives the item as a `RenderableValue` (an error already converted to its text) and its
+position in `message`:
+
+```vue
+<messages-widget
+  :message="cells"
+  :item-attrs="(item, index) => ({ role: 'cell', 'aria-colindex': index + 1 })"
+/>
+```
 
 ## How the inputs use it
 

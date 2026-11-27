@@ -115,6 +115,10 @@ export interface MessagesWidgetProps {
   message: string | readonly (RenderableValue | ErrorInput)[];
   /** Classes for every rendered item, beside the item's own `extraClasses`. */
   classes?: ClassTypes;
+  /** Attributes for the element of every rendered item, or a function that gives them per item (`index` is the
+   * item's position; a plain text message is item 0). They are merged with the item's own bindings as Vue merges
+   * props: classes, styles and listeners add up, any other attribute replaces the item's own. */
+  itemAttrs?: Record<string, unknown> | ((item: RenderableValue, index: number) => Record<string, unknown> | undefined);
 }
 
 export interface DfInputHintProps {

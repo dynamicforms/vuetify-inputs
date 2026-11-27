@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, inject, resolveComponent, type VNodeChild } from 'vue';
+import { h, inject, mergeProps, resolveComponent, type VNodeChild } from 'vue';
 
 import type { MessagesWidgetProps } from '../dynamicforms-component-props';
 
@@ -103,25 +103,45 @@ function renderChild(child: RenderContentNonCallable): VNodeChild {
   }
 }
 
+function attrsOf(item: RenderableValue | (() => RenderableValue), index: number) {
+  const { itemAttrs } = props;
+  if (typeof itemAttrs !== 'function') return itemAttrs;
+  return itemAttrs(typeof item === 'function' ? item() : item, index);
+}
+
+// class, style and listeners add up as Vue merges props; any other key replaces the binding
+function needsMerge(attrs: Record<string, unknown>) {
+  return Object.keys(attrs).some((key) => key === 'class' || key === 'style' || /^on[A-Z]/.test(key));
+}
+
+function withAttrs(bindings: Record<string, any>, attrs: Record<string, unknown> | undefined): Record<string, any> {
+  if (!attrs) return bindings;
+  return needsMerge(attrs) ? mergeProps(bindings, attrs) : { ...bindings, ...attrs };
+}
+
 const render = () => {
-  if (typeof props.message === 'string') return h('span', { class: props.classes }, props.message);
-  return props.message.map((item) => {
+  if (typeof props.message === 'string') {
+    const text = props.message;
+    const attrs = attrsOf(() => new RenderableValue(text), 0);
+    return h('span', withAttrs({ class: props.classes }, attrs), text);
+  }
+  return props.message.map((item, index) => {
     const msg = asRenderable(item);
     const classes = [props.classes, msg.extraClasses];
+    const attrs = attrsOf(msg, index);
     switch (msg.componentName) {
       case 'template':
-        return h('div', { class: classes }, msg.componentBody);
+        return h('div', withAttrs({ class: classes }, attrs), msg.componentBody);
       case 'html':
-        return h('div', { class: classes, innerHTML: msg.componentBody });
-      case 'vue-markdown':
-        return h('div', {
-          class: [...classes, 'df-messages-widget-markdown'],
-          innerHTML: renderMarkdown(msg.resolvedText as MdString),
-        });
+        return h('div', withAttrs({ class: classes, innerHTML: msg.componentBody }, attrs));
+      case 'vue-markdown': {
+        const bindings = withAttrs({ class: [...classes, 'df-messages-widget-markdown'] }, attrs);
+        return h('div', { ...bindings, innerHTML: renderMarkdown(msg.resolvedText as MdString) });
+      }
       default:
         return renderComponent(
           msg.componentName,
-          { ...msg.componentBindings, class: [classes, msg.componentBindings.class] },
+          withAttrs({ ...msg.componentBindings, class: [classes, msg.componentBindings.class] }, attrs),
           msg.componentChildren,
         );
     }
