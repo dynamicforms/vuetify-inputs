@@ -12,9 +12,8 @@ const TABLE_WITH_TWO_IMAGES = `<table style="min-width: 50px;"><colgroup><col st
   <td><p><img src="data:image/png;base64,${RED_SQUARE}" alt="large" width="368" height="389"></p></td>
 </tr></tbody></table>`;
 
-// Word's clipboard HTML for a shaded table cell: mso-* noise plus a literal (non-mso) `background`/`bgcolor` -
-// the kind of "Automatic" theme colour Word resolves to black in the exported HTML even though the cell looked
-// white on screen.
+// Word's clipboard HTML for a shaded table cell: mso-* styles plus a plain `background`/`bgcolor`, which Word exports
+// as black for the "Automatic" theme colour
 const WORD_TABLE_WITH_BLACK_SHADING = `<html xmlns:o="urn:schemas-microsoft-com:office:office">
 <body lang=EN-US style='tab-interval:36.0pt'>
 <table class=MsoTableGrid border=1 style='border-collapse:collapse;mso-border-alt:solid windowtext .5pt'>
