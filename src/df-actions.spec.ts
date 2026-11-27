@@ -1,14 +1,21 @@
 import { Action as FormAction, ExecuteAction, Field, Group, SubmitAction, Validators } from '@dynamicforms/vue-forms';
-import { flushPromises, mount } from '@vue/test-utils';
+import { flushPromises, GlobalMountOptions, mount } from '@vue/test-utils';
 import { vi } from 'vitest';
 import { nextTick, Ref, ref } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import { VBtn } from 'vuetify/components';
 
 import DfActions from '@/df-actions.vue';
+import { DfActionsProps } from '@/dynamicforms-component-props';
 import { Action, HtmlString } from '@/helpers';
 
 describe('DfActions', () => {
+  const mountActions = (
+    actions: DfActionsProps['actions'],
+    props: Partial<DfActionsProps> = {},
+    global: GlobalMountOptions = {},
+  ) => mount(DfActions, { props: { actions, ...props }, global });
+
   const createMockAction = (name: string, label: string, icon?: string): Action => {
     const executeAction = new ExecuteAction(vi.fn());
     return new Action({
@@ -30,9 +37,7 @@ describe('DfActions', () => {
       createMockAction('cancel', 'Cancel', 'close-outline'),
     ];
 
-    const wrapper = mount(DfActions, {
-      props: { actions },
-    });
+    const wrapper = mountActions(actions);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(2);
   });
@@ -40,9 +45,7 @@ describe('DfActions', () => {
   it('shows the label and the icon', () => {
     const actions = [createMockAction('save', 'Save', 'save-outline')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions },
-    });
+    const wrapper = mountActions(actions);
 
     const button = wrapper.find('.v-btn');
     expect(button.text()).toContain('Save');
@@ -54,18 +57,14 @@ describe('DfActions', () => {
     const action = createMockAction('save', 'Save');
     action.execute = mockExecute;
 
-    const wrapper = mount(DfActions, {
-      props: { actions: [action] },
-    });
+    const wrapper = mountActions([action]);
 
     await wrapper.find('.v-btn').trigger('click');
     expect(mockExecute).toHaveBeenCalledTimes(1);
   });
 
   it('renders nothing without actions', () => {
-    const wrapper = mount(DfActions, {
-      props: { actions: [] },
-    });
+    const wrapper = mountActions([]);
 
     expect(wrapper.find('.v-btn').exists()).toBe(false);
   });
@@ -73,9 +72,7 @@ describe('DfActions', () => {
   it('uses the button-group class when showAsGroup is set', () => {
     const actions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions, showAsGroup: 'grouped' },
-    });
+    const wrapper = mountActions(actions, { showAsGroup: 'grouped' });
 
     expect(wrapper.find('.button-group').exists()).toBe(true);
     expect(wrapper.find('.with-border').exists()).toBe(true);
@@ -84,9 +81,7 @@ describe('DfActions', () => {
   it('sets the button size', () => {
     const actions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions, buttonSize: 'large' },
-    });
+    const wrapper = mountActions(actions, { buttonSize: 'large' });
 
     const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
     expect(buttonComponent.props('size')).toBe('large');
@@ -95,9 +90,10 @@ describe('DfActions', () => {
     const action = createMockAction('save', 'Save');
     action.value.renderAs = 'text';
 
-    const wrapper = mount(DfActions, {
-      props: { actions: [action] },
-      global: {
+    const wrapper = mountActions(
+      [action],
+      {},
+      {
         stubs: {
           'v-btn': {
             template: '<button class="v-btn" :data-variant="variant"><slot /></button>',
@@ -105,7 +101,7 @@ describe('DfActions', () => {
           },
         },
       },
-    });
+    );
 
     const button = wrapper.find('.v-btn');
     expect(button.attributes('data-variant')).toBe('text');
@@ -114,9 +110,7 @@ describe('DfActions', () => {
   it('shows a spacer between the icon and the label', () => {
     const action = createMockAction('save', 'Save', 'save-outline');
 
-    const wrapper = mount(DfActions, {
-      props: { actions: [action] },
-    });
+    const wrapper = mountActions([action]);
 
     const spacer = wrapper.find('span[style*="width: 0.5rem"]');
     expect(spacer.exists()).toBe(true);
@@ -125,9 +119,7 @@ describe('DfActions', () => {
   it('shows no spacer without an icon or a label', () => {
     const actionOnlyIcon = createMockAction('save', '', 'save-outline');
 
-    const wrapper = mount(DfActions, {
-      props: { actions: [actionOnlyIcon] },
-    });
+    const wrapper = mountActions([actionOnlyIcon]);
 
     const spacer = wrapper.find('span[style*="width: .5rem"]');
     expect(spacer.exists()).toBe(false);
@@ -136,9 +128,7 @@ describe('DfActions', () => {
   it('sets the grouping CSS classes', () => {
     const actions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions, showAsGroup: 'grouped-no-borders' },
-    });
+    const wrapper = mountActions(actions, { showAsGroup: 'grouped-no-borders' });
 
     const container = wrapper.find('div');
     expect(container.classes()).toContain('button-group');
@@ -147,9 +137,7 @@ describe('DfActions', () => {
   it('follows changes to the actions prop', async () => {
     const initialActions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions: initialActions },
-    });
+    const wrapper = mountActions(initialActions);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(1);
 
@@ -171,9 +159,7 @@ describe('DfActions', () => {
       createMockAction('cancel', 'Cancel'),
     ];
 
-    const wrapper = mount(DfActions, {
-      props: { actions: initialActions },
-    });
+    const wrapper = mountActions(initialActions);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(3);
 
@@ -185,9 +171,7 @@ describe('DfActions', () => {
   it('hides when all actions are removed', async () => {
     const initialActions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions: initialActions },
-    });
+    const wrapper = mountActions(initialActions);
 
     expect(wrapper.find('.v-btn').exists()).toBe(true);
 
@@ -200,9 +184,7 @@ describe('DfActions', () => {
   it('follows changes to a reactive actions ref', async () => {
     const actionsRef = <Ref<Action[]>>ref([createMockAction('save', 'Save')]);
 
-    const wrapper = mount(DfActions, {
-      props: { actions: actionsRef },
-    });
+    const wrapper = mountActions(actionsRef);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(1);
 
@@ -221,9 +203,7 @@ describe('DfActions', () => {
       ])
     );
 
-    const wrapper = mount(DfActions, {
-      props: { actions: actionsRef },
-    });
+    const wrapper = mountActions(actionsRef);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(3);
 
@@ -240,9 +220,7 @@ describe('DfActions', () => {
       const action = createMockAction('save', 'Save');
       action.value.defaultConfirm = true;
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('color')).toBe('primary');
@@ -252,9 +230,7 @@ describe('DfActions', () => {
       const action = createMockAction('cancel', 'Cancel');
       action.value.defaultReject = true;
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('color')).toBe('secondary');
@@ -265,9 +241,7 @@ describe('DfActions', () => {
       action.value.defaultConfirm = true;
       action.value.defaultReject = true;
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('color')).toBe('primary');
@@ -276,9 +250,7 @@ describe('DfActions', () => {
     it('leaves the button without a colour when neither defaultConfirm nor defaultReject is set', () => {
       const action = createMockAction('neutral', 'Neutral');
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('color')).toBeUndefined();
@@ -290,9 +262,7 @@ describe('DfActions', () => {
       const action = createMockAction('save', 'Save');
       action.access = 'disabled';
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('disabled')).toBe(true);
@@ -301,9 +271,7 @@ describe('DfActions', () => {
     it('enables the button when action.enabled is true (default)', () => {
       const action = createMockAction('save', 'Save');
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('disabled')).toBe(false);
@@ -314,9 +282,7 @@ describe('DfActions', () => {
       const form = new Group({ save: action });
       form.access = 'disabled';
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       expect(action.enabled).toBe(true);
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -331,9 +297,7 @@ describe('DfActions', () => {
       });
       const form: Group = new Group({ name, save });
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [save] },
-      });
+      const wrapper = mountActions([save]);
       await flushPromises();
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -362,9 +326,7 @@ describe('DfActions', () => {
     it('disables the button and shows it loading until the run settles', async () => {
       const [action, release] = pendingAction();
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('disabled')).toBe(false);
@@ -386,9 +348,7 @@ describe('DfActions', () => {
       const [action, release] = pendingAction();
       const executeSpy = vi.spyOn(action, 'execute');
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       await wrapper.find('.v-btn').trigger('click');
       await nextTick();
@@ -405,9 +365,7 @@ describe('DfActions', () => {
     it('renders an action that carries only a label', () => {
       const action = new FormAction({ value: { label: 'Save' } });
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.text()).toContain('Save');
@@ -419,9 +377,7 @@ describe('DfActions', () => {
       const executed = vi.fn();
       const action = new FormAction({ value: { label: 'Save' }, actions: [new ExecuteAction(executed)] });
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       await wrapper.find('.v-btn').trigger('click');
       expect(executed).toHaveBeenCalledTimes(1);
@@ -433,9 +389,7 @@ describe('DfActions', () => {
       const action = createMockAction('save', 'Save');
       action.visibility = 'hidden';
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       expect(wrapper.find('.v-btn').classes()).toContain('d-none');
     });
@@ -444,9 +398,7 @@ describe('DfActions', () => {
       const action = createMockAction('save', 'Save');
       action.visibility = 'invisible';
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       expect(wrapper.find('.v-btn').classes()).toContain('invisible');
     });
@@ -456,9 +408,7 @@ describe('DfActions', () => {
       const suppressedAction = createMockAction('secret', 'Secret');
       suppressedAction.visibility = 'suppress';
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [shownAction, suppressedAction] },
-      });
+      const wrapper = mountActions([shownAction, suppressedAction]);
 
       const buttons = wrapper.findAll('.v-btn');
       expect(buttons).toHaveLength(1);
@@ -468,9 +418,7 @@ describe('DfActions', () => {
     it('adds no classes when visibility is FULL (default)', () => {
       const action = createMockAction('save', 'Save');
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const button = wrapper.find('.v-btn');
       expect(button.classes()).not.toContain('d-none');
@@ -482,9 +430,7 @@ describe('DfActions', () => {
       const action = createMockAction('save', 'Save');
       action.value.passthroughAttrs = { block: true, rounded: 'lg' };
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('block')).toBe(true);
@@ -496,17 +442,13 @@ describe('DfActions', () => {
       action.value.defaultConfirm = true;
       action.value.passthroughAttrs = { color: 'error' };
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('color')).toBe('error');
     });
   });
   describe('accessible name', () => {
-    const mountActions = (actions: Action[]) => mount(DfActions, { props: { actions } });
-
     it('names an icon-only button with aria-label and title', () => {
       const action = createMockAction('save', 'Save', 'save-outline');
       action.value.showLabel = false;
@@ -581,8 +523,8 @@ describe('DfActions', () => {
   });
 
   describe('simple', () => {
-    const mountSimple = (actions: Action[], props: Record<string, unknown> = {}) =>
-      mount(DfActions, { props: { actions, simple: true, ...props } });
+    const mountSimple = (actions: Action[], props: Partial<DfActionsProps> = {}) =>
+      mountActions(actions, { simple: true, ...props });
 
     it('renders native buttons instead of v-btn', () => {
       const wrapper = mountSimple([createMockAction('save', 'Save'), createMockAction('cancel', 'Cancel')]);
