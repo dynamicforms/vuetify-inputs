@@ -301,9 +301,10 @@ const setResultingValueGuard = ref(false);
 // Number of writes into the value. A write onSelect() defers is dropped when another write is made before it.
 let writeCount = 0;
 
-// The only place the select writes into the value. It is called from the user's edits only: setting the select up,
-// mounting it, loading choices or a value set from outside leave the value as it is.
+// The only place the select writes into the value; the select shows the written value. It is called from the user's
+// edits only: setting the select up, mounting it, loading choices or a value set from outside leave the value as it is.
 function setResultingValue(newValue: any) {
+  syncSelected(newValue);
   writeCount++;
   setResultingValueGuard.value = true;
   try {
@@ -442,7 +443,6 @@ function onSelect(/* val: any */) {
       multiple.value && Array.isArray(selected.value) ? withHiddenIds(selected.value) : selected.value,
       multiple.value,
     );
-    syncSelected(mcVal);
     setResultingValue(mcVal);
   });
 }
@@ -450,7 +450,6 @@ function onSelect(/* val: any */) {
 // the clear button is offered under allowNull only
 function onClear() {
   if (vuetifyBindings.value.readonly) return;
-  syncSelected(null);
   setResultingValue(null);
 }
 
@@ -462,7 +461,6 @@ function chipClose(event: Event, itemValue: any): boolean {
     multiple.value && Array.isArray(selected.value) ? selected.value.filter((v) => v !== itemValue) : [];
   if (!allowNull.value && !remaining.length) return false;
   const mcVal = multipleCompliantValue(withHiddenIds(remaining), multiple.value);
-  syncSelected(mcVal);
   setResultingValue(mcVal);
   return true;
 }
