@@ -34,7 +34,7 @@ test.beforeEach(async ({ page }) => {
   await page.waitForSelector('.rtf-content');
 });
 
-test('pasting a Word table strips background shading instead of carrying it into the theme', async ({ page }) => {
+test('pasting a Word table drops the background and bgcolor of its cells', async ({ page }) => {
   await pasteHtml(page, WORD_TABLE_WITH_BLACK_SHADING);
 
   const td = page.locator('.rtf-content td').first();
