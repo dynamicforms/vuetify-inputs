@@ -436,18 +436,13 @@ translateStrings((key: string): string => {
 translateStrings((key, defaultValue) => myCatalogue[key] ?? defaultValue);
 ```
 
-The callback now receives the English default as a second argument, so there is no longer a need to fall back to
-it by hand or to widen a declined return past `string` with a cast. The behaviour on a declined key changes along
-with the signature: previously, a key the callback declined kept *whatever a previous `translateStrings` call had
-set it to* - so a locale switcher had to supply a complete catalogue, English included, or an entry could be left
-showing a stale translation from a locale the application had moved away from. Now, a declined key resets to its
-English default on that call, so every call to `translateStrings` is a complete statement of the current locale
-rather than a patch on top of the last one - a locale that only overrides a handful of keys behaves the same as
-one that overrides all of them.
+The callback receives the English default as its second argument, so a fallback by hand and a cast of a declined
+return are not needed. A key the callback declines resets to its English default on that call. In 0.10 it kept the
+value a previous `translateStrings` call set, so a locale switcher had to supply a complete catalogue, English
+included, or an entry kept the translation of the previous locale.
 
-If your own callback relied on the old accumulating behaviour - for instance, calling `translateStrings` once with
-a partial catalogue early and topping it up later without repeating the earlier keys - it now needs to supply
-every key it wants translated on every call.
+A callback that called `translateStrings` with a partial catalogue and later added keys without repeating the
+earlier ones must now return every key it translates on every call.
 
 ### `<df-rtf-editor>`'s toolbar no longer needs remounting
 
