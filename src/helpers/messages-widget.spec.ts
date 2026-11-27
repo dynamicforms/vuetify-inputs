@@ -13,10 +13,15 @@ const MockCustomAlert = {
   template: '<div class="custom-alert-mock" :type="$props.type" :dismissible="$props.dismissible"></div>',
 };
 
+const MockCustomCard = { name: 'CustomCard', template: '<section class="custom-card-mock"><slot /></section>' };
+
 function buildWrapper(props: any, settings: VuetifyInputsSettings = {}) {
   return mount(MessagesWidget, {
     props,
-    global: { components: { CustomAlert: MockCustomAlert }, provide: { [vuetifyInputsSettingsKey]: settings } },
+    global: {
+      components: { CustomAlert: MockCustomAlert, CustomCard: MockCustomCard },
+      provide: { [vuetifyInputsSettingsKey]: settings },
+    },
   });
 }
 
@@ -60,13 +65,8 @@ describe('MessagesWidget', () => {
   });
 
   describe('component children', () => {
-    const MockCustomCard = { name: 'CustomCard', template: '<section class="custom-card-mock"><slot /></section>' };
-
     function buildChildrenWrapper(content: SimpleComponentDef) {
-      return mount(MessagesWidget, {
-        props: { message: [new RenderableValue(content)] },
-        global: { components: { CustomCard: MockCustomCard }, provide: { [vuetifyInputsSettingsKey]: {} } },
-      });
+      return buildWrapper({ message: [new RenderableValue(content)] });
     }
 
     it('renders a string child of an element as escaped text', () => {
