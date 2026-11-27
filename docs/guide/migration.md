@@ -283,7 +283,7 @@ that marked fields touched after the server answered, to make its errors appear,
 is sent nowhere shows no error at all.
 
 ```typescript
-// before: the server's errors stayed out of sight until each field was marked touched
+// before: a server error was shown only once its field was touched
 field.errors.push(new ValidationErrorText(message));
 field.touched = true;
 
