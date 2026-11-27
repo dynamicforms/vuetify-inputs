@@ -10,6 +10,8 @@ type DatePart = 'day' | 'month' | 'year';
 
 const meridiemSuffix = /\s*([ap])\.?\s*m?\.?\s*$/i;
 
+const toInt = (s: string) => Number.parseInt(s, 10);
+
 function timeOf(hours: number, minutes: number, meridiem?: 'a' | 'p'): TimeOfDay | null {
   if (!Number.isInteger(hours) || !Number.isInteger(minutes) || minutes > 59) return null;
   if (meridiem) {
@@ -21,18 +23,17 @@ function timeOf(hours: number, minutes: number, meridiem?: 'a' | 'p'): TimeOfDay
 
 /** A time written as digits only: `9`, `18` (whole hours), `65` (6:05), `130` (1:30), `1843` (18:43). */
 function timeFromDigits(digits: string, meridiem?: 'a' | 'p'): TimeOfDay | null {
-  const n = (s: string) => Number.parseInt(s, 10);
   switch (digits.length) {
     case 1:
-      return timeOf(n(digits), 0, meridiem);
+      return timeOf(toInt(digits), 0, meridiem);
     case 2:
-      return n(digits) <= (meridiem ? 12 : 23)
-        ? timeOf(n(digits), 0, meridiem)
-        : timeOf(n(digits[0]), n(digits[1]), meridiem);
+      return toInt(digits) <= (meridiem ? 12 : 23)
+        ? timeOf(toInt(digits), 0, meridiem)
+        : timeOf(toInt(digits[0]), toInt(digits[1]), meridiem);
     case 3:
-      return timeOf(n(digits[0]), n(digits.slice(1)), meridiem);
+      return timeOf(toInt(digits[0]), toInt(digits.slice(1)), meridiem);
     case 4:
-      return timeOf(n(digits.slice(0, 2)), n(digits.slice(2)), meridiem);
+      return timeOf(toInt(digits.slice(0, 2)), toInt(digits.slice(2)), meridiem);
     default:
       return null;
   }
@@ -62,7 +63,7 @@ export function parseTimeInput(text: string, displayFormat: string, locale: Loca
   const parts = body.split(/\D+/).filter(Boolean);
   if (parts.length === 1) return timeFromDigits(parts[0], meridiem);
   if ((parts.length === 2 || parts.length === 3) && parts.every((part) => part.length <= 2)) {
-    return timeOf(Number.parseInt(parts[0], 10), Number.parseInt(parts[1], 10), meridiem);
+    return timeOf(toInt(parts[0]), toInt(parts[1]), meridiem);
   }
   return null;
 }
@@ -125,19 +126,18 @@ export function parseDateInput(text: string, displayFormat: string, locale: Loca
   if (!/^[\d\s./,-]+$/.test(trimmed)) return null;
   const order = datePartOrder(displayFormat, locale);
   const dayMonth = order.filter((part) => part !== 'year');
-  const n = (s: string) => Number.parseInt(s, 10);
 
   const fromParts = (parts: string[], partOrder: DatePart[]) => {
     const values: Record<DatePart, number> = { day: 0, month: today.getMonth() + 1, year: today.getFullYear() };
     for (let i = 0; i < partOrder.length; i++) {
       const part = parts[i];
       if (partOrder[i] === 'year') {
-        if (part.length === 2) values.year = fullYear(n(part), today);
-        else if (part.length === 4) values.year = n(part);
+        if (part.length === 2) values.year = fullYear(toInt(part), today);
+        else if (part.length === 4) values.year = toInt(part);
         else return null;
       } else {
         if (part.length > 2) return null;
-        values[partOrder[i]] = n(part);
+        values[partOrder[i]] = toInt(part);
       }
     }
     return dateOf(values.year, values.month, values.day);
