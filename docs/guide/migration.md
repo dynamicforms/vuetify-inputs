@@ -584,8 +584,8 @@ watchEffect(() => { saveAction.enabled = !saveAction.busy; });
 // after: <df-actions> binds busy itself
 ```
 
-The write is not refused - it is `enabled` like any other - but it states the same thing the component already
-draws, and anything else that reads the action's `enabled` reads a run in flight rather than what the form declared.
+Remove the write: with it in place, code that reads the action's `enabled` gets `false` during a run instead of the
+value the form set.
 
 ### Checklist for 0.9.1
 
