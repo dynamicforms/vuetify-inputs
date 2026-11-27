@@ -1,5 +1,5 @@
 <template>
-  <v-locale-provider :rtl="errorLanguage === 'fa'" class="demo-container">
+  <v-locale-provider :rtl="errorLanguage === 'fa'" class="demo-container validators-form-demo">
     <v-card class="mb-4">
       <v-card-title>Validators Demo</v-card-title>
       <v-card-text>
