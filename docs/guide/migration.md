@@ -664,12 +664,12 @@ name is read case-insensitively and a value naming no `DisplayMode` constant is 
 
 Both lines used to render the field fully: the prop was passed through untouched, and only an exact
 `DisplayMode` constant matched the comparisons the render decision and the `d-none` / `invisible` classes are made
-of. A misspelled name, and a mode a backend knows that this version does not, therefore did nothing and said
-nothing; they now throw where the field renders.
+of. A misspelled name, or a mode a backend defines that this version does not, therefore rendered the field in full
+without a warning; it now throws when the field renders.
 
 A prop that names nothing still resolves to `DisplayMode.FULL`, and a `control` prop still decides on its own
-`visibility`, which the peer library resolves the same way. Where a mode arrives from a payload and an unknown one
-has to be survivable, resolve it yourself before it reaches the prop:
+`visibility`, which the peer library resolves the same way. Where a mode comes from a payload and an unknown mode
+must not throw, resolve it before passing it to the prop:
 
 ```typescript
 const mode = Form.DisplayMode.isDefined(payload.visibility)
