@@ -451,13 +451,11 @@ every key it wants translated on every call.
 
 ### `<df-rtf-editor>`'s toolbar no longer needs remounting
 
-`translatableStrings` reads used to be frozen at the moment a component last rendered, so an application working
-around that would remount `<df-rtf-editor>` on a locale change, typically by binding `:key` to the locale code. The
-toolbar (heading dropdown included) now reads the table reactively and updates on its own; a `:key` binding kept
-for this reason is no longer necessary, though it is harmless to leave in place. `Action.closeAction()`,
-`.yesAction()` and `.noAction()` are unaffected by this - they still copy the label into the action when the
-factory runs, so an application already rebuilding its actions on a locale change (as
-[Localisation](/examples/localisation) recommends) needs no change there.
+Before 0.11.0, a component read `translatableStrings` only when it rendered, so an application remounted
+`<df-rtf-editor>` on a locale change, typically by binding `:key` to the locale code. The toolbar, heading dropdown
+included, now reads `translatableStrings` reactively and follows a locale change; a `:key` bound to the locale to
+remount it can be removed. `Action.closeAction()`, `.yesAction()` and `.noAction()` still copy the label when the
+factory runs; rebuild them on a locale change as [Localisation](/examples/localisation) describes.
 
 ### Checklist for 0.11.0
 
@@ -465,8 +463,7 @@ factory runs, so an application already rebuilding its actions on a locale chang
    `null as unknown as string` cast, since the return type now properly includes `null`/`undefined`.
 2. If any callback relied on a declined key keeping a previous translation rather than the English default, make
    it supply every key it wants translated on every call instead.
-3. Drop a `:key="locale"`-style remount workaround on `<df-rtf-editor>` if you added one for this - it is no
-   longer needed, though leaving it in place is harmless.
+3. Remove a `:key="locale"` remount of `<df-rtf-editor>`.
 
 ## Upgrading to v0.10.0 (from v0.9.2)
 
