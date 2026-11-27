@@ -73,7 +73,7 @@ const focused = ref<boolean>(false);
 // v-field's control attributes and the control's state, for the element the user operates
 function controlProps(fieldProps: Record<string, unknown>, id: string): InputBaseControlProps {
   return {
-    ...(fieldProps as { id: string; class: string; 'aria-describedby'?: string }),
+    ...(fieldProps as Pick<InputBaseControlProps, 'id' | 'class' | 'aria-describedby'>),
     'aria-labelledby': `${id}-label`,
     'aria-label': vuetifyBindings.value.label || undefined,
     'aria-invalid': vuetifyBindings.value['aria-invalid'],
