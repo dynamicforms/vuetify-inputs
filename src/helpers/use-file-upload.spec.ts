@@ -39,7 +39,13 @@ function makeComms(): FileComms {
 function setup(options: { initial?: string | null; touchInterval?: number; comms?: FileComms } = {}) {
   const value = ref<string | null>(options.initial ?? null);
   const comms = options.comms ?? makeComms();
-  const upload = useFileUpload({ comms, touchInterval: options.touchInterval }, value, ref(false));
+  const upload = useFileUpload({
+    value,
+    touched: ref(false),
+    comms: () => comms,
+    touchInterval: () => options.touchInterval,
+    control: () => undefined,
+  });
   return { value, comms, ...upload };
 }
 
@@ -47,7 +53,13 @@ function setupWithControl(control: Form.Field<string | null>, options: { touchIn
   const comms = makeComms();
   // the value follows the control both ways, as useInputBase's does
   const value = computed({ get: () => control.value, set: (v) => (control.value = v) });
-  const upload = useFileUpload({ comms, touchInterval: options.touchInterval, control }, value, ref(false));
+  const upload = useFileUpload({
+    value,
+    touched: ref(false),
+    comms: () => comms,
+    touchInterval: () => options.touchInterval,
+    control: () => control,
+  });
   return { comms, ...upload };
 }
 

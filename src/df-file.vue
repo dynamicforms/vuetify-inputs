@@ -64,7 +64,13 @@ const emits = defineEmits<Emits>();
 const { density, densityClass, touched, value, vuetifyBindings } = useInputBase(props, emits);
 const t = translate;
 
-const { currentFile, progress, loading, upload, clear } = useFileUpload(props, value, touched);
+const { currentFile, progress, loading, upload, clear } = useFileUpload({
+  value,
+  touched,
+  comms: () => props.comms,
+  touchInterval: () => props.touchInterval,
+  control: () => props.control,
+});
 const selectedFile = ref<File | null>();
 // the file input shows the picked file only while the value holds its upload
 watch(currentFile, (file) => {

@@ -1,11 +1,17 @@
 import Form, { ValidationError } from '@dynamicforms/vue-forms';
 import { computed, onBeforeUnmount, ref, watch, type Ref } from 'vue';
 
-import type { DfFileProps } from '../dynamicforms-component-props';
-
-import { FileGoneError } from './df-file.interface';
+import { FileComms, FileGoneError } from './df-file.interface';
 import { namespaced } from './error-namespace';
 import { useSettings } from './use-settings';
+
+export interface FileUploadOptions {
+  value: Ref<string | null>;
+  touched: Ref<boolean>;
+  comms: () => FileComms;
+  touchInterval: () => number | undefined;
+  control: () => Form.FieldBase | undefined;
+}
 
 /**
  * The upload state of `<df-file>`/`<df-image>`.
@@ -20,11 +26,7 @@ import { useSettings } from './use-settings';
  * field while it runs writes nothing, and the identifier it returns is deleted. A touch that rejects with a
  * {@link FileGoneError} clears the field only while the value still holds the touched identifier.
  */
-export function useFileUpload(
-  props: Pick<DfFileProps, 'comms' | 'touchInterval' | 'control'>,
-  value: Ref<string | null>,
-  touched: Ref<boolean>,
-) {
+export function useFileUpload({ value, touched, comms, touchInterval, control }: FileUploadOptions) {
   const settings = useSettings();
 
   // the file of the latest upload, kept once it succeeds; null when the value holds no upload of this component
@@ -36,7 +38,7 @@ export function useFileUpload(
   const temporaryUpload = computed(() => {
     const id = ownUpload.value;
     if (!id || value.value !== id) return null;
-    const ctrl = props.control;
+    const ctrl = control();
     return ctrl && ctrl.originalValue === id ? null : id;
   });
 
@@ -44,9 +46,11 @@ export function useFileUpload(
   let inFlight = false;
 
   function deleteIgnoringGone(id: string): Promise<void> {
-    return props.comms.delete(id).catch((err) => {
-      if (!(err instanceof FileGoneError)) throw err;
-    });
+    return comms()
+      .delete(id)
+      .catch((err) => {
+        if (!(err instanceof FileGoneError)) throw err;
+      });
   }
 
   function stopUpload() {
@@ -77,7 +81,7 @@ export function useFileUpload(
     progress.value = -1;
     let id: string;
     try {
-      id = await props.comms.upload(file, (loaded: number, total: number) => {
+      id = await comms().upload(file, (loaded: number, total: number) => {
         if (seq === uploadSeq) progress.value = Math.round((loaded * 100) / total);
       });
     } catch (err) {
@@ -114,13 +118,15 @@ export function useFileUpload(
   watch(temporaryUpload, (id) => {
     stopTouching();
     if (!id) return;
-    const interval = props.touchInterval ?? settings.defaultTouchInterval ?? 60_000;
+    const interval = touchInterval() ?? settings.defaultTouchInterval ?? 60_000;
     touchHandle = window.setInterval(() => {
-      props.comms.touch(id).catch((err) => {
-        if (!(err instanceof FileGoneError) || value.value !== id) return;
-        clearValue();
-        setFileGoneError(props.control, err.errorText);
-      });
+      comms()
+        .touch(id)
+        .catch((err) => {
+          if (!(err instanceof FileGoneError) || value.value !== id) return;
+          clearValue();
+          setFileGoneError(control(), err.errorText);
+        });
     }, interval);
   });
   onBeforeUnmount(stopTouching);
