@@ -1,8 +1,8 @@
 import { isArray, first, castArray } from 'lodash-es';
-import MarkdownIt from 'markdown-it';
 import { Ref } from 'vue';
 
 import { SelectChoice } from './df-select.interface';
+import { renderMarkdown } from './markdown';
 import {
   HtmlString,
   isCallableFunction,
@@ -21,25 +21,10 @@ export function choiceContent(text: unknown): RenderContentNonCallable {
   return content == null ? '' : String(content);
 }
 
-// the text of each MdString rendered so far
-const markdownTexts = new WeakMap<MdString, string>();
-
-// the text of markdown as rendered with its options and plugins
-function markdownText(md: MdString): string {
-  let text = markdownTexts.get(md);
-  if (text === undefined) {
-    const renderer = new MarkdownIt(md.options ?? {});
-    (md.plugins ?? []).forEach((plugin) => renderer.use(plugin));
-    text = renderContentText(new HtmlString(renderer.render(md.toString())));
-    markdownTexts.set(md, text);
-  }
-  return text;
-}
-
 /** The plain text of a choice's text: `renderContentText` of its content, an `MdString` rendered first. */
 export function choiceText(text: unknown): string {
   const content = choiceContent(text);
-  return content instanceof MdString ? markdownText(content) : renderContentText(content);
+  return renderContentText(content instanceof MdString ? new HtmlString(renderMarkdown(content)) : content);
 }
 
 /** The items for Vuetify: `title` is the plain text, `content` the choice's text as given. */

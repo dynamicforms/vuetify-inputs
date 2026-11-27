@@ -74,7 +74,6 @@ export default defineConfig({
         'markdown-it',
         'vue',
         'vue-cached-icon',
-        'vue-markdown-render',
         'vuetify',
         /^vuetify\/.*/,
       ],

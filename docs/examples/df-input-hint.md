@@ -57,8 +57,8 @@ An error description carries no markdown, HTML or component of its own. It rende
 returns an `MdString`, an `HtmlString` or a `SimpleComponentDef` for its code. The classes given here are merged with
 each `RenderableValue`'s own `classes`.
 
-Markdown renders through `vue-markdown-render`, which `MessagesWidget` imports itself; the library's stylesheet
-removes the outer margins of a markdown message.
+Markdown renders through `markdown-it` into a `<div>`; the library's stylesheet removes the outer margins of a
+markdown message.
 
 ## Render content
 
@@ -90,7 +90,7 @@ class RenderableValue {
 | Content | Renders as |
 |---|---|
 | `string` | a `<div>` holding the text |
-| `MdString` | markdown, through `vue-markdown-render` with the string's `options` and `plugins` |
+| `MdString` | a `<div>` holding the markdown rendered by `markdown-it` with the string's `options` and `plugins` |
 | `HtmlString` | a `<div>` with the string as its inner HTML. The string is not sanitised: text from a user or a server is escaped or sanitised before it is wrapped |
 | `SimpleComponentDef` | the component named by `componentName`, with `componentProps` as its props and `children` as its content. A common HTML element name renders as that element; any other name is resolved as a globally registered component. An `innerHTML` prop is dropped |
 

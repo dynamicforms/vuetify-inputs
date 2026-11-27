@@ -37,7 +37,7 @@ describe('MessagesWidget', () => {
     expect(divs[0].classes()).toEqual(['text-error', 'class-1']);
   });
 
-  it('renders markdown through vue-markdown-render, with its plugins', () => {
+  it('renders markdown through markdown-it, with its plugins', () => {
     const md = new MdString('**Bold** [link](https://example.com){target="_blank"}', undefined, [MarkdownItAttrs]);
 
     const markdown = buildWrapper({ message: [new RenderableValue(md)], classes: 'text-error' }).find(

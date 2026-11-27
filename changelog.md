@@ -21,7 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   loaded choices are reduced to the chosen ones and the menu shows `minQueryText`.
 - `DfSelect` with `fetchChoices`: prop `fetchDebounce` (milliseconds, default `0`). A search text is fetched once it
   has not changed for that long; an empty search text and loading the choices for the value's ids are not delayed.
-- Peer dependency `markdown-it` (`^14.1.0 || ^15.0.0`), the renderer `vue-markdown-render` already depends on.
+- Peer dependency `markdown-it` (`^14.1.0 || ^15.0.0`) in place of `vue-markdown-render`: `MessagesWidget` renders an
+  `MdString` with it into a `<div>`, with the string's `options` and `plugins`, as before.
 
 ### Fixed
 

@@ -4,12 +4,12 @@
 
 <script setup lang="ts">
 import { h, inject, resolveComponent, type VNodeChild } from 'vue';
-import VueMarkdown from 'vue-markdown-render';
 
 import type { MessagesWidgetProps } from '../dynamicforms-component-props';
 
 import { type ErrorInput, errorText } from './error-text';
-import { RenderableValue, type RenderContentNonCallable } from './render-content';
+import { renderMarkdown } from './markdown';
+import { type MdString, RenderableValue, type RenderContentNonCallable } from './render-content';
 import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 
 const props = defineProps<MessagesWidgetProps>();
@@ -93,10 +93,11 @@ function renderChild(child: RenderContentNonCallable): VNodeChild {
       return msg.componentBody;
     case 'html':
       return h('span', { innerHTML: msg.componentBody });
-    case 'vue-markdown': {
-      const { source, options, plugins } = msg.componentBindings;
-      return h(VueMarkdown, { class: 'df-messages-widget-markdown', source, options, plugins });
-    }
+    case 'vue-markdown':
+      return h('div', {
+        class: 'df-messages-widget-markdown',
+        innerHTML: renderMarkdown(msg.resolvedText as MdString),
+      });
     default:
       return renderComponent(msg.componentName, msg.componentBindings, msg.componentChildren);
   }
@@ -112,10 +113,11 @@ const render = () => {
         return h('div', { class: classes }, msg.componentBody);
       case 'html':
         return h('div', { class: classes, innerHTML: msg.componentBody });
-      case 'vue-markdown': {
-        const { source, options, plugins } = msg.componentBindings;
-        return h(VueMarkdown, { class: [...classes, 'df-messages-widget-markdown'], source, options, plugins });
-      }
+      case 'vue-markdown':
+        return h('div', {
+          class: [...classes, 'df-messages-widget-markdown'],
+          innerHTML: renderMarkdown(msg.resolvedText as MdString),
+        });
       default:
         return renderComponent(
           msg.componentName,
