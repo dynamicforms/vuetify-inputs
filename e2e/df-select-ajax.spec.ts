@@ -1,13 +1,11 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
-// the demo's fake server answers each fetch after 3000 ms
-const FETCH = { timeout: 10000 };
+import { demo, FETCH, MIN_QUERY_TEXT, minimumQueryCheckbox, NO_DATA_TEXT } from './df-select-ajax-demo';
 
-const demo = (page: Page) => page.locator('.demo-container', { has: page.getByText('Dynamic options loading') });
-
-const languageSelect = (page: Page) =>
+// until it renders in the browser, the select is a read-only text field without the v-autocomplete class
+const languageSelect = (page: Page, { rendered = true }: { rendered?: boolean } = {}) =>
   demo(page)
-    .locator('.v-input.v-autocomplete')
+    .locator(rendered ? '.v-input.v-autocomplete' : '.v-input')
     .filter({ has: page.getByText('Programming languages', { exact: true }) })
     .first();
 
@@ -22,10 +20,7 @@ const languageOptions = (page: Page) => menu(page).getByRole('option', { name: /
 
 async function openDemo(page: Page): Promise<Locator> {
   await page.goto('/examples/df-select');
-  // until it renders in the browser, the select is a read-only text field
-  await expect(
-    demo(page).locator('.v-input').filter({ has: page.getByText('Programming languages', { exact: true }) }).first(),
-  ).toHaveClass(/v-autocomplete/);
+  await expect(languageSelect(page, { rendered: false })).toHaveClass(/v-autocomplete/);
   await expect(selectedValue(page)).toHaveText(NO_VALUE);
   return languageSelect(page);
 }
@@ -125,20 +120,20 @@ test('with "Minimum query of two letters" one letter asks for more and two lette
   page,
 }) => {
   const select = await openDemo(page);
-  const minimum = demo(page).getByRole('checkbox', { name: 'Minimum query of two letters' });
+  const minimum = minimumQueryCheckbox(page);
   await expect(minimum).not.toBeChecked();
   await minimum.check();
 
   await select.locator('input').focus();
   await page.keyboard.type('J');
-  await expect(menu(page).getByText('Type at least two letters of the language name.')).toBeVisible(FETCH);
+  await expect(menu(page).getByText(MIN_QUERY_TEXT)).toBeVisible(FETCH);
   await expect(languageOptions(page)).toHaveCount(0);
 
   await page.keyboard.type('a');
   await expect(menu(page).getByRole('option', { name: /\bJava\W+Statically typed/ })).toBeVisible(FETCH);
   await expect(menu(page).getByRole('option', { name: /JavaScript\W+Dynamically typed/ })).toBeVisible();
   await expect(menu(page).getByRole('option', { name: /Python/ })).toHaveCount(0);
-  await expect(menu(page).getByText('Type at least two letters of the language name.')).toHaveCount(0);
+  await expect(menu(page).getByText(MIN_QUERY_TEXT)).toHaveCount(0);
 });
 
 test('a query that matches no language shows "No languages found." after the fetch', async ({ page }) => {
@@ -147,6 +142,6 @@ test('a query that matches no language shows "No languages found." after the fet
   await select.locator('input').focus();
   await page.keyboard.type('xyz');
 
-  await expect(menu(page).getByText('No languages found.')).toBeVisible(FETCH);
+  await expect(menu(page).getByText(NO_DATA_TEXT)).toBeVisible(FETCH);
   await expect(languageOptions(page)).toHaveCount(0);
 });
