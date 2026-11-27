@@ -892,8 +892,7 @@ If you only pass a `Field`, a `Group` or an `Action` into `control`, nothing cha
 wrote the type out yourself — a wrapper component that declares its own `control` prop, a helper that takes a field
 as a parameter, or a variable annotated before it is handed to a component.
 
-What the components accept at runtime is exactly what they always accepted: they guard with `instanceof FieldBase`,
-so the value passed in has to derive from that class, as it always did.
+At runtime the components check `control instanceof FieldBase`, as before.
 
 ### `DFInputHint` is spelled `DfInputHint`
 
