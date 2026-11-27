@@ -24,6 +24,8 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | rows | `number` | `undefined` | Number of visible text rows |
 | maxRows | `number` | `undefined` | Maximum number of rows when auto-grow is enabled |
 
+The value (`modelValue`) is the text, a string.
+
 ## Auto-Growing Behaviour
 
 The textarea grows with its content only when `maxRows` is a positive value; the growth stops at `maxRows`.

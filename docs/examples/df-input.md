@@ -32,6 +32,8 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | precision | `number` \| `null` | `null` | Decimal precision (for number inputs) |
 | anyDecimalSeparator | `boolean` | the plugin's `anyDecimalSeparator`, else `false` | `.` and `,` both act as the decimal separator (for number inputs). See [Any decimal separator](#any-decimal-separator) |
 
+The value (`modelValue`) is a string, or with `inputType` `'number'` a number (`null` when empty).
+
 ## Number Input Handling
 
 When `inputType` is set to 'number', the component:
