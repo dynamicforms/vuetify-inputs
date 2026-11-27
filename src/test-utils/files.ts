@@ -17,3 +17,8 @@ export function fileList(files: File[]): FileList {
   (list as any).item = (i: number) => files[i] ?? null;
   return list;
 }
+
+/** the first bytes of a PNG file */
+export const PNG_BYTES = new Uint8Array([137, 80, 78, 71]);
+
+export const pngFile = (name = 'picture.png') => new File([PNG_BYTES], name, { type: 'image/png' });

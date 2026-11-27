@@ -4,9 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import DfImage from '@/df-image.vue';
 import { FileComms, FileGoneError } from '@/helpers';
-import { fileList, makeComms } from '@/test-utils/files';
+import { fileList, makeComms, PNG_BYTES, pngFile } from '@/test-utils/files';
 
-const pngFile = (name = 'photo.png') => new File([new Uint8Array([137, 80, 78, 71])], name, { type: 'image/png' });
 const textFile = (name = 'notes.txt') => new File(['hello'], name, { type: 'text/plain' });
 
 describe('DfImage', () => {
@@ -281,7 +280,7 @@ describe('DfImage', () => {
     });
 
     it('uploads the image the paste button reads from the clipboard', async () => {
-      const blob = new Blob([new Uint8Array([137, 80, 78, 71])], { type: 'image/png' });
+      const blob = new Blob([PNG_BYTES], { type: 'image/png' });
       setClipboard(async () => [clipboardItem(['text/html', 'image/png'], blob)]);
       const wrapper = mountImage();
       await wrapper.vm.$nextTick();

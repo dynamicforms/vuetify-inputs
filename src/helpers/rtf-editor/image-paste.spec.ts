@@ -6,6 +6,8 @@ import { extractImageFiles } from '../image-files';
 
 import { createImagePasteHandler, fileToDataUrl } from './image-paste';
 
+import { pngFile } from '@/test-utils/files';
+
 const schema = new Schema({
   nodes: {
     doc: { content: 'block+' },
@@ -21,10 +23,6 @@ const schema = new Schema({
   },
   marks: {},
 });
-
-function pngFile(name = 'picture.png'): File {
-  return new File([new Uint8Array([137, 80, 78, 71])], name, { type: 'image/png' });
-}
 
 function fakeClipboardEvent(files: File[], hasHtml = false): ClipboardEvent {
   const items = files.map((file) => ({ kind: 'file', type: file.type, getAsFile: () => file }));
