@@ -13,8 +13,8 @@ or a field, with an inline density for table cells. Built for
 - **Set the look once, override anywhere**: density and variant are read from the prop, then the field, then a
   `provide` from any ancestor, then the plugin defaults — most specific first
 - **The field carries its own presentation**: a `@dynamicforms/vue-forms` field holds the label, hint, placeholder,
-  css class, density and variant it is drawn with, so a form declared in code needs no presentation attributes on
-  the tags that draw it
+  css class, density and variant it is rendered with, so a form declared in code needs no presentation attributes
+  on the tags that render it
 
 The [density example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/density.html) renders every component
 side by side in every density and variant.
