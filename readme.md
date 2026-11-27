@@ -21,8 +21,6 @@ side by side in every density and variant.
 
 ## Further features
 
-- **Thirteen components**: `df-input`, `df-text-area`, `df-select`, `df-checkbox`, `df-color`, `df-date-time`,
-  `df-file`, `df-image`, `df-rtf-editor`, `df-actions`, `df-input-hint`, `df-input-group` and `df-label`
 - **A control, a v-model, or neither**: a bound element owns the value, validity, touched, enabled and visibility;
   `v-model` reports changes to the parent; neither keeps the value internally
 - **Errors and hints** in one row, rendered through the library's own `MessagesWidget`; an error
@@ -137,7 +135,7 @@ Detailed documentation is available at [https://docs.velis.si/dynamicforms/vueti
 ## Available Components
 
 - **InputBase**: The field frame that df-date-time, df-file, df-image and df-rtf-editor place their control in
-- **DfLabel**: Renders a label - plain text, markdown, HTML or a component, with an icon - the way every input renders
+- **df-label**: Renders a label - plain text, markdown, HTML or a component, with an icon - the way every input renders
   its own
 - **df-actions**: An actions group.
 - **df-checkbox**: A checkbox component.
