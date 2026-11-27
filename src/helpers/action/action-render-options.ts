@@ -43,11 +43,8 @@ export interface ActionRenderOptions extends ActionValue {
    * `aria-label` and `title` of a button that does not show its label. */
   passthroughAttrs?: Record<string, any>;
 }
-/**
- * What one breakpoint of an action's value may state: the members that describe how the action is drawn.
- * `name`, `defaultConfirm` and `defaultReject` are not among them - which key a modal resolves with, and which
- * key fires the action, are properties of the action itself and do not depend on the width of the screen.
- */
+/** The members of an action's value a breakpoint may state: every render option except `name`, `defaultConfirm` and
+ * `defaultReject`. */
 export type ActionBreakpointRenderOptions = Omit<ActionRenderOptions, 'name' | 'defaultConfirm' | 'defaultReject'>;
 export type ActionBreakpointOptions = BreakpointsJSON<ActionRenderOptions, ActionBreakpointRenderOptions>;
 
@@ -64,7 +61,7 @@ export class ResponsiveActionRenderOptions extends ResponsiveRenderOptions<Actio
 
     if (bp) {
       if (bp.renderAs != null) {
-        // a style nobody defined is refused rather than drawn as the default
+        // a renderAs that is not a display style throws
         if (!isActionDisplayStyle(bp.renderAs)) {
           throw new Error(`'${bp.renderAs}' is not an action display style: ${actionDisplayStyles.join(', ')}`);
         }
