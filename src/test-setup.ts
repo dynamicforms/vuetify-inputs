@@ -1,5 +1,5 @@
-import { config } from '@vue/test-utils';
-import { vi } from 'vitest';
+import { config, enableAutoUnmount } from '@vue/test-utils';
+import { afterEach, vi } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
@@ -25,3 +25,6 @@ globalThis.visualViewport = null;
 
 // every mount gets this Vuetify instance; a test that needs another one replaces config.global.plugins for its mount
 config.global.plugins = [createVuetify({ components, directives })];
+
+// unmounts every mounted wrapper after its test
+enableAutoUnmount(afterEach);

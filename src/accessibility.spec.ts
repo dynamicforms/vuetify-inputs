@@ -1,6 +1,6 @@
 import { Field, Validators } from '@dynamicforms/vue-forms';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { type Component } from 'vue';
 
 import DfCheckbox from '@/df-checkbox.vue';
@@ -61,17 +61,11 @@ const cases: Case[] = [
 
 const inputBaseHosted: Component[] = [DfDateTime, DfFile, DfImage, DfRtfEditor];
 
-const mounted: VueWrapper[] = [];
-afterEach(() => {
-  mounted.splice(0).forEach((wrapper) => wrapper.unmount());
-});
-
 async function mountCase(testCase: Case, control: Field, extra: Record<string, unknown> = {}) {
   const wrapper = mount(testCase.component, {
     props: { control, label: 'Field label', hint: 'Hint text', ...testCase.props, ...extra },
     attachTo: document.body,
   });
-  mounted.push(wrapper);
   await flushPromises();
   return wrapper;
 }

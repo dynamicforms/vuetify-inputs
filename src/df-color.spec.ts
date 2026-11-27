@@ -149,7 +149,6 @@ describe('DfColor', () => {
 
       expect(control.value).toBe('#00ff00');
       expect(control.touched).toBe(true);
-      wrapper.unmount();
     });
 
     it('enables Cancel before a change and OK after one', async () => {
@@ -165,7 +164,6 @@ describe('DfColor', () => {
       wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ff00');
       await flushPromises();
       expect(button('OK')[0].props('disabled')).toBe(false);
-      wrapper.unmount();
     });
 
     it("labels the buttons with the library's strings", async () => {
@@ -175,7 +173,6 @@ describe('DfColor', () => {
       const labels = wrapper.findAllComponents({ name: 'VBtn' }).map((b) => b.text());
       expect(labels).toEqual(expect.arrayContaining(['Prekliči', 'Potrdi']));
       translateStrings((key) => key);
-      wrapper.unmount();
     });
 
     it('writes a picked colour on a double-click on the canvas', async () => {
@@ -188,14 +185,12 @@ describe('DfColor', () => {
 
       expect(control.value).toBe('#00ff00');
       expect(control.touched).toBe(true);
-      wrapper.unmount();
     });
     it('sizes the menu to the picker, not to the field', async () => {
       const wrapper = await openPicker(new Field<string>({ value: '#f00' }));
 
       expect(Number(wrapper.findComponent({ name: 'VMenu' }).props('minWidth'))).toBe(0);
       expect(Number(wrapper.findComponent(ColorPickerStub).props('elevation'))).toBe(0);
-      wrapper.unmount();
     });
 
     it('runs the picker in hexa mode with all its modes by default', async () => {
@@ -204,7 +199,6 @@ describe('DfColor', () => {
 
       expect(picker.props('mode')).toBe('hexa');
       expect(picker.props('modes')).toBeUndefined();
-      wrapper.unmount();
     });
 
     it('runs the picker in hex mode without alpha modes under alpha: false', async () => {
@@ -213,7 +207,6 @@ describe('DfColor', () => {
 
       expect(picker.props('mode')).toBe('hex');
       expect(picker.props('modes')).toEqual(['hex', 'rgb', 'hsl']);
-      wrapper.unmount();
     });
 
     it('keeps the raw colour in the picker and writes it normalised on OK', async () => {
@@ -229,7 +222,6 @@ describe('DfColor', () => {
       await ok!.trigger('click');
 
       expect(control.value).toBe('#00FFAA');
-      wrapper.unmount();
     });
 
     it('emits the pending colour as preview on opening and on every change, and null on closing', async () => {
@@ -247,7 +239,6 @@ describe('DfColor', () => {
 
       expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
       expect(control.value).toBe('#ff0000');
-      wrapper.unmount();
     });
 
     it('renders the picker-prepend slot above the picker with the pending colour', async () => {
@@ -272,7 +263,6 @@ describe('DfColor', () => {
       wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ffaa');
       await flushPromises();
       expect(card.querySelector('.prepended')!.textContent).toBe('#00FFAA');
-      wrapper.unmount();
     });
 
     it('makes a colour selected through the picker-prepend slot pending, written by OK', async () => {
@@ -298,7 +288,6 @@ describe('DfColor', () => {
       const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
       await ok!.trigger('click');
       expect(control.value).toBe('#00FFAA');
-      wrapper.unmount();
     });
 
     it("shows only the picker-prepend slot under picker 'none', and save writes the pending colour", async () => {
@@ -325,7 +314,6 @@ describe('DfColor', () => {
 
       expect(control.value).toBe('#00ffaa');
       expect(menu.props('modelValue')).toBe(false);
-      wrapper.unmount();
     });
 
     it('emits a null preview when OK closes the picker', async () => {
@@ -339,7 +327,6 @@ describe('DfColor', () => {
       await flushPromises();
 
       expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
-      wrapper.unmount();
     });
 
     it('emits a null preview when the menu closes by a click outside', async () => {
@@ -349,7 +336,6 @@ describe('DfColor', () => {
       await flushPromises();
 
       expect(wrapper.emitted('preview')).toEqual([['#ff0000'], [null]]);
-      wrapper.unmount();
     });
     describe('hexagon', () => {
       const hexagon = { picker: 'hexagon' };
@@ -363,14 +349,12 @@ describe('DfColor', () => {
 
         expect(wrapper.findComponent(ColorPickerStub).exists()).toBe(false);
         expect(cellsOf(wrapper)).toHaveLength(61);
-        wrapper.unmount();
       });
 
       it('lays out hexagonRings rings', async () => {
         const wrapper = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, hexagonRings: 3 });
 
         expect(cellsOf(wrapper)).toHaveLength(19);
-        wrapper.unmount();
       });
 
       const levels = (wrapper: Awaited<ReturnType<typeof openPicker>>) => ({
@@ -383,7 +367,6 @@ describe('DfColor', () => {
         const wrapper = await openPicker(new Field<string>({ value: '#f00' }), hexagon);
 
         expect(levels(wrapper)).toEqual({ slider: true, toggle: false, bar: false });
-        wrapper.unmount();
       });
 
       it('offers fewer than 16 levels with level buttons and no selector for one level', async () => {
@@ -399,7 +382,6 @@ describe('DfColor', () => {
         expect(palette(three).find('.df-hexagon-palette__level').attributes('aria-label')).toBe('Lightness 1');
         expect(levels(array)).toEqual({ slider: false, toggle: true, bar: false });
         expect(levels(one)).toEqual({ slider: false, toggle: false, bar: false });
-        [three, array, one].forEach((wrapper) => wrapper.unmount());
       });
 
       it('lays out the level buttons as a grid of one column per level', async () => {
@@ -413,7 +395,6 @@ describe('DfColor', () => {
         const viewBoxWidth = Number(palette(wrapper).find('svg').attributes('viewBox')!.split(' ')[2]);
         const ratio = Number((palette(wrapper).element as HTMLElement).style.getPropertyValue('--df-cell-ratio'));
         expect(ratio).toBeCloseTo((2 * 0.95) / Math.sqrt(3) / viewBoxWidth, 6);
-        wrapper.unmount();
       });
 
       it('selects a level button by the arrow keys', async () => {
@@ -429,7 +410,6 @@ describe('DfColor', () => {
         await okButton(wrapper).trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.4)[20].color);
-        wrapper.unmount();
       });
 
       it('offers 16 or more levels with a segmented bar', async () => {
@@ -442,7 +422,6 @@ describe('DfColor', () => {
         const checked = segments.filter((segment) => segment.attributes('aria-checked') === 'true');
         expect(checked).toHaveLength(1);
         expect(checked[0].attributes('tabindex')).toBe('0');
-        wrapper.unmount();
       });
 
       it('selects a segment by a click and by the arrow keys, keeping the place of the selected cell', async () => {
@@ -460,7 +439,6 @@ describe('DfColor', () => {
         await okButton(wrapper).trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.3)[20].color);
-        wrapper.unmount();
       });
 
       it('selects the exact lightness of the value in the full range, and writes along the slider', async () => {
@@ -476,7 +454,6 @@ describe('DfColor', () => {
         await okButton(wrapper).trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.8)[33].color);
-        wrapper.unmount();
       });
 
       it('selects the level and the cell nearest to the value on opening', async () => {
@@ -493,7 +470,6 @@ describe('DfColor', () => {
         const checked = cellsOf(wrapper).filter((cell) => cell.attributes('aria-checked') === 'true');
         expect(checked.map((cell) => cell.attributes('aria-label'))).toEqual([cells[30].color]);
         expect(checked[0].attributes('tabindex')).toBe('0');
-        wrapper.unmount();
       });
 
       it('writes a clicked cell when OK confirms it', async () => {
@@ -509,7 +485,6 @@ describe('DfColor', () => {
         await okButton(wrapper).trigger('click');
         expect(control.value).toBe(cell.attributes('aria-label'));
         expect(control.touched).toBe(true);
-        wrapper.unmount();
       });
 
       it('writes a cell on a double-click', async () => {
@@ -521,7 +496,6 @@ describe('DfColor', () => {
         await cell.trigger('dblclick');
 
         expect(control.value).toBe(cell.attributes('aria-label'));
-        wrapper.unmount();
       });
 
       it('writes the cell at the same place of another level when the level changes', async () => {
@@ -533,7 +507,6 @@ describe('DfColor', () => {
         await okButton(wrapper).trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.45)[20].color);
-        wrapper.unmount();
       });
 
       it('applies normalize to the preview and the written value, not to the pending one', async () => {
@@ -551,7 +524,6 @@ describe('DfColor', () => {
         await flushPromises();
         expect(control.value).toBe(raw.toUpperCase());
         expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
-        wrapper.unmount();
       });
 
       it('moves the focus with the arrow keys and picks with Enter', async () => {
@@ -567,7 +539,6 @@ describe('DfColor', () => {
         await focused.trigger('keydown', { key: 'Enter' });
         await okButton(wrapper).trigger('click');
         expect(control.value).toBe(focused.attributes('aria-label'));
-        wrapper.unmount();
       });
     });
   });

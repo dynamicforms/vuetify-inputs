@@ -30,7 +30,6 @@ describe('DfInputGroup', () => {
     expect(field.classes()).toContain('v-field--active');
     expect(wrapper.find('.v-field__input .v-checkbox').exists()).toBe(true);
     expect(wrapper.text()).toContain('Days');
-    wrapper.unmount();
   });
 
   it('gives its children the plain variant and the inline density', () => {
@@ -41,7 +40,6 @@ describe('DfInputGroup', () => {
 
     expect(wrapper.find('.v-checkbox').classes()).toContain('df-density-inline');
     expect(wrapper.classes()).toContain('df-density-compact');
-    wrapper.unmount();
   });
 
   it("shows the errors of the bound container's members and of the container itself", async () => {
@@ -55,7 +53,6 @@ describe('DfInputGroup', () => {
     expect(messages).toContain('Choose a day');
     expect(messages).toContain('Closed on Tuesday');
     expect(wrapper.find('.v-field').classes()).toContain('v-field--error');
-    wrapper.unmount();
   });
 
   it('shows the hint while there is no error', () => {
@@ -63,21 +60,18 @@ describe('DfInputGroup', () => {
 
     expect(wrapper.find('.v-input__details').text()).toContain('At least one');
     expect(wrapper.find('.v-field').classes()).not.toContain('v-field--error');
-    wrapper.unmount();
   });
 
   it('shows the errors prop without a control', () => {
     const wrapper = mountGroup({ label: 'Days', errors: [{ detail: 'Given', origin: 'server' }] });
 
     expect(wrapper.find('.v-input__details').text()).toContain('Given');
-    wrapper.unmount();
   });
 
   it.each(['row', 'wrap', 'column'])('lays its children out by direction %s', (direction) => {
     const wrapper = mountGroup({ label: 'Days', direction });
 
     expect(wrapper.find('.df-input-group-content').classes()).toContain(`df-input-group--${direction}`);
-    wrapper.unmount();
   });
 
   it('is focused while one of its children is', async () => {
@@ -96,7 +90,6 @@ describe('DfInputGroup', () => {
 
     await tue.trigger('focusout', { relatedTarget: document.body });
     expect(wrapper.find('.v-field').classes()).not.toContain('v-field--focused');
-    wrapper.unmount();
   });
 
   it('renders nothing for a suppressed control', () => {
@@ -105,6 +98,5 @@ describe('DfInputGroup', () => {
     const wrapper = mountGroup({ control: group, label: 'Days' });
 
     expect(wrapper.find('.v-input').exists()).toBe(false);
-    wrapper.unmount();
   });
 });

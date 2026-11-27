@@ -428,7 +428,6 @@ describe('DfSelect', () => {
       expect(control.value).toEqual([1, 3]);
       expect(wrapper.findComponent(VAutocomplete).props('menu')).toBe(false);
       expect(document.activeElement?.getAttribute('aria-label')).toBe('Remove Choice 3');
-      wrapper.unmount();
     });
 
     it('removes no chip on a repeated Space keydown and keeps it from the autocomplete', async () => {
@@ -486,7 +485,6 @@ describe('DfSelect', () => {
 
       expect(control.value).toEqual([2]);
       expect(document.activeElement).toBe(wrapper.find('input').element);
-      wrapper.unmount();
     });
 
     it('leaves other keys on a chip to the autocomplete', async () => {
@@ -518,7 +516,6 @@ describe('DfSelect', () => {
       const optionIcons = document.querySelectorAll('.v-overlay-container .v-list-item .cached-icon-wrapper');
       expect(optionIcons).toHaveLength(ICON_CHOICES.length);
       optionIcons.forEach((icon) => expect(icon.getAttribute('aria-hidden')).toBe('true'));
-      wrapper.unmount();
     });
 
     it.each(['', '  '])('gives a blank id outside the choices no choice and keeps it (%j)', async (blank) => {
@@ -564,22 +561,13 @@ describe('DfSelect', () => {
   });
 
   describe('search states', () => {
-    const mounted: ReturnType<typeof mountSelect>[] = [];
-
     afterEach(() => {
       vi.useRealTimers();
-      mounted.splice(0).forEach((wrapper) => wrapper.unmount());
     });
 
     // mounted in the document, so that the menu can be opened and read
-    const mountAttached = (props: Record<string, any>) => {
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', ...props },
-        attachTo: document.body,
-      });
-      mounted.push(wrapper);
-      return wrapper;
-    };
+    const mountAttached = (props: Record<string, any>) =>
+      mount(DfSelect, { props: { label: 'Select', ...props }, attachTo: document.body });
     const openMenu = async (wrapper: ReturnType<typeof mountSelect>) => {
       await wrapper.find('.v-field').trigger('mousedown');
       await flushPromises();
