@@ -129,7 +129,6 @@ text are dropped once a later search text is fetched or cut short by `minQueryLe
 
 ```typescript
 const fetchChoices = async (query?: string, idValue?: any): Promise<SelectChoice[]> => {
-  // Simulate API call
   const response = await apiCall('/api/options', { search: query, ids: idValue });
   return response.data.map(item => ({
     id: item.id,
