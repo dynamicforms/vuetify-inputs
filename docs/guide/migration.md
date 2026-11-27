@@ -548,8 +548,8 @@ rule applies to all saved content.
 
 ## Upgrading to v0.9.1 (from v0.9.0)
 
-Nothing this library exports is renamed or removed. What changes is that your compiler finally sees the package's
-declarations, and that `<df-actions>` draws two states it did not draw before. There is a
+Nothing this library exports is renamed or removed. The package's type declarations resolve, and `<df-actions>`
+renders two more states. There is a
 [checklist](#checklist-for-0-9-1) at the end of this section.
 
 ### The declarations reach your compiler
@@ -558,9 +558,8 @@ declarations, and that `<df-actions>` draws two states it did not draw before. T
 alone - the top-level `types` field is not consulted - so on `moduleResolution: "bundler"` or `"node16"` every import
 from this package was `any`.
 
-Expect the first build after the upgrade to report errors your project always had: a misspelled member of an
-`Action` value, a prop passed to a component that does not declare it, a `label` read as something other than a
-string. They are the checks that were never run, not new rules.
+The first build after the upgrade reports type errors in code that uses this package, e.g. a misspelled member of an
+`Action` value, a prop the component does not declare, or a `label` read as something other than a string.
 
 ### An action inside a disabled container is drawn disabled
 
@@ -590,8 +589,7 @@ draws, and anything else that reads the action's `enabled` reads a run in flight
 
 ### Checklist for 0.9.1
 
-1. Build once and work through the type errors that surface: they are your project's, and this release is the first
-   in which they are reported.
+1. Build once and fix the reported type errors.
 2. Load the forms that disable a whole section: the action buttons inside one now render disabled. Drop the
    per-action `enabled = false` writes that were there to achieve it.
 3. Drop the `watchEffect` (or equivalent) that mirrored `busy` into `enabled` on an action.
