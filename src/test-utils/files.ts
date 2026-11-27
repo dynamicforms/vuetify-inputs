@@ -1,3 +1,4 @@
+import type { VueWrapper } from '@vue/test-utils';
 import { vi } from 'vitest';
 
 import { FileComms, FileGoneError } from '@/helpers/df-file.interface';
@@ -28,3 +29,12 @@ export const touchGone = (message: string) =>
   vi.fn(async () => {
     throw new FileGoneError(message);
   });
+
+/** Picks `file` through the component's `input[type=file]` and lets the upload it starts settle. */
+export async function pickFile(wrapper: VueWrapper<any>, file: File) {
+  const input = wrapper.find('input[type="file"]');
+  Object.defineProperty(input.element, 'files', { value: fileList([file]), configurable: true });
+  await input.trigger('change');
+  await wrapper.vm.$nextTick();
+  await vi.advanceTimersByTimeAsync(0);
+}

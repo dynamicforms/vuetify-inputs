@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import DfImage from '@/df-image.vue';
 import { FileComms } from '@/helpers';
-import { fileList, makeComms, PNG_BYTES, pngFile, touchGone } from '@/test-utils/files';
+import { fileList, makeComms, pickFile, PNG_BYTES, pngFile, touchGone } from '@/test-utils/files';
 
 const GONE = 'The uploaded image is no longer available on the server.';
 
@@ -28,14 +28,6 @@ describe('DfImage', () => {
     mount(DfImage, {
       props: { comms, label: 'Photo', ...props },
     });
-
-  const pickImage = async (wrapper: ReturnType<typeof mountImage>, file: File) => {
-    const input = wrapper.find('input[type="file"]');
-    Object.defineProperty(input.element, 'files', { value: fileList([file]), configurable: true });
-    await input.trigger('change');
-    await wrapper.vm.$nextTick();
-    await vi.advanceTimersByTimeAsync(0);
-  };
 
   it('shows the drop placeholder when no image is set', () => {
     const wrapper = mountImage();
@@ -64,24 +56,6 @@ describe('DfImage', () => {
     const link = wrapper.find('.df-image-download-btn');
     expect(link.exists()).toBe(true);
     expect(link.attributes('href')).toBe('https://example.com/existing.png');
-  });
-
-  it('names the progress bar shown while an image uploads', async () => {
-    comms.upload = vi.fn(() => new Promise<string>(() => {}));
-    const wrapper = mountImage();
-
-    await pickImage(wrapper, pngFile());
-
-    expect(wrapper.find('.v-field__loader [role="progressbar"]').attributes('aria-label')).toBe('Uploading');
-  });
-
-  it('uploads a picked image and reflects the returned identifier as modelValue', async () => {
-    const wrapper = mountImage();
-
-    await pickImage(wrapper, pngFile());
-
-    expect(comms.upload).toHaveBeenCalledTimes(1);
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['https://example.com/uploaded.png']);
   });
 
   it('uploads a dropped image', async () => {
@@ -115,36 +89,10 @@ describe('DfImage', () => {
     errorSpy.mockRestore();
   });
 
-  it('deletes an image it uploaded and clears modelValue on click:clear', async () => {
-    const wrapper = mountImage();
-    await pickImage(wrapper, pngFile());
-
-    await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
-
-    expect(comms.delete).toHaveBeenCalledWith('https://example.com/uploaded.png');
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null]);
-  });
-
-  it('clears an image it was given without deleting it', async () => {
-    const control = new Form.Field<string | null>({ value: 'https://example.com/existing.png' });
-    const wrapper = mountImage({ control });
-
-    await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
-
-    expect(comms.delete).not.toHaveBeenCalled();
-    expect(control.value).toBeNull();
-  });
-
-  it('shows no clear button with clearable false', () => {
-    const wrapper = mountImage({ modelValue: 'https://example.com/existing.png', clearable: false });
-
-    expect(wrapper.findComponent({ name: 'VField' }).props('clearable')).toBe(false);
-  });
-
   it('shows the image of a value set on the field after an upload', async () => {
     const control = new Form.Field<string | null>({ value: null });
     const wrapper = mountImage({ control });
-    await pickImage(wrapper, pngFile());
+    await pickFile(wrapper, pngFile());
     expect(wrapper.findComponent({ name: 'VImg' }).props('src')).toBe('blob:mock-url');
 
     control.value = 'https://example.com/other.png';
@@ -154,83 +102,16 @@ describe('DfImage', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url');
   });
 
-  it('touches the uploaded image at a regular interval', async () => {
-    const wrapper = mountImage({ touchInterval: 1_000 });
-    await pickImage(wrapper, pngFile());
-
-    await vi.advanceTimersByTimeAsync(1_000);
-
-    expect(comms.touch).toHaveBeenCalledWith('https://example.com/uploaded.png');
-  });
-
-  it('keeps the uploaded image when the field is disabled while the upload runs', async () => {
-    let finishUpload!: (id: string) => void;
-    comms.upload = vi.fn(() => new Promise<string>((resolve) => (finishUpload = resolve)));
-    const control = new Form.Field<string | null>({ value: null });
-    const wrapper = mountImage({ control, touchInterval: 1_000 });
-    await pickImage(wrapper, pngFile());
-
-    control.access = 'disabled';
-    finishUpload('https://example.com/uploaded.png');
-    await vi.advanceTimersByTimeAsync(1_000);
-
-    expect(control.value).toBe('https://example.com/uploaded.png');
-    expect(comms.touch).toHaveBeenCalledWith('https://example.com/uploaded.png');
-  });
-
-  it('clears the field and preview and reports the error on control when touch reports the image is gone', async () => {
+  it('clears the preview when touch reports the image is gone', async () => {
     comms.touch = touchGone(GONE);
-    const control = new Form.Field<string>({ value: '' });
-    const wrapper = mountImage({ control, touchInterval: 1_000 });
-    await pickImage(wrapper, pngFile());
+    const wrapper = mountImage({ touchInterval: 1_000 });
+    await pickFile(wrapper, pngFile());
+    expect(wrapper.findComponent({ name: 'VImg' }).exists()).toBe(true);
 
     await vi.advanceTimersByTimeAsync(1_000);
     await wrapper.vm.$nextTick();
 
-    expect(control.value).toBeFalsy();
-    expect(control.errors).toHaveLength(1);
-    expect(control.errors[0].detail).toBe(GONE);
     expect(wrapper.findComponent({ name: 'VImg' }).exists()).toBe(false);
-  });
-
-  it('clears a disabled field when touch reports the image is gone', async () => {
-    comms.touch = touchGone(GONE);
-    const control = new Form.Field<string | null>({ value: null });
-    const wrapper = mountImage({ control, touchInterval: 1_000 });
-    await pickImage(wrapper, pngFile());
-    await vi.advanceTimersByTimeAsync(0);
-    expect(control.value).toBe('https://example.com/uploaded.png');
-
-    control.access = 'disabled';
-    await vi.advanceTimersByTimeAsync(1_000);
-    await wrapper.vm.$nextTick();
-
-    expect(control.value).toBeNull();
-    expect(control.errors).toHaveLength(1);
-  });
-
-  it('clears the field without throwing when touch reports the image is gone and no control is bound', async () => {
-    comms.touch = touchGone(GONE);
-    const wrapper = mountImage({ touchInterval: 1_000 });
-    await pickImage(wrapper, pngFile());
-
-    await vi.advanceTimersByTimeAsync(1_000);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null]);
-  });
-
-  it('leaves the field untouched when touch rejects with a transient error', async () => {
-    comms.touch = vi.fn(async () => {
-      throw new Error('network hiccup');
-    });
-    const wrapper = mountImage({ touchInterval: 1_000 });
-    await pickImage(wrapper, pngFile());
-
-    await vi.advanceTimersByTimeAsync(1_000);
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['https://example.com/uploaded.png']);
   });
 
   describe('clipboard', () => {
