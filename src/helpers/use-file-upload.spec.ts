@@ -7,17 +7,11 @@ import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings
 import { setFileGoneError, useFileUpload } from './use-file-upload';
 
 import { makeComms, touchGone } from '@/test-utils/files';
+import { mockInjectValues } from '@/test-utils/mock-inject';
 
 const GONE = 'The file is gone';
 
-const mockInjectValues = new Map<any, any>();
-vi.mock('vue', async () => {
-  const actual = await vi.importActual('vue');
-  return {
-    ...actual,
-    inject: (key: any, defaultValue?: any) => mockInjectValues.get(key) ?? defaultValue,
-  };
-});
+vi.mock('vue', async () => (await import('@/test-utils/mock-inject')).mockVueInject());
 
 const file = (name: string) => new File([new Uint8Array([1])], name);
 

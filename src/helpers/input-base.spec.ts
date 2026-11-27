@@ -5,17 +5,9 @@ import { nextTick, reactive } from 'vue';
 import { Label, useInputBase, type BaseProps } from './input-base';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings';
 
-// Mock inject globally
-const mockInjectValues = new Map<any, any>();
-vi.mock('vue', async () => {
-  const actual = await vi.importActual('vue');
-  return {
-    ...actual,
-    inject: (key: any, defaultValue?: any) => {
-      return mockInjectValues.get(key) ?? defaultValue;
-    },
-  };
-});
+import { mockInjectValues } from '@/test-utils/mock-inject';
+
+vi.mock('vue', async () => (await import('@/test-utils/mock-inject')).mockVueInject());
 
 describe('input-base', () => {
   describe('Label class', () => {
