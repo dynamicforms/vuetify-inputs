@@ -52,13 +52,14 @@ const settings = useSettings();
 const { decimalSeparator: localeDecimalSeparator } = useLocale();
 
 const isNumber = computed(() => inputType.value === 'number');
+// what v-number-input takes where vuetifyBindings states nothing else
+const numberInputDefaults: Record<string, unknown> = { density: 'compact', controlVariant: 'stacked' };
 // the bindings of the field component the input type renders
 const fieldBindings = computed((): Record<string, unknown> => {
   if (!isNumber.value) return { modelValue: value.value, type: inputType.value, ...vuetifyBindings.value };
   return {
     modelValue: value.value,
-    density: 'compact',
-    controlVariant: 'stacked',
+    ...numberInputDefaults,
     ...vuetifyBindings.value,
     min: unref(min),
     max: unref(max),
