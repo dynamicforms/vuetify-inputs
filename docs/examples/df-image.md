@@ -31,16 +31,6 @@ In addition to [common props from InputBase](./input-base), this component requi
 | comms | `FileComms` | **Required** | Object with methods for image operations |
 | touchInterval | `number` | `undefined`: the plugin's `defaultTouchInterval`, else `60000` | Milliseconds between keep-alive touches. See [Configuration](/examples/configuration) for setting this application-wide instead |
 
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The image URL (v-model)
-- `label` - Input label
-- `hint` - Hint text
-- And more...
-
 ## Value and Backend
 
 The value is the string `comms.upload` resolves to, and the component renders it as the image's `src`. There is no
@@ -70,9 +60,7 @@ paste-button click when the clipboard holds no image.
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the image URL changes
+This component emits the [common events of InputBase](./input-base#events).
 
 ## Examples
 

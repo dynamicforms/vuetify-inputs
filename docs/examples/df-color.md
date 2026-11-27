@@ -10,7 +10,6 @@
 
 ## Features
 
-- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Vuetify's colour picker in a menu
 - Hex colour input
 - A swatch of the current colour
@@ -43,16 +42,6 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | picker | `'generic' \| 'hexagon' \| 'none'` | `'generic'` | The picker in the menu: `'generic'` is Vuetify's colour picker, `'hexagon'` the [hexagon palette](#hexagon-palette), `'none'` only the [`picker-prepend` slot](#slots) |
 | hexagonRings | `number` | `5` | The number of rings of the hexagon palette, the centre cell counted as the first: `1 + 3·n·(n − 1)` cells (3 → 19, 4 → 37, 5 → 61) |
 | lightnessLevels | `number \| number[]` | `undefined` | The OKLCH lightness (0..1) the hexagon palette offers: the full range, `n` evenly spaced levels, or the given levels (see [Lightness](#lightness)) |
-
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The colour value in hex format
-- `label` - Input label
-- `hint` - Hint text
-- And more...
 
 ## Colour Format
 
@@ -192,9 +181,7 @@ const colorField = new Field({
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the colour value changes
+This component emits the [common events of InputBase](./input-base#events).
 
 In addition:
 

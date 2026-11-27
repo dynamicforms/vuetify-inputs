@@ -10,7 +10,6 @@
 
 ## Features
 
-- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Date only, time only, or both
 - Display formats as date-fns patterns
 - Date and time pickers in a menu
@@ -113,16 +112,6 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | displayFormatDate | `string` | `'P'`        | Date display format (date-fns format)              |
 | displayFormatTime | `string` | `'p'`        | Time display format (date-fns format)              |
 | locale            | `Locale` | `undefined`  | date-fns locale object for formatting and parsing. Without it, the `dateTimeLocale` setting applies, and without that `DateTimeLocaleConfig` |
-
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The date/time value as ISO string (v-model)
-- `label` - Input field label
-- `hint` - Hint text
-- And more...
 
 ## Value Format
 
@@ -230,9 +219,7 @@ come from Vuetify's locale configuration. See [Localisation](/examples/localisat
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the date/time value changes
+This component emits the [common events of InputBase](./input-base#events).
 
 ## Examples
 

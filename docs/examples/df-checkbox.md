@@ -10,7 +10,6 @@
 
 ## Features
 
-- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Binary (true/false) and ternary (true/false/null) values
 - A click cycles the value `false` → `true` → `null` → `false` with `allowNull`, and `false` ↔ `true` without it
 - The indeterminate state renders `null`
@@ -24,22 +23,9 @@ In addition to [common props from InputBase](./input-base), this component suppo
 |------|------|---------|-------------|
 | allowNull | `boolean` | `false` | Whether to allow null (indeterminate) state |
 
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The checkbox value (v-model)
-- `label` - Checkbox label
-- `hint` - Hint text
-- `enabled` - Whether the input is enabled
-- And more...
-
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the checkbox value changes
+This component emits the [common events of InputBase](./input-base#events).
 
 ## Examples
 

@@ -10,7 +10,6 @@
 
 ## Features
 
-- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - File upload with a progress bar
 - Deletion of a temporary upload when the field is cleared or another upload replaces it
 - Downloading the file currently held by the field, where `comms` implements `getDownloadUrl`
@@ -26,16 +25,6 @@ In addition to [common props from InputBase](./input-base), this component requi
 |------|------|---------|-------------|
 | comms | `FileComms` | **Required** | Object with methods for file operations |
 | touchInterval | `number` | `undefined`: the plugin's `defaultTouchInterval`, else `60000` | Milliseconds between keep-alive touches. See [Configuration](/examples/configuration) for setting this application-wide instead |
-
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The file identifier string (v-model)
-- `label` - Input label
-- `hint` - Hint text
-- And more...
 
 ## Value Format
 
@@ -130,9 +119,7 @@ An upload that returns and a clear of the field mark the field touched.
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the file identifier changes
+This component emits the [common events of InputBase](./input-base#events).
 
 ## Examples
 
