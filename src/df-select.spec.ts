@@ -40,6 +40,18 @@ function deferredFetchChoices(available: SelectChoice[] = ALL_CHOICES) {
   return { fetchChoices, release };
 }
 
+// records every value written to the control
+function recordWrites(control: Field<any>): unknown[] {
+  const writes: unknown[] = [];
+  control.registerAction(
+    new ValueChangedAction((field, supr, newValue, oldValue) => {
+      writes.push(newValue);
+      return supr(field, newValue, oldValue);
+    }),
+  );
+  return writes;
+}
+
 // mounts in place of the Vuetify instance that test-setup registers for every mount
 function withPlugins<T>(plugins: typeof config.global.plugins, mountFn: () => T): T {
   const shared = config.global.plugins;
@@ -201,18 +213,12 @@ describe('DfSelect', () => {
       { name: 'an id that is not among the choices', value: 99, multiple: false, allowNull: true },
     ])('leave $name as it is', async ({ value, multiple, allowNull }) => {
       const control = new Field<any>({ value });
-      const changed = vi.fn();
-      control.registerAction(
-        new ValueChangedAction((field, supr, newValue, oldValue) => {
-          changed(newValue);
-          return supr(field, newValue, oldValue);
-        }),
-      );
+      const writes = recordWrites(control);
       const wrapper = mountSelect({ control, multiple, allowNull, choices: ALL_CHOICES });
       await flushPromises();
 
       expect(toRaw(control.value)).toBe(value);
-      expect(changed).not.toHaveBeenCalled();
+      expect(writes).toEqual([]);
       expect(wrapper.emitted('update:modelValue')).toBeUndefined();
     });
   });
@@ -238,20 +244,14 @@ describe('DfSelect', () => {
 
     it('the clear button sets null', async () => {
       const control = new Field<number[] | null>({ value: [1, 2] });
-      const values: any[] = [];
-      control.registerAction(
-        new ValueChangedAction((field, supr, newValue, oldValue) => {
-          values.push(newValue);
-          return supr(field, newValue, oldValue);
-        }),
-      );
+      const writes = recordWrites(control);
       const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
       await flushPromises();
 
       await wrapper.find('.v-field__clearable .v-icon').trigger('click');
       await flushPromises();
       expect(control.value).toBeNull();
-      expect(values).toEqual([null]);
+      expect(writes).toEqual([null]);
     });
   });
 
