@@ -79,6 +79,11 @@ export function hexToOkLab(hex: string): OkLab | null {
   return rgb ? linearToOkLab(rgb.map(toLinear) as [number, number, number]) : null;
 }
 
+/** The outline colour that contrasts with a colour of OKLab lightness `L`: black above 0.6, white otherwise. */
+export function contrastOutline(L: number): '#000' | '#fff' {
+  return L > 0.6 ? '#000' : '#fff';
+}
+
 /** `#rrggbb` of an OKLab colour; channels outside sRGB are clamped. */
 export function okLabToHex(lab: OkLab): string {
   return rgbToHex(okLabToLinear(lab).map(fromLinear) as [number, number, number]);

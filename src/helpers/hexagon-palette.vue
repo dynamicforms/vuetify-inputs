@@ -53,7 +53,7 @@
         type="button"
         class="df-hexagon-palette__level"
         :class="{ 'df-hexagon-palette__level--selected': index === levelIndex }"
-        :style="{ backgroundColor: greyOf(level), '--df-segment-outline': level > 0.6 ? '#000' : '#fff' }"
+        :style="{ backgroundColor: greyOf(level), '--df-segment-outline': contrastOutline(level) }"
         role="radio"
         :aria-label="translate('Lightness', { level: index + 1 })"
         :aria-checked="index === levelIndex"
@@ -74,7 +74,7 @@
         :ref="(el) => setSegmentElement(index, el)"
         class="df-hexagon-palette__segment"
         :class="{ 'df-hexagon-palette__segment--selected': index === levelIndex }"
-        :style="{ backgroundColor: greyOf(level), '--df-segment-outline': level > 0.6 ? '#000' : '#fff' }"
+        :style="{ backgroundColor: greyOf(level), '--df-segment-outline': contrastOutline(level) }"
         role="radio"
         :aria-label="translate('Lightness', { level: index + 1 })"
         :aria-checked="index === levelIndex"
@@ -90,6 +90,7 @@
 import { computed, ref, watch } from 'vue';
 
 import {
+  contrastOutline,
   type HexagonCell,
   hexagonCellRadius,
   hexagonCells,
@@ -146,7 +147,7 @@ const currentLightness = computed(() =>
 );
 const cells = computed(() => hexagonCells(Math.max(1, Math.floor(props.rings)), currentLightness.value));
 const selected = computed(() => nearestCell(cells.value, props.modelValue));
-const selectionStroke = computed(() => ((hexToOkLab(selected.value?.color ?? '')?.L ?? 0) > 0.6 ? '#000' : '#fff'));
+const selectionStroke = computed(() => contrastOutline(hexToOkLab(selected.value?.color ?? '')?.L ?? 0));
 
 function write(color: string) {
   written = color;
