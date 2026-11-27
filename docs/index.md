@@ -1,6 +1,5 @@
 ---
 title: 'Consistent Vuetify 3 form inputs'
-description: 'Vuetify 3 fields that share one layout, so text fields, selects, checkboxes and date pickers align. Density and variant are set per app, section or field.'
 layout: home
 hero:
   name: DynamicForms Vuetify Inputs
