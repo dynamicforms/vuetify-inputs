@@ -637,13 +637,13 @@ releases changed: the `Field`, `Group`, `List`, `Action` and validators your app
 Work through [the vue-forms migration guide](:vue-forms:/guide/migration.html) for that API; the sections below cover
 this package.
 
-Four breaks are worth searching for before you upgrade rather than after. The first three announce nothing at all —
-no log, no throw — so the code keeps compiling and stops working:
+Search for these four changes before upgrading. Code affected by the first three compiles and fails without a log
+or an exception:
 
 - **`watch(element, cb)` no longer fires.** An element is no longer a Vue proxy of itself, so the deep traversal a
   reactive watch source starts stops immediately. Watch a getter over what you read: `watch(() => field.value, cb)`.
-- **`readonly(element)` protects nothing.** It hands the element straight back, and a write through the result
-  reaches the element. Hand out `element.value`, or a `computed` over it.
+- **`readonly(element)` returns the element itself**, so a write through the result reaches the element. Pass
+  `element.value`, or a `computed` over it.
 - **`isEqual` over two elements no longer compares their data.** It answered `true` for any two elements of the same
   class, and answers `false` now unless they are the same instance. Compare `a.value` with `b.value`.
 - **`clone()` is `bind(data, overrides)`.** The data comes first: `f.clone({ value: x, label: 'Name' })` is
