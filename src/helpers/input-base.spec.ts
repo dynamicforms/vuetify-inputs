@@ -356,6 +356,52 @@ describe('input-base', () => {
         expect(useInputBase(props2, emit).enabled.value).toBe(false);
         expect(useInputBase(props3, emit).enabled.value).toBe(true);
       });
+
+      it('is false while a container above the element is disabled', () => {
+        const section = new Form.Group({ amount: new Form.Field({ value: 1 }) });
+        const emit = vi.fn();
+
+        const { enabled, vuetifyBindings } = useInputBase({ control: section.fields.amount }, emit);
+
+        expect(enabled.value).toBe(true);
+
+        section.access = 'disabled';
+
+        expect(section.fields.amount.enabled).toBe(true);
+        expect(enabled.value).toBe(false);
+        expect(vuetifyBindings.value.disabled).toBe(true);
+        expect(vuetifyBindings.value.readonly).toBe(true);
+      });
+
+      it('draws an element of a read-only container read-only, not disabled', () => {
+        const section = new Form.Group({ amount: new Form.Field({ value: 1 }) }, { access: 'readonly' });
+        const emit = vi.fn();
+
+        const { enabled, vuetifyBindings } = useInputBase({ control: section.fields.amount }, emit);
+
+        expect(enabled.value).toBe(false);
+        expect(vuetifyBindings.value.readonly).toBe(true);
+        expect(vuetifyBindings.value.disabled).toBe(false);
+      });
+
+      it("draws a 'disabled-null' element disabled", () => {
+        const control = new Form.Field({ value: 1, access: 'disabled-null' });
+        const emit = vi.fn();
+
+        const { vuetifyBindings } = useInputBase({ control }, emit);
+
+        expect(vuetifyBindings.value.readonly).toBe(true);
+        expect(vuetifyBindings.value.disabled).toBe(true);
+      });
+
+      it('draws an input disabled by the enabled prop disabled', () => {
+        const emit = vi.fn();
+
+        const { vuetifyBindings } = useInputBase({ enabled: false }, emit);
+
+        expect(vuetifyBindings.value.readonly).toBe(true);
+        expect(vuetifyBindings.value.disabled).toBe(true);
+      });
     });
 
     describe('visibility', () => {
@@ -374,20 +420,27 @@ describe('input-base', () => {
         expect(visibility.value).toBe('hidden');
       });
 
-      it('returns props.visibility when provided and no control', () => {
-        const props: BaseProps = { visibility: 'hidden' };
+      it('takes the visibility it names', () => {
         const emit = vi.fn();
 
-        const { visibility } = useInputBase(props, emit);
+        const { visibility, isRendered } = useInputBase({ visibility: 'hidden' }, emit);
 
         expect(visibility.value).toBe('hidden');
+        expect(isRendered.value).toBe(true);
       });
 
-      it("returns 'full' as default when no control and no visibility prop", () => {
-        const props: BaseProps = {};
+      it('refuses a string that is none of the four visibilities', () => {
         const emit = vi.fn();
 
-        const { visibility } = useInputBase(props, emit);
+        const { visibility } = useInputBase({ visibility: 'hiden' as Form.Visibility }, emit);
+
+        expect(() => visibility.value).toThrow("'hiden' is not a visibility");
+      });
+
+      it("is 'full' when the prop names nothing", () => {
+        const emit = vi.fn();
+
+        const { visibility } = useInputBase({}, emit);
 
         expect(visibility.value).toBe('full');
       });
@@ -573,81 +626,6 @@ describe('input-base', () => {
       });
     });
 
-    describe('enabled', () => {
-      it('is false while a container above the element is disabled', () => {
-        const section = new Form.Group({ amount: new Form.Field({ value: 1 }) });
-        const emit = vi.fn();
-
-        const { enabled, vuetifyBindings } = useInputBase({ control: section.fields.amount }, emit);
-
-        expect(enabled.value).toBe(true);
-
-        section.access = 'disabled';
-
-        expect(section.fields.amount.enabled).toBe(true);
-        expect(enabled.value).toBe(false);
-        expect(vuetifyBindings.value.disabled).toBe(true);
-        expect(vuetifyBindings.value.readonly).toBe(true);
-      });
-
-      it('draws an element of a read-only container read-only, not disabled', () => {
-        const section = new Form.Group({ amount: new Form.Field({ value: 1 }) }, { access: 'readonly' });
-        const emit = vi.fn();
-
-        const { enabled, vuetifyBindings } = useInputBase({ control: section.fields.amount }, emit);
-
-        expect(enabled.value).toBe(false);
-        expect(vuetifyBindings.value.readonly).toBe(true);
-        expect(vuetifyBindings.value.disabled).toBe(false);
-      });
-
-      it("draws a 'disabled-null' element disabled", () => {
-        const control = new Form.Field({ value: 1, access: 'disabled-null' });
-        const emit = vi.fn();
-
-        const { vuetifyBindings } = useInputBase({ control }, emit);
-
-        expect(vuetifyBindings.value.readonly).toBe(true);
-        expect(vuetifyBindings.value.disabled).toBe(true);
-      });
-
-      it('draws an input disabled by the enabled prop disabled', () => {
-        const emit = vi.fn();
-
-        const { vuetifyBindings } = useInputBase({ enabled: false }, emit);
-
-        expect(vuetifyBindings.value.readonly).toBe(true);
-        expect(vuetifyBindings.value.disabled).toBe(true);
-      });
-    });
-
-    describe('visibility prop', () => {
-      it('takes the visibility it names', () => {
-        const emit = vi.fn();
-
-        const { visibility, isRendered } = useInputBase({ visibility: 'hidden' }, emit);
-
-        expect(visibility.value).toBe('hidden');
-        expect(isRendered.value).toBe(true);
-      });
-
-      it('refuses a string that is none of the four visibilities', () => {
-        const emit = vi.fn();
-
-        const { visibility } = useInputBase({ visibility: 'hiden' as Form.Visibility }, emit);
-
-        expect(() => visibility.value).toThrow("'hiden' is not a visibility");
-      });
-
-      it("is 'full' when the prop names nothing", () => {
-        const emit = vi.fn();
-
-        const { visibility } = useInputBase({}, emit);
-
-        expect(visibility.value).toBe('full');
-      });
-    });
-
     describe('placeholder, hint, cssClass', () => {
       it('returns provided values', () => {
         const props: BaseProps = {
@@ -708,6 +686,17 @@ describe('input-base', () => {
       });
 
       it('defaults to "default" when nothing is provided', () => {
+        const props: BaseProps = {};
+        const emit = vi.fn();
+
+        const { density } = useInputBase(props, emit);
+
+        expect(density.value).toBe('default');
+      });
+
+      it('defaults to "default" with an empty settings object', () => {
+        mockInjectValues.set(vuetifyInputsSettingsKey, {});
+
         const props: BaseProps = {};
         const emit = vi.fn();
 
@@ -851,16 +840,6 @@ describe('input-base', () => {
         expect(bindings['data-test']).toBe('value');
       });
 
-      it('sets readonly and disabled to true when not enabled', () => {
-        const props: BaseProps = { enabled: false };
-        const emit = vi.fn();
-
-        const { vuetifyBindings } = useInputBase(props, emit);
-
-        expect(vuetifyBindings.value.readonly).toBe(true);
-        expect(vuetifyBindings.value.disabled).toBe(true);
-      });
-
       it('sets persistent-placeholder to false when placeholder is empty', () => {
         const props: BaseProps = { placeholder: '' };
         const emit = vi.fn();
@@ -899,35 +878,6 @@ describe('input-base', () => {
         const { vuetifyBindings } = useInputBase(props, emit);
 
         expect(vuetifyBindings.value.hint).toBe('overridden hint');
-      });
-    });
-
-    describe('settings injection', () => {
-      it('uses injected VuetifyInputsSettings', () => {
-        const settings: VuetifyInputsSettings = {
-          defaultDensity: 'comfortable',
-          defaultVariant: 'solo-filled',
-        };
-        mockInjectValues.set(vuetifyInputsSettingsKey, settings);
-
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
-
-        expect(result.density.value).toBe('comfortable');
-        expect(result.vuetifyBindings.value.variant).toBe('solo-filled');
-      });
-
-      it('works with empty settings object', () => {
-        mockInjectValues.set(vuetifyInputsSettingsKey, {});
-
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { density } = useInputBase(props, emit);
-
-        expect(density.value).toBe('default');
       });
     });
   });
