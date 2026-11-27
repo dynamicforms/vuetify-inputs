@@ -26,9 +26,11 @@ translation function reads, such as the locale.
 | `ColorPalette` | `Colour palette` | `<df-color picker="hexagon">`, the accessible label of the palette |
 | `Lightness` | `Lightness {level}` | `<df-color picker="hexagon">`, the accessible label of a lightness level button or segment; `level` counts from 1 |
 | `LightnessRange` | `Lightness` | `<df-color picker="hexagon">`, the accessible label of the lightness slider and of the level selectors |
-| `Loading` | `Loading` | `<df-select>`, the accessible label of the progress bar shown while choices are being fetched |
+| `Loading` | `Loading` | `<df-select>`, the accessible label of the progress bar shown while choices are being fetched, and the menu's text while it has no choices and choices are being fetched or a debounced fetch is waiting |
 | `Uploading` | `Uploading` | `<df-file>` and `<df-image>`, the accessible label of the upload progress bar |
 | `RemoveChoice` | `Remove {choice}` | `<df-select multiple>`, the accessible label of a chip's close button; `choice` is the chip's text |
+| `NoChoices` | `No choices` | `<df-select>`, the menu's text while it has no choices to show; `noDataText` replaces it |
+| `MinQuery` | `Type at least {count} characters` | `<df-select>` with `minQueryLength`, the menu's text while the search text is shorter; `count` is `minQueryLength`; `minQueryText` replaces it |
 | `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, "no heading" entry |
 | `Heading1`–`Heading6` | `Heading 1`–`Heading 6` | `<df-rtf-editor>` heading dropdown entries |
 | `Undo` / `Redo` | `Undo` / `Redo` | `<df-rtf-editor>` toolbar button tooltips |

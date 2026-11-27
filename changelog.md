@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.5] - 2026-11-27
+
+### Added
+
+- `DfSelect`: a choice's `text` takes `RenderContent` - plain text, `MdString`, `HtmlString`, a component, or a function
+  answering one, read on every render, so that it can follow the locale. The option and the chip render the content;
+  the search filter, the text field rendered before hydration and the chip close button's label take its text
+  (`renderContentText`, of an `MdString` once rendered as markdown). An option with rendered content is named by its
+  text, a line break read as a space. Other values are shown as `String(value)`.
+- `DfSelect`: prop `noDataText` (`RenderContent`, default the translatable `NoChoices`, "No choices"), shown in the menu
+  when there are no choices to show; while choices are being fetched the menu shows the translatable `Loading`.
+- `DfSelect` with `fetchChoices`: props `minQueryLength` (default `0`) and `minQueryText` (default the translatable
+  `MinQuery`, "Type at least {count} characters"). A search text shorter than `minQueryLength` is not fetched, the
+  loaded choices are reduced to the chosen ones and the menu shows `minQueryText`.
+- `DfSelect` with `fetchChoices`: prop `fetchDebounce` (milliseconds, default `0`). A search text is fetched once it
+  has not changed for that long; an empty search text and loading the choices for the value's ids are not delayed.
+- Peer dependency `markdown-it` (`^14.1.0 || ^15.0.0`), the renderer `vue-markdown-render` already depends on.
+
+### Fixed
+
+- `DfSelect`: the list of a menu without options (role `list`) carries no `aria-multiselectable`.
+
 ## [0.16.4] - 2026-11-26
 
 ### Added

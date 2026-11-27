@@ -13,11 +13,14 @@ What the components give assistive technology, and what the application sets up 
 - `df-actions`: a button that does not show its label (`showLabel: false`, also per breakpoint) has the label's plain
   text as its `aria-label` and `title`. Give every icon-only action a `label` with `showLabel: false` instead of
   leaving the label out. [df-actions](/examples/df-actions)
-- `df-select`: the choice text names the option and the chip; choice icons are hidden from assistive technology.
+- `df-select`: the choice text names the option and the chip; an option whose text is rendered content is named by
+  the content's text, a line break read as a space. Choice icons are hidden from assistive technology. The menu's text
+  while it has no choices (`noDataText`, `minQueryText`, `Loading`) is a list item, not an option, in the menu's polite
+  live region.
 - Progress bars are named `Loading` (`df-select`) and `Uploading` (`df-file`, `df-image`).
 
-The strings the components add (`Date`, `Time`, `RemoveChoice`, `Loading`, `Uploading`) are translation keys; see
-[Localisation](/examples/localisation).
+The strings the components add (`Date`, `Time`, `RemoveChoice`, `NoChoices`, `MinQuery`, `Loading`, `Uploading`)
+are translation keys; see [Localisation](/examples/localisation).
 
 ## States
 

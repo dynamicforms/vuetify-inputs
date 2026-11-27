@@ -1,5 +1,7 @@
 export interface SelectChoice {
   id: any;
+  /** `RenderContent`, or a function answering it, so that it can follow the locale. Any other value is shown as
+   * `String(value)`. */
   text: any;
   icon?: string;
 }

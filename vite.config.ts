@@ -71,6 +71,7 @@ export default defineConfig({
         /^@tiptap\/vue-3\/.*/,
         'date-fns',
         'lodash-es',
+        'markdown-it',
         'vue',
         'vue-cached-icon',
         'vue-markdown-render',

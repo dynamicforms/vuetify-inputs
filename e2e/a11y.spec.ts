@@ -29,6 +29,9 @@ const pages = readdirSync(examplesDir)
 
 const states = {
   selectMenu: 'df-select: menu open',
+  selectLoadedOptions: 'df-select: loaded choices menu with two-line options',
+  selectLoadedMinQuery: 'df-select: loaded choices menu with the minimum query text',
+  selectLoadedNoData: 'df-select: loaded choices menu with the no data text',
   datetimePicker: 'df-datetime: picker open',
   colorPicker: 'df-color: picker open',
   colorPalette: 'df-color: hexagon palette open',
@@ -139,6 +142,30 @@ test('df-select with the menu open', async ({ page }) => {
   await page.locator('.demo-container').first().locator('.v-input').first().locator('.v-field').click();
   await expect(page.locator('.v-overlay-container .v-overlay--active .v-list-item').first()).toBeVisible();
   check(states.selectMenu, await scan(page));
+});
+
+test('df-select with loaded choices: two-line options, minimum query text, no data text', async ({ page }) => {
+  await open(page, 'df-select');
+  const demo = page.locator('.demo-container', { has: page.getByText('Dynamic options loading') });
+  const input = demo.locator('.v-autocomplete input').first();
+  const menu = page.locator('.v-overlay-container .v-overlay--active');
+  // the demo's server answers after 3000 ms
+  const loaded = { timeout: 10_000 };
+
+  await input.fill('Ja');
+  // the debounced fetch starts; scan() waits for it to end
+  await expect(page.locator('.v-progress-linear--active')).toHaveCount(1, loaded);
+  await expect(menu.getByRole('option', { name: 'Java Statically typed' })).toBeVisible(loaded);
+  check(states.selectLoadedOptions, await scan(page));
+
+  await demo.getByRole('checkbox', { name: 'Minimum query of two letters' }).check();
+  await input.fill('J');
+  await expect(menu.getByText('Type at least two letters of the language name.')).toBeVisible();
+  check(states.selectLoadedMinQuery, await scan(page));
+
+  await input.fill('xyz');
+  await expect(menu.getByText('No languages found.')).toBeVisible(loaded);
+  check(states.selectLoadedNoData, await scan(page));
 });
 
 test('df-datetime with the picker open', async ({ page }) => {

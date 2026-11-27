@@ -33,6 +33,7 @@
     :loading="loading"
     :hide-selected="false"
     :menu-props="{ maxHeight: '400' }"
+    :list-props="listProps"
     :search="searchText"
     v-bind="vuetifyBindings"
     @update:search="(query: any) => queryOptions(query, undefined)"
@@ -47,13 +48,17 @@
         label
         size="small"
         class="d-flex align-middle"
+        :class="{ 'df-select-rich-chip': isRich(item.raw?.content) }"
         :variant="multiple ? 'tonal' : 'text'"
         :closable="false"
       >
         <template #prepend>
           <cached-icon v-if="item.raw?.icon" class="me-1" :name="item.raw.icon" aria-hidden="true" />
         </template>
-        <span :class="{ 'text-body-1': !multiple }">{{ item.title }}</span>
+        <span :class="{ 'text-body-1': !multiple }">
+          <messages-widget v-if="isRich(item.raw?.content)" :message="[choiceRenderable(item.raw.content)]" />
+          <template v-else>{{ item.title }}</template>
+        </span>
         <!-- VChip's own close button passes its label through Vuetify's locale function, which reads it as a key -->
         <template v-if="multiple && (allowNull || selected.length > 1)" #append>
           <button
@@ -73,12 +78,20 @@
     </template>
 
     <template #item="{ props: prps, item }">
-      <v-list-item v-bind="prps">
+      <v-list-item v-choice-label="isRich(item.raw?.content)" v-bind="prps">
         <template #prepend>
           <span v-if="item.raw?.icon" class="me-1">
             <cached-icon class="action-icon" :name="item.raw.icon" aria-hidden="true" />
           </span>
         </template>
+        <template v-if="isRich(item.raw?.content)" #title>
+          <messages-widget :message="[choiceRenderable(item.raw.content)]" />
+        </template>
+      </v-list-item>
+    </template>
+    <template #no-data>
+      <v-list-item class="df-select-no-data" @vue:mounted="menuEmpty = true" @vue:unmounted="menuEmpty = false">
+        <template #title><messages-widget :message="[noDataMessage()]" /></template>
       </v-list-item>
     </template>
     <template #loader="{ color, isActive }">
@@ -98,14 +111,28 @@
 
 <script setup lang="ts">
 import { castArray, isEqual, unionBy } from 'lodash-es';
-import { computed, nextTick, onBeforeUnmount, ref, toRefs, unref, watch } from 'vue';
+import { computed, type Directive, nextTick, onBeforeUnmount, ref, toRefs, unref, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import { VAutocomplete, VCombobox } from 'vuetify/components';
 
 import { DfSelectProps } from './dynamicforms-component-props';
-import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, SelectChoice, translate, useInputBase } from './helpers';
+import {
+  BaseEmits,
+  defaultBaseProps,
+  DfInputHint,
+  DfLabel,
+  HtmlString,
+  MessagesWidget,
+  RenderableValue,
+  renderContentText,
+  SelectChoice,
+  translate,
+  useInputBase,
+} from './helpers';
 import { useClientRendered } from './helpers/client-rendered';
 import {
+  choiceContent,
+  choiceText,
   convertItems,
   getSelectedChoices,
   multipleCompliantValue,
@@ -119,6 +146,10 @@ const propsWithDefaults = withDefaults(defineProps<DfSelectProps>(), {
   allowTags: false,
   allowNull: true,
   fetchChoices: undefined,
+  noDataText: undefined,
+  minQueryLength: 0,
+  minQueryText: undefined,
+  fetchDebounce: 0,
 });
 
 const { choices, multiple, allowTags: taggable, allowNull, cssClass } = toRefs(propsWithDefaults);
@@ -134,6 +165,28 @@ defineSlots<{
 }>();
 
 const t = translate;
+
+// a choice text rendered as content rather than as plain text
+function isRich(text: unknown): boolean {
+  return typeof choiceContent(text) !== 'string';
+}
+
+// read on every render, so that a function follows what it answers
+function choiceRenderable(text: unknown): RenderableValue {
+  return new RenderableValue(() => choiceContent(text));
+}
+
+// The accessible name of an option with rendered content: the text of its title, a line break and a block read as a
+// space. Without it, the name runs the lines together.
+function setChoiceLabel(el: HTMLElement, rich: boolean) {
+  const title = el.querySelector('.v-list-item-title');
+  if (rich && title) el.setAttribute('aria-label', renderContentText(new HtmlString(title.innerHTML)));
+  else el.removeAttribute('aria-label');
+}
+const vChoiceLabel: Directive<HTMLElement, boolean> = {
+  mounted: (el, { value }) => setChoiceLabel(el, value),
+  updated: (el, { value }) => setChoiceLabel(el, value),
+};
 
 const dfSelectRef = ref<InstanceType<typeof VAutocomplete> | InstanceType<typeof VCombobox> | null>(null);
 
@@ -194,17 +247,43 @@ function withHiddenIds(ids: any[]): any[] {
 }
 
 const options = computed(() => convertItems(displayChoices.value));
+// The menu's list is a listbox only while it shows options; a list (role list) does not allow aria-multiselectable,
+// which the autocomplete passes in either case. The no-data item is mounted while the list shows no options.
+const menuEmpty = ref(false);
+const listProps = computed(() => ({ 'aria-multiselectable': multiple.value && !menuEmpty.value ? true : undefined }));
 const chosenText = computed(() =>
   getSelectedChoices(displayChoices.value, currentValue())
-    .map((choice) => choice.text)
+    .map((choice) => choiceText(choice.text))
     .join(', '),
 );
 const searchText = ref<string | null>(null);
 const fetchCounterGlobal = ref(0);
 const isMultiline = ref(false);
-// Number of queryOptions() calls in flight.
+// Number of query fetches in flight.
 const searching = ref(0);
 const loading = computed(() => searching.value > 0 || resolvingValue.value > 0);
+// a query fetch waiting for fetchDebounce
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+const debouncePending = ref(false);
+
+function fetchesChoices(): boolean {
+  return !choices.value && propsWithDefaults.fetchChoices !== undefined;
+}
+
+function isShortQuery(query: any): boolean {
+  return fetchesChoices() && String(query ?? '').length < propsWithDefaults.minQueryLength;
+}
+
+// the content the menu shows when it has no choices to show
+function noDataMessage(): RenderableValue {
+  if (isShortQuery(searchText.value)) {
+    return new RenderableValue(
+      propsWithDefaults.minQueryText ?? t('MinQuery', { count: propsWithDefaults.minQueryLength }),
+    );
+  }
+  if (loading.value || debouncePending.value) return new RenderableValue(t('Loading'));
+  return new RenderableValue(propsWithDefaults.noDataText ?? t('NoChoices'));
+}
 
 if (choices.value?.length && propsWithDefaults.fetchChoices !== undefined) {
   console.warn('Both choices and fetchChoices are set. Only one of them should be set.');
@@ -301,8 +380,12 @@ watch(
   },
   { deep: true },
 );
+// Number of selections onSelect() has yet to write. Until then the select shows the selection, not the value.
+let selectsPending = 0;
 // choices loaded, replaced or resolved for the value: the select shows the value against them
-watch(displayChoices, () => syncSelected(currentValue()));
+watch(displayChoices, () => {
+  if (!selectsPending) syncSelected(currentValue());
+});
 watch([displayChoices, valueChoicesPending, resultingValue], emitModelValueDisplay, { deep: true });
 
 watch(selected, () => nextTick(checkMultiline), { deep: true });
@@ -326,7 +409,24 @@ watch(
     if (el instanceof Element) resizeObserver?.observe(el);
   },
 );
-onBeforeUnmount(() => resizeObserver?.disconnect());
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect();
+  cancelDebounce();
+});
+watch(
+  () => vuetifyBindings.value.readonly,
+  (readonly) => {
+    if (readonly) cancelDebounce();
+  },
+);
+
+// a changed minQueryLength applies to the search text as it is
+watch(
+  () => propsWithDefaults.minQueryLength,
+  () => {
+    if (inBrowser) queryOptions(searchText.value, undefined, true);
+  },
+);
 
 function resetQuery() {
   if (searchText.value != null && searchText.value.length > 0) {
@@ -339,9 +439,11 @@ function resetQuery() {
 // onClear() writes in its place. A taggable select keeps the search text: a single combobox selects as it is typed.
 function onSelect(/* val: any */) {
   if (vuetifyBindings.value.readonly) return;
+  selectsPending++;
   if (!taggable.value) resetQuery();
   const writesBefore = writeCount;
   nextTick(() => {
+    selectsPending--;
     if (writeCount !== writesBefore) return;
     const mcVal = multipleCompliantValue(
       multiple.value && Array.isArray(selected.value) ? withHiddenIds(selected.value) : selected.value,
@@ -400,15 +502,72 @@ function chipCloseKeydown(event: KeyboardEvent, itemValue: any) {
   });
 }
 
-async function queryOptions(queryValue?: any, idValue?: any): Promise<void> {
+function cancelDebounce() {
+  if (debounceTimer !== null) clearTimeout(debounceTimer);
+  debounceTimer = null;
+  debouncePending.value = false;
+}
+
+// The ids of the chosen choices: of the selection while onSelect() has yet to write it, else of the value and the
+// selection.
+function chosenIds(): any[] {
+  const sources = selectsPending ? [selected.value] : [currentValue(), selected.value];
+  return sources.flatMap((val) => (val == null ? [] : castArray(val)));
+}
+
+// The loaded choices reduced to the chosen ones; a query fetch in flight is dropped.
+function keepChosenChoices() {
+  fetchCounterGlobal.value++;
+  const ids = chosenIds();
+  loaded.value = loadedChoices.value.filter((choice) => ids.includes(choice.id));
+  takeLoaded.value = true;
+}
+
+function isEmptyValue(value: any): boolean {
+  return value == null || (Array.isArray(value) && !value.length);
+}
+
+/**
+ * Sets the search text and loads the choices for it. A query shorter than minQueryLength is not fetched: the loaded
+ * choices are reduced to the chosen ones, and a non-empty `idValue` is fetched at once for its choices only. With
+ * fetchDebounce, the fetch of a non-empty query waits until the query has not changed for that long, unless
+ * `immediate` is set.
+ */
+function queryOptions(queryValue?: any, idValue?: any, immediate = false): void {
   if (vuetifyBindings.value.readonly) return;
   searchText.value = queryValue;
-  if (choices.value || propsWithDefaults.fetchChoices === undefined) return;
+  if (!fetchesChoices()) return;
+  cancelDebounce();
+  if (isShortQuery(queryValue)) {
+    keepChosenChoices();
+    if (!isEmptyValue(idValue)) fetchQuery(queryValue, idValue, true);
+    return;
+  }
+  const delay = propsWithDefaults.fetchDebounce;
+  // an emptied search text is one action, not typing: it is fetched at once
+  if (immediate || !(delay > 0) || String(queryValue ?? '') === '') {
+    fetchQuery(queryValue, idValue);
+    return;
+  }
+  debouncePending.value = true;
+  debounceTimer = setTimeout(() => {
+    debounceTimer = null;
+    debouncePending.value = false;
+    fetchQuery(queryValue, idValue);
+  }, delay);
+}
+
+// With `chosenOnly`, only the fetched choices of the value are taken.
+async function fetchQuery(queryValue: any, idValue: any, chosenOnly = false): Promise<void> {
+  const fetchChoices = propsWithDefaults.fetchChoices;
+  if (fetchChoices === undefined) return;
   const fetchCounter = ++fetchCounterGlobal.value;
   searching.value++;
   try {
-    const newChoices = await propsWithDefaults.fetchChoices(queryValue, idValue);
+    const fetched = await fetchChoices(queryValue, idValue);
     if (fetchCounter !== fetchCounterGlobal.value) return;
+    const ids = chosenOnly ? chosenIds() : [];
+    const newChoices = chosenOnly ? fetched.filter((choice) => ids.includes(choice.id)) : fetched;
     // Taken after the fetch, from the value: choices resolveValueChoices() loaded while this call was in flight
     // must survive the search results replacing the rest.
     const selectedChoices = getSelectedChoices(
@@ -454,7 +613,7 @@ function resolveValueChoices(mcVal: any): Promise<void> | null {
 // empty value, a taggable select - goes through queryOptions() with the value as idValue. On the server nothing is
 // fetched: the server does not wait for a fetch, so its result would not reach the HTML.
 if (propsWithDefaults.fetchChoices !== undefined && inBrowser) {
-  if (!resolveValueChoices(currentValue())) queryOptions(undefined, resultingValue.value);
+  if (!resolveValueChoices(currentValue())) queryOptions(undefined, resultingValue.value, true);
 }
 syncSelected(currentValue());
 emitModelValueDisplay();
@@ -466,6 +625,13 @@ emitModelValueDisplay();
    field: it stays beside the chip while the text fits there, and wraps to a line of its own when it does not */
 .df-select-single :deep(.v-field__input > input) {
   min-width: min(var(--df-select-search-width), 100%);
+}
+
+.v-chip.df-select-rich-chip {
+  height: auto;
+  min-height: var(--v-chip-height);
+  padding-block: 2px;
+  white-space: normal;
 }
 
 .df-select-multirow :deep(.v-field__clearable) {

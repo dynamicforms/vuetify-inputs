@@ -12,6 +12,8 @@ const defaults = {
   Loading: 'Loading',
   Uploading: 'Uploading',
   RemoveChoice: 'Remove {choice}',
+  NoChoices: 'No choices',
+  MinQuery: 'Type at least {count} characters',
   Paragraph: 'Paragraph',
   Heading1: 'Heading 1',
   Heading2: 'Heading 2',

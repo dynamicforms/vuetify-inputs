@@ -8,7 +8,16 @@ import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
-import { DfDateTime, DfImage, DfRtfEditor, DfSelect, DynamicFormsInputs, type VuetifyInputsSettings } from '@/index';
+import {
+  DfDateTime,
+  DfImage,
+  DfRtfEditor,
+  DfSelect,
+  DynamicFormsInputs,
+  HtmlString,
+  MdString,
+  type VuetifyInputsSettings,
+} from '@/index';
 
 function render(component: Component, props: Record<string, unknown>, settings: VuetifyInputsSettings = {}) {
   const app = createSSRApp({ render: () => h(component, props) });
@@ -29,6 +38,23 @@ describe('server-side rendering', () => {
 
     expect(html).toContain('Number');
     expect(html).toContain('value="Two"');
+  });
+
+  it("renders a select holding a choice with content as a text field holding the content's text", async () => {
+    const choices = [
+      { id: 1, text: new HtmlString('Lesce<br>Train') },
+      { id: 2, text: 'Kranj' },
+    ];
+    const html = await render(DfSelect, { label: 'Stop', choices, control: new Field({ value: 1 }) });
+
+    expect(html).toContain('value="Lesce Train"');
+  });
+
+  it('renders a select holding a choice with markdown as a text field holding its rendered text', async () => {
+    const choices = [{ id: 1, text: new MdString('**Koper**  \nTrain and Bus') }];
+    const html = await render(DfSelect, { label: 'Stop', choices, control: new Field({ value: 1 }) });
+
+    expect(html).toContain('value="Koper Train and Bus"');
   });
 
   it('does not call fetchChoices, and leaves the value as it is', async () => {
