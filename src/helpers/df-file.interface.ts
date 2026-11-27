@@ -14,8 +14,8 @@ export class FileGoneError extends Error {
 
 export interface FileComms {
   /**
-   * Uploads a file added to the field (picked, dropped or, in `df-image`, pasted). The identifier it resolves to becomes the field's value.
-   * A rejection is an upload failure.
+   * Uploads a file added to the field (picked, dropped or, in `df-image`, pasted). The identifier it resolves to
+   * becomes the field's value. A rejection is an upload failure.
    *
    * @param file the file to upload
    * @param progressCallback called with upload progress (e.g. from axios `onUploadProgress`)
