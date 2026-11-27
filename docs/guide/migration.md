@@ -327,8 +327,8 @@ in a time zone with daylight saving time is an hour off for every date on the ot
 when.value;      // before: '2026-01-15T11:30:00+02:00' (10:30 local)   after: '2026-01-15T11:30:00+01:00'
 ```
 
-The same mismatch made the component rewrite its own value without end: a field bound to a date on the other side
-of the change from today stopped with "Maximum recursive updates exceeded" on mount. Records saved from such a form
+Before, the same mismatch also made a field bound to a date on the other side of the change from today rewrite its
+value in a loop and fail on mount with "Maximum recursive updates exceeded". Records saved from such a form
 by an earlier version, in a time zone with daylight saving time, may hold a time shifted by an hour or more; nothing
 in the upgrade corrects them.
 
