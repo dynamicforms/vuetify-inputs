@@ -144,22 +144,8 @@ const categoryOptions = [
 
 ## Available Components
 
-- [**InputBase**](/examples/input-base): The field frame that df-date-time, df-file, df-image and df-rtf-editor place
-  their control in.
-- [**df-actions**](/examples/df-actions): An actions group.
-- [**df-checkbox**](/examples/df-checkbox): A checkbox component.
-- [**df-color**](/examples/df-color): A colour input.
-- [**df-date-time**](/examples/df-datetime): A date and time selection component with configurable format and type.
-- [**df-file**](/examples/df-file): A file upload component with progress indication.
-- [**df-image**](/examples/df-image): An image upload with a preview, drag and drop and paste.
-- [**df-input**](/examples/df-input): A general value input.
-- [**df-input-group**](/examples/df-input-group): One field's frame, label and message row around several inputs, e.g. a
-  set of checkboxes.
-- [**df-input-hint**](/examples/df-input-hint): Renders a field's or a group's errors, falling back to its hint text.
-- [**df-rtf-editor**](/examples/df-rtf-editor): A RTF editor input.
-- [**df-select**](/examples/df-select): A selection component supporting static or dynamic options, multiple selection,
-  and tagging.
-- [**df-text-area**](/examples/df-text-area): A textarea component with configurable rows and validation.
+[The fields](/guide/rationale#the-fields) lists every component with what it is.
+[InputBase](/examples/input-base) describes the frame and the props they share.
 
 ## Localisation
 
