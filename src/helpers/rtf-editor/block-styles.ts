@@ -1,5 +1,7 @@
 import { Editor, Extension, Mark, mergeAttributes } from '@tiptap/core';
 
+import { htmlAttribute } from './attributes';
+
 /**
  * Adds a `class` attribute to paragraph, heading, blockquote and code-block nodes, so the "Style" dropdown's
  * named looks (`h3.category`, `p.info-box`, `pre.fancy-code-dark`...) persist through `getHTML()`/`setContent()`
@@ -12,11 +14,7 @@ export const ClassAttribute = Extension.create({
       {
         types: ['paragraph', 'heading', 'blockquote', 'codeBlock'],
         attributes: {
-          class: {
-            default: null,
-            parseHTML: (element: HTMLElement) => element.getAttribute('class'),
-            renderHTML: (attributes: Record<string, any>) => (attributes.class ? { class: attributes.class } : {}),
-          },
+          class: htmlAttribute('class'),
         },
       },
     ];
