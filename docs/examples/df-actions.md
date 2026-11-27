@@ -194,7 +194,7 @@ import { ExecuteAction } from '@dynamicforms/vue-forms';
 // Create the execution logic
 const saveFormAction = new ExecuteAction(async (action, supr, params) => {
   await saveDocument();
-  return supr(action, params); // Call the super method
+  return supr(action, params); // continue with the next handler in the chain
 });
 
 // Attach to Action
