@@ -300,8 +300,9 @@ It emits `BaseEmits` plus one event of its own:
 | blur | - | The hosted control lost focus. `touched` is set to `true` before this is emitted, so a listener already reads the field as touched |
 
 The root element is a `v-input`, rendered only when the visibility is not `'suppress'`, carrying the `name`,
-`density`, `hint`, `persistent-hint`, `hide-details`, `errorMessages` and `class` bindings and the visibility
-classes. Its `message` slot renders `DfInputHint` with the [shown errors](#shown-errors) and the hint.
+`density`, `hint`, `persistent-hint`, `hide-details` and `errorMessages` bindings, the `cssClass` member of
+`useInputBase()` and the visibility classes. Its `message` slot renders `DfInputHint` with the
+[shown errors](#shown-errors) and the hint.
 Inside it, a `v-field` takes the `v-input`'s id, as Vuetify's own text field does: the field label's `for` is that id,
 the label's own id is the id with `-label` appended, and while the message row is rendered its id is the id with
 `-messages` appended. The `v-field` carries the `variant`, `bg-color`, `density`, `label` and `disabled` bindings, is `dirty`
@@ -433,13 +434,14 @@ const { value, shownErrors } = useInputBase<string>(props, emits, () =>
 | visibility | `ComputedRef<Visibility>` | The resolved visibility, see [Display Modes](#display-modes) |
 | isRendered | `ComputedRef<boolean>` | `false` only for `'suppress'`; it is the `v-if` on the component's root element |
 | visibilityClass | `ComputedRef<{ 'd-none': boolean, invisible: boolean }>` | The class object for `'hidden'` and `'invisible'`, to bind on the root element |
+| cssClass | `ComputedRef<string>` | The `cssClass` prop, then the control's `extra.cssClass`, then `''`. `vuetifyBindings` carries it as `class`, where `passthroughAttrs.class` replaces it |
 | label | `ComputedRef<Label>` | The label as a `Label` instance: content in any of the four forms is wrapped, a `Label` is passed through |
 | touched | `WritableComputedRef<boolean> \| Ref<boolean>` | Bound to `control.touched` when there is a control, a standalone ref otherwise. Components write `true` to it on blur, and on an edit that ends without a blur: `df-file` and `df-image` when an upload returns or the field is cleared, `df-date-time` when a value picked in its menu is saved or the field is cleared, `df-color` when a color picked in its menu is saved |
 | density | `ComputedRef<FieldDensity>` | The `density` prop, then the control's `extra.density`, then the injected `field-density`, then the plugin's `defaultDensity`, then `'default'` |
 | densityClass | `ComputedRef<string>` | `` `df-density-${density}` ``, to bind on the root element |
 | vuetifyBindings | `ComputedRef<Record<string, any>>` | Everything to `v-bind` on the Vuetify input, see below |
 
-`placeholder`, `hint`, `cssClass` and the resolved `variant` are not returned separately; they reach the
+`placeholder`, `hint` and the resolved `variant` are not returned separately; they reach the
 component through `vuetifyBindings`.
 
 A control may hold a different value than the one written (a `ValueChangedAction` that normalises it) or refuse the

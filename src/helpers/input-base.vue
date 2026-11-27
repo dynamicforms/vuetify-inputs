@@ -7,7 +7,7 @@
     :persistent-hint="vuetifyBindings.persistentHint"
     :hide-details="vuetifyBindings.hideDetails"
     :error-messages="vuetifyBindings.errorMessages"
-    :class="[vuetifyBindings.class, visibilityClass]"
+    :class="[cssClass, visibilityClass]"
   >
     <!-- v-field takes v-input's id, as in Vuetify's own text field: its label's `for` and the messages row's id
          follow from it -->
@@ -65,7 +65,7 @@ defineSlots<{
   prepend?(props: Record<string, unknown>): any;
 }>();
 
-const { isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
+const { cssClass, isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 
 const isClearable = computed(() => !!(unref(props.clearable) && unref(value) && !vuetifyBindings.value.readonly));
 const focused = ref<boolean>(false);

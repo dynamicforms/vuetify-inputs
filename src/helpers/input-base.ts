@@ -279,6 +279,7 @@ export function useInputBase<T = any>(
     visibility,
     isRendered,
     visibilityClass,
+    cssClass,
     label,
     touched,
     density,
