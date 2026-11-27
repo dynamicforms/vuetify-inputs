@@ -141,81 +141,10 @@ Common format strings:
 - `'HH:mm'` - 14:30
 - `'HH:mm:ss'` - 14:30:45
 
-## Locale Configuration
+## Locale
 
-The locale is a date-fns locale object, set in one of two ways:
-
-### 1. Global Locale Configuration
-
-`DateTimeLocaleConfig` sets the locale of every `df-date-time` component whose app gives no `dateTimeLocale` setting
-(see [Configuration](/examples/configuration)) and that has no `locale` prop:
-
-```vue
-<script setup>
-import { DateTimeLocaleConfig } from '@dynamicforms/vuetify-inputs';
-import { enUS, de, fr } from 'date-fns/locale';
-
-// Set global locale (affects all df-date-time components)
-DateTimeLocaleConfig.setDateTimeLocale(enUS);
-
-// You can also use a reactive ref
-import { ref } from 'vue';
-const currentLocale = ref(de);
-DateTimeLocaleConfig.setDateTimeLocale(currentLocale);
-
-// Change locale dynamically
-currentLocale.value = fr;
-</script>
-```
-
-### 2. Component-specific Locale
-
-The `locale` prop overrides the global locale for one component:
-
-```vue
-<template>
-  <df-date-time
-    v-model="selectedDate"
-    :locale="germanLocale"
-    display-format-date="dd.MM.yyyy"
-    label="Deutsches Datum"
-  />
-</template>
-
-<script setup>
-import { ref } from 'vue';
-import { de } from 'date-fns/locale';
-import { DfDateTime } from '@dynamicforms/vuetify-inputs';
-
-const germanLocale = de;
-const selectedDate = ref('2023-04-17');
-</script>
-```
-
-### Available Locales
-
-Any date-fns locale can be used:
-
-```typescript
-import { 
-  sl,     // Slovenian (default)
-  enUS,   // English (US)
-  de,     // German
-  fr,     // French
-  es,     // Spanish
-  it,     // Italian
-  // ... and many more
-} from 'date-fns/locale';
-```
-
-The date-fns locale affects:
-
-- Display formatting (how dates/times appear)
-- Parsing (how manual input is interpreted)
-- First day of week in date picker
-
-The month and weekday names inside the picker are not: the component passes no locale to `<v-date-picker>`, so they
-come from Vuetify's locale configuration. See [Localisation](/examples/localisation).
+The date-fns locale sets the display format, the parsing of typed text and the first day of the week; the `locale` prop
+overrides the global one for one component. See [Localisation: Dates and times](/examples/localisation#dates-and-times).
 
 ## Events
 
@@ -264,39 +193,6 @@ const form = new Group({
     value: '2026-03-15T09:30:00'
   })
 });
-</script>
-```
-
-### Multilingual Date Picker
-
-```vue
-<template>
-  <div>
-    <v-btn-toggle v-model="selectedLocaleIndex" mandatory>
-      <v-btn value="0">Slovenščina</v-btn>
-      <v-btn value="1">U.S. English</v-btn>
-      <v-btn value="2">Deutsch</v-btn>
-    </v-btn-toggle>
-    
-    <df-date-time
-      v-model="selectedDate"
-      :locale="locales[selectedLocaleIndex]"
-      display-format-date="PP"
-      display-format-time="pp"
-      label="Izberite datum"
-      hint="Datum se prikaže v izbrani lokali"
-    />
-  </div>
-</template>
-
-<script setup>
-import { ref, computed } from 'vue';
-import { sl, enUS, de } from 'date-fns/locale';
-import { DfDateTime } from '@dynamicforms/vuetify-inputs';
-
-const selectedLocaleIndex = ref(0);
-const locales = [sl, enUS, de];
-const selectedDate = ref('2023-04-17T14:30:00');
 </script>
 ```
 

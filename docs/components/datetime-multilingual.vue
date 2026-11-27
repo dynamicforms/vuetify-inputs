@@ -11,12 +11,14 @@
       </v-btn-toggle>
     </div>
 
+    <!-- #region field -->
     <df-date-time
       :control="dateTimeField"
       :locale="locales[selectedLocaleIndex]"
       :label="new Label(labels[selectedLocaleIndex], 'mdi-calendar-clock')"
       :hint="hints[selectedLocaleIndex]"
     />
+    <!-- #endregion field -->
 
     <div class="mt-4">
       <strong>{{ infoLabels[selectedLocaleIndex] }}:</strong>
@@ -32,6 +34,7 @@
 </template>
 
 <script setup>
+// #region setup
 import { Field, Validators } from '@dynamicforms/vue-forms';
 import { sl, enUS, de, fr, ja, zhCN } from 'date-fns/locale';
 import { ref } from 'vue';
@@ -41,6 +44,12 @@ import { DfDateTime, Label } from '../../src';
 const selectedLocaleIndex = ref(0);
 
 const locales = [sl, enUS, de, fr, ja, zhCN];
+
+const dateTimeField = new Field({
+  value: '2026-03-15T09:30:00',
+  validators: [new Validators.Required()],
+});
+// #endregion setup
 
 const labels = [
   'Izberite datum in čas',
@@ -70,11 +79,6 @@ const localeInfos = [
   '日本語ロケール: 週は日曜日から始まり、yyyy年M月d日形式',
   '中文区域设置: 周从周一开始，yyyy年M月d日格式',
 ];
-
-const dateTimeField = new Field({
-  value: '2026-03-15T09:30:00',
-  validators: [new Validators.Required()],
-});
 </script>
 
 <style scoped>
