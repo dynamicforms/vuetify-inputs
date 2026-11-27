@@ -16,26 +16,13 @@ In your main.ts
 import { DynamicFormsInputs } from '@dynamicforms/vuetify-inputs';
 import '@dynamicforms/vuetify-inputs/styles.css';
 
-...
 const app = createApp(MyApp);
-app.use(router);
 app.use(vuetify);
-// registers the library for use and optionally inputs globally
-app.use(DynamicFormsInputs, { registerComponents: true, registerVuetifyComponents: false });
+app.use(DynamicFormsInputs);
 ```
 
-::: tip
-you may also import a list of components like so:
-
-```typescript
-import { VuetifyComponents } from '@dynamicforms/vuetify-inputs';
-
-...
-
-Object.entries(VuetifyComponents).map(([name, component]) => app.component(name, component));
-```
-
-:::
+[Configuration](/examples/configuration) describes the plugin options, among them the global registration of the
+components and of the Vuetify components they use, and the `VuetifyComponents` export.
 
 ### Resolving a component by its tag
 
@@ -149,16 +136,8 @@ const categoryOptions = [
 
 ## Localisation
 
-The library renders a few English strings of its own: the labels of the RTF editor's toolbar, the buttons of the
-pickers, the upload and download prompts of `<df-image>` and `<df-file>`, and accessible names such as those of the
-colour palette, progress bars, chip close buttons and date and time inputs.
-`translateStrings()`, or the `translate` setting per app, connects them to the application's translation function.
-Errors render as the `errorText` setting converts them, and `DateTimeLocaleConfig`, or the `dateTimeLocale` setting
-per app, sets the date-fns locale `<df-date-time>` formats and parses with.
-
-[Localisation](/examples/localisation) lists every translatable key with its default and where it appears, describes
-[translating errors](/examples/localisation#translating-errors), and has an example that keeps all three on the
-application's current locale.
+[Localisation](/examples/localisation) describes how the library's own strings, its errors and the date-fns locale of
+`<df-date-time>` follow the application's language.
 
 ## Next Steps
 
