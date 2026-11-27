@@ -300,8 +300,8 @@ It emits `BaseEmits` plus one event of its own:
 | blur | - | The hosted control lost focus. `touched` is set to `true` before this is emitted, so a listener already reads the field as touched |
 
 The root element is a `v-input`, rendered only when the visibility is not `'suppress'`, carrying the `name`,
-`density`, `hint`, `persistent-hint`, `hide-details` and `errorMessages` bindings together with the `cssClass` prop
-and the visibility classes. Its `message` slot renders `DfInputHint` with the [shown errors](#shown-errors) and the hint.
+`density`, `hint`, `persistent-hint`, `hide-details`, `errorMessages` and `class` bindings and the visibility
+classes. Its `message` slot renders `DfInputHint` with the [shown errors](#shown-errors) and the hint.
 Inside it, a `v-field` takes the `v-input`'s id, as Vuetify's own text field does: the field label's `for` is that id,
 the label's own id is the id with `-label` appended, and while the message row is rendered its id is the id with
 `-messages` appended. The `v-field` carries the `variant`, `bg-color`, `density`, `label` and `disabled` bindings, is `dirty`
