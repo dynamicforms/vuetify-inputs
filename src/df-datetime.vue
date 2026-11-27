@@ -18,25 +18,31 @@
         ]"
         @keydown.capture="onKeydown"
       >
-        <span v-if="inputType !== 'time'" :id="partNameId('date')" class="df-sr-only">{{ t('Date') }}</span>
-        <span v-if="inputType !== 'date'" :id="partNameId('time')" class="df-sr-only">{{ t('Time') }}</span>
+        <span
+          v-for="part in parts"
+          :id="partNameId(part.which)"
+          :key="part.which"
+          class="df-sr-only"
+          v-text="partLabel(part.which)"
+        />
         <v-text-field
-          v-if="['date', 'datetime'].includes(inputType)"
-          :id="slotProps.props.id"
-          v-model="dateText"
-          class="df-datetime-date"
-          style="flex-grow: 4"
+          v-for="(part, index) in parts"
+          :id="index === 0 ? slotProps.props.id : undefined"
+          :key="part.which"
+          v-model="part.text.value"
+          :class="`df-datetime-${part.which}`"
+          :style="{ flexGrow: part.flexGrow }"
           density="compact"
           variant="plain"
           :clearable="false"
           :hide-details="true"
           :readonly="vuetifyBindings.readonly"
           :disabled="vuetifyBindings.disabled"
-          :name="partName('date')"
-          v-bind="{ ...partAttrs('date', slotProps.props), ...passthroughAttrs }"
-          :placeholder="vuetifyBindings.placeholder"
-          @update:model-value="closeMenu('date')"
-          @click="dropdown = 'date'"
+          :name="partName(part.which)"
+          v-bind="{ ...partAttrs(part.which, slotProps.props), ...passthroughAttrs }"
+          :placeholder="index === 0 ? vuetifyBindings.placeholder : undefined"
+          @update:model-value="closeMenu(part.which)"
+          @click="dropdown = part.which"
           @mousedown="markPointerFocus"
           @mouseup="keepSelectionOnPointerFocus"
           @focus="
@@ -44,16 +50,22 @@
             slotProps.focus();
           "
           @blur="
-            closeMenu('date');
-            commitDate();
+            closeMenu(part.which);
+            commitPart(part.which);
             slotProps.blur();
           "
         >
           <template #default>
-            <v-menu v-if="clientRendered" v-model="dateMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsDate" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
+            <v-menu
+              v-if="clientRendered"
+              v-model="part.menuShown.value"
+              :close-on-content-click="false"
+              activator="parent"
+            >
+              <v-confirm-edit v-model="part.model.value" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
                 <template #default="{ model: proxyModel, save, cancel, isPristine }">
                   <v-date-picker
+                    v-if="part.which === 'date'"
                     :ref="(el) => bindEdit('date', el, { model: proxyModel, save, cancel })"
                     v-model="proxyModel.value"
                     :hide-header="true"
@@ -70,46 +82,8 @@
                       <confirm-actions :save="save" :cancel="cancel" :is-pristine="isPristine" />
                     </template>
                   </v-date-picker>
-                </template>
-              </v-confirm-edit>
-            </v-menu>
-          </template>
-        </v-text-field>
-
-        <v-text-field
-          v-if="['time', 'datetime'].includes(inputType)"
-          :id="inputType === 'time' ? slotProps.props.id : undefined"
-          v-model="timeText"
-          class="df-datetime-time"
-          style="flex-grow: 3"
-          density="compact"
-          variant="plain"
-          :clearable="false"
-          :hide-details="true"
-          :readonly="vuetifyBindings.readonly"
-          :disabled="vuetifyBindings.disabled"
-          :name="partName('time')"
-          v-bind="{ ...partAttrs('time', slotProps.props), ...passthroughAttrs }"
-          :placeholder="inputType === 'time' ? vuetifyBindings.placeholder : undefined"
-          @update:model-value="closeMenu('time')"
-          @click="dropdown = 'time'"
-          @mousedown="markPointerFocus"
-          @mouseup="keepSelectionOnPointerFocus"
-          @focus="
-            selectText($event);
-            slotProps.focus();
-          "
-          @blur="
-            closeMenu('time');
-            commitTime();
-            slotProps.blur();
-          "
-        >
-          <template #default>
-            <v-menu v-if="clientRendered" v-model="timeMenuShown" :close-on-content-click="false" activator="parent">
-              <v-confirm-edit v-model="valueAsTimeString" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
-                <template #default="{ model: proxyModel, save, cancel, isPristine }">
                   <v-time-picker
+                    v-else
                     :ref="(el) => bindEdit('time', el, { model: proxyModel, save, cancel })"
                     v-model="proxyModel.value"
                     v-model:view-mode="timeViewMode"
@@ -207,43 +181,39 @@ const shownInputErrors = computed(() => [...(props.errors ?? []), ...inputErrors
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
 
 // Each part is named by the field label and its own name; the field label's `for` is the first part's id.
+type DateTimePart = 'date' | 'time';
 const nameId = useId();
-const partNameId = (which: 'date' | 'time') => `${nameId}-${which}`;
-const partName = (which: 'date' | 'time') =>
+const partLabel = (which: DateTimePart) => t(which === 'date' ? 'Date' : 'Time');
+const partNameId = (which: DateTimePart) => `${nameId}-${which}`;
+const partName = (which: DateTimePart) =>
   vuetifyBindings.value.name ? `${vuetifyBindings.value.name}-${which}` : undefined;
 const partErrorCodes = { date: invalidDateError.code, time: invalidTimeError.code };
 
 // a part is invalid while an error is shown that is not the other part's own
-function partAttrs(which: 'date' | 'time', controlProps: InputBaseControlProps) {
+function partAttrs(which: DateTimePart, controlProps: InputBaseControlProps) {
   const otherCode = partErrorCodes[which === 'date' ? 'time' : 'date'];
   const invalid = shownErrors.value.some((error) => (error as ValidationError).code !== otherCode);
   const aria = controlAria(controlProps);
   return {
     ...aria,
     'aria-labelledby': `${aria['aria-labelledby']} ${partNameId(which)}`,
-    'aria-label': [aria['aria-label'], t(which === 'date' ? 'Date' : 'Time')].filter(Boolean).join(' '),
+    'aria-label': [aria['aria-label'], partLabel(which)].filter(Boolean).join(' '),
     'aria-invalid': invalid ? 'true' : undefined,
   };
 }
 
 const dropdown = ref('');
 const clientRendered = useClientRendered();
-const dateMenuShown = computed({
-  get() {
-    return !vuetifyBindings.value.readonly && unref(dropdown) === 'date';
-  },
-  set(newValue: boolean) {
-    dropdown.value = newValue ? 'date' : '';
-  },
-});
-const timeMenuShown = computed({
-  get() {
-    return !vuetifyBindings.value.readonly && unref(dropdown) === 'time';
-  },
-  set(newValue: boolean) {
-    dropdown.value = newValue ? 'time' : '';
-  },
-});
+const menuShown = (which: DateTimePart) =>
+  computed({
+    get() {
+      return !vuetifyBindings.value.readonly && unref(dropdown) === which;
+    },
+    set(newValue: boolean) {
+      dropdown.value = newValue ? which : '';
+    },
+  });
+const menusShown = { date: menuShown('date'), time: menuShown('time') };
 
 // a value picked in the menu or cleared concludes the edit: the field may hold no focus to lose
 function concludeEdit() {
@@ -258,15 +228,15 @@ interface PickerEdit {
   save: () => void;
   cancel: () => void;
 }
-const edits: Partial<Record<'date' | 'time', PickerEdit>> = {};
-function bindEdit(which: 'date' | 'time', el: unknown, edit: PickerEdit) {
+const edits: Partial<Record<DateTimePart, PickerEdit>> = {};
+function bindEdit(which: DateTimePart, el: unknown, edit: PickerEdit) {
   if (el) edits[which] = edit;
   else delete edits[which];
 }
 
 // Typing into a field or leaving it discards the choice in its picker and closes it: the arrow keys then move the caret
 // instead of the picker.
-function closeMenu(which: 'date' | 'time') {
+function closeMenu(which: DateTimePart) {
   if (dropdown.value !== which) return;
   edits[which]?.cancel();
   dropdown.value = '';
@@ -382,7 +352,11 @@ function stepTime(time: string, minutes: number) {
 // and so out of the field, which closes the menu.
 function onKeydown(event: KeyboardEvent) {
   const target = event.target as HTMLElement;
-  const which = target.closest('.df-datetime-date') ? 'date' : target.closest('.df-datetime-time') ? 'time' : null;
+  const which: DateTimePart | null = target.closest('.df-datetime-date')
+    ? 'date'
+    : target.closest('.df-datetime-time')
+      ? 'time'
+      : null;
   if (which == null || vuetifyBindings.value.readonly) return;
   const shown = dropdown.value === which;
   const edit = edits[which];
@@ -393,11 +367,10 @@ function onKeydown(event: KeyboardEvent) {
 
   if (event.key === 'Enter') {
     if (shown) edit?.save();
-    else if (which === 'date') commitDate();
-    else commitTime();
+    else commitPart(which);
   } else if (event.key === ' ') {
     // the text as shown opens the picker; text being typed takes the space
-    if (which === 'date' ? dateText.value !== dateDisplay.value : timeText.value !== timeDisplay.value) return;
+    if (partText[which].value !== partDisplay[which].value) return;
     handled();
     dropdown.value = which;
   } else if (event.key === 'Escape' && shown) {
@@ -431,19 +404,28 @@ function keepSelectionOnPointerFocus(event: MouseEvent) {
   pointerFocus = false;
 }
 
-const dateDisplay = computed(() => {
-  const vad = unref(valueAsDate);
-  return vad == null ? '' : format(vad, unref(displayFormatDate), { locale: currentLocale.value });
-});
-const timeDisplay = computed(() => {
-  const vad = unref(valueAsDate);
-  return vad == null ? '' : format(vad, unref(displayFormatTime), { locale: currentLocale.value });
-});
+const display = (displayFormat: Ref<string>) =>
+  computed(() => {
+    const vad = unref(valueAsDate);
+    return vad == null ? '' : format(vad, unref(displayFormat), { locale: currentLocale.value });
+  });
+const dateDisplay = display(displayFormatDate);
+const timeDisplay = display(displayFormatTime);
+const partDisplay = { date: dateDisplay, time: timeDisplay };
 
 // The fields hold the text as typed; it is read into the value when the field loses focus or on Enter, and replaced
 // by the formatted value once it is read or the value changes.
 const dateText = ref('');
 const timeText = ref('');
+const partText = { date: dateText, time: timeText };
+
+// the parts the input type shows, in their order
+const parts = computed(() =>
+  [
+    { which: 'date' as const, flexGrow: 4, text: dateText, menuShown: menusShown.date, model: valueAsDate },
+    { which: 'time' as const, flexGrow: 3, text: timeText, menuShown: menusShown.time, model: valueAsTimeString },
+  ].filter((part) => [part.which, 'datetime'].includes(unref(inputType))),
+);
 
 function showValue() {
   dateText.value = dateDisplay.value;
@@ -464,35 +446,30 @@ function clearFromText() {
   showValue();
 }
 
-function commitDate() {
-  if (vuetifyBindings.value.readonly || dateText.value === dateDisplay.value) return;
-  if (!dateText.value.trim()) {
-    clearFromText();
-    return;
-  }
-  const date = parseDateInput(dateText.value, unref(displayFormatDate), currentLocale.value, new Date());
-  if (date == null) {
-    dateInvalid.value = true;
-    return;
-  }
-  dateInvalid.value = false;
-  setValueISOFull(formatNaive(date), 0);
-  dateText.value = dateDisplay.value;
-}
+// the typed text of a part as the ISO value it writes, null where it cannot be read
+const partParsers: Record<DateTimePart, (text: string) => string | null> = {
+  date: (text) => {
+    const date = parseDateInput(text, unref(displayFormatDate), currentLocale.value, new Date());
+    return date && formatNaive(date);
+  },
+  time: (text) => {
+    const time = parseTimeInput(text, unref(displayFormatTime), currentLocale.value);
+    return time && `T${pad2(time.hours)}:${pad2(time.minutes)}:00`;
+  },
+};
+const partInvalid = { date: dateInvalid, time: timeInvalid };
 
-function commitTime() {
-  if (vuetifyBindings.value.readonly || timeText.value === timeDisplay.value) return;
-  if (!timeText.value.trim()) {
+function commitPart(which: DateTimePart) {
+  const text = partText[which];
+  if (vuetifyBindings.value.readonly || text.value === partDisplay[which].value) return;
+  if (!text.value.trim()) {
     clearFromText();
     return;
   }
-  const time = parseTimeInput(timeText.value, unref(displayFormatTime), currentLocale.value);
-  if (time == null) {
-    timeInvalid.value = true;
-    return;
-  }
-  timeInvalid.value = false;
-  setValueISOFull(`T${pad2(time.hours)}:${pad2(time.minutes)}:00`, 1);
-  timeText.value = timeDisplay.value;
+  const iso = partParsers[which](text.value);
+  partInvalid[which].value = iso == null;
+  if (iso == null) return;
+  setValueISOFull(iso, which === 'date' ? 0 : 1);
+  text.value = partDisplay[which].value;
 }
 </script>
