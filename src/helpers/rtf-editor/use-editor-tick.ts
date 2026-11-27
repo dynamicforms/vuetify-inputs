@@ -2,11 +2,9 @@ import { Editor } from '@tiptap/vue-3';
 import { onBeforeUnmount, Ref, ref, watch } from 'vue';
 
 /**
- * A counter bumped on every editor transaction, and on every `update` (which `setEditable()` emits on its own,
- * without a transaction, to report an editable-state change). The `Editor` instance is not a reactive object, so
- * nothing else tells Vue that `editor.isActive(...)`/`editor.can()...`/`editor.isEditable` now answer differently -
- * a computed that reads this counter before calling them re-evaluates exactly when the editor's state actually
- * changed.
+ * A counter incremented on every editor transaction and on every `update` event (`setEditable()` emits one without a
+ * transaction). `Editor` is not reactive: a computed that reads this counter before `editor.isActive()`,
+ * `editor.can()` or `editor.isEditable` re-evaluates on every change of the editor's state.
  */
 export function useEditorTick(editorRef: Ref<Editor | undefined>) {
   const tick = ref(0);
