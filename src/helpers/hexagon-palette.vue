@@ -40,40 +40,19 @@
       @update:model-value="selectLightness"
     />
     <div
-      v-else-if="levels.length > 1 && levels.length < segmentedFrom"
-      class="df-hexagon-palette__levels"
-      :style="{ '--df-level-count': levels.length }"
+      v-else-if="levels.length > 1"
+      :class="`${levelClass}s`"
+      :style="segmented ? undefined : { '--df-level-count': levels.length }"
       role="radiogroup"
       :aria-label="translate('LightnessRange')"
     >
-      <button
+      <component
+        :is="segmented ? 'div' : 'button'"
         v-for="(level, index) in levels"
         :key="index"
-        :ref="(el) => setSegmentElement(index, el)"
-        type="button"
-        class="df-hexagon-palette__level"
-        :class="{ 'df-hexagon-palette__level--selected': index === levelIndex }"
-        :style="{ backgroundColor: greyOf(level), '--df-segment-outline': contrastOutline(level) }"
-        role="radio"
-        :aria-label="translate('Lightness', { level: index + 1 })"
-        :aria-checked="index === levelIndex"
-        :tabindex="index === levelIndex ? 0 : -1"
-        @click="selectLevel(index)"
-        @keydown="onSegmentKeydown($event, index)"
-      />
-    </div>
-    <div
-      v-else-if="levels.length >= segmentedFrom"
-      class="df-hexagon-palette__segments"
-      role="radiogroup"
-      :aria-label="translate('LightnessRange')"
-    >
-      <div
-        v-for="(level, index) in levels"
-        :key="index"
-        :ref="(el) => setSegmentElement(index, el)"
-        class="df-hexagon-palette__segment"
-        :class="{ 'df-hexagon-palette__segment--selected': index === levelIndex }"
+        :ref="(el: unknown) => setSegmentElement(index, el)"
+        :type="segmented ? undefined : 'button'"
+        :class="[levelClass, { [`${levelClass}--selected`]: index === levelIndex }]"
         :style="{ backgroundColor: greyOf(level), '--df-segment-outline': contrastOutline(level) }"
         role="radio"
         :aria-label="translate('Lightness', { level: index + 1 })"
@@ -113,6 +92,9 @@ const emits = defineEmits<{ (e: 'update:modelValue', value: string): void }>();
 
 /** The number of levels from which the levels are a segmented bar instead of a grid of buttons. */
 const segmentedFrom = 16;
+const segmented = computed(() => (props.levels?.length ?? 0) >= segmentedFrom);
+// the BEM element of one level: a button of the grid, or a segment of the bar
+const levelClass = computed(() => (segmented.value ? 'df-hexagon-palette__segment' : 'df-hexagon-palette__level'));
 
 // a small gap between neighbouring cells
 const drawnRadius = hexagonCellRadius * 0.95;
