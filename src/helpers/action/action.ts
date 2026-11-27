@@ -1,9 +1,9 @@
 import { Action as FormAction } from '@dynamicforms/vue-forms';
-import { isEmpty, isString } from 'lodash-es';
 import { computed, Ref, toValue } from 'vue';
 
 import { ActionBreakpointOptions, getRenderOptionsForBreakpoint } from './action-render-options';
 import { BreakpointNames } from './responsive-render-options';
+import { shownFlag } from './shown-flag';
 
 class Action extends FormAction<ActionBreakpointOptions> {
   /** @see getRenderOptionsForBreakpoint, which answers the same for the value of any `Action` */
@@ -35,8 +35,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
 
   /** @see ActionRenderOptions.showLabel */
   get showLabel() {
-    const label = toValue(this.value.label);
-    return isString(label) && !isEmpty(label) ? this.value.showLabel : false;
+    return shownFlag(toValue(this.value.label), this.value.showLabel);
   }
 
   /**
@@ -49,7 +48,7 @@ class Action extends FormAction<ActionBreakpointOptions> {
 
   /** @see ActionRenderOptions.showIcon */
   get showIcon() {
-    return isString(this.value.icon) && !isEmpty(this.value.icon) ? this.value.showIcon : false;
+    return shownFlag(this.value.icon, this.value.showIcon);
   }
 
   /** @see ActionRenderOptions.renderAs */

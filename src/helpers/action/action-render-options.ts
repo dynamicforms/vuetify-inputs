@@ -1,5 +1,5 @@
 import { ActionValue } from '@dynamicforms/vue-forms';
-import { isBoolean, isEmpty, isObjectLike, isPlainObject, isString } from 'lodash-es';
+import { isBoolean, isObjectLike, isPlainObject, isString } from 'lodash-es';
 import { type MaybeRefOrGetter, toValue } from 'vue';
 
 import { renderContentText } from '../render-content';
@@ -11,6 +11,7 @@ import {
   isActionDisplayStyle,
 } from './action-display-style';
 import { BreakpointNames, BreakpointsJSON, ResponsiveRenderOptions } from './responsive-render-options';
+import { shownFlag } from './shown-flag';
 
 export interface ActionRenderOptions extends ActionValue {
   /** The text of the action, rendered when {@link showLabel} is set and the text is not empty. `ActionValue`
@@ -121,8 +122,8 @@ export function getRenderOptionsForBreakpoint(
     accessibleLabel: accessibleLabel || undefined,
     icon: partial.showIcon ? partial.icon : undefined,
     renderAs: partial.renderAs,
-    showLabel: isString(label) && !isEmpty(label) ? partial.showLabel : false,
-    showIcon: isString(partial.icon) && !isEmpty(partial.icon) ? partial.showIcon : false,
+    showLabel: shownFlag(label, partial.showLabel),
+    showIcon: shownFlag(partial.icon, partial.showIcon),
     defaultConfirm: partial.defaultConfirm,
     defaultReject: partial.defaultReject,
     passthroughAttrs: partial.passthroughAttrs,
