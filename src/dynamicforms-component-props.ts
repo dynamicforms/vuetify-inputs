@@ -65,24 +65,21 @@ export interface DfDateTimeProps extends BaseProps {
   locale?: Locale;
 }
 
-export interface DfFileProps extends BaseProps {
+interface FileUploadProps extends BaseProps {
   comms: FileComms;
   /** Milliseconds between keep-alive touches. Overrides `defaultTouchInterval` from the plugin's
    *  `VuetifyInputsSettings`, which in turn overrides the baked-in default of 60000. */
   touchInterval?: number;
 }
 
+export interface DfFileProps extends FileUploadProps {}
+
 /**
  * `comms.upload` must resolve to a value directly usable as an `<img>` src (typically the URL your backend
  * serves the image from): the component has no separate lookup for turning an identifier into a display URL,
  * so it renders `modelValue` itself as the preview once a file has been uploaded.
  */
-export interface DfImageProps extends BaseProps {
-  comms: FileComms;
-  /** Milliseconds between keep-alive touches. Overrides `defaultTouchInterval` from the plugin's
-   *  `VuetifyInputsSettings`, which in turn overrides the baked-in default of 60000. */
-  touchInterval?: number;
-}
+export interface DfImageProps extends FileUploadProps {}
 
 export interface DfInputProps extends BaseProps {
   inputType?: 'text' | 'password' | 'email' | 'url' | 'number';
