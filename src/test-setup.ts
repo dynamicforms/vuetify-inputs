@@ -4,7 +4,6 @@ import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
-
 vi.mock('vue-cached-icon', () => ({
   CachedIcon: {
     template: '<div class="cached-icon-wrapper"><svg title="{{ name }}" /></div>',
