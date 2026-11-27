@@ -1,8 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import { chooseDensityVariant, openDensityDemo } from './helpers';
+
 async function selectVariant(page: Page, variant: string) {
-  await page.locator('.density-demo .v-field').first().click();
-  await page.locator('.v-overlay-container .v-list-item', { hasText: new RegExp(`^${variant}$`, 'i') }).click();
+  await chooseDensityVariant(page, variant);
   await expect(page.locator('.demo-grid .v-field').first()).toHaveClass(new RegExp(`v-field--variant-${variant}`, 'i'));
 }
 
@@ -33,8 +34,7 @@ function measureRows(page: Page) {
 
 for (const variant of ['outlined', 'underlined', 'plain']) {
   test(`the checkbox label is on the line of the input text, ${variant}`, async ({ page }) => {
-    await page.setViewportSize({ width: 1800, height: 1000 });
-    await page.goto('/examples/density');
+    await openDensityDemo(page, { width: 1800, height: 1000 });
     await page.getByText('stretch demo to browser').click();
     await selectVariant(page, variant);
 

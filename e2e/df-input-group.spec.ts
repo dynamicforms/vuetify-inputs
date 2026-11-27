@@ -1,12 +1,9 @@
 import { expect, type Page, test } from "@playwright/test";
 
-async function choose(page: Page, index: number, option: string) {
-  await page.locator(".input-group-demo .v-field").nth(index).click();
-  await page
-    .locator(".v-overlay-container .v-list-item", {
-      hasText: new RegExp(`^${option}$`),
-    })
-    .click();
+import { chooseOption } from "./helpers";
+
+function choose(page: Page, index: number, option: string) {
+  return chooseOption(page, page.locator(".input-group-demo .v-field").nth(index), option);
 }
 
 // the outer field of each column of the demo row, and the vertical centre of the text in the first column and of the
