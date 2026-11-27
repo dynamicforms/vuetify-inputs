@@ -10,3 +10,10 @@ export function makeComms(upload: (file: File) => Promise<string> = async () => 
     touch: vi.fn(async () => {}),
   };
 }
+
+/** A `FileList` mock; v-file-input spreads `target.files`, so it is a real (iterable) array with an `item` method. */
+export function fileList(files: File[]): FileList {
+  const list = [...files] as unknown as FileList;
+  (list as any).item = (i: number) => files[i] ?? null;
+  return list;
+}

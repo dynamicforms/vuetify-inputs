@@ -4,16 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import DfFile from '@/df-file.vue';
 import { FileComms, FileGoneError } from '@/helpers';
-import { makeComms } from '@/test-utils/files';
+import { fileList, makeComms } from '@/test-utils/files';
 
 const pdfFile = (name = 'doc.pdf') => new File([new Uint8Array([37, 80, 68, 70])], name, { type: 'application/pdf' });
-
-function fileList(files: File[]): FileList {
-  // v-file-input spreads `target.files`, so the mock has to be a real (iterable) array, not just array-like
-  const list = files as unknown as FileList;
-  (list as any).item = (i: number) => files[i] ?? null;
-  return list;
-}
 
 describe('DfFile', () => {
   let comms: FileComms;

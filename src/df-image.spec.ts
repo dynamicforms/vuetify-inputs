@@ -4,16 +4,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import DfImage from '@/df-image.vue';
 import { FileComms, FileGoneError } from '@/helpers';
-import { makeComms } from '@/test-utils/files';
+import { fileList, makeComms } from '@/test-utils/files';
 
 const pngFile = (name = 'photo.png') => new File([new Uint8Array([137, 80, 78, 71])], name, { type: 'image/png' });
 const textFile = (name = 'notes.txt') => new File(['hello'], name, { type: 'text/plain' });
-
-function fileList(files: File[]): FileList {
-  const list = { length: files.length, item: (i: number) => files[i] ?? null } as FileList;
-  files.forEach((file, i) => ((list as any)[i] = file));
-  return list;
-}
 
 describe('DfImage', () => {
   let comms: FileComms;
