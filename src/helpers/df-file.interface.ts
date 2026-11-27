@@ -40,13 +40,12 @@ export interface FileComms {
   delete: (fileIdentifier: string) => Promise<void>;
 
   /**
-   * touch is called at a regular interval (see the `touchInterval` prop / `defaultTouchInterval` setting) for a
-   * temporary upload, to let the backend know that the file is still in play and must not be discarded. A temporary
-   * upload is the identifier this component's last upload returned, while the field holds it and it is not the bound
-   * control's `originalValue`
+   * touch is called every `touchInterval` milliseconds (the `defaultTouchInterval` setting by default) for a
+   * temporary upload, so the backend keeps the file. A temporary upload is the identifier the component's last upload
+   * returned, while the field holds it and it is not the bound control's `originalValue`.
    *
-   * throw {@link FileGoneError} if the backend reports the file identifier no longer exists; any other thrown
-   * error is treated as a transient failure and left to the consumer to act on, if at all
+   * Throw {@link FileGoneError} when the backend no longer has the file: the field is cleared and the error's text is
+   * shown. Any other error is ignored.
    *
    * @param fileIdentifier the identifier that was returned by upload
    */
