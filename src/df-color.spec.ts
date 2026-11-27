@@ -136,6 +136,11 @@ describe('DfColor', () => {
       return wrapper;
     }
 
+    type PickerWrapper = Awaited<ReturnType<typeof openPicker>>;
+    const pickerButtons = (wrapper: PickerWrapper, text: string) =>
+      wrapper.findAllComponents({ name: 'VBtn' }).filter((button) => button.text() === text);
+    const pickerButton = (wrapper: PickerWrapper, text: string) => pickerButtons(wrapper, text)[0];
+
     it('writes a picked colour when OK confirms it, and marks the field touched', async () => {
       const control = new Field<string>({ value: '#f00' });
       const wrapper = await openPicker(control);
@@ -144,8 +149,7 @@ describe('DfColor', () => {
       await flushPromises();
       expect(control.value).toBe('#f00');
 
-      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
-      await ok!.trigger('click');
+      await pickerButton(wrapper, 'OK').trigger('click');
 
       expect(control.value).toBe('#00ff00');
       expect(control.touched).toBe(true);
@@ -154,16 +158,15 @@ describe('DfColor', () => {
     it('enables Cancel before a change and OK after one', async () => {
       const control = new Field<string>({ value: '#f00' });
       const wrapper = await openPicker(control);
-      const button = (text: string) => wrapper.findAllComponents({ name: 'VBtn' }).filter((b) => b.text() === text);
 
-      expect(button('Cancel')).toHaveLength(1);
-      expect(button('OK')).toHaveLength(1);
-      expect(button('Cancel')[0].props('disabled')).toBe(false);
-      expect(button('OK')[0].props('disabled')).toBe(true);
+      expect(pickerButtons(wrapper, 'Cancel')).toHaveLength(1);
+      expect(pickerButtons(wrapper, 'OK')).toHaveLength(1);
+      expect(pickerButton(wrapper, 'Cancel').props('disabled')).toBe(false);
+      expect(pickerButton(wrapper, 'OK').props('disabled')).toBe(true);
 
       wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ff00');
       await flushPromises();
-      expect(button('OK')[0].props('disabled')).toBe(false);
+      expect(pickerButton(wrapper, 'OK').props('disabled')).toBe(false);
     });
 
     it("labels the buttons with the library's strings", async () => {
@@ -217,8 +220,7 @@ describe('DfColor', () => {
       await flushPromises();
       expect(picker.props('modelValue')).toBe('#00ffaa');
 
-      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
-      await ok!.trigger('click');
+      await pickerButton(wrapper, 'OK').trigger('click');
 
       expect(control.value).toBe('#00FFAA');
     });
@@ -232,8 +234,7 @@ describe('DfColor', () => {
       await flushPromises();
       expect(wrapper.emitted('preview')!.at(-1)).toEqual(['#00FFAA']);
 
-      const cancel = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'Cancel');
-      await cancel!.trigger('click');
+      await pickerButton(wrapper, 'Cancel').trigger('click');
       await flushPromises();
 
       expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
@@ -284,8 +285,7 @@ describe('DfColor', () => {
       expect(wrapper.emitted('preview')!.at(-1)).toEqual(['#00FFAA']);
       expect(control.value).toBe('#ff0000');
 
-      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
-      await ok!.trigger('click');
+      await pickerButton(wrapper, 'OK').trigger('click');
       expect(control.value).toBe('#00FFAA');
     });
 
@@ -321,8 +321,7 @@ describe('DfColor', () => {
       wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ffaa');
       await flushPromises();
       expect(wrapper.emitted('preview')!.at(-1)).toEqual(['#00ffaa']);
-      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
-      await ok!.trigger('click');
+      await pickerButton(wrapper, 'OK').trigger('click');
       await flushPromises();
 
       expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
@@ -338,10 +337,8 @@ describe('DfColor', () => {
     });
     describe('hexagon', () => {
       const hexagon = { picker: 'hexagon' };
-      const palette = (wrapper: Awaited<ReturnType<typeof openPicker>>) => wrapper.findComponent(HexagonPalette);
-      const cellsOf = (wrapper: Awaited<ReturnType<typeof openPicker>>) => palette(wrapper).findAll('.df-hexagon-cell');
-      const okButton = (wrapper: Awaited<ReturnType<typeof openPicker>>) =>
-        wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK')!;
+      const palette = (wrapper: PickerWrapper) => wrapper.findComponent(HexagonPalette);
+      const cellsOf = (wrapper: PickerWrapper) => palette(wrapper).findAll('.df-hexagon-cell');
 
       it('replaces the generic picker with the hexagon palette', async () => {
         const wrapper = await openPicker(new Field<string>({ value: '#f00' }), hexagon);
@@ -356,7 +353,7 @@ describe('DfColor', () => {
         expect(cellsOf(wrapper)).toHaveLength(19);
       });
 
-      const levels = (wrapper: Awaited<ReturnType<typeof openPicker>>) => ({
+      const levels = (wrapper: PickerWrapper) => ({
         slider: palette(wrapper).findComponent({ name: 'VSlider' }).exists(),
         toggle: palette(wrapper).find('.df-hexagon-palette__levels').exists(),
         bar: palette(wrapper).find('.df-hexagon-palette__segments').exists(),
@@ -406,7 +403,7 @@ describe('DfColor', () => {
         expect(button(2).attributes('aria-checked')).toBe('true');
         expect(button(2).element).toBe(document.activeElement);
         await flushPromises();
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.4)[20].color);
       });
@@ -435,7 +432,7 @@ describe('DfColor', () => {
         expect(segment(6).attributes('aria-checked')).toBe('true');
         expect(segment(6).element).toBe(document.activeElement);
         await flushPromises();
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.3)[20].color);
       });
@@ -450,7 +447,7 @@ describe('DfColor', () => {
         slider.vm.$emit('update:modelValue', 0.8);
         await flushPromises();
         expect(Number(slider.props('modelValue'))).toBe(0.8);
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.8)[33].color);
       });
@@ -481,7 +478,7 @@ describe('DfColor', () => {
         expect(control.value).toBe('#808080');
         expect(cell.attributes('aria-checked')).toBe('true');
 
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
         expect(control.value).toBe(cell.attributes('aria-label'));
         expect(control.touched).toBe(true);
       });
@@ -503,7 +500,7 @@ describe('DfColor', () => {
 
         await palette(wrapper).findAll('.df-hexagon-palette__level')[0].trigger('click');
         await flushPromises();
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.45)[20].color);
       });
@@ -519,7 +516,7 @@ describe('DfColor', () => {
         expect(wrapper.emitted('preview')).toEqual([['#808080'], [raw.toUpperCase()]]);
         expect(cell.attributes('aria-checked')).toBe('true');
 
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
         await flushPromises();
         expect(control.value).toBe(raw.toUpperCase());
         expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
@@ -536,7 +533,7 @@ describe('DfColor', () => {
         expect(focused.element).not.toBe(center.element);
 
         await focused.trigger('keydown', { key: 'Enter' });
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
         expect(control.value).toBe(focused.attributes('aria-label'));
       });
     });
