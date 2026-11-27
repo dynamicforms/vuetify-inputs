@@ -760,9 +760,8 @@ const form = new Group({
 </template>
 ```
 
-Nothing is required of an existing form: a prop wins over what the element carries, so every attribute you have
-written goes on saying what it said. What an element carries wins over an injected `field-density` /
-`field-variant` and over the plugin defaults, which puts it second in the cascade, behind the prop alone.
+Existing forms need no change: a prop takes precedence over the element's value. The element's value takes
+precedence over an injected `field-density` / `field-variant` and over the plugin defaults.
 
 One thing to check: an application that already attached extended properties of these names to its elements — a
 `label` written with `setExtendedValues()` and rendered by the application's own template — now feeds the
