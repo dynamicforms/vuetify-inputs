@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `DfSelect`: the list of a menu without options (role `list`) carries no `aria-multiselectable`.
+- `DfFile`, `DfImage`, `DfDateTime` and `DfRtfEditor` take the `cssClass` of the bound control's `extra` when the
+  `cssClass` prop is not given.
 
 ## [0.16.4] - 2026-11-26
 

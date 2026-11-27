@@ -7,7 +7,7 @@
     :persistent-hint="vuetifyBindings.persistentHint"
     :hide-details="vuetifyBindings.hideDetails"
     :error-messages="vuetifyBindings.errorMessages"
-    :class="[cssClass, visibilityClass]"
+    :class="[vuetifyBindings.class, visibilityClass]"
   >
     <!-- v-field takes v-input's id, as in Vuetify's own text field: its label's `for` and the messages row's id
          follow from it -->

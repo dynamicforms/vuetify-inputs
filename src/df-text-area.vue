@@ -2,7 +2,6 @@
   <div v-if="isRendered" class="df-textarea-container" :class="[densityClass, visibilityClass]">
     <v-textarea
       v-model="value"
-      :class="cssClass"
       :rows="rows"
       :auto-grow="(maxRows || 0) > 0"
       :max-rows="maxRows"
@@ -18,8 +17,6 @@
 </template>
 
 <script setup lang="ts">
-import { toRefs } from 'vue';
-
 import { DfTextAreaProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 
@@ -36,5 +33,4 @@ const { densityClass, isRendered, label, shownErrors, touched, value, visibility
   props,
   emits,
 );
-const { cssClass } = toRefs(props);
 </script>

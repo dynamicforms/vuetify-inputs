@@ -1,7 +1,7 @@
 <template>
   <v-text-field
     v-if="isRendered && !clientRendered"
-    :class="[cssClass, densityClass, visibilityClass]"
+    :class="[densityClass, visibilityClass]"
     :model-value="chosenText"
     v-bind="vuetifyBindings"
     readonly
@@ -17,7 +17,6 @@
     ref="dfSelectRef"
     v-model="selected"
     :class="[
-      cssClass,
       densityClass,
       visibilityClass,
       { 'df-select-multirow': isMultiline, 'df-select-single': !multiple },
@@ -152,7 +151,7 @@ const propsWithDefaults = withDefaults(defineProps<DfSelectProps>(), {
   fetchDebounce: 0,
 });
 
-const { choices, multiple, allowTags: taggable, allowNull, cssClass } = toRefs(propsWithDefaults);
+const { choices, multiple, allowTags: taggable, allowNull } = toRefs(propsWithDefaults);
 
 interface Emits extends BaseEmits {
   (e: 'update:modelValueDisplay', value: SelectChoice[]): any;

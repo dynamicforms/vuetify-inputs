@@ -261,4 +261,11 @@ describe('DfFile', () => {
     const emitted = wrapper.emitted('update:modelValue') as any[];
     expect(emitted[emitted.length - 1]).toEqual(['file-id-1']);
   });
+
+  it('takes the css class the bound control carries', () => {
+    const control = new Form.Field<string | null>({ value: null, cssClass: 'own-class' });
+    const wrapper = mountFile({ control });
+
+    expect(wrapper.find('.v-input').classes()).toContain('own-class');
+  });
 });
