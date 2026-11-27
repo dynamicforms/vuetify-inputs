@@ -118,41 +118,11 @@ describe('RtfToolbar button groups', () => {
     editor.destroy();
   });
 
-  it('opens the link menu without crashing', async () => {
+  it.each(['Link', 'Image', 'Insert media', 'Table'])('opens the %s menu without crashing', async (title) => {
     const editor = makeEditor();
     const wrapper = mountToolbar(editor);
 
-    await click(wrapper, 'Link');
-    await nextTick();
-
-    editor.destroy();
-  });
-
-  it('opens the image menu without crashing', async () => {
-    const editor = makeEditor();
-    const wrapper = mountToolbar(editor);
-
-    await click(wrapper, 'Image');
-    await nextTick();
-
-    editor.destroy();
-  });
-
-  it('opens the media embed menu without crashing', async () => {
-    const editor = makeEditor();
-    const wrapper = mountToolbar(editor);
-
-    await click(wrapper, 'Insert media');
-    await nextTick();
-
-    editor.destroy();
-  });
-
-  it('opens the table menu without crashing', async () => {
-    const editor = makeEditor();
-    const wrapper = mountToolbar(editor);
-
-    await click(wrapper, 'Table');
+    await click(wrapper, title);
     await nextTick();
 
     editor.destroy();
