@@ -852,8 +852,6 @@ const save = Action.create({ value: { label: 'Save' } });
 const save = new Action({ value: { label: 'Save' } });
 ```
 
-For most projects the whole change is a search and replace of `Action.create(` → `new Action(`.
-
 The factory took a type argument constrained to `ActionBreakpointOptions`; the class takes none, because it extends
 vue-forms' `Action` with that type already applied. Drop the argument — `new Action({ ... })` checks its parameter
 against `Partial<IFieldConstructorParams<ActionBreakpointOptions>>`, which is what the constrained factory checked
