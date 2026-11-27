@@ -524,17 +524,13 @@ separate vendor UI language to configure.
 
 ### List items and table cells wrap their text in a `<p>` now
 
-This is the one that reaches outside this library. CKEditor 5 saved a bulleted item as `<li>Text</li>` and a table
-cell as `<td>Text</td>`. TipTap's list and table schemas wrap block content in a paragraph even inside a list item
-or a cell, so the same content now saves as `<li><p>Text</p></li>` and `<td><p>Text</p></td>`.
+TipTap's list and table schemas wrap block content in a paragraph, so a list item saves as `<li><p>Text</p></li>`
+and a table cell as `<td><p>Text</p></td>`; CKEditor 5 saved `<li>Text</li>` and `<td>Text</td>`.
 
-Inside `<df-rtf-editor>` itself this is invisible - its own stylesheet zeroes the paragraph margin in that
-context, so a list reads as tightly spaced lines, not double-spaced ones. But `<df-rtf-editor>` only styles its
-own editing surface. **Anywhere else this saved HTML is rendered** - a public page built from the stored value, a
-PDF export, a templated email - inherits the browser's or renderer's default `<p>` margin on every list item and
-table cell, unless that renderer's own stylesheet accounts for it. A `<li>` that used to be one line becomes a
-`<li>` with a paragraph's worth of empty space above and below it; a table built for compact rows gets visibly taller
-ones. Add the same rule this library's own editor uses wherever else this HTML is displayed:
+`<df-rtf-editor>` sets the margin of these paragraphs to 0 in its own editing surface only. Any other renderer of the
+saved HTML (a public page built from the stored value, a PDF export, a templated email) applies its default `<p>`
+margin to every list item and table cell, which adds vertical space to list items and makes table rows taller, unless
+its stylesheet overrides it. Add the rule the editor uses to those renderers:
 
 ```css
 li p, td p, th p {
