@@ -4,10 +4,10 @@ Vuetify input components that share one layout: one density and variant system, 
 or a field, with an inline density for table cells. Built for
 [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
 
-## What matters most
+## Main features
 
-- **Every field matches every other**: one shared base, so a row mixing a text field, a select, a checkbox and a
-  date picker comes out aligned with no per-component tweaking
+- **One layout for every field**: the components share one base, so a row mixing a text field, a select, a checkbox
+  and a date picker is aligned without per-component adjustments
 - **A density that fits a table cell**: `default`, `comfortable` and `compact` are Vuetify's; `inline` is this
   library's own, and strips a field of its decoration until it fits inside a cell
 - **Set the look once, override anywhere**: density and variant are read from the prop, then the field, then a
@@ -19,7 +19,7 @@ or a field, with an inline density for table cells. Built for
 The [density example](https://docs.velis.si/dynamicforms/vuetify-inputs/examples/density.html) renders every component
 side by side in every density and variant.
 
-## Everything else it does
+## Further features
 
 - **Thirteen components**: `df-input`, `df-text-area`, `df-select`, `df-checkbox`, `df-color`, `df-date-time`,
   `df-file`, `df-image`, `df-rtf-editor`, `df-actions`, `df-input-hint`, `df-input-group` and `df-label`
