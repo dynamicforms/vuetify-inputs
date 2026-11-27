@@ -942,9 +942,9 @@ repaint in an application built on this library that never repainted before:
 
 See [Groups](/examples/groups) for worked examples of the first two.
 
-One limit is worth stating precisely: `enabled` and `visibility` do **not** cascade from a group to the fields
-inside it. Each field carries its own, and hiding or disabling a group does not disable the fields it holds — it
-only affects what you render off the group itself. This library adds no cascade of its own.
+In 0.8, `enabled` and `visibility` do **not** cascade from a group to the fields inside it. Each field carries its
+own; hiding or disabling a group affects only what the template renders from the group itself. This library adds no
+cascade of its own.
 
 ### Checklist for 0.8.0
 
