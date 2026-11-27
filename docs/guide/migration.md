@@ -632,11 +632,10 @@ The last two are the peer library's own floors, which this package now states as
 
 ### Your own use of vue-forms migrates at the same time
 
-Eleven releases of the peer library sit between 0.6.0 and 0.17.0, and this library re-exports none of the API they
-changed — every `Field`, `Group`, `List`, `Action` and validator your application builds is that library's, and it
-crosses all ten in one step here. Work through
-[the vue-forms migration guide](:vue-forms:/guide/migration.html), which is written for exactly this jump; the
-sections below cover only what that guide cannot know about, which is this package's own surface.
+This release moves vue-forms from 0.6.0 to 0.17.0, eleven releases. This library re-exports none of the API those
+releases changed: the `Field`, `Group`, `List`, `Action` and validators your application builds come from vue-forms.
+Work through [the vue-forms migration guide](:vue-forms:/guide/migration.html) for that API; the sections below cover
+this package.
 
 Four breaks are worth searching for before you upgrade rather than after. The first three announce nothing at all —
 no log, no throw — so the code keeps compiling and stops working:
