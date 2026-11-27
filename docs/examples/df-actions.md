@@ -34,16 +34,15 @@ The component expects an array of `Action` objects created with `new Action()` w
 
 ```typescript
 interface ActionBreakpointOptions {
-  name?: string;                    // Unique identifier for the action
-  label?: MaybeRefOrGetter<string>; // Display text: a string, a ref or a function returning one
-  icon?: string;                    // Icon name, resolved by vue-cached-icon (e.g. ion-save-outline, mdi-content-save)
-  renderAs?: ActionDisplayStyle;    // 'button' or 'text'
-  showIcon?: boolean;               // Whether to show the icon
-  showLabel?: boolean;              // Whether to show the label
-  defaultConfirm?: boolean;         // Marks the action as the "confirm" one - coloured primary by default
-  defaultReject?: boolean;          // Marks the action as the "reject/dismiss" one - coloured secondary by default
-  passthroughAttrs?: Record<string, any>; // Extra props forwarded straight to the rendered <v-btn> (HTML attributes of the <button> with `simple`)
-  // Responsive breakpoints
+  name?: string;
+  label?: MaybeRefOrGetter<string>;
+  icon?: string;
+  renderAs?: ActionDisplayStyle;
+  showIcon?: boolean;
+  showLabel?: boolean;
+  defaultConfirm?: boolean;
+  defaultReject?: boolean;
+  passthroughAttrs?: Record<string, any>;
   xs?: ActionBreakpointRenderOptions;
   sm?: ActionBreakpointRenderOptions;
   md?: ActionBreakpointRenderOptions;
@@ -51,6 +50,9 @@ interface ActionBreakpointOptions {
   xl?: ActionBreakpointRenderOptions;
 }
 ```
+
+The members are described in [Action Value Configuration](#action-value-configuration), the breakpoints `xs` to `xl`
+in [Responsive Breakpoints](#responsive-breakpoints).
 
 A breakpoint sets how the action is rendered at that width: `renderAs`, `label`, `icon`, `showLabel`, `showIcon` and
 `passthroughAttrs`. `name`, `defaultConfirm` and `defaultReject` do not depend on the screen width and are set only in
