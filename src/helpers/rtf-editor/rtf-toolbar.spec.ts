@@ -25,10 +25,6 @@ function click(wrapper: ReturnType<typeof mountToolbar>, title: string) {
 }
 
 describe('RtfToolbar heading dropdown', () => {
-  afterEach(() => {
-    translateStrings((key) => key);
-  });
-
   it('shows the English default heading label for a plain paragraph', () => {
     const editor = makeEditor();
     const wrapper = mountToolbar(editor);
@@ -64,7 +60,6 @@ describe('RtfToolbar button groups', () => {
     const bold = wrapper.find('button[title="Krepko"]');
     expect(bold.attributes('aria-label')).toBe('Krepko');
 
-    translateStrings((key) => key);
     editor.destroy();
   });
 

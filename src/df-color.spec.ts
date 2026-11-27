@@ -172,7 +172,6 @@ describe('DfColor', () => {
 
       const labels = wrapper.findAllComponents({ name: 'VBtn' }).map((b) => b.text());
       expect(labels).toEqual(expect.arrayContaining(['Prekliči', 'Potrdi']));
-      translateStrings((key) => key);
     });
 
     it('writes a picked colour on a double-click on the canvas', async () => {
