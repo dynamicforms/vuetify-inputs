@@ -202,6 +202,13 @@ const selected = ref<any>(null);
 const takeLoaded = ref(false);
 const loaded = ref<SelectChoice[]>([]);
 const loadedChoices = computed<SelectChoice[]>(() => (unref(takeLoaded) ? unref(loaded) : unref(choices) || []));
+
+// sets the choices the select offers; they take the place of the choices prop
+function setLoaded(list: SelectChoice[]) {
+  loaded.value = list;
+  takeLoaded.value = true;
+}
+
 // Number of fetchChoices calls in flight that resolve ids held by the value (resolveValueChoices()).
 const resolvingValue = ref(0);
 // The choices for the value are not known yet while they are being fetched, and on the server for a select with
@@ -510,8 +517,7 @@ function chosenIds(): any[] {
 function keepChosenChoices() {
   fetchCounterGlobal.value++;
   const ids = chosenIds();
-  loaded.value = loadedChoices.value.filter((choice) => ids.includes(choice.id));
-  takeLoaded.value = true;
+  setLoaded(loadedChoices.value.filter((choice) => ids.includes(choice.id)));
 }
 
 function isEmptyValue(value: any): boolean {
@@ -562,8 +568,7 @@ async function fetchQuery(queryValue: any, idValue: any, chosenOnly = false): Pr
     // Taken after the fetch, from the value: choices resolveValueChoices() loaded while this call was in flight
     // must survive the search results replacing the rest.
     const selectedChoices = getSelectedChoices(loadedChoices.value, currentValue());
-    loaded.value = unionBy([...selectedChoices, ...newChoices], 'id');
-    takeLoaded.value = true;
+    setLoaded(unionBy([...selectedChoices, ...newChoices], 'id'));
   } catch (error) {
     // a failed fetch leaves the choices as they are; a rejection out of here would be unhandled
     console.error(error);
@@ -587,8 +592,7 @@ function resolveValueChoices(mcVal: any): Promise<void> | null {
   return (async () => {
     try {
       const newChoices = await fetchChoices(undefined, multiple.value ? unresolved : unresolved[0]);
-      loaded.value = unionBy([...loadedChoices.value, ...newChoices], 'id');
-      takeLoaded.value = true;
+      setLoaded(unionBy([...loadedChoices.value, ...newChoices], 'id'));
     } catch (error) {
       console.error(error);
     } finally {
