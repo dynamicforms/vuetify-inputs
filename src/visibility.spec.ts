@@ -1,8 +1,6 @@
 import Form from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
 
 import DfCheckbox from '@/df-checkbox.vue';
 import DfColor from '@/df-color.vue';
@@ -41,17 +39,10 @@ const inputComponents: [string, any, Record<string, any>][] = [
 ];
 
 describe('DisplayMode visibility', () => {
-  let vuetify: any;
-
-  beforeEach(() => {
-    vuetify = createVuetify({ components });
-  });
-
   const mountWith = (component: any, extraProps: Record<string, any>, visibility: Form.Visibility) => {
     const control = new Form.Field({ value: null, visibility });
     return mount(component, {
       props: { control, label: 'Test Label', ...extraProps },
-      global: { plugins: [vuetify] },
     });
   };
 
@@ -89,7 +80,6 @@ describe('DisplayMode visibility', () => {
     it('falls back to the visibility prop when no control is bound', () => {
       const wrapper = mount(component, {
         props: { visibility: 'hidden', label: 'Test Label', ...extraProps },
-        global: { plugins: [vuetify] },
       });
 
       expect(wrapper.classes()).toContain('d-none');
@@ -99,7 +89,6 @@ describe('DisplayMode visibility', () => {
       const control = new Form.Field({ value: null, visibility: 'full' });
       const wrapper = mount(component, {
         props: { control, visibility: 'suppress', label: 'Test Label', ...extraProps },
-        global: { plugins: [vuetify] },
       });
 
       expect(wrapper.find('.v-input').exists()).toBe(true);
@@ -110,7 +99,6 @@ describe('DisplayMode visibility', () => {
       const control = new Form.Field({ value: null, visibility: 'full' });
       const wrapper = mount(component, {
         props: { control, label: 'Test Label', ...extraProps },
-        global: { plugins: [vuetify] },
       });
 
       expect(wrapper.classes()).not.toContain('d-none');

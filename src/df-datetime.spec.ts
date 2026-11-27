@@ -2,25 +2,16 @@ import { Field, ValidationError } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
 import { ja } from 'date-fns/locale';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
 
 import DfDateTime from '@/df-datetime.vue';
 import { viewSettleMs } from '@/helpers/picker-double-click';
 
 describe('DfDateTime', () => {
-  let vuetify: any;
-
-  beforeEach(() => {
-    vuetify = createVuetify({ components });
-  });
-
   afterAll(() => {
     vi.unstubAllEnvs();
   });
 
-  const mountDateTime = (props: Record<string, any>) =>
-    mount(DfDateTime, { props: { label: 'When', ...props }, global: { plugins: [vuetify] } });
+  const mountDateTime = (props: Record<string, any>) => mount(DfDateTime, { props: { label: 'When', ...props } });
 
   const inputs = (wrapper: ReturnType<typeof mountDateTime>) =>
     wrapper.findAll('input').map((input) => (input.element as HTMLInputElement).value);

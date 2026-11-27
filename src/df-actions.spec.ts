@@ -3,19 +3,12 @@ import { flushPromises, mount } from '@vue/test-utils';
 import { vi } from 'vitest';
 import { nextTick, Ref, ref } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
-import { createVuetify } from 'vuetify';
 import { VBtn } from 'vuetify/components';
 
 import DfActions from '@/df-actions.vue';
 import { Action, HtmlString } from '@/helpers';
 
 describe('DfActions', () => {
-  let vuetify: any;
-
-  beforeEach(() => {
-    vuetify = createVuetify({ components: { VBtn } });
-  });
-
   const createMockAction = (name: string, label: string, icon?: string): Action => {
     const executeAction = new ExecuteAction(vi.fn());
     return new Action({
@@ -39,7 +32,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions },
-      global: { plugins: [vuetify] },
     });
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(2);
@@ -50,7 +42,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions },
-      global: { plugins: [vuetify] },
     });
 
     const button = wrapper.find('.v-btn');
@@ -65,7 +56,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions: [action] },
-      global: { plugins: [vuetify] },
     });
 
     await wrapper.find('.v-btn').trigger('click');
@@ -75,7 +65,6 @@ describe('DfActions', () => {
   it('renders nothing without actions', () => {
     const wrapper = mount(DfActions, {
       props: { actions: [] },
-      global: { plugins: [vuetify] },
     });
 
     expect(wrapper.find('.v-btn').exists()).toBe(false);
@@ -86,7 +75,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions, showAsGroup: 'grouped' },
-      global: { plugins: [vuetify] },
     });
 
     expect(wrapper.find('.button-group').exists()).toBe(true);
@@ -98,7 +86,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions, buttonSize: 'large' },
-      global: { plugins: [vuetify] },
     });
 
     const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -111,7 +98,6 @@ describe('DfActions', () => {
     const wrapper = mount(DfActions, {
       props: { actions: [action] },
       global: {
-        plugins: [vuetify],
         stubs: {
           'v-btn': {
             template: '<button class="v-btn" :data-variant="variant"><slot /></button>',
@@ -130,7 +116,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions: [action] },
-      global: { plugins: [vuetify] },
     });
 
     const spacer = wrapper.find('span[style*="width: 0.5rem"]');
@@ -142,7 +127,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions: [actionOnlyIcon] },
-      global: { plugins: [vuetify] },
     });
 
     const spacer = wrapper.find('span[style*="width: .5rem"]');
@@ -154,7 +138,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions, showAsGroup: 'grouped-no-borders' },
-      global: { plugins: [vuetify] },
     });
 
     const container = wrapper.find('div');
@@ -166,7 +149,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions: initialActions },
-      global: { plugins: [vuetify] },
     });
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(1);
@@ -191,7 +173,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions: initialActions },
-      global: { plugins: [vuetify] },
     });
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(3);
@@ -206,7 +187,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions: initialActions },
-      global: { plugins: [vuetify] },
     });
 
     expect(wrapper.find('.v-btn').exists()).toBe(true);
@@ -222,7 +202,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions: actionsRef },
-      global: { plugins: [vuetify] },
     });
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(1);
@@ -244,7 +223,6 @@ describe('DfActions', () => {
 
     const wrapper = mount(DfActions, {
       props: { actions: actionsRef },
-      global: { plugins: [vuetify] },
     });
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(3);
@@ -264,7 +242,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -277,7 +254,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -291,7 +267,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -303,7 +278,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -318,7 +292,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -330,7 +303,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -344,7 +316,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       expect(action.enabled).toBe(true);
@@ -362,7 +333,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [save] },
-        global: { plugins: [vuetify] },
       });
       await flushPromises();
 
@@ -394,7 +364,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -419,7 +388,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       await wrapper.find('.v-btn').trigger('click');
@@ -439,7 +407,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -454,7 +421,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       await wrapper.find('.v-btn').trigger('click');
@@ -469,7 +435,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       expect(wrapper.find('.v-btn').classes()).toContain('d-none');
@@ -481,7 +446,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       expect(wrapper.find('.v-btn').classes()).toContain('invisible');
@@ -494,7 +458,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [shownAction, suppressedAction] },
-        global: { plugins: [vuetify] },
       });
 
       const buttons = wrapper.findAll('.v-btn');
@@ -507,7 +470,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const button = wrapper.find('.v-btn');
@@ -522,7 +484,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -537,7 +498,6 @@ describe('DfActions', () => {
 
       const wrapper = mount(DfActions, {
         props: { actions: [action] },
-        global: { plugins: [vuetify] },
       });
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -545,8 +505,7 @@ describe('DfActions', () => {
     });
   });
   describe('accessible name', () => {
-    const mountActions = (actions: Action[]) =>
-      mount(DfActions, { props: { actions }, global: { plugins: [vuetify] } });
+    const mountActions = (actions: Action[]) => mount(DfActions, { props: { actions } });
 
     it('names an icon-only button with aria-label and title', () => {
       const action = createMockAction('save', 'Save', 'save-outline');
@@ -623,7 +582,7 @@ describe('DfActions', () => {
 
   describe('simple', () => {
     const mountSimple = (actions: Action[], props: Record<string, unknown> = {}) =>
-      mount(DfActions, { props: { actions, simple: true, ...props }, global: { plugins: [vuetify] } });
+      mount(DfActions, { props: { actions, simple: true, ...props } });
 
     it('renders native buttons instead of v-btn', () => {
       const wrapper = mountSimple([createMockAction('save', 'Save'), createMockAction('cancel', 'Cancel')]);

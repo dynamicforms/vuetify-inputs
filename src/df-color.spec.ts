@@ -1,9 +1,6 @@
 import { Field } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
 
 import { hexagonCells } from './helpers/hexagon-palette';
 import HexagonPalette from './helpers/hexagon-palette.vue';
@@ -12,10 +9,8 @@ import { translateStrings } from './helpers/translations';
 
 import DfColor from '@/df-color.vue';
 
-const vuetify = createVuetify({ components, directives });
-
 function mountColor(props: Record<string, any>, settings: VuetifyInputsSettings = {}) {
-  return mount(DfColor, { props, global: { plugins: [vuetify], provide: { [vuetifyInputsSettingsKey]: settings } } });
+  return mount(DfColor, { props, global: { provide: { [vuetifyInputsSettingsKey]: settings } } });
 }
 
 async function touch(wrapper: ReturnType<typeof mountColor>) {
@@ -133,7 +128,7 @@ describe('DfColor', () => {
     async function openPicker(control: Field<string>, props: Record<string, any> = {}) {
       const wrapper = mount(DfColor, {
         props: { control, ...props },
-        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
+        global: { stubs: { VColorPicker: ColorPickerStub } },
         attachTo: document.body,
       });
       await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
@@ -261,7 +256,7 @@ describe('DfColor', () => {
         slots: {
           'picker-prepend': '<template #picker-prepend="{ color }"><i class="prepended">{{ color }}</i></template>',
         },
-        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
+        global: { stubs: { VColorPicker: ColorPickerStub } },
         attachTo: document.body,
       });
       expect(document.querySelector('.prepended')).toBeNull();
@@ -288,7 +283,7 @@ describe('DfColor', () => {
           'picker-prepend':
             '<template #picker-prepend="{ select }"><b class="pick" @click="select(\'#00ffaa\')" /></template>',
         },
-        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
+        global: { stubs: { VColorPicker: ColorPickerStub } },
         attachTo: document.body,
       });
       await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
@@ -315,7 +310,7 @@ describe('DfColor', () => {
             '<template #picker-prepend="{ select, save }">' +
             '<b class="pick" @click="select(\'#00ffaa\'); save()" /></template>',
         },
-        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
+        global: { stubs: { VColorPicker: ColorPickerStub } },
         attachTo: document.body,
       });
       const menu = wrapper.findComponent({ name: 'VMenu' });

@@ -1,8 +1,6 @@
 import Form from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
 
 import DfImage from '@/df-image.vue';
 import { FileComms, FileGoneError } from '@/helpers';
@@ -17,11 +15,9 @@ function fileList(files: File[]): FileList {
 }
 
 describe('DfImage', () => {
-  let vuetify: any;
   let comms: FileComms;
 
   beforeEach(() => {
-    vuetify = createVuetify({ components });
     comms = {
       upload: vi.fn(async () => 'https://example.com/uploaded.png'),
       delete: vi.fn(async () => {}),
@@ -39,7 +35,6 @@ describe('DfImage', () => {
   const mountImage = (props: Record<string, any> = {}) =>
     mount(DfImage, {
       props: { comms, label: 'Photo', ...props },
-      global: { plugins: [vuetify] },
     });
 
   const pickImage = async (wrapper: ReturnType<typeof mountImage>, file: File) => {

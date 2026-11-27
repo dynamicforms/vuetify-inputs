@@ -1,8 +1,6 @@
 import { Field } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
 import { vi } from 'vitest';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
 
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from '../settings';
 import { translate } from '../translations';
@@ -13,10 +11,8 @@ import DfRtfEditor from '@/df-rtf-editor.vue';
 
 describe('EditorCore empty-content modelValue', () => {
   it('emits an empty string, not the empty paragraph HTML, when the document is cleared', async () => {
-    const vuetify = createVuetify({ components });
     const wrapper = mount(EditorCore, {
       props: { modelValue: '<p>hello world</p>' },
-      global: { plugins: [vuetify] },
     });
     await flushPromises();
 
@@ -27,10 +23,8 @@ describe('EditorCore empty-content modelValue', () => {
   });
 
   it('still emits HTML when the document holds only an image', async () => {
-    const vuetify = createVuetify({ components });
     const wrapper = mount(EditorCore, {
       props: { modelValue: '' },
-      global: { plugins: [vuetify] },
     });
     await flushPromises();
 
@@ -48,17 +42,15 @@ describe('EditorCore writes only what the user edits', () => {
   const html = '<p>Hello <b>world</b></p>';
 
   it('does not write its own serialization of the value when it mounts', async () => {
-    const vuetify = createVuetify({ components });
-    const wrapper = mount(EditorCore, { props: { modelValue: html }, global: { plugins: [vuetify] } });
+    const wrapper = mount(EditorCore, { props: { modelValue: html } });
     await flushPromises();
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
   });
 
   it('leaves a bound field unchanged when it mounts', async () => {
-    const vuetify = createVuetify({ components });
     const control = new Field<string>({ value: html });
-    mount(DfRtfEditor, { props: { control }, global: { plugins: [vuetify] } });
+    mount(DfRtfEditor, { props: { control } });
     await flushPromises();
 
     expect(control.value).toBe(html);
@@ -66,8 +58,7 @@ describe('EditorCore writes only what the user edits', () => {
   });
 
   it('does not write the value when it is made read-only or editable', async () => {
-    const vuetify = createVuetify({ components });
-    const wrapper = mount(EditorCore, { props: { modelValue: html }, global: { plugins: [vuetify] } });
+    const wrapper = mount(EditorCore, { props: { modelValue: html } });
     await flushPromises();
 
     await wrapper.setProps({ readonly: true });
@@ -80,10 +71,8 @@ describe('EditorCore writes only what the user edits', () => {
 
 describe('EditorCore bubble menu link prompt', () => {
   it('prompts for a URL using the translated LinkUrl label', async () => {
-    const vuetify = createVuetify({ components });
     const wrapper = mount(EditorCore, {
       props: { modelValue: '<p>hello world</p>' },
-      global: { plugins: [vuetify] },
     });
     await flushPromises();
 
@@ -97,11 +86,10 @@ describe('EditorCore bubble menu link prompt', () => {
   });
 
   it('prompts with the translate setting the component reads, from an event handler', async () => {
-    const vuetify = createVuetify({ components });
     const settings: VuetifyInputsSettings = { translate: (key) => `app:${key}` };
     const wrapper = mount(EditorCore, {
       props: { modelValue: '<p>hello world</p>' },
-      global: { plugins: [vuetify], provide: { [vuetifyInputsSettingsKey]: settings } },
+      global: { provide: { [vuetifyInputsSettingsKey]: settings } },
     });
     await flushPromises();
 

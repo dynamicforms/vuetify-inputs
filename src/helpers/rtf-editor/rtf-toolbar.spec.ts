@@ -3,8 +3,6 @@ import StarterKit from '@tiptap/starter-kit';
 import { Editor } from '@tiptap/vue-3';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
 
 import { translateStrings } from '../translations';
 
@@ -19,8 +17,7 @@ function makeEditor() {
 }
 
 function mountToolbar(editor: Editor) {
-  const vuetify = createVuetify({ components });
-  return mount(RtfToolbar, { props: { editor }, global: { plugins: [vuetify] } });
+  return mount(RtfToolbar, { props: { editor } });
 }
 
 function click(wrapper: ReturnType<typeof mountToolbar>, title: string) {

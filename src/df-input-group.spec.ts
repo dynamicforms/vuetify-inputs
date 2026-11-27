@@ -2,20 +2,14 @@ import { Field, Group, ValidationError } from '@dynamicforms/vue-forms';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { h, nextTick } from 'vue';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
 
 import DfCheckbox from '@/df-checkbox.vue';
 import DfInputGroup from '@/df-input-group.vue';
-
-const vuetify = createVuetify({ components, directives });
 
 function mountGroup(props: Record<string, unknown>, children: () => any[] = () => []) {
   return mount(DfInputGroup, {
     props,
     slots: { default: children },
-    global: { plugins: [vuetify] },
     attachTo: document.body,
   });
 }

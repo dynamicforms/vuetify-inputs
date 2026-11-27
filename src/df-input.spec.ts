@@ -1,5 +1,5 @@
 import { Field, Validators } from '@dynamicforms/vue-forms';
-import { flushPromises, mount } from '@vue/test-utils';
+import { config, flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
@@ -14,12 +14,21 @@ import {
   vuetifyInputsSettingsKey,
 } from '@/helpers';
 
-const vuetify = createVuetify({ components, directives });
+// mounts in place of the Vuetify instance that test-setup registers for every mount
+function withPlugins<T>(plugins: typeof config.global.plugins, mountFn: () => T): T {
+  const shared = config.global.plugins;
+  config.global.plugins = plugins;
+  try {
+    return mountFn();
+  } finally {
+    config.global.plugins = shared;
+  }
+}
 
 describe('DfInput', () => {
   describe('as a number input', () => {
     const mountNumber = (control: Field<number | null>, props: Record<string, any>) =>
-      mount(DfInput, { props: { control, inputType: 'number', ...props }, global: { plugins: [vuetify] } });
+      mount(DfInput, { props: { control, inputType: 'number', ...props } });
 
     it.each([
       { name: 'above max', value: 150, props: { max: 100 }, corrected: 100 },
@@ -66,7 +75,6 @@ describe('DfInput', () => {
       const focusSelected = async (value: number, props: Record<string, any>) => {
         const wrapper = mount(DfInput, {
           props: { control: new Field<number | null>({ value }), inputType: 'number', ...props },
-          global: { plugins: [vuetify] },
           attachTo: document.body,
         });
         await flushPromises();
@@ -89,7 +97,6 @@ describe('DfInput', () => {
       it('selects the whole text again when a render is pending at focus', async () => {
         const wrapper = mount(DfInput, {
           props: { control: new Field<number | null>({ value: 0 }), inputType: 'number', precision: 2 },
-          global: { plugins: [vuetify] },
           attachTo: document.body,
         });
         await flushPromises();
@@ -125,11 +132,13 @@ describe('DfInput', () => {
         value: number | null = null,
       ) => {
         const control = new Field<number | null>({ value });
-        const wrapper = mount(DfInput, {
-          props: { control, inputType: 'number', ...props },
-          global: { plugins: [vuetifyFor(locale)], provide: { [vuetifyInputsSettingsKey]: settings } },
-          attachTo: document.body,
-        });
+        const wrapper = withPlugins([vuetifyFor(locale)], () =>
+          mount(DfInput, {
+            props: { control, inputType: 'number', ...props },
+            global: { provide: { [vuetifyInputsSettingsKey]: settings } },
+            attachTo: document.body,
+          }),
+        );
         await flushPromises();
         const input = wrapper.find('input').element as HTMLInputElement;
         input.focus();
@@ -262,7 +271,7 @@ describe('DfInput', () => {
 
   it.each(['text', 'number'] as const)('marks its control touched on blur, as a %s input', async (inputType) => {
     const control = new Field({ value: inputType === 'number' ? 5 : 'x', validators: [new Validators.MinValue(10)] });
-    const wrapper = mount(DfInput, { props: { control, inputType }, global: { plugins: [vuetify] } });
+    const wrapper = mount(DfInput, { props: { control, inputType } });
     expect(control.touched).toBe(false);
 
     await wrapper.find('input').trigger('blur');
@@ -271,8 +280,7 @@ describe('DfInput', () => {
   });
 
   describe('label', () => {
-    const mountWithLabel = (label: RenderContentNonCallable) =>
-      mount(DfInput, { props: { label, modelValue: '' }, global: { plugins: [vuetify] } });
+    const mountWithLabel = (label: RenderContentNonCallable) => mount(DfInput, { props: { label, modelValue: '' } });
 
     it('renders an MdString label as markdown', () => {
       expect(mountWithLabel(new MdString('**Name**')).find('.df-label strong').text()).toBe('Name');
@@ -291,7 +299,7 @@ describe('DfInput', () => {
 
   describe('errors prop', () => {
     const mountWithErrors = async (errors: ErrorInput[]) => {
-      const wrapper = mount(DfInput, { props: { errors, modelValue: '' }, global: { plugins: [vuetify] } });
+      const wrapper = mount(DfInput, { props: { errors, modelValue: '' } });
       await wrapper.find('input').trigger('blur');
       return wrapper;
     };

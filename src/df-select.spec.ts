@@ -1,6 +1,6 @@
 import { Field, Group, ValueChangedAction } from '@dynamicforms/vue-forms';
-import { flushPromises, mount } from '@vue/test-utils';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { config, flushPromises, mount } from '@vue/test-utils';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref, toRaw } from 'vue';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
@@ -40,15 +40,19 @@ function deferredFetchChoices(available: SelectChoice[] = ALL_CHOICES) {
   return { fetchChoices, release };
 }
 
+// mounts in place of the Vuetify instance that test-setup registers for every mount
+function withPlugins<T>(plugins: typeof config.global.plugins, mountFn: () => T): T {
+  const shared = config.global.plugins;
+  config.global.plugins = plugins;
+  try {
+    return mountFn();
+  } finally {
+    config.global.plugins = shared;
+  }
+}
+
 describe('DfSelect', () => {
-  let vuetify: any;
-
-  beforeEach(() => {
-    vuetify = createVuetify({ components });
-  });
-
-  const mountSelect = (props: Record<string, any>) =>
-    mount(DfSelect, { props: { label: 'Select', ...props }, global: { plugins: [vuetify] } });
+  const mountSelect = (props: Record<string, any>) => mount(DfSelect, { props: { label: 'Select', ...props } });
 
   const chipTexts = (wrapper: ReturnType<typeof mountSelect>) => wrapper.findAll('.v-chip').map((chip) => chip.text());
 
@@ -354,7 +358,7 @@ describe('DfSelect', () => {
             },
           }),
       });
-      const wrapper = mount(Parent, { global: { plugins: [vuetify] } });
+      const wrapper = mount(Parent);
       return { wrapper, model, updates };
     };
 
@@ -410,7 +414,6 @@ describe('DfSelect', () => {
       const control = new Field<number[] | null>({ value: [1, 2, 3] });
       const wrapper = mount(DfSelect, {
         props: { label: 'Select', control, multiple: true, choices: ALL_CHOICES },
-        global: { plugins: [vuetify] },
         attachTo: document.body,
       });
       await flushPromises();
@@ -472,7 +475,6 @@ describe('DfSelect', () => {
       const control = new Field<number[] | null>({ value: [1, 2] });
       const wrapper = mount(DfSelect, {
         props: { label: 'Select', control, multiple: true, allowNull: false, choices: ALL_CHOICES },
-        global: { plugins: [vuetify] },
         attachTo: document.body,
       });
       await flushPromises();
@@ -503,7 +505,6 @@ describe('DfSelect', () => {
     it('hides choice icons in chips and options from assistive technology', async () => {
       const wrapper = mount(DfSelect, {
         props: { label: 'Select', control: new Field({ value: [1] }), multiple: true, choices: ICON_CHOICES },
-        global: { plugins: [vuetify] },
         attachTo: document.body,
       });
       await flushPromises();
@@ -525,7 +526,6 @@ describe('DfSelect', () => {
       const onDisplay = vi.fn();
       const wrapper = mount(DfSelect, {
         props: { label: 'Select', control, choices: ALL_CHOICES, 'onUpdate:modelValueDisplay': onDisplay },
-        global: { plugins: [vuetify] },
       });
       await flushPromises();
 
@@ -575,7 +575,6 @@ describe('DfSelect', () => {
     const mountAttached = (props: Record<string, any>) => {
       const wrapper = mount(DfSelect, {
         props: { label: 'Select', ...props },
-        global: { plugins: [vuetify] },
         attachTo: document.body,
       });
       mounted.push(wrapper);
@@ -672,7 +671,6 @@ describe('DfSelect', () => {
             choices,
             'onUpdate:modelValueDisplay': onDisplay,
           },
-          global: { plugins: [vuetify] },
         });
         await flushPromises();
 
@@ -969,7 +967,7 @@ describe('DfSelect', () => {
   it('renders the autocomplete once mounted where Vuetify is created for server-side rendering', async () => {
     const ssrVuetify = createVuetify({ ssr: true, components });
     const choices = [{ id: 1, text: 'One' }];
-    const wrapper = mount(DfSelect, { props: { choices, modelValue: 1 }, global: { plugins: [ssrVuetify] } });
+    const wrapper = withPlugins([ssrVuetify], () => mount(DfSelect, { props: { choices, modelValue: 1 } }));
 
     await flushPromises();
 
