@@ -53,6 +53,9 @@ function withPlugins<T>(plugins: typeof config.global.plugins, mountFn: () => T)
 
 describe('DfSelect', () => {
   const mountSelect = (props: Record<string, any>) => mount(DfSelect, { props: { label: 'Select', ...props } });
+  // mounted in the document, so that focus moves and the menu can be opened and read
+  const mountAttached = (props: Record<string, any>) =>
+    mount(DfSelect, { props: { label: 'Select', ...props }, attachTo: document.body });
 
   const chipTexts = (wrapper: ReturnType<typeof mountSelect>) => wrapper.findAll('.v-chip').map((chip) => chip.text());
   const closeLabels = (wrapper: ReturnType<typeof mountSelect>) =>
@@ -417,10 +420,7 @@ describe('DfSelect', () => {
 
     it.each(['Enter', ' '])('removes a chip with %j on its close button and focuses the next one', async (key) => {
       const control = new Field<number[] | null>({ value: [1, 2, 3] });
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', control, multiple: true, choices: ALL_CHOICES },
-        attachTo: document.body,
-      });
+      const wrapper = mountAttached({ control, multiple: true, choices: ALL_CHOICES });
       await flushPromises();
 
       const button = wrapper.findAll('.v-chip__close')[1];
@@ -476,10 +476,7 @@ describe('DfSelect', () => {
 
     it('focuses the input once no closable chip remains', async () => {
       const control = new Field<number[] | null>({ value: [1, 2] });
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', control, multiple: true, allowNull: false, choices: ALL_CHOICES },
-        attachTo: document.body,
-      });
+      const wrapper = mountAttached({ control, multiple: true, allowNull: false, choices: ALL_CHOICES });
       await flushPromises();
 
       wrapper
@@ -505,10 +502,7 @@ describe('DfSelect', () => {
     });
 
     it('hides choice icons in chips and options from assistive technology', async () => {
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', control: new Field({ value: [1] }), multiple: true, choices: ICON_CHOICES },
-        attachTo: document.body,
-      });
+      const wrapper = mountAttached({ control: new Field({ value: [1] }), multiple: true, choices: ICON_CHOICES });
       await flushPromises();
 
       const chipIcons = wrapper.findAll('.v-chip .cached-icon-wrapper');
@@ -525,9 +519,7 @@ describe('DfSelect', () => {
     it.each(['', '  '])('gives a blank id outside the choices no choice and keeps it (%j)', async (blank) => {
       const control = new Field<any>({ value: blank });
       const onDisplay = vi.fn();
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', control, choices: ALL_CHOICES, 'onUpdate:modelValueDisplay': onDisplay },
-      });
+      const wrapper = mountSelect({ control, choices: ALL_CHOICES, 'onUpdate:modelValueDisplay': onDisplay });
       await flushPromises();
 
       expect(itemTitles(wrapper)).toEqual(ALL_CHOICES.map((choice) => choice.text));
@@ -568,9 +560,6 @@ describe('DfSelect', () => {
       vi.useRealTimers();
     });
 
-    // mounted in the document, so that the menu can be opened and read
-    const mountAttached = (props: Record<string, any>) =>
-      mount(DfSelect, { props: { label: 'Select', ...props }, attachTo: document.body });
     const openMenu = async (wrapper: ReturnType<typeof mountSelect>) => {
       await wrapper.find('.v-field').trigger('mousedown');
       await flushPromises();
@@ -651,13 +640,11 @@ describe('DfSelect', () => {
           { id: 2, text: html },
         ];
         const onDisplay = vi.fn();
-        const wrapper = mount(DfSelect, {
-          props: {
-            control: new Field({ value: [1, 2] }),
-            multiple: true,
-            choices,
-            'onUpdate:modelValueDisplay': onDisplay,
-          },
+        const wrapper = mountSelect({
+          control: new Field({ value: [1, 2] }),
+          multiple: true,
+          choices,
+          'onUpdate:modelValueDisplay': onDisplay,
         });
         await flushPromises();
 
