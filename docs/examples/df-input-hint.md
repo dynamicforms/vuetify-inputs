@@ -213,10 +213,9 @@ The demo, without the cards it is laid out in:
 
 Experiment with the demo by:
 
-1. Leaving the email field empty and clicking away, to watch the hint give up the row to the errors, which both
-   validators contribute to and which render one node each
-2. Typing an address without an `@` and leaving the field again, to see the second validator's message, which its
-   own `code` and `detail` replace
+1. Leaving the email field empty and clicking away: the row shows the `Required` error in place of the hint
+2. Typing an address without an `@` and leaving the field: the row shows the `Pattern` validator's
+   `app.invalid_email` error, with its own `detail` in place of the default pattern message
 3. Switching the standalone row between the empty string, three spaces and a message
 4. Typing two different passwords, to bring up the group's error under the pair
 
