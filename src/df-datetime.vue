@@ -280,6 +280,7 @@ function clear() {
   touched.value = true;
 }
 
+const pad2 = (n: number) => n.toString().padStart(2, '0');
 const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, 'HH:mm')}:00`;
 
 const valueISOFull = ref<string | null>(null);
@@ -370,8 +371,7 @@ function stepTime(time: string, minutes: number) {
   const now = new Date();
   const [hours, mins] = time ? time.split(':').map(Number) : [now.getHours(), now.getMinutes()];
   const total = (((hours * 60 + mins + minutes) % 1440) + 1440) % 1440;
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  return `${pad(Math.floor(total / 60))}:${pad(total % 60)}`;
+  return `${pad2(Math.floor(total / 60))}:${pad2(total % 60)}`;
 }
 
 // Runs in the capture phase, before the menu's own handler, which moves the focus into the menu on an up or down arrow
@@ -488,8 +488,7 @@ function commitTime() {
     return;
   }
   timeInvalid.value = false;
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  setValueISOFull(`T${pad(time.hours)}:${pad(time.minutes)}:00`, 1);
+  setValueISOFull(`T${pad2(time.hours)}:${pad2(time.minutes)}:00`, 1);
   timeText.value = timeDisplay.value;
 }
 </script>
