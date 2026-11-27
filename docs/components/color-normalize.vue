@@ -5,6 +5,7 @@
       <v-card-text>
         <v-row>
           <v-col cols="12" md="6">
+            <!-- #region field -->
             <df-color
               v-model="color"
               label="Web-safe color"
@@ -12,9 +13,10 @@
               :normalize="webSafe"
               @preview="previewColor = $event"
             />
+            <!-- #endregion field -->
           </v-col>
           <v-col cols="12" md="6">
-            <div class="preview" :style="{ backgroundColor: previewColor ?? color }">
+            <div class="demo-color-preview" :style="{ backgroundColor: previewColor ?? color }">
               {{ previewColor ?? 'No preview' }}
             </div>
           </v-col>
@@ -30,6 +32,7 @@
 </template>
 
 <script setup lang="ts">
+// #region setup
 import { ref } from 'vue';
 
 import { DfColor } from '../../src';
@@ -44,22 +47,5 @@ function webSafe(value: string): string {
   const channels = [0, 2, 4].map((start) => Math.round(parseInt(hex.slice(start, start + 2), 16) / 0x33) * 0x33);
   return `#${channels.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
 }
+// #endregion setup
 </script>
-
-<style scoped>
-.demo-container {
-  margin-bottom: 20px;
-}
-
-.preview {
-  height: 56px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: monospace;
-  color: #fff;
-  text-shadow: 0 0 2px #000;
-}
-</style>

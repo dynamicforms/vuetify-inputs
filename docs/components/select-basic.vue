@@ -28,9 +28,3 @@ const fruits = [
   { id: 'elder', text: 'Elderflower' },
 ];
 </script>
-
-<style scoped>
-.demo-container {
-  margin-bottom: 20px;
-}
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="person-form-demo">
+  <div class="demo-container">
     <v-card class="mb-4">
       <v-card-title>Person Form</v-card-title>
       <v-card-text>
@@ -54,7 +54,7 @@
     <v-card>
       <v-card-title>Form Output</v-card-title>
       <v-card-text>
-        <pre class="output">{{ personForm.value }}</pre>
+        <pre class="demo-output">{{ personForm.value }}</pre>
       </v-card-text>
     </v-card>
   </div>
@@ -94,15 +94,3 @@ personForm.registerAction(
   }),
 );
 </script>
-
-<style scoped>
-.person-form-demo {
-  margin: 2rem 0;
-}
-.output {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 1rem;
-  border-radius: 4px;
-  white-space: pre-wrap;
-}
-</style>

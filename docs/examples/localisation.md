@@ -270,21 +270,9 @@ can thereby show one field in the application's locale and another in a fixed on
 
 <datetime-multilingual/>
 
-```vue
-<template>
-  <df-date-time v-model="date" :locale="locales[selected]" label="Date and time" />
-</template>
+<<< @/components/datetime-multilingual.vue#field{vue}
 
-<script setup>
-import { ref } from 'vue';
-import { de, enUS, sl } from 'date-fns/locale';
-import { DfDateTime } from '@dynamicforms/vuetify-inputs';
-
-const locales = [sl, enUS, de];
-const selected = ref(0);
-const date = ref(new Date().toISOString());
-</script>
-```
+<<< @/components/datetime-multilingual.vue#setup{js}
 
 See [df-date-time](/examples/df-datetime) for the display format patterns and the value formats.
 

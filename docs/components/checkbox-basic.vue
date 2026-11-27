@@ -135,9 +135,3 @@ onBeforeUnmount(() => {
   }
 });
 </script>
-
-<style scoped>
-.demo-container {
-  margin-bottom: 20px;
-}
-</style>

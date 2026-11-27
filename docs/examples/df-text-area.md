@@ -10,7 +10,6 @@
 
 ## Features
 
-- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Configurable number of rows
 - Auto-growing height with configurable maximum rows
 - Length validation through vue-forms validators on the bound field
@@ -25,16 +24,6 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | rows | `number` | `undefined` | Number of visible text rows |
 | maxRows | `number` | `undefined` | Maximum number of rows when auto-grow is enabled |
 
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The textarea content (v-model)
-- `label` - Input label
-- `hint` - Hint text
-- And more...
-
 ## Auto-Growing Behaviour
 
 The textarea grows with its content only when `maxRows` is a positive value; the growth stops at `maxRows`.
@@ -47,9 +36,7 @@ When auto-grow is enabled:
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the textarea content changes
+This component emits the [common events of InputBase](./input-base#events).
 
 ## Examples
 

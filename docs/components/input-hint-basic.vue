@@ -1,5 +1,5 @@
 <template>
-  <div class="input-hint-demo">
+  <div class="demo-container">
     <v-card class="mb-4">
       <v-card-title>Inside an input</v-card-title>
       <v-card-text>
@@ -8,7 +8,11 @@
           invalid, and the errors after that. Type a few letters and leave the field.
         </p>
 
+        <!-- #region template -->
+        <!-- The hint is shown until the field is touched and invalid -->
         <df-input :control="email" label="Email" hint="We use it for the receipt only" />
+
+        <!-- #endregion template -->
 
         <div class="mt-2">
           <strong>touched:</strong>
@@ -22,6 +26,7 @@
     <v-card class="mb-4">
       <v-card-title>Standalone</v-card-title>
       <v-card-text>
+        <!-- #region template -->
         <df-select
           v-model="errorSource"
           :choices="errorSources"
@@ -30,6 +35,7 @@
           class="mb-4"
         />
 
+        <!-- Standalone, with a plain string in each of the two props -->
         <div class="row-frame">
           <df-input-hint
             :errors="standaloneErrors"
@@ -37,6 +43,8 @@
             message-classes="text-medium-emphasis"
           />
         </div>
+
+        <!-- #endregion template -->
 
         <p class="mt-4 mb-0">
           The middle option passes three spaces. An
@@ -57,6 +65,7 @@
           naming a colour of its own.
         </p>
 
+        <!-- #region template -->
         <v-row>
           <v-col cols="12" md="6">
             <df-input :control="credentials.fields.password" input-type="password" label="Password" />
@@ -66,13 +75,16 @@
           </v-col>
         </v-row>
 
+        <!-- The group's own errors, in a colour of their own -->
         <df-input-hint :errors="credentials.errors" error-classes="text-warning font-weight-bold" />
+        <!-- #endregion template -->
       </v-card-text>
     </v-card>
   </div>
 </template>
 
 <script setup lang="ts">
+// #region setup
 import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { computed, ref } from 'vue';
 
@@ -97,6 +109,7 @@ const errorSources = [
 
 const errorSource = ref<'none' | 'blank' | 'text'>('none');
 
+// The middle option is three spaces: a whitespace-only errors string is no error
 const standaloneErrors = computed(() => {
   if (errorSource.value === 'blank') return '   ';
   if (errorSource.value === 'text') return 'The value is not one of the allowed ones';
@@ -108,6 +121,7 @@ const credentials = new Group({
   confirmation: new Field<string>({ value: '' }),
 });
 
+// A rule over two fields: its error belongs to the group, and one hint row renders it
 credentials.registerAction(
   new Validators.Validator(() => {
     const { password, confirmation } = credentials.fields;
@@ -115,13 +129,10 @@ credentials.registerAction(
     return [new ValidationError('app.passwords_differ', {}, 'The two entries do not match')];
   }),
 );
+// #endregion setup
 </script>
 
 <style scoped>
-.input-hint-demo {
-  margin: 2rem 0;
-}
-
 .row-frame {
   border: 1px dashed rgba(0, 0, 0, 0.2);
   border-radius: 4px;

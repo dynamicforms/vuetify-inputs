@@ -11,7 +11,6 @@ so it uses the application's theme and this library's translated strings.
 
 ## Features
 
-- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Text formatting, lists, tables, links, images, media embeds, named block styles and pasting from Word or Google
   Docs (see [Toolbar Features](#toolbar-features))
 
@@ -24,16 +23,6 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | minHeight | `string` | `'7em'` | Minimum height of the editing area |
 | toolbarButtonSize | `VuetifyButtonSize` | `'small'` | Size of the toolbar buttons (Vuetify `v-btn` `size`) |
 | fontFamily | `string` | `'inherit'` | `font-family` of the editing area and its named block styles. The component loads no font of its own; pass a value here (and load the font itself, if needed) to use something other than the surrounding page's font |
-
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The HTML content (v-model)
-- `label` - Input label
-- `hint` - Hint text
-- And more...
 
 ## Toolbar Features
 
@@ -68,9 +57,7 @@ This component inherits all common props from [InputBase](./input-base), includi
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the HTML content changes
+This component emits the [common events of InputBase](./input-base#events).
 
 ## Working with HTML Content
 

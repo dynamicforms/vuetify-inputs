@@ -31,99 +31,17 @@ In addition to [common props from InputBase](./input-base), this component requi
 | comms | `FileComms` | **Required** | Object with methods for image operations |
 | touchInterval | `number` | `undefined`: the plugin's `defaultTouchInterval`, else `60000` | Milliseconds between keep-alive touches. See [Configuration](/examples/configuration) for setting this application-wide instead |
 
-### Inherited Props
+## Value and Backend
 
-This component inherits all common props from [InputBase](./input-base), including:
+The value is the string `comms.upload` resolves to, and the component renders it as the image's `src`. There is no
+lookup from an identifier to a URL, so it must be a URL the browser can load. The same URL is passed to `comms.delete`
+and `comms.touch`, and is stored in the form data when using DynamicForms.
 
-- `control` - DynamicForms field object
-- `modelValue` - The image URL (v-model)
-- `label` - Input label
-- `hint` - Hint text
-- And more...
-
-## Value Format
-
-The component stores and displays a URL string, not the file itself:
-
-1. `comms.upload` resolves to the URL the component renders as the image's `src`. There is no lookup from an
-   identifier to a URL, so the returned value must be a URL the browser can load.
-2. The same value is used in subsequent operations (delete, touch) to reference the image.
-3. It is stored in the form data when using DynamicForms.
-
-A started upload completes when the field is disabled while it runs: the URL is still written into it and touched from
-then on. A later upload, a clear of the field or a value set on the field while an upload runs supersedes that upload:
-it writes nothing into the field, and the URL it returns is deleted through `comms.delete`.
-
-## Temporary Uploads
-
-The URL the component's last upload returned is a temporary upload while the field holds it and, where a `control` is
-bound, it differs from the control's `originalValue`.
-
-- A temporary upload is touched every `touchInterval` milliseconds.
-- Clearing the field deletes a temporary upload through `comms.delete`. Clearing any other URL, such as one the field
-  was given with its record, sets the value to `null` and calls no `comms` method.
-- An upload that replaces a temporary upload deletes the replaced one through `comms.delete`.
-- Once the URL is the control's `originalValue` (`control.originalValue = control.value` or a `rebind` after the form is
-  saved), it is no longer touched or deleted. Without a `control`, an uploaded URL is temporary for as long as the field
-  holds it.
-
-## FileComms Interface
-
-The `comms` prop requires an object implementing the same `FileComms` interface `df-file` uses:
-
-```typescript
-interface FileComms {
-  /**
-   * Called when an image is picked, dropped, or selected via the dialog, and needs to be uploaded
-   * @param file The image file to be uploaded
-   * @param progressCallback Callback function for upload progress
-   * @return Promise resolving to the URL the component displays the image from
-   */
-  upload: (file: File, progressCallback?: FileProgressCallback) => Promise<string>;
-
-  /**
-   * Called for a temporary upload the field clears or another upload replaces, and for an upload superseded
-   * before it returned. Throw FileGoneError if the backend already reports the identifier as gone; any other
-   * thrown error is treated as transient.
-   * @param fileIdentifier The URL that was returned by upload
-   */
-  delete: (fileIdentifier: string) => Promise<void>;
-
-  /**
-   * Called periodically to keep a temporary upload active. Throw FileGoneError if the backend reports the
-   * identifier no longer exists — the component then clears the field and, where a `control` is bound, reports an error
-   * of code `vuetify-inputs.file_gone` with the error's `errorText` as its detail. Any other thrown error is treated as transient and left to the consumer.
-   * @param fileIdentifier The URL that was returned by upload
-   */
-  touch: (fileIdentifier: string) => Promise<void>;
-}
-
-// Progress callback type
-type FileProgressCallback = (loaded: number, total: number) => void;
-
-// Thrown by touch/delete to report that the backend has already discarded the image
-class FileGoneError extends Error {
-  constructor(public errorText: string) {
-    super(errorText);
-  }
-}
-```
-
-`FileComms` also declares an optional `getDownloadUrl`, used by `df-file`; `df-image` ignores it, because its value is
-the URL.
-
-## Upload Progress
-
-During an upload the component shows a progress bar from the values passed to `progressCallback` of `upload`.
-
-If a touch rejects with a `FileGoneError` while the field still holds the touched URL, the field and preview are
-cleared, a disabled field as well, and, where a `control` is bound, its errors are replaced with one `ValidationError`
-of code `vuetify-inputs.file_gone` and origin `'server'`, whose `detail` is the error's `errorText`; the [`errorText`
-setting](/examples/localisation#translating-errors) can render another text for the code. Under vue-forms' default
-[`ErrorPolicy`](:vue-forms:/api/validators.html#errorpolicy) the field drops the error when a new image is uploaded. Any
-other rejection is ignored by the component and left to the application.
-
-An upload that returns and a clear of the field mark the field touched.
+Otherwise df-file's [FileComms interface](/examples/df-file#filecomms-interface), its rules for an upload that runs
+while the field is disabled or is superseded ([value format](/examples/df-file#value-format)),
+[temporary uploads](/examples/df-file#temporary-uploads) and
+[upload progress and `FileGoneError` handling](/examples/df-file#upload-progress) apply unchanged, with the URL in place
+of the file identifier. A `FileGoneError` from a touch also clears the preview. `getDownloadUrl` is not used.
 
 ## Pasting From the Clipboard
 
@@ -143,9 +61,7 @@ paste-button click when the clipboard holds no image.
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the image URL changes
+This component emits the [common events of InputBase](./input-base#events).
 
 ## Examples
 

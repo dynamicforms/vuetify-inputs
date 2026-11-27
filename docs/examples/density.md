@@ -36,20 +36,10 @@ and grid layouts.
   the label is at full opacity. Rendered as Vuetify's `solo` with `bg-color="surface-variant"`. `df-checkbox` has no
   field and renders as in every other variant
 
-## Support for setting variant and density on groups of inputs
+## Where density and variant come from
 
-Every input component takes `variant` and `density` props, and also reads them from the sources below, in descending
-priority:
-
-- props: a component with `variant` and/or `density` props uses exactly those values
-- the bound element: a `control`'s `density` and `variant` [extended
-  properties](/examples/input-base#presentation-carried-by-the-element)
-- provide: any ancestor component may `provide` `'field-variant'` and/or `'field-density'`
-- global defaults, set when installing the library:
-  `app.use(DynamicFormsInputs, { defaultVariant: 'your variant', defaultDensity: 'your density' })`
-- built-in defaults:
-  - density: `'default'`
-  - variant: `'underlined'`
+The order in which a field's density and variant are resolved is described under
+[Where density and variant come from](/examples/configuration#where-density-and-variant-come-from).
 
 <script setup>
 import DensityDemo from '../components/density-demo.vue';

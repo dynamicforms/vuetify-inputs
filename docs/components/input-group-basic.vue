@@ -1,5 +1,5 @@
 <template>
-  <div class="input-group-demo">
+  <div class="demo-container input-group-demo">
     <v-card>
       <v-card-text>
         <v-row>
@@ -14,6 +14,7 @@
           </v-col>
         </v-row>
 
+        <!-- #region form -->
         <v-row class="demo-row">
           <v-col cols="12" md="3">
             <df-input :control="form.fields.name" label="Course" :variant="variant" :density="density" />
@@ -39,12 +40,14 @@
             <df-input :control="form.fields.hours" label="Hours" :variant="variant" :density="density" />
           </v-col>
         </v-row>
+        <!-- #endregion form -->
       </v-card-text>
     </v-card>
   </div>
 </template>
 
 <script setup lang="ts">
+// #region setup
 import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
 import { ref } from 'vue';
 
@@ -58,14 +61,15 @@ import {
   type FieldVariant,
 } from '../../src';
 
+import { choicesOf, fieldDensities, fieldVariants } from './demo-choices';
+
 const variant = ref<FieldVariant>('outlined');
 const density = ref<FieldDensity>('default');
 const direction = ref<DfInputComponentProps.DfInputGroupDirection>('wrap');
 
-const variants = ['outlined', 'filled', 'underlined', 'plain', 'solo', 'solo-inverted', 'solo-filled', 'inverted'].map(
-  (id) => ({ id, text: id }),
-);
-const densities = ['default', 'comfortable', 'compact'].map((id) => ({ id, text: id }));
+const variants = choicesOf(fieldVariants);
+// the densities Vuetify's fields take
+const densities = choicesOf(fieldDensities.filter((id) => id !== 'inline'));
 const directions = ['row', 'wrap', 'column'].map((id) => ({ id, text: id }));
 
 const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -81,10 +85,5 @@ const form = new Group({
   days,
   hours: new Field({ value: '17:00' }),
 });
+// #endregion setup
 </script>
-
-<style scoped>
-.input-group-demo {
-  margin: 2rem 0;
-}
-</style>

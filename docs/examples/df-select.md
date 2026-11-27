@@ -23,7 +23,6 @@ minimum query length:
 
 ## Features
 
-- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Single and multiple selection
 - Choices loaded through `fetchChoices`
 - Entry of new values (tagging)
@@ -53,16 +52,6 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | minQueryLength | `number` | `0` | With `fetchChoices`: the length the search text must reach before `fetchChoices` is called for it. See [Dynamic Option Loading](#dynamic-option-loading) |
 | minQueryText | `RenderContent` | translatable `MinQuery` ("Type at least {count} characters", `count` = `minQueryLength`) | Shown in the menu in place of `noDataText` while the search text is shorter than `minQueryLength` |
 | fetchDebounce | `number` | `0` | With `fetchChoices`: milliseconds the search text must stay unchanged before `fetchChoices` is called for it. Only the last search text is fetched. `0` calls it at once |
-
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The selected value(s)
-- `label` - Input label
-- `hint` - Hint text
-- And more...
 
 ## SelectChoice Interface
 
@@ -152,9 +141,8 @@ const fetchChoices = async (query?: string, idValue?: any): Promise<SelectChoice
 
 ## Events
 
-In addition to the [common events from InputBase](./input-base):
+In addition to the [common events of InputBase](./input-base#events):
 
-- `update:modelValue` - When the selected value(s) change
 - `update:modelValueDisplay` - Carries a `SelectChoice[]` holding the choices shown for the current value, including
   those whose text is the id. It is emitted while the component is being set up and whenever those choices change; not
   while the choices for the value's ids are being fetched, nor on the server for a select with `fetchChoices`

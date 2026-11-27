@@ -1,5 +1,5 @@
 <template>
-  <v-locale-provider :rtl="errorLanguage === 'fa'" class="validators-form-demo">
+  <v-locale-provider :rtl="errorLanguage === 'fa'" class="demo-container validators-form-demo">
     <v-card class="mb-4">
       <v-card-title>Validators Demo</v-card-title>
       <v-card-text>
@@ -57,7 +57,7 @@
         <v-alert :type="formValid ? 'success' : 'error'" class="mb-3">
           Form is {{ formValid ? 'valid' : 'invalid' }}
         </v-alert>
-        <pre class="output">{{ JSON.stringify(validatedForm.value, null, 2) }}</pre>
+        <pre class="demo-output">{{ JSON.stringify(validatedForm.value, null, 2) }}</pre>
       </v-card-text>
     </v-card>
   </v-locale-provider>
@@ -139,19 +139,3 @@ validatedForm.registerAction(
   }),
 );
 </script>
-
-<style>
-.validators-form-demo {
-  margin: 2rem 0;
-}
-.output {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 1rem;
-  border-radius: 4px;
-  white-space: pre-wrap;
-}
-
-hr {
-  margin: 0 !important;
-}
-</style>

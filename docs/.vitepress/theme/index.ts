@@ -9,6 +9,7 @@ import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 import { DynamicFormsInputs } from '../../../src';
 import '../../../src/helpers/global.css';
+import './demo.css';
 import { errorText } from '../../components/demo-error-text';
 // import DynamicFormsInputsVuetify from '../../../src/vuetify-components';
 

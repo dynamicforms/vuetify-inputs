@@ -16,7 +16,6 @@ With `input-type="number"`, `df-input` renders Vuetify's `v-number-input`:
 
 ## Features
 
-- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Input types text, email, password, URL and number
 - `v-number-input` for the number type
 
@@ -32,16 +31,6 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | step | `number` | `undefined` | Step value (for number inputs) |
 | precision | `number` \| `null` | `null` | Decimal precision (for number inputs) |
 | anyDecimalSeparator | `boolean` | the plugin's `anyDecimalSeparator`, else `false` | `.` and `,` both act as the decimal separator (for number inputs). See [Any decimal separator](#any-decimal-separator) |
-
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The input value (v-model)
-- `label` - Input label
-- `hint` - Hint text
-- And more...
 
 ## Number Input Handling
 
@@ -92,9 +81,7 @@ The number input supports:
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the input value changes
+This component emits the [common events of InputBase](./input-base#events).
 
 ## Examples
 

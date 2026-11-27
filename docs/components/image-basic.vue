@@ -25,6 +25,8 @@ import { Field } from '@dynamicforms/vue-forms';
 
 import { DfImage } from '../../src';
 
+import { mockFileComms } from './demo-file-comms';
+
 // Stands in for an image already stored on the backend - comms.upload() must resolve to the same kind of
 // directly-usable URL for a freshly uploaded image to preview and download the same way.
 const existingImage =
@@ -39,49 +41,10 @@ const existingImage =
 
 const imageField = new Field({ value: existingImage });
 
-// Mock implementation of FileComms for demo purposes: upload() must resolve to whatever the <img> src should be
-const imageComms = {
-  upload: async (file, progressCallback) => {
-    const totalSize = file.size;
-    let loaded = 0;
-    const chunkSize = totalSize / 20;
-
-    for (let i = 0; i < 20; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 30));
-      loaded += chunkSize;
-      if (progressCallback) progressCallback(loaded, totalSize);
-    }
-
-    return URL.createObjectURL(file);
-  },
-
-  delete: async (fileIdentifier) => {
-    console.log('Deleting image:', fileIdentifier);
-    return Promise.resolve();
-  },
-
-  touch: async (fileIdentifier) => {
-    console.log('Touching image:', fileIdentifier);
-    return Promise.resolve();
-  },
-};
+// upload() resolves to whatever the <img> src should be
+const imageComms = mockFileComms({ result: (file) => URL.createObjectURL(file) });
 
 function toggleEnabled() {
   imageField.access = imageField.enabled ? 'disabled' : 'editable';
 }
 </script>
-
-<style scoped>
-.demo-container {
-  margin: 1rem 0;
-}
-
-pre {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 0.5rem;
-  border-radius: 4px;
-  max-height: 100px;
-  overflow: auto;
-  white-space: pre-wrap;
-}
-</style>

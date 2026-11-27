@@ -44,18 +44,3 @@ function resetField() {
   descriptionField.value = '';
 }
 </script>
-
-<style scoped>
-.demo-container {
-  margin: 1rem 0;
-}
-
-pre {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 0.5rem;
-  border-radius: 4px;
-  max-height: 100px;
-  overflow: auto;
-  white-space: pre-wrap;
-}
-</style>

@@ -69,41 +69,11 @@ the children come from their own elements, which take them from the container in
 
 ### JavaScript/TypeScript
 
-```ts
-import { Field, Group, ValidationError, Validators } from '@dynamicforms/vue-forms';
-import { DfCheckbox, DfInput, DfInputGroup } from '@dynamicforms/vuetify-inputs';
-
-const days = new Group(
-  Object.fromEntries(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => [day, new Field({ value: false })])),
-);
-days.registerAction(
-  new Validators.Validator(() =>
-    Object.values(days.value).some(Boolean) ? null : [new ValidationError('app.no_day', {}, 'Choose at least one day')],
-  ),
-);
-
-const form = new Group({
-  name: new Field({ value: 'Swimming' }),
-  days,
-  hours: new Field({ value: '17:00' }),
-});
-```
+<<< @/components/input-group-basic.vue#setup{ts}
 
 ### Vue Template
 
-```vue
-<template>
-  <v-row>
-    <v-col cols="3"><df-input :control="form.fields.name" label="Course" /></v-col>
-    <v-col cols="6">
-      <df-input-group :control="form.fields.days" label="Days" hint="At least one day" direction="wrap">
-        <df-checkbox v-for="(field, day) in form.fields.days.fields" :key="day" :control="field" :label="day" />
-      </df-input-group>
-    </v-col>
-    <v-col cols="3"><df-input :control="form.fields.hours" label="Hours" /></v-col>
-  </v-row>
-</template>
-```
+<<< @/components/input-group-basic.vue#form{vue}
 
 ## Try It Yourself
 

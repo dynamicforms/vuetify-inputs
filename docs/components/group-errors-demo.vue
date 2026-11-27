@@ -1,8 +1,9 @@
 <template>
-  <div class="group-demo">
+  <div class="demo-container">
     <v-card class="mb-4">
       <v-card-title>Trip Budget</v-card-title>
       <v-card-text>
+        <!-- #region form -->
         <v-form @submit.prevent>
           <v-row>
             <v-col cols="12" md="4">
@@ -38,6 +39,7 @@
             </v-row>
           </v-card>
 
+          <!-- group.valid covers the group's own errors as well as its fields' -->
           <div class="mt-4">
             <strong>Total:</strong>
             {{ total }} € of {{ budgetLimit }} €
@@ -51,19 +53,21 @@
             <df-input-hint :errors="formErrors" />
           </div>
         </v-form>
+        <!-- #endregion form -->
       </v-card-text>
     </v-card>
 
     <v-card>
       <v-card-title>Form Value</v-card-title>
       <v-card-text>
-        <pre class="output">{{ JSON.stringify(form.value, null, 2) }}</pre>
+        <pre class="demo-output">{{ JSON.stringify(form.value, null, 2) }}</pre>
       </v-card-text>
     </v-card>
   </div>
 </template>
 
 <script setup>
+// #region setup
 import {
   ConditionalAccessAction,
   ConditionalVisibilityAction,
@@ -133,21 +137,5 @@ const total = computed(() => tripTotal());
 
 // the group's own errors, shown by the rule the inputs follow
 const formErrors = useShownErrors(form);
+// #endregion setup
 </script>
-
-<style scoped>
-.group-demo {
-  margin: 2rem 0;
-}
-
-.output {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 1rem;
-  border-radius: 4px;
-  white-space: pre-wrap;
-}
-
-:deep(hr) {
-  margin: 0 !important;
-}
-</style>

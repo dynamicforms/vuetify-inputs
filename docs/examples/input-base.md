@@ -85,8 +85,9 @@ export type VuetifyDensity = 'default' | 'comfortable' | 'compact';
 export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
 ```
 
-`inline` is a density in addition to Vuetify's. It hides the outline and the floating label and removes the margins
-and padding of the remaining elements, so the control takes the least space.
+`inline` is a density in addition to Vuetify's, described under [Density options](/examples/density#density-options).
+The variants, including the library's own `inverted`, are described under
+[Variant options](/examples/density#variant-options).
 
 The order in which a field's density and variant are resolved is described under
 [Where density and variant come from](/examples/configuration#where-density-and-variant-come-from). The
@@ -235,49 +236,11 @@ export class Label {
 Supported icon types are `v-icon`, `v-img` and any other component which takes a single `src: string` parameter.
 A component that needs several parameters is wrapped in one that takes them as a JSON string in `src`.
 
-## Integration with DynamicForms forms
+## Binding
 
-Each component binds a vue-forms element through the `control` prop:
-
-```vue
-<template>
-  <df-input
-    :control="form.fields.name"
-    label="Name"
-    hint="Enter your name"
-  />
-</template>
-
-<script setup>
-import { Group, Field } from '@dynamicforms/vue-forms';
-import { DfInput } from '@dynamicforms/vuetify-inputs';
-
-const form = new Group({
-  name: new Field({ value: '' })
-});
-</script>
-```
-
-## Usage Without DynamicForms
-
-Each component also works with `v-model`:
-
-```vue
-<template>
-  <df-input
-    v-model="name"
-    label="Name"
-    hint="Enter your name"
-  />
-</template>
-
-<script setup>
-import { ref } from 'vue';
-import { DfInput } from '@dynamicforms/vuetify-inputs';
-
-const name = ref('');
-</script>
-```
+Each component binds a vue-forms element through the `control` prop or a value through `v-model`; both are shown in
+[Using with DynamicForms](/guide/getting-started#using-with-dynamicforms) and
+[Using without DynamicForms](/guide/getting-started#using-without-dynamicforms).
 
 ## The InputBase component
 
@@ -470,8 +433,8 @@ value the field holds.
 | aria-invalid | `'true'` while errors are shown, `undefined` otherwise |
 
 `errorMessages` is a single space, not the messages: it puts the Vuetify control into its error state, and
-`DfInputHint` renders the messages from `shownErrors`. An error therefore renders as the content the
-[`errorText` setting](/examples/configuration) returns for its `code`: plain text, markdown, HTML or a component.
+`DfInputHint` renders the messages from `shownErrors`. An error therefore renders through the
+[`errorText` setting](/examples/localisation#translating-errors).
 
 Vuetify passes `aria-invalid`, which is not its prop, on to the native control.
 

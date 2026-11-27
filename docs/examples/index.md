@@ -29,58 +29,20 @@ How an action's breakpoints are resolved, and the rules to follow when building 
 
 ## Input Fields
 
-### [df-actions](./df-actions)
+- [df-actions](./df-actions)
+- [df-checkbox](./df-checkbox)
+- [df-color](./df-color)
+- [df-date-time](./df-datetime)
+- [df-file](./df-file)
+- [df-image](./df-image)
+- [df-input](./df-input)
+- [df-input-group](./df-input-group)
+- [df-input-hint](./df-input-hint)
+- [df-rtf-editor](./df-rtf-editor)
+- [df-select](./df-select)
+- [df-text-area](./df-text-area)
 
-A component for rendering a group of actions.
-
-### [df-checkbox](./df-checkbox)
-
-A component for checkbox / ternary selection.
-
-### [df-color](./df-color)
-
-A colour input.
-
-### [df-date-time](./df-datetime)
-
-A component for date and time selection.
-
-### [df-file](./df-file)
-
-A component for file uploads.
-
-### [df-image](./df-image)
-
-A component for image uploads, with a preview, drag & drop, and a browse dialog.
-
-### [df-input](./df-input)
-
-A component for general data entry.
-
-### [df-input-group](./df-input-group)
-
-One field's frame, label and message row around several inputs, e.g. a set of checkboxes.
-
-### [df-input-hint](./df-input-hint)
-
-The message row every input renders: errors when there are any, the hint otherwise. Also usable without an input, for a group's
-errors.
-
-### [**df-rtf-editor**](./df-rtf-editor)
-
-A RTF editor input.
-
-### [df-select](./df-select)
-
-A component for selecting values from a list. The examples show:
-
-- Basic usage with a static list
-- Advanced features (multiple selection, AJAX loading, icons)
-- Integration with DynamicForms
-
-### [df-text-area](./df-text-area)
-
-A component for multi-line text input.
+[The fields](/guide/rationale#the-fields) describes what each one is.
 
 ## Integration Options
 

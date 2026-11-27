@@ -6,13 +6,10 @@ What the components give assistive technology, and what the application sets up 
 
 - Every input's field label names the control the user operates, and the message row (hint and shown errors)
   describes it through `aria-describedby`.
-- `df-date-time`: the date and the time input are named by the field label followed by `Date` or `Time`.
-- `df-file`: the name of the stored file is part of the file input's description.
-- `df-rtf-editor`: the editable element carries the field label, the message row and `aria-multiline`; a click on the
-  field label focuses it.
-- `df-actions`: a button that does not show its label (`showLabel: false`, also per breakpoint) has the label's plain
-  text as its `aria-label` and `title`. Give every icon-only action a `label` with `showLabel: false` instead of
-  leaving the label out. [df-actions](/examples/df-actions)
+- `df-date-time`, `df-file`, `df-rtf-editor`: how each names and describes its controls is listed in
+  [InputBase: Accessibility](/examples/input-base#accessibility).
+- `df-actions`: a button that does not show its label is named by the label's plain text, so an icon-only action
+  takes a `label` with `showLabel: false`. [df-actions](/examples/df-actions#action-value-configuration)
 - `df-select`: the choice text names the option and the chip; an option whose text is rendered content is named by
   the content's text, a line break read as a space. Choice icons are hidden from assistive technology. The menu's text
   while it has no choices (`noDataText`, `minQueryText`, `Loading`) is a list item, not an option, in the menu's polite
@@ -37,10 +34,8 @@ are translation keys; see [Localisation](/examples/localisation).
 - `df-select`: a chip's close button is a native button named `Remove <choice>`. A click, Enter or Space removes the
   chip (a held Space removes one), Enter does not open the menu, and focus moves to the next chip's close button, or to
   the input when no closable chip remains.
-- `df-actions` with `simple`: each action is a native `<button type="button">`, so Tab reaches it, Enter and Space
-  activate it, and it has the native button role. Its name is its label, or the label's plain text in `aria-label`
-  where the label is not shown. It has a visible `:focus-visible` outline, is disabled while the action is not
-  executable and carries `aria-busy="true"` while a run is in flight. [df-actions](/examples/df-actions#simple-mode)
+- `df-actions` with `simple`: each action is a native `<button type="button">`, reached with Tab and activated with
+  Enter or Space. [df-actions](/examples/df-actions#simple-mode)
 
 ## Contrast
 

@@ -10,7 +10,6 @@
 
 ## Features
 
-- Binds a `@dynamicforms/vue-forms` element, a `v-model`, or neither
 - Vuetify's colour picker in a menu
 - Hex colour input
 - A swatch of the current colour
@@ -43,16 +42,6 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | picker | `'generic' \| 'hexagon' \| 'none'` | `'generic'` | The picker in the menu: `'generic'` is Vuetify's colour picker, `'hexagon'` the [hexagon palette](#hexagon-palette), `'none'` only the [`picker-prepend` slot](#slots) |
 | hexagonRings | `number` | `5` | The number of rings of the hexagon palette, the centre cell counted as the first: `1 + 3·n·(n − 1)` cells (3 → 19, 4 → 37, 5 → 61) |
 | lightnessLevels | `number \| number[]` | `undefined` | The OKLCH lightness (0..1) the hexagon palette offers: the full range, `n` evenly spaced levels, or the given levels (see [Lightness](#lightness)) |
-
-### Inherited Props
-
-This component inherits all common props from [InputBase](./input-base), including:
-
-- `control` - DynamicForms field object
-- `modelValue` - The colour value in hex format
-- `label` - Input label
-- `hint` - Hint text
-- And more...
 
 ## Colour Format
 
@@ -106,15 +95,7 @@ segment.
 
 <color-hexagon/>
 
-```vue
-<df-color
-  v-model="color"
-  label="6 levels"
-  picker="hexagon"
-  :lightness-levels="6"
-  @preview="previewColor = $event"
-/>
-```
+<<< @/components/color-hexagon.vue#six-levels{vue}
 
 Without `lightnessLevels` the same palette offers the full lightness range with a slider.
 
@@ -134,33 +115,9 @@ value that does not pass the format check is not passed to `normalize`.
 
 <color-normalize/>
 
-```vue
-<template>
-  <df-color
-    v-model="color"
-    label="Web-safe colour"
-    :alpha="false"
-    :normalize="webSafe"
-    @preview="previewColor = $event"
-  />
-</template>
+<<< @/components/color-normalize.vue#field{vue}
 
-<script setup lang="ts">
-import { ref } from 'vue';
-import { DfColor } from '@dynamicforms/vuetify-inputs';
-
-const color = ref('#336699');
-const previewColor = ref<string | null>(null);
-
-// rounds each channel to the nearest multiple of 0x33
-function webSafe(value: string): string {
-  let hex = value.replace('#', '');
-  if (hex.length === 3) hex = [...hex].map((digit) => digit + digit).join('');
-  const channels = [0, 2, 4].map((start) => Math.round(parseInt(hex.slice(start, start + 2), 16) / 0x33) * 0x33);
-  return `#${channels.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`.toUpperCase();
-}
-</script>
-```
+<<< @/components/color-normalize.vue#setup{ts}
 
 ## Validation
 
@@ -192,9 +149,7 @@ const colorField = new Field({
 
 ## Events
 
-This component emits all [common events from InputBase](./input-base):
-
-- `update:modelValue` - When the colour value changes
+This component emits the [common events of InputBase](./input-base#events).
 
 In addition:
 

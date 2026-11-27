@@ -88,14 +88,8 @@ options.getOptionsForBreakpoint('md'); // { title: 'only at md' }
 
 ## Options forbidden in breakpoint declarations
 
-`ActionBreakpointOptions` forbids setting the following options at a breakpoint:
-
-- `name`
-- `defaultConfirm`
-- `defaultReject`
-
-These options identify the action and its role in the form, and that does not depend on screen width. They are set
-only on the base object. All other action options, including `label` and `icon`, may be set per breakpoint.
+`ActionBreakpointOptions` forbids `name`, `defaultConfirm` and `defaultReject` at a breakpoint; see
+[df-actions](/examples/df-actions#action-object).
 
 A subclass forbids options the same way: `BreakpointsJSON` takes a second type argument, the options a breakpoint may
 set. An option left out of it is a type error at a breakpoint.

@@ -64,25 +64,8 @@ function resetField() {
 </script>
 
 <style scoped>
-.demo-container {
-  margin: 1rem 0;
-}
-
-pre {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 0.5rem;
-  border-radius: 4px;
+.demo-container pre {
   max-height: 150px;
-  overflow: auto;
-  white-space: pre-wrap;
   font-size: 0.8rem;
-}
-
-.preview-container {
-  padding: 1rem;
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  border-radius: 4px;
-  margin-top: 0.5rem;
-  background-color: rgb(var(--v-theme-surface));
 }
 </style>

@@ -1,6 +1,5 @@
 ---
 title: 'Consistent Vuetify 3 form inputs'
-description: 'Vuetify 3 fields that share one layout, so text fields, selects, checkboxes and date pickers align. Density and variant are set per app, section or field.'
 layout: home
 hero:
   name: DynamicForms Vuetify Inputs
@@ -54,8 +53,9 @@ Vuetify input components for data entry with one shared layout.
 
 A set of Vuetify fields that share one base, so a row mixing a text field, a select, a checkbox and a date picker
 is aligned. The layout is set on two axes: **density**, the vertical compactness of a field (`default`,
-`comfortable`, `compact`, or `inline` for a table cell), and **variant**, the seven Vuetify visual styles. Both are
-resolved by the same code for every component; a change to either applies to every field.
+`comfortable`, `compact`, or `inline` for a table cell), and **variant**, the visual style: Vuetify's seven and the
+library's own `inverted`. Both are resolved by the same code for every component; a change to either applies to every
+field.
 
 A field bound to a [@dynamicforms/vue-forms](:vue-forms:) element takes the value, the validation, the enabled state
 and the visibility from the element and renders them. **Every component also works with a plain `v-model`, or with

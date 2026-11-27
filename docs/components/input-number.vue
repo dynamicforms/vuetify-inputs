@@ -86,10 +86,10 @@
         <div v-if="quantityField.errors.length > 0 || priceField.errors.length > 0" class="mt-4">
           <strong>Validation errors:</strong>
           <ul>
-            <li v-for="(error, index) in quantityField.errors" :key="`q-${index}`" class="error-text">
+            <li v-for="(error, index) in quantityField.errors" :key="`q-${index}`" class="demo-error-text">
               Quantity: {{ error.detail }}
             </li>
-            <li v-for="(error, index) in priceField.errors" :key="`p-${index}`" class="error-text">
+            <li v-for="(error, index) in priceField.errors" :key="`p-${index}`" class="demo-error-text">
               Price: {{ error.detail }}
             </li>
           </ul>
@@ -154,10 +154,6 @@ function calculateTotal() {
 </script>
 
 <style scoped>
-.demo-container {
-  margin-bottom: 20px;
-}
-
 .values-display {
   background-color: rgba(var(--v-theme-on-surface), 0.04);
   padding: 15px;
@@ -166,13 +162,5 @@ function calculateTotal() {
 
 .value-item {
   margin: 8px 0;
-}
-
-.error-text {
-  color: #ff5252;
-}
-
-:deep(hr) {
-  margin: 0 !important;
 }
 </style>

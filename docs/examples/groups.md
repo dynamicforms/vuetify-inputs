@@ -21,119 +21,13 @@ by adding a second traveller with the checkbox, the group-level message appears 
 
 ## Source Code
 
-The demo's form, without the cards it is laid out in:
-
 ### JavaScript/TypeScript
 
-```js
-import { computed } from 'vue';
-import {
-  ConditionalAccessAction,
-  ConditionalVisibilityAction,
-  Field,
-  Group,
-  Operator,
-  Statement,
-  ValidationError,
-  Validators,
-} from '@dynamicforms/vue-forms';
-import {
-  DfCheckbox,
-  DfInput,
-  DfInputHint,
-  useShownErrors,
-} from '@dynamicforms/vuetify-inputs';
-
-const budgetLimit = 2000;
-
-// The checkbox that decides whether the second traveller section is on the form
-const addTraveller = new Field({ value: false });
-
-const travelling = new Statement(addTraveller, Operator.EQUALS, true);
-
-// A nested group: its fields are addressed as traveller.fields.name, and while it is sent its value is a member of
-// form.value. Two actions on it, over one statement: visibility decides whether the template draws the section,
-// access whether the form sends it - and validates it
-const traveller = new Group(
-  { name: new Field({ value: '' }), ticket: new Field({ value: 400 }) },
-  { actions: [new ConditionalVisibilityAction(travelling), new ConditionalAccessAction(travelling)] },
-);
-
-const form = new Group({
-  flights: new Field({ value: 900 }),
-  hotel: new Field({ value: 700 }),
-  extras: new Field({ value: 150 }),
-  addTraveller,
-  traveller,
-});
-
-function amount(field) {
-  return Number(field.value) || 0;
-}
-
-function tripTotal() {
-  const total = amount(form.fields.flights) + amount(form.fields.hotel) + amount(form.fields.extras);
-  return form.fields.addTraveller.value ? total + amount(traveller.fields.ticket) : total;
-}
-
-// A validator on the group itself: the rule spans several fields, so the error belongs to the group
-form.registerAction(new Validators.Validator(() => {
-  const total = tripTotal();
-  if (total <= budgetLimit) return null;
-  const over = total - budgetLimit;
-  return [
-    new ValidationError('app.over_budget', { total, over }, `The trip totals ${total} €, which is ${over} € over the budget.`),
-  ];
-}));
-
-// group.value is reactive, so the total and the rendered form value follow every keystroke
-const total = computed(() => tripTotal());
-
-// the group's own errors, shown by the rule the inputs follow
-const formErrors = useShownErrors(form);
-```
+<<< @/components/group-errors-demo.vue#setup{js}
 
 ### Vue Template
 
-```vue
-<template>
-  <v-form @submit.prevent>
-    <v-row>
-      <v-col cols="12" md="4">
-        <df-input :control="form.fields.flights" input-type="number" label="Flights" :min="0" :step="50" />
-      </v-col>
-      <v-col cols="12" md="4">
-        <df-input :control="form.fields.hotel" input-type="number" label="Hotel" :min="0" :step="50" />
-      </v-col>
-      <v-col cols="12" md="4">
-        <df-input :control="form.fields.extras" input-type="number" label="Extras" :min="0" :step="50" />
-      </v-col>
-    </v-row>
-
-    <df-checkbox :control="form.fields.addTraveller" label="Book a second traveller" />
-
-    <!-- The section is rendered by the visibility of the traveller group -->
-    <v-card v-if="traveller.visibility !== 'suppress'" variant="outlined" class="pa-4 mt-2">
-      <div class="text-subtitle-1 mb-2">Second traveller</div>
-      <df-input :control="traveller.fields.name" label="Full name" />
-      <df-input :control="traveller.fields.ticket" input-type="number" label="Ticket" :min="0" :step="50" />
-    </v-card>
-
-    <div class="mt-4">
-      <strong>Total:</strong> {{ total }} € of {{ budgetLimit }} €
-      <!-- group.valid covers the group's own errors as well as its fields' -->
-      <v-chip :color="form.valid ? 'success' : 'error'" size="small" class="ml-2">
-        {{ form.valid ? 'Within budget' : 'Over budget' }}
-      </v-chip>
-    </div>
-
-    <!-- The group-level validator's errors, shown once a field of the form is touched -->
-    <df-input-hint :errors="formErrors" />
-
-    <pre>{{ JSON.stringify(form.value, null, 2) }}</pre>
-  </v-form>
-</template>
-```
+<<< @/components/group-errors-demo.vue#form{vue}
 
 ## Rendering group errors
 
@@ -154,10 +48,9 @@ Binding `form.errors` directly shows the message whenever the total exceeds the 
 touched.
 
 `DfInputHint` renders a non-empty `errors` value with `errorClasses` (`text-error` by default); for an empty array it
-renders `message`, so a form within the budget shows nothing. An error renders as the content the
-[`errorText` setting](/examples/localisation#translating-errors) returns for it, which may be plain text, an `MdString`
-for markdown or a component definition, and otherwise as its `detail`. The budget error carries `total` and `over` in
-its `params`; the docs' `errorText` renders `app.over_budget` from them, as markdown while the
+renders `message`, so a form within the budget shows nothing. An error renders through the
+[`errorText` setting](/examples/localisation#translating-errors). The budget error carries `total` and `over` in its
+`params`; the docs' `errorText` renders `app.over_budget` from them, as markdown while the
 [validation and i18n demo](/examples/validators)'s markdown setting is on.
 
 ## Writing a group-level validator

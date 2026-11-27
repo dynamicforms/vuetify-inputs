@@ -42,60 +42,29 @@ import { CachedIcon } from 'vue-cached-icon';
 
 import { DfFile } from '../../src';
 
+import { mockFileComms } from './demo-file-comms';
+
 const fileField = new Field({
   value: 'contracts/existing-agreement.pdf',
 });
 
 const uploadedFiles = ref([]);
 
-// Mock implementation of FileComms for demo purposes
-const fileComms = {
-  upload: async (file, progressCallback) => {
-    // Simulate network delay and progress updates
-    const totalSize = file.size;
-    let loaded = 0;
-    const chunkSize = totalSize / 1000;
-
-    for (let i = 0; i < 1000; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 3));
-      loaded += chunkSize;
-      if (progressCallback) {
-        progressCallback(loaded, totalSize);
-      }
-    }
-
-    // Store the uploaded file in our local array
-    uploadedFiles.value.push(file);
-
-    // Return a mock file ID
-    return `file-${Date.now()}-${file.name}`;
-  },
-
-  delete: async (fileIdentifier) => {
-    // In a real implementation, this would call an API to delete the file
-    console.log('Deleting file:', fileIdentifier);
+const fileComms = mockFileComms({
+  steps: 1000,
+  stepMs: 3,
+  result: (file) => `file-${Date.now()}-${file.name}`,
+  onUpload: (file) => uploadedFiles.value.push(file),
+  onDelete: async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // For demo purposes, we'll just clear our local array
     uploadedFiles.value = [];
-
-    return Promise.resolve();
   },
-
-  touch: async (fileIdentifier) => {
-    // In a real implementation, this would call an API to "touch" the file
-    console.log('Touching file:', fileIdentifier);
-    return Promise.resolve();
-  },
-
-  getDownloadUrl: async (fileIdentifier) => {
-    // In a real implementation, this would resolve to a signed URL or a same-origin download path
-    const blob = new Blob([`Hello world!\n\nThis is a mock download standing in for: ${fileIdentifier}`], {
-      type: 'text/plain',
-    });
-    return URL.createObjectURL(blob);
-  },
-};
+  // a real backend resolves to a signed URL or a same-origin download path
+  getDownloadUrl: (fileIdentifier) =>
+    URL.createObjectURL(
+      new Blob([`Hello world!\n\nThis is a mock download standing in for: ${fileIdentifier}`], { type: 'text/plain' }),
+    ),
+});
 
 function toggleEnabled() {
   fileField.access = fileField.enabled ? 'disabled' : 'editable';
@@ -111,18 +80,3 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 </script>
-
-<style scoped>
-.demo-container {
-  margin: 1rem 0;
-}
-
-pre {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 0.5rem;
-  border-radius: 4px;
-  max-height: 100px;
-  overflow: auto;
-  white-space: pre-wrap;
-}
-</style>

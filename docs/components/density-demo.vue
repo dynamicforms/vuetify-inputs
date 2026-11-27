@@ -1,5 +1,5 @@
 <template>
-  <div class="density-demo" :class="{ fullscreen }">
+  <div class="demo-container density-demo" :class="{ fullscreen }">
     <v-card class="mb-4">
       <v-card-title>Density and Variant Demo</v-card-title>
       <v-card-text>
@@ -30,7 +30,7 @@
             </div>
             <div style="grid-column: 1/10; border-top: 1px solid rgba(var(--v-theme-on-surface), 0.4)" />
             <!-- Density rows -->
-            <template v-for="density in densityOptions" :key="density">
+            <template v-for="density in fieldDensities" :key="density">
               <div class="grid-row">
                 <div class="density-label">{{ density }}</div>
                 <div v-for="component in components" :key="`${density}-${component.name}`" class="component-cell">
@@ -107,21 +107,13 @@ import { ref } from 'vue';
 
 import { DfInput, DfInputGroup, DfSelect, DfCheckbox, DfDateTime, DfFile, DfTextArea, DfColor } from '../../src';
 
+import { choicesOf, fieldDensities, fieldVariants } from './demo-choices';
+import { mockFileComms } from './demo-file-comms';
+
 const selectedVariant = ref('outlined');
 const fullscreen = ref(false);
 
-const variantOptions = [
-  { text: 'Outlined', id: 'outlined' },
-  { text: 'Filled', id: 'filled' },
-  { text: 'Underlined', id: 'underlined' },
-  { text: 'Plain', id: 'plain' },
-  { text: 'Solo', id: 'solo' },
-  { text: 'Solo Inverted', id: 'solo-inverted' },
-  { text: 'Solo Filled', id: 'solo-filled' },
-  { text: 'Inverted', id: 'inverted' },
-];
-
-const densityOptions = ['default', 'compact', 'comfortable', 'inline'];
+const variantOptions = choicesOf(fieldVariants);
 
 const formData = ref({
   input: 'Sample text',
@@ -141,23 +133,7 @@ const selectChoices = [
   { id: 'option3', text: 'Option 3' },
 ];
 
-// Mock file communications for df-file component
-const mockFileComms = {
-  upload: async (file, progressCallback) => {
-    // Simulate upload progress
-    for (let i = 0; i <= 100; i += 20) {
-      if (progressCallback) progressCallback(i, 100);
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-    return `file-${Date.now()}`;
-  },
-  delete: async (fileId) => {
-    console.log('Delete file:', fileId);
-  },
-  touch: async (fileId) => {
-    console.log('Touch file:', fileId);
-  },
-};
+const fileComms = mockFileComms({ steps: 5, stepMs: 100, result: () => `file-${Date.now()}` });
 
 const components = [
   {
@@ -200,7 +176,7 @@ const components = [
     label: 'df-file',
     component: DfFile,
     model: 'file',
-    props: { comms: mockFileComms },
+    props: { comms: fileComms },
   },
   {
     name: 'textarea',
@@ -223,6 +199,7 @@ const components = [
 .fullscreen {
   position: fixed;
   inset: 0;
+  margin: 0;
   z-index: 1000;
 }
 
