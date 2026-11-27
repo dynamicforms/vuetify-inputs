@@ -9,9 +9,9 @@
     @blur="commitTyped"
     @keydown.enter="commitTyped"
   >
-    <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+    <template #label="labelData"><df-label :data="labelData" /></template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      <df-input-hint :message="message" />
     </template>
     <template #prepend-inner>
       <div
@@ -80,7 +80,7 @@ import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from 
 import { useClientRendered } from './helpers/client-rendered';
 import ConfirmActions from './helpers/confirm-actions.vue';
 import { namespaced } from './helpers/error-namespace';
-import { lightnessLevelsOf } from './helpers/hexagon-palette';
+import { hexColorPattern, lightnessLevelsOf, opaqueHexColorPattern } from './helpers/hexagon-palette';
 import HexagonPalette from './helpers/hexagon-palette.vue';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 
@@ -107,14 +107,12 @@ defineSlots<{
   'picker-prepend'?: (props: { color: string | null; select: (color: string) => void; save: () => void }) => any;
 }>();
 
-const hexColor = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{4}|[a-fA-F0-9]{6}|[a-fA-F0-9]{8})$/;
-const opaqueHexColor = /^#?([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/;
 // the picker's modes without an alpha channel, offered under `alpha: false`
 const opaqueModes = ['hex', 'rgb', 'hsl'] as const;
 
 /** Whether `color` is a hex colour of the format the `alpha` prop allows. */
 function isValidColor(color: string | null | undefined): color is string {
-  return (props.alpha ? hexColor : opaqueHexColor).test(color ?? '');
+  return (props.alpha ? hexColorPattern : opaqueHexColorPattern).test(color ?? '');
 }
 
 /** `color` as `normalize` returns it, for a valid colour; any other value as it is. */
@@ -135,7 +133,7 @@ function hexColorErrors(): ValidationError[] {
   return [new ValidationError(namespaced('invalid_opaque_hex_color'), {}, detail, 'validator')];
 }
 
-const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
+const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
   props,
   emits,
   hexColorErrors,

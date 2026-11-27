@@ -53,6 +53,12 @@ export function getSelectedChoices(loadedChoices: SelectChoice[], multipleCplian
   return loadedChoices.filter((choice) => mcValue.some((val: any) => val === choice.id));
 }
 
+/** The ids of a multiple-compliant value that none of the choices has as its id. */
+export function uncoveredIds(choices: SelectChoice[], multipleCompliantVal: any): any[] {
+  if (multipleCompliantVal == null) return [];
+  return castArray(multipleCompliantVal).filter((val) => !choices.some((choice) => choice.id === val));
+}
+
 /**
  * updateSelectedFromValue ensures that the actual select component receives model-value formatted to its needs. It
  * only sets what the select shows: the value itself is not written.
@@ -71,22 +77,16 @@ export function updateSelectedFromValue(
     return;
   }
 
+  if (taggable) {
+    // taggable (can add new items not in choices): keep the value as-is
+    selected.value = mcValue;
+    return;
+  }
+
+  // when not taggable, the value is filtered to the given choices
   if (multiple) {
-    if (taggable) {
-      // if taggable (can add new items not in choices), keep the value as-is
-      selected.value = mcValue;
-    } else {
-      // when not taggable, we filter the result to the given choices
-      selected.value = getSelectedChoices(choices, mcValue).map((choice) => choice.id);
-    }
+    selected.value = getSelectedChoices(choices, mcValue).map((choice) => choice.id);
   } else {
-    if (taggable) {
-      // if taggable, we just keep the selected value
-      selected.value = mcValue;
-    } else {
-      // when not taggable, we filter the result to the given choices
-      const matchingChoice = first(getSelectedChoices(choices, mcValue));
-      selected.value = matchingChoice?.id ?? null;
-    }
+    selected.value = first(getSelectedChoices(choices, mcValue))?.id ?? null;
   }
 }

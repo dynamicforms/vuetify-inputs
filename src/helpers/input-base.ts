@@ -1,11 +1,24 @@
 import Form, { ValidationError } from '@dynamicforms/vue-forms';
 import { isEmpty } from 'lodash-es';
-import { computed, type ComputedRef, inject, nextTick, type Ref, ref, shallowRef, toRaw } from 'vue';
+import {
+  computed,
+  type ComputedRef,
+  getCurrentInstance,
+  inject,
+  nextTick,
+  provide,
+  type Ref,
+  ref,
+  shallowRef,
+  toRaw,
+} from 'vue';
 
 import { type ErrorInput, toErrorDescription } from './error-text';
+import { inputContextKey } from './input-context';
 import { type RenderContentNonCallable, renderContentText } from './render-content';
-import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 import { selectShownErrors } from './shown-errors';
+import { useSettings } from './use-settings';
+import { visibilityClasses } from './visibility-classes';
 
 /** A field's label: its content, and an icon shown before it. */
 export class Label {
@@ -114,7 +127,7 @@ export function useInputBase<T = any>(
   emit: BaseEmits<T>,
   componentErrors?: () => ValidationError[],
 ) {
-  const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+  const settings = useSettings();
   const injectedDensity = inject<FieldDensity | null>('field-density', null);
   const injectedVariant = inject<FieldVariant | null>('field-variant', null);
   const internalValue = ref<T | null>(null);
@@ -203,10 +216,7 @@ export function useInputBase<T = any>(
     return props.visibility;
   });
   const isRendered = computed(() => visibility.value !== 'suppress');
-  const visibilityClass = computed(() => ({
-    'd-none': visibility.value === 'hidden',
-    invisible: visibility.value === 'invisible',
-  }));
+  const visibilityClass = computed(() => visibilityClasses(visibility.value));
   // the presentation the bound element carries: what a prop does not state is taken from here before any default
   const extra = computed(() => props.control?.extra ?? {});
 
@@ -227,6 +237,39 @@ export function useInputBase<T = any>(
       props.variant ?? extra.value.variant ?? injectedVariant ?? settings.defaultVariant ?? 'underlined',
   );
 
+  const vuetifyBindings = computed(() => ({
+    name: props.control?.fieldName,
+    class: cssClass.value,
+
+    density: boundDensity.value,
+    // 'inverted' is solo-inverted inverted always: solo on the background solo-inverted takes while focused
+    variant: (variant.value === 'inverted' ? 'solo' : variant.value) as VuetifyVariant,
+    bgColor: variant.value === 'inverted' ? 'surface-variant' : undefined,
+
+    label: renderContentText(label.value.text),
+    errorMessages: anyErrors.value,
+    // 'error-count': errors?.value.length || 0,
+    readonly: !enabled.value,
+    disabled: disabled.value,
+
+    placeholder: placeholder.value,
+    'persistent-placeholder': !isEmpty(placeholder.value),
+
+    hint: hint.value,
+    persistentHint: true, // we want persistent hint always
+    hideDetails: <boolean | 'auto' | undefined>'auto', // we want to hide the hint element when hint isn't there
+
+    // the control's state for assistive technology; Vuetify passes unknown attributes on to the native control
+    'aria-invalid': <'true' | undefined>(shownErrors.value.length > 0 ? 'true' : undefined),
+
+    ...(props.passthroughAttrs || {}),
+  }));
+
+  // DfInputHint and DfLabel in the input's slots take the shown errors, hint and label from here
+  if (getCurrentInstance()) {
+    provide(inputContextKey, { shownErrors, hint: computed(() => vuetifyBindings.value.hint), label });
+  }
+
   return {
     value,
     valid,
@@ -236,37 +279,12 @@ export function useInputBase<T = any>(
     visibility,
     isRendered,
     visibilityClass,
+    cssClass,
     label,
     touched,
     density,
     densityClass: computed(() => `df-density-${density.value}`),
 
-    vuetifyBindings: computed(() => ({
-      name: props.control?.fieldName,
-      class: cssClass.value,
-
-      density: boundDensity.value,
-      // 'inverted' is solo-inverted inverted always: solo on the background solo-inverted takes while focused
-      variant: (variant.value === 'inverted' ? 'solo' : variant.value) as VuetifyVariant,
-      bgColor: variant.value === 'inverted' ? 'surface-variant' : undefined,
-
-      label: renderContentText(label.value.text),
-      errorMessages: anyErrors.value,
-      // 'error-count': errors?.value.length || 0,
-      readonly: !enabled.value,
-      disabled: disabled.value,
-
-      placeholder: placeholder.value,
-      'persistent-placeholder': !isEmpty(placeholder.value),
-
-      hint: hint.value,
-      persistentHint: true, // we want persistent hint always
-      hideDetails: <boolean | 'auto' | undefined>'auto', // we want to hide the hint element when hint isn't there
-
-      // the control's state for assistive technology; Vuetify passes unknown attributes on to the native control
-      'aria-invalid': <'true' | undefined>(shownErrors.value.length > 0 ? 'true' : undefined),
-
-      ...(props.passthroughAttrs || {}),
-    })),
+    vuetifyBindings,
   };
 }

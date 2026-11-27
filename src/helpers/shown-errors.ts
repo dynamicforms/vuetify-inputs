@@ -1,7 +1,8 @@
 import { type FieldBase, Group, List, type ValidationError } from '@dynamicforms/vue-forms';
-import { computed, type ComputedRef, inject, type MaybeRefOrGetter, toValue } from 'vue';
+import { computed, type ComputedRef, type MaybeRefOrGetter, toValue } from 'vue';
 
-import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
+import type { VuetifyInputsSettings } from './settings';
+import { useSettings } from './use-settings';
 
 /**
  * The errors of `errors` a component shows now.
@@ -30,7 +31,7 @@ export function selectShownErrors(
  * appear when the inputs' errors do. Call it in a component's setup, where the settings are injected.
  */
 export function useShownErrors(element: MaybeRefOrGetter<FieldBase | undefined>): ComputedRef<ValidationError[]> {
-  const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+  const settings = useSettings();
   return computed(() => {
     const control = toValue(element);
     return control ? selectShownErrors(control.errors, control, control.touched, settings) : [];

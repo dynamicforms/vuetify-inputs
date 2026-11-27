@@ -65,24 +65,21 @@ export interface DfDateTimeProps extends BaseProps {
   locale?: Locale;
 }
 
-export interface DfFileProps extends BaseProps {
+interface FileUploadProps extends BaseProps {
   comms: FileComms;
   /** Milliseconds between keep-alive touches. Overrides `defaultTouchInterval` from the plugin's
    *  `VuetifyInputsSettings`, which in turn overrides the baked-in default of 60000. */
   touchInterval?: number;
 }
 
+export interface DfFileProps extends FileUploadProps {}
+
 /**
  * `comms.upload` must resolve to a value directly usable as an `<img>` src (typically the URL your backend
  * serves the image from): the component has no separate lookup for turning an identifier into a display URL,
  * so it renders `modelValue` itself as the preview once a file has been uploaded.
  */
-export interface DfImageProps extends BaseProps {
-  comms: FileComms;
-  /** Milliseconds between keep-alive touches. Overrides `defaultTouchInterval` from the plugin's
-   *  `VuetifyInputsSettings`, which in turn overrides the baked-in default of 60000. */
-  touchInterval?: number;
-}
+export interface DfImageProps extends FileUploadProps {}
 
 export interface DfInputProps extends BaseProps {
   inputType?: 'text' | 'password' | 'email' | 'url' | 'number';
@@ -109,10 +106,13 @@ export interface DfInputGroupProps extends Pick<
   direction?: DfInputGroupDirection;
 }
 
+/** A plain text, or the items to render, each in its own element: a `RenderableValue` as its content, an error as
+ * `errorText()` gives it. */
+export type MessageItems = string | readonly (RenderableValue | ErrorInput)[];
+
 export interface MessagesWidgetProps {
-  /** A plain text, or the items to render, each in its own element: a `RenderableValue` as its content, an error
-   * as `errorText()` gives it. */
-  message: string | readonly (RenderableValue | ErrorInput)[];
+  /** The text or the items to render. */
+  message: MessageItems;
   /** Classes for every rendered item, beside the item's own `extraClasses`. */
   classes?: ClassTypes;
   /** Attributes for the element of every rendered item, or a function that gives them per item (`index` is the
@@ -123,8 +123,8 @@ export interface MessagesWidgetProps {
 
 export interface DfInputHintProps {
   /** The errors to render, in place of {@link message} whenever there is one. A string is text in the user's
-   * language; an error description may lack any member. */
-  errors?: string | readonly (RenderableValue | ErrorInput)[];
+   * language; an error description may lack any member. Defaults to the errors the enclosing input shows. */
+  errors?: MessageItems;
   /** The message to render, shown while there is no error: content in any of its forms, or the items to render. */
   message?: RenderContentRef | readonly RenderableValue[];
   /** Classes for the rendered errors. Defaults to `text-error`. */
@@ -132,7 +132,7 @@ export interface DfInputHintProps {
   /** Classes for the rendered message. Defaults to no class. */
   messageClasses?: ClassTypes;
   /** The field's hint. While errors are rendered, it is rendered visually hidden after them, for assistive
-   * technology. */
+   * technology. Defaults to the enclosing input's hint. */
   hint?: RenderContentRef;
 }
 
@@ -140,8 +140,9 @@ export interface DfLabelProps {
   /** The slot data Vuetify hands a `#label` slot. Its `label`, the label's text, is rendered where {@link label} has
    * no content. */
   data?: { label?: string; props?: Record<string, unknown> };
-  /** The label to render: its content in any of the four forms, and the icon it carries. */
-  label: Label;
+  /** The label to render: its content in any of the four forms, and the icon it carries. Defaults to the enclosing
+   * input's label. */
+  label?: Label;
   /** Whether the label wraps over several lines. It is rendered on one line by default. */
   allowWrap?: boolean;
 }

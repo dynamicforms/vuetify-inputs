@@ -1,14 +1,14 @@
 <template>
   <v-text-field
     v-if="isRendered && !clientRendered"
-    :class="[cssClass, densityClass, visibilityClass]"
+    :class="[densityClass, visibilityClass]"
     :model-value="chosenText"
     v-bind="vuetifyBindings"
     readonly
   >
-    <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+    <template #label="labelData"><df-label :data="labelData" /></template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      <df-input-hint :message="message" />
     </template>
   </v-text-field>
   <component
@@ -16,12 +16,7 @@
     v-else-if="isRendered"
     ref="dfSelectRef"
     v-model="selected"
-    :class="[
-      cssClass,
-      densityClass,
-      visibilityClass,
-      { 'df-select-multirow': isMultiline, 'df-select-single': !multiple },
-    ]"
+    :class="[densityClass, visibilityClass, { 'df-select-multirow': isMultiline, 'df-select-single': !multiple }]"
     :style="{ '--df-select-search-width': `${(searchText?.length ?? 0) + 1}ch` }"
     :items="options"
     :return-object="false"
@@ -74,7 +69,7 @@
       </v-chip>
     </template>
     <template #label="labelData">
-      <df-label :data="labelData" :label="label" />
+      <df-label :data="labelData" />
     </template>
 
     <template #item="{ props: prps, item }">
@@ -98,7 +93,7 @@
       <v-progress-linear :active="isActive" :color="color" height="2" indeterminate :aria-label="t('Loading')" />
     </template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      <df-input-hint :message="message" />
     </template>
     <template v-if="$slots['append-inner']" #append-inner="props">
       <slot name="append-inner" v-bind="props" />
@@ -136,6 +131,7 @@ import {
   convertItems,
   getSelectedChoices,
   multipleCompliantValue,
+  uncoveredIds,
   updateSelectedFromValue,
 } from './helpers/df-select.helper';
 
@@ -152,7 +148,7 @@ const propsWithDefaults = withDefaults(defineProps<DfSelectProps>(), {
   fetchDebounce: 0,
 });
 
-const { choices, multiple, allowTags: taggable, allowNull, cssClass } = toRefs(propsWithDefaults);
+const { choices, multiple, allowTags: taggable, allowNull } = toRefs(propsWithDefaults);
 
 interface Emits extends BaseEmits {
   (e: 'update:modelValueDisplay', value: SelectChoice[]): any;
@@ -193,8 +189,6 @@ const dfSelectRef = ref<InstanceType<typeof VAutocomplete> | InstanceType<typeof
 const {
   densityClass,
   isRendered,
-  label,
-  shownErrors,
   touched,
   value: resultingValue,
   visibilityClass,
@@ -209,6 +203,13 @@ const selected = ref<any>(null);
 const takeLoaded = ref(false);
 const loaded = ref<SelectChoice[]>([]);
 const loadedChoices = computed<SelectChoice[]>(() => (unref(takeLoaded) ? unref(loaded) : unref(choices) || []));
+
+// sets the choices the select offers; they take the place of the choices prop
+function setLoaded(list: SelectChoice[]) {
+  loaded.value = list;
+  takeLoaded.value = true;
+}
+
 // Number of fetchChoices calls in flight that resolve ids held by the value (resolveValueChoices()).
 const resolvingValue = ref(0);
 // The choices for the value are not known yet while they are being fetched, and on the server for a select with
@@ -228,9 +229,7 @@ const displayChoices = computed<SelectChoice[]>(() => {
   const loadedList = loadedChoices.value;
   const mcVal = currentValue();
   if (taggable.value || mcVal == null || valueChoicesPending.value) return loadedList;
-  const unknown = castArray(mcVal).filter(
-    (val) => String(val).trim() !== '' && !loadedList.some((choice) => choice.id === val),
-  );
+  const unknown = uncoveredIds(loadedList, mcVal).filter((val) => String(val).trim() !== '');
   if (!unknown.length) return loadedList;
   return [...loadedList, ...unknown.map((val): SelectChoice => ({ id: val, text: String(val) }))];
 });
@@ -240,9 +239,7 @@ const displayChoices = computed<SelectChoice[]>(() => {
 function withHiddenIds(ids: any[]): any[] {
   const mcVal = currentValue();
   if (taggable.value || !multiple.value || mcVal == null) return ids;
-  const hidden = castArray(mcVal).filter(
-    (val) => !ids.includes(val) && !displayChoices.value.some((choice) => choice.id === val),
-  );
+  const hidden = uncoveredIds(displayChoices.value, mcVal).filter((val) => !ids.includes(val));
   return hidden.length ? [...ids, ...hidden] : ids;
 }
 
@@ -308,9 +305,10 @@ const setResultingValueGuard = ref(false);
 // Number of writes into the value. A write onSelect() defers is dropped when another write is made before it.
 let writeCount = 0;
 
-// The only place the select writes into the value. It is called from the user's edits only: setting the select up,
-// mounting it, loading choices or a value set from outside leave the value as it is.
+// The only place the select writes into the value; the select shows the written value. It is called from the user's
+// edits only: setting the select up, mounting it, loading choices or a value set from outside leave the value as it is.
 function setResultingValue(newValue: any) {
+  syncSelected(newValue);
   writeCount++;
   setResultingValueGuard.value = true;
   try {
@@ -320,7 +318,7 @@ function setResultingValue(newValue: any) {
     // control holds. Deep comparison: multiple selection reads back as a new array. Next tick: under v-model the parent
     // passes modelValue back on re-render; an earlier read reverts the write, and the two swap values without end.
     nextTick(() => {
-      const current = multipleCompliantValue(resultingValue.value, multiple.value);
+      const current = currentValue();
       if (!isEqual(current, newValue)) {
         syncSelected(current);
       }
@@ -449,7 +447,6 @@ function onSelect(/* val: any */) {
       multiple.value && Array.isArray(selected.value) ? withHiddenIds(selected.value) : selected.value,
       multiple.value,
     );
-    syncSelected(mcVal);
     setResultingValue(mcVal);
   });
 }
@@ -457,7 +454,6 @@ function onSelect(/* val: any */) {
 // the clear button is offered under allowNull only
 function onClear() {
   if (vuetifyBindings.value.readonly) return;
-  syncSelected(null);
   setResultingValue(null);
 }
 
@@ -469,7 +465,6 @@ function chipClose(event: Event, itemValue: any): boolean {
     multiple.value && Array.isArray(selected.value) ? selected.value.filter((v) => v !== itemValue) : [];
   if (!allowNull.value && !remaining.length) return false;
   const mcVal = multipleCompliantValue(withHiddenIds(remaining), multiple.value);
-  syncSelected(mcVal);
   setResultingValue(mcVal);
   return true;
 }
@@ -519,8 +514,7 @@ function chosenIds(): any[] {
 function keepChosenChoices() {
   fetchCounterGlobal.value++;
   const ids = chosenIds();
-  loaded.value = loadedChoices.value.filter((choice) => ids.includes(choice.id));
-  takeLoaded.value = true;
+  setLoaded(loadedChoices.value.filter((choice) => ids.includes(choice.id)));
 }
 
 function isEmptyValue(value: any): boolean {
@@ -570,12 +564,8 @@ async function fetchQuery(queryValue: any, idValue: any, chosenOnly = false): Pr
     const newChoices = chosenOnly ? fetched.filter((choice) => ids.includes(choice.id)) : fetched;
     // Taken after the fetch, from the value: choices resolveValueChoices() loaded while this call was in flight
     // must survive the search results replacing the rest.
-    const selectedChoices = getSelectedChoices(
-      loadedChoices.value,
-      multipleCompliantValue(resultingValue.value, multiple.value),
-    );
-    loaded.value = unionBy([...selectedChoices, ...newChoices], 'id');
-    takeLoaded.value = true;
+    const selectedChoices = getSelectedChoices(loadedChoices.value, currentValue());
+    setLoaded(unionBy([...selectedChoices, ...newChoices], 'id'));
   } catch (error) {
     // a failed fetch leaves the choices as they are; a rejection out of here would be unhandled
     console.error(error);
@@ -593,14 +583,13 @@ async function fetchQuery(queryValue: any, idValue: any, chosenOnly = false): Pr
 function resolveValueChoices(mcVal: any): Promise<void> | null {
   const fetchChoices = propsWithDefaults.fetchChoices;
   if (fetchChoices === undefined || taggable.value || mcVal == null) return null;
-  const unresolved = castArray(mcVal).filter((val) => !loadedChoices.value.some((choice) => choice.id === val));
+  const unresolved = uncoveredIds(loadedChoices.value, mcVal);
   if (!unresolved.length) return null;
   resolvingValue.value++;
   return (async () => {
     try {
       const newChoices = await fetchChoices(undefined, multiple.value ? unresolved : unresolved[0]);
-      loaded.value = unionBy([...loadedChoices.value, ...newChoices], 'id');
-      takeLoaded.value = true;
+      setLoaded(unionBy([...loadedChoices.value, ...newChoices], 'id'));
     } catch (error) {
       console.error(error);
     } finally {

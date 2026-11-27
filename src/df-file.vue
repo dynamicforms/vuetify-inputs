@@ -2,12 +2,7 @@
   <input-base v-bind="{ ...props, loading } as any" :class="densityClass" @click:clear="clear" @blur="touched = true">
     <template #prepend-inner><cached-icon name="mdi-paperclip" /></template>
     <template #loader>
-      <v-progress-linear
-        v-if="currentFile && progress < 100"
-        :model-value="progress"
-        :indeterminate="progress === -1"
-        :aria-label="t('Uploading')"
-      />
+      <upload-progress v-if="loading" :progress="progress" />
     </template>
     <template #default="slotProps">
       <div class="d-flex w-100 position-relative df-input-wrapper" :class="density">
@@ -23,7 +18,7 @@
           :hide-details="true"
           :show-size="true"
           :multiple="false"
-          :style="currentFile && progress < 100 ? 'visibility: hidden' : ''"
+          :style="loading ? 'visibility: hidden' : ''"
           :clearable="false"
           v-bind="{ ...fileInputAria(slotProps.props), ...passthroughAttrs }"
           prepend-icon=""
@@ -58,6 +53,7 @@ import { CachedIcon } from 'vue-cached-icon';
 import { DfFileProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, InputBase, type InputBaseControlProps, translate, useInputBase } from './helpers';
 import { controlAria } from './helpers/control-aria';
+import UploadProgress from './helpers/upload-progress.vue';
 import { useFileUpload } from './helpers/use-file-upload';
 
 const props = withDefaults(defineProps<DfFileProps>(), defaultBaseProps);

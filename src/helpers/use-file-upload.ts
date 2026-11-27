@@ -1,9 +1,9 @@
 import Form, { ValidationError } from '@dynamicforms/vue-forms';
-import { computed, inject, onBeforeUnmount, ref, watch, type Ref } from 'vue';
+import { computed, onBeforeUnmount, ref, watch, type Ref } from 'vue';
 
 import { FileComms, FileGoneError } from './df-file.interface';
 import { namespaced } from './error-namespace';
-import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
+import { useSettings } from './use-settings';
 
 export interface FileUploadOptions {
   value: Ref<string | null>;
@@ -27,7 +27,7 @@ export interface FileUploadOptions {
  * {@link FileGoneError} clears the field only while the value still holds the touched identifier.
  */
 export function useFileUpload({ value, touched, comms, touchInterval, control }: FileUploadOptions) {
-  const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+  const settings = useSettings();
 
   // the file of the latest upload, kept once it succeeds; null when the value holds no upload of this component
   const currentFile = ref<File | null>(null);
@@ -45,29 +45,32 @@ export function useFileUpload({ value, touched, comms, touchInterval, control }:
   let uploadSeq = 0;
   let inFlight = false;
 
-  function deleteQuietly(id: string) {
-    comms()
+  function deleteIgnoringGone(id: string): Promise<void> {
+    return comms()
       .delete(id)
       .catch((err) => {
         if (!(err instanceof FileGoneError)) throw err;
       });
   }
 
-  function reset() {
-    uploadSeq++;
+  function stopUpload() {
     inFlight = false;
-    ownUpload.value = null;
     currentFile.value = null;
     progress.value = 0;
+  }
+
+  function clearValue() {
+    uploadSeq++;
+    stopUpload();
+    ownUpload.value = null;
+    value.value = null;
   }
 
   // a value set on the field from outside supersedes an upload in flight and the file shown for the last one
   watch(value, (newValue) => {
     if (inFlight || (currentFile.value && newValue !== ownUpload.value)) {
       uploadSeq++;
-      inFlight = false;
-      currentFile.value = null;
-      progress.value = 0;
+      stopUpload();
     }
   });
 
@@ -83,13 +86,11 @@ export function useFileUpload({ value, touched, comms, touchInterval, control }:
       });
     } catch (err) {
       if (seq !== uploadSeq) return;
-      inFlight = false;
-      currentFile.value = null;
-      progress.value = 0;
+      stopUpload();
       throw err;
     }
     if (seq !== uploadSeq) {
-      deleteQuietly(id);
+      deleteIgnoringGone(id);
       return;
     }
     const replaced = temporaryUpload.value;
@@ -99,21 +100,14 @@ export function useFileUpload({ value, touched, comms, touchInterval, control }:
     progress.value = 100;
     // a picked file concludes the edit: the file dialog and a drop have no blur of the field
     touched.value = true;
-    if (replaced && replaced !== id) deleteQuietly(replaced);
+    if (replaced && replaced !== id) deleteIgnoringGone(replaced);
   }
 
   async function clear() {
     const temporary = temporaryUpload.value;
-    reset();
-    value.value = null;
+    clearValue();
     touched.value = true;
-    if (temporary) {
-      try {
-        await comms().delete(temporary);
-      } catch (err) {
-        if (!(err instanceof FileGoneError)) throw err;
-      }
-    }
+    if (temporary) await deleteIgnoringGone(temporary);
   }
 
   let touchHandle: number | null = null;
@@ -130,8 +124,7 @@ export function useFileUpload({ value, touched, comms, touchInterval, control }:
         .touch(id)
         .catch((err) => {
           if (!(err instanceof FileGoneError) || value.value !== id) return;
-          reset();
-          value.value = null;
+          clearValue();
           setFileGoneError(control(), err.errorText);
         });
     }, interval);

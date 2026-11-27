@@ -8,12 +8,7 @@
   >
     <template #prepend-inner><cached-icon name="mdi-image" /></template>
     <template #loader>
-      <v-progress-linear
-        v-if="currentFile && progress < 100"
-        :model-value="progress"
-        :indeterminate="progress === -1"
-        :aria-label="t('Uploading')"
-      />
+      <upload-progress v-if="loading" :progress="progress" />
     </template>
     <template #default="slotProps">
       <!-- click.stop: v-field's own click handler calls preventDefault whenever the click target isn't already
@@ -43,11 +38,7 @@
           @blur="slotProps.blur()"
         />
         <label v-if="previewUrl" :for="slotProps.props.id" class="df-image-preview-label">
-          <v-img
-            :src="previewUrl"
-            class="df-image-preview"
-            :style="currentFile && progress < 100 ? 'visibility: hidden' : ''"
-          />
+          <v-img :src="previewUrl" class="df-image-preview" :style="loading ? 'visibility: hidden' : ''" />
         </label>
         <label v-else :for="slotProps.props.id" class="df-image-placeholder">
           <cached-icon name="mdi-tray-arrow-up" />
@@ -97,6 +88,7 @@ import { DfImageProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, InputBase, translate, useInputBase } from './helpers';
 import { controlAria } from './helpers/control-aria';
 import { extractImageFiles } from './helpers/image-files';
+import UploadProgress from './helpers/upload-progress.vue';
 import { useFileUpload } from './helpers/use-file-upload';
 
 const props = withDefaults(defineProps<DfImageProps>(), defaultBaseProps);

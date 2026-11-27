@@ -14,13 +14,8 @@
         :key="idx"
         type="button"
         class="df-action-simple"
-        :disabled="!action.action.executable"
         :aria-busy="action.action.busy ? 'true' : undefined"
-        :class="visibilityClasses(action)"
-        :aria-label="action.showLabel ? undefined : action.accessibleLabel"
-        :title="action.showLabel ? undefined : action.accessibleLabel"
-        v-bind="action.passthroughAttrs"
-        @click.stop="(event: MouseEvent) => action.action.execute(event)"
+        v-bind="actionAttrs(action)"
       >
         <cached-icon v-if="action.icon" :name="action.icon" />
         <span v-if="action.label">{{ action.label }}</span>
@@ -32,16 +27,11 @@
         :key="idx"
         :variant="action.renderAs === 'button' ? 'tonal' : 'text'"
         :color="defaultActionColor(action)"
-        :disabled="!action.action.executable"
         :loading="action.action.busy"
         :elevation="0"
         :size="buttonSize"
         :density="buttonDensity"
-        :class="visibilityClasses(action)"
-        :aria-label="action.showLabel ? undefined : action.accessibleLabel"
-        :title="action.showLabel ? undefined : action.accessibleLabel"
-        v-bind="action.passthroughAttrs"
-        @click.stop="(event: MouseEvent) => action.action.execute(event)"
+        v-bind="actionAttrs(action)"
       >
         <cached-icon v-if="action.icon" :name="action.icon" />
         <span v-if="action.icon && action.label" style="width: 0.5rem" />
@@ -53,11 +43,17 @@
 
 <script setup lang="ts">
 import { Action } from '@dynamicforms/vue-forms';
-import { computed, unref } from 'vue';
+import { computed, mergeProps, unref } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import { DfActionsProps } from './dynamicforms-component-props';
-import { ActionRenderOptions, getRenderOptionsForBreakpoint, useBreakpoint } from './helpers';
+import {
+  ActionRenderOptions,
+  getRenderOptionsForBreakpoint,
+  type ResolvedActionRenderOptions,
+  useBreakpoint,
+} from './helpers';
+import { visibilityClasses } from './helpers/visibility-classes';
 
 const props = withDefaults(defineProps<DfActionsProps>(), {
   buttonSize: 'default',
@@ -78,8 +74,24 @@ const actionsWithBreakpoint = computed(() =>
   })),
 );
 
-function visibilityClasses({ action }: { action: Action }) {
-  return { 'd-none': action.visibility === 'hidden', invisible: action.visibility === 'invisible' };
+// the bindings both kinds of button take; passthroughAttrs override them, its class, style and listeners add up
+function actionAttrs(options: ResolvedActionRenderOptions & { action: Action }) {
+  const accessibleLabel = options.showLabel ? undefined : options.accessibleLabel;
+  return mergeProps(
+    {
+      disabled: !options.action.executable,
+      class: visibilityClasses(options.action.visibility),
+      'aria-label': accessibleLabel,
+      title: accessibleLabel,
+    },
+    options.passthroughAttrs ?? {},
+    {
+      onClick: (event: MouseEvent) => {
+        event.stopPropagation();
+        options.action.execute(event);
+      },
+    },
+  );
 }
 
 function defaultActionColor(options: ActionRenderOptions): string | undefined {

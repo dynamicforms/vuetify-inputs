@@ -26,10 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `MessagesWidget`: prop `itemAttrs`, attributes for the element of every rendered item, or a function
   `(item, index)` that gives them per item. They merge with the item's own bindings as Vue merges props: classes,
   styles and listeners add up, any other attribute replaces the item's own.
+- `DfInputHint` and `DfLabel` inside an input (a component that calls `useInputBase()`) take the input's shown errors,
+  hint and label where their `errors`, `hint` and `label` props are not given; `DfLabel`'s `label` prop is optional.
+- `useInputBase()` returns `cssClass`: the `cssClass` prop, then the control's `extra.cssClass`.
 
 ### Fixed
 
 - `DfSelect`: the list of a menu without options (role `list`) carries no `aria-multiselectable`.
+- `DfFile`, `DfImage`, `DfDateTime` and `DfRtfEditor` take the `cssClass` of the bound control's `extra` when the
+  `cssClass` prop is not given.
 
 ## [0.16.4] - 2026-11-26
 

@@ -11,18 +11,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 
 import type { DfLabelProps } from '../dynamicforms-component-props';
 
+import { Label } from './input-base';
+import { inputContextKey } from './input-context';
 import MessagesWidget from './messages-widget.vue';
 import { RenderableValue } from './render-content';
 
 const props = defineProps<DfLabelProps>();
 
+const input = inject(inputContextKey, null);
+const label = computed(() => props.label ?? input?.label.value ?? new Label(''));
+
 // the label's own content: the slot data holds only its text, which Vuetify is given
-const lbl = computed(() => props.label.text || props.data?.label || '');
+const lbl = computed(() => label.value.text || props.data?.label || '');
 const content = computed(() => new RenderableValue(lbl.value));
 </script>
 
@@ -41,14 +46,5 @@ const content = computed(() => new RenderableValue(lbl.value));
 
 .df-label .icon {
   width: 1.25em;
-}
-
-.df-label .df-messages-widget-markdown :first-child,
-.df-label .df-messages-widget-markdown :last-child {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-  line-height: 1.35em !important; /* inspired by vitepress' aggressive settings */
 }
 </style>

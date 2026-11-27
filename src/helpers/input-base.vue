@@ -29,7 +29,7 @@
         @click:clear="emits('click:clear')"
         @update:focused="(isFocused) => setFocused(isFocused)"
       >
-        <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+        <template #label="labelData"><df-label :data="labelData" /></template>
         <template #default="slotProps">
           <div class="d-flex w-100 df-style-resetting df-sub-field">
             <slot v-bind="{ ...slotProps, props: controlProps(slotProps.props, id.value) }" />
@@ -42,7 +42,7 @@
       </v-field>
     </template>
     <template #message="{ message }">
-      <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+      <df-input-hint :message="message" />
     </template>
     <template v-if="$slots.prepend" #prepend="prependProps"><slot name="prepend" v-bind="prependProps" /></template>
   </v-input>
@@ -65,7 +65,7 @@ defineSlots<{
   prepend?(props: Record<string, unknown>): any;
 }>();
 
-const { isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
+const { cssClass, isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 
 const isClearable = computed(() => !!(unref(props.clearable) && unref(value) && !vuetifyBindings.value.readonly));
 const focused = ref<boolean>(false);
@@ -73,7 +73,7 @@ const focused = ref<boolean>(false);
 // v-field's control attributes and the control's state, for the element the user operates
 function controlProps(fieldProps: Record<string, unknown>, id: string): InputBaseControlProps {
   return {
-    ...(fieldProps as { id: string; class: string; 'aria-describedby'?: string }),
+    ...(fieldProps as Pick<InputBaseControlProps, 'id' | 'class' | 'aria-describedby'>),
     'aria-labelledby': `${id}-label`,
     'aria-label': vuetifyBindings.value.label || undefined,
     'aria-invalid': vuetifyBindings.value['aria-invalid'],

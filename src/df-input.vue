@@ -9,50 +9,28 @@
     @focusin="onFocusIn"
     @pointerdown.capture="onEnter"
   >
-    <v-text-field
-      v-if="!isNumber"
-      v-model="value"
-      :type="inputType"
-      v-bind="vuetifyBindings as any"
+    <component
+      :is="isNumber ? 'v-number-input' : 'v-text-field'"
+      v-bind="fieldBindings"
+      @update:model-value="onModelUpdate"
       @blur="touched = true"
     >
-      <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
+      <template #label="labelData"><df-label :data="labelData" /></template>
       <template #message="{ message }">
-        <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
+        <df-input-hint :message="message" />
       </template>
-    </v-text-field>
-    <v-number-input
-      v-else
-      :model-value="value"
-      density="compact"
-      control-variant="stacked"
-      v-bind="{ ...vuetifyBindings, ...numberInputBindings } as any"
-      @update:model-value="onNumberUpdate"
-      @blur="touched = true"
-    >
-      <template #label="labelData"><df-label :data="labelData" :label="label" /></template>
-      <template #message="{ message }">
-        <df-input-hint :message="message" :errors="shownErrors" :hint="vuetifyBindings.hint" />
-      </template>
-    </v-number-input>
+    </component>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, shallowRef, toRefs, unref, watch } from 'vue';
+import { computed, nextTick, shallowRef, toRefs, unref, watch } from 'vue';
 import { useLocale } from 'vuetify';
 
 import { DfInputProps } from './dynamicforms-component-props';
-import {
-  BaseEmits,
-  defaultBaseProps,
-  DfInputHint,
-  DfLabel,
-  useInputBase,
-  type VuetifyInputsSettings,
-  vuetifyInputsSettingsKey,
-} from './helpers';
+import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 import { normalizeDecimalSeparators } from './helpers/decimal-separator';
+import { useSettings } from './helpers/use-settings';
 
 const props = withDefaults(defineProps<DfInputProps>(), {
   ...defaultBaseProps,
@@ -68,24 +46,38 @@ interface Emits extends BaseEmits {}
 
 const emits = defineEmits<Emits>();
 
-const { densityClass, isRendered, label, shownErrors, touched, value, visibilityClass, vuetifyBindings } = useInputBase(
-  props,
-  emits,
-);
+const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 const { inputType, max, min, precision, step } = toRefs(props);
-const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+const settings = useSettings();
 const { decimalSeparator: localeDecimalSeparator } = useLocale();
 
 const isNumber = computed(() => inputType.value === 'number');
-const numberInputBindings = computed(() =>
-  !isNumber.value ? {} : { min: unref(min), max: unref(max), precision: unref(precision), step: unref(step) },
-);
+// what v-number-input takes where vuetifyBindings states nothing else
+const numberInputDefaults: Record<string, unknown> = { density: 'compact', controlVariant: 'stacked' };
+// the bindings of the field component the input type renders
+const fieldBindings = computed((): Record<string, unknown> => {
+  if (!isNumber.value) return { modelValue: value.value, type: inputType.value, ...vuetifyBindings.value };
+  return {
+    modelValue: value.value,
+    ...numberInputDefaults,
+    ...vuetifyBindings.value,
+    min: unref(min),
+    max: unref(max),
+    precision: unref(precision),
+    step: unref(step),
+  };
+});
 
 // v-number-input corrects a value outside min and max or with more decimals than precision when it is mounted. The
 // correction is held until the user enters the field - focuses it or presses one of its controls, which take no
 // focus - and written then; until then the field keeps its value.
 let entered = false;
 let heldCorrection: { value: number | null } | null = null;
+
+function onModelUpdate(newValue: any) {
+  if (isNumber.value) onNumberUpdate(newValue);
+  else value.value = newValue;
+}
 
 function onNumberUpdate(newValue: number | null) {
   if (entered) value.value = newValue;

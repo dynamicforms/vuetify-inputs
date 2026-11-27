@@ -31,10 +31,15 @@ export const hexagonCellRadius = 1 / Math.sqrt(3);
 // a linear channel this far outside 0..1 still counts as inside sRGB: it rounds to the same 8-bit value
 const gamutTolerance = 1e-6;
 
-/** The sRGB channels (0..1) of `#rgb`, `#rgba`, `#rrggbb` or `#rrggbbaa`, with or without `#`; alpha is ignored. */
+/** `#rgb`, `#rgba`, `#rrggbb` or `#rrggbbaa`, with or without `#`. */
+export const hexColorPattern = /^#?([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+/** `#rgb` or `#rrggbb`, with or without `#`. */
+export const opaqueHexColorPattern = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;
+
+/** The sRGB channels (0..1) of a colour {@link hexColorPattern} matches; alpha is ignored. */
 export function hexToRgb(hex: string): [number, number, number] | null {
+  if (!hexColorPattern.test(hex)) return null;
   let digits = hex.replace(/^#/, '');
-  if (!/^([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(digits)) return null;
   if (digits.length <= 4) digits = [...digits].map((digit) => digit + digit).join('');
   return [0, 2, 4].map((start) => parseInt(digits.slice(start, start + 2), 16) / 255) as [number, number, number];
 }
@@ -77,6 +82,11 @@ function okLabToLinear({ L, a, b }: OkLab): [number, number, number] {
 export function hexToOkLab(hex: string): OkLab | null {
   const rgb = hexToRgb(hex);
   return rgb ? linearToOkLab(rgb.map(toLinear) as [number, number, number]) : null;
+}
+
+/** The outline colour that contrasts with a colour of OKLab lightness `L`: black above 0.6, white otherwise. */
+export function contrastOutline(L: number): '#000' | '#fff' {
+  return L > 0.6 ? '#000' : '#fff';
 }
 
 /** `#rrggbb` of an OKLab colour; channels outside sRGB are clamped. */

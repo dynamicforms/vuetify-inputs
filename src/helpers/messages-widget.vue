@@ -3,17 +3,17 @@
 </template>
 
 <script setup lang="ts">
-import { h, inject, mergeProps, resolveComponent, type VNodeChild } from 'vue';
+import { h, mergeProps, resolveComponent, type VNodeChild } from 'vue';
 
 import type { MessagesWidgetProps } from '../dynamicforms-component-props';
 
 import { type ErrorInput, errorText } from './error-text';
 import { renderMarkdown } from './markdown';
 import { type MdString, RenderableValue, type RenderContentNonCallable } from './render-content';
-import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
+import { useSettings } from './use-settings';
 
 const props = defineProps<MessagesWidgetProps>();
-const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+const settings = useSettings();
 
 const htmlElements = new Set([
   'div',
@@ -87,19 +87,25 @@ function renderComponent(name: string, bindings: Record<string, any>, children: 
 
 // a child of a component: text as a text node, an HtmlString in a span, so that it fits in an inline element
 function renderChild(child: RenderContentNonCallable): VNodeChild {
-  const msg = new RenderableValue(child);
+  return renderValue(new RenderableValue(child));
+}
+
+// with `item`, a message of the list: each kind in an element carrying the item's classes and attrs
+function renderValue(msg: RenderableValue, item?: { classes: unknown[]; attrs?: Record<string, unknown> }): VNodeChild {
+  const bind = (bindings: Record<string, any>) =>
+    item ? withAttrs({ ...bindings, class: [item.classes, bindings.class] }, item.attrs) : bindings;
   switch (msg.componentName) {
     case 'template':
-      return msg.componentBody;
+      return item ? h('div', bind({}), msg.componentBody) : msg.componentBody;
     case 'html':
-      return h('span', { innerHTML: msg.componentBody });
+      return h(item ? 'div' : 'span', bind({ innerHTML: msg.componentBody }));
     case 'vue-markdown':
       return h('div', {
-        class: 'df-messages-widget-markdown',
+        ...bind({ class: 'df-messages-widget-markdown' }),
         innerHTML: renderMarkdown(msg.resolvedText as MdString),
       });
     default:
-      return renderComponent(msg.componentName, msg.componentBindings, msg.componentChildren);
+      return renderComponent(msg.componentName, bind(msg.componentBindings), msg.componentChildren);
   }
 }
 
@@ -127,32 +133,17 @@ const render = () => {
   }
   return props.message.map((item, index) => {
     const msg = asRenderable(item);
-    const classes = [props.classes, msg.extraClasses];
-    const attrs = attrsOf(msg, index);
-    switch (msg.componentName) {
-      case 'template':
-        return h('div', withAttrs({ class: classes }, attrs), msg.componentBody);
-      case 'html':
-        return h('div', withAttrs({ class: classes, innerHTML: msg.componentBody }, attrs));
-      case 'vue-markdown': {
-        const bindings = withAttrs({ class: [...classes, 'df-messages-widget-markdown'] }, attrs);
-        return h('div', { ...bindings, innerHTML: renderMarkdown(msg.resolvedText as MdString) });
-      }
-      default:
-        return renderComponent(
-          msg.componentName,
-          withAttrs({ ...msg.componentBindings, class: [classes, msg.componentBindings.class] }, attrs),
-          msg.componentChildren,
-        );
-    }
+    return renderValue(msg, { classes: [props.classes, msg.extraClasses], attrs: attrsOf(msg, index) });
   });
 };
 </script>
 
 <style>
-/* no margins for markdown at the very top and very bottom */
+/* no margins for markdown at the very top and very bottom; in a label, also for nested first and last children */
 .df-messages-widget-markdown > :first-child,
-.df-messages-widget-markdown > :last-child {
+.df-messages-widget-markdown > :last-child,
+.df-label .df-messages-widget-markdown :first-child,
+.df-label .df-messages-widget-markdown :last-child {
   margin-top: 0 !important;
   padding-top: 0 !important;
   margin-bottom: 0 !important;

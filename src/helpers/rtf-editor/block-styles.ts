@@ -1,5 +1,7 @@
 import { Editor, Extension, Mark, mergeAttributes } from '@tiptap/core';
 
+import { htmlAttribute } from './attributes';
+
 /**
  * Adds a `class` attribute to paragraph, heading, blockquote and code-block nodes, so the "Style" dropdown's
  * named looks (`h3.category`, `p.info-box`, `pre.fancy-code-dark`...) persist through `getHTML()`/`setContent()`
@@ -12,11 +14,7 @@ export const ClassAttribute = Extension.create({
       {
         types: ['paragraph', 'heading', 'blockquote', 'codeBlock'],
         attributes: {
-          class: {
-            default: null,
-            parseHTML: (element: HTMLElement) => element.getAttribute('class'),
-            renderHTML: (attributes: Record<string, any>) => (attributes.class ? { class: attributes.class } : {}),
-          },
+          class: htmlAttribute('class'),
         },
       },
     ];
@@ -91,17 +89,15 @@ function anchorAncestor(editor: Editor, typeName: string) {
 
 export function isStyleActive(editor: Editor, def: StyleDef): boolean {
   switch (def.kind) {
-    case 'heading': {
-      const node = anchorNode(editor);
-      return node.type.name === 'heading' && node.attrs.level === def.level && node.attrs.class === def.className;
-    }
-    case 'paragraph': {
-      const node = anchorNode(editor);
-      return node.type.name === 'paragraph' && node.attrs.class === def.className;
-    }
+    case 'heading':
+    case 'paragraph':
     case 'codeBlock': {
       const node = anchorNode(editor);
-      return node.type.name === 'codeBlock' && node.attrs.class === def.className;
+      return (
+        node.type.name === def.kind &&
+        node.attrs.class === def.className &&
+        (def.level === undefined || node.attrs.level === def.level)
+      );
     }
     case 'blockquote': {
       const node = anchorAncestor(editor, 'blockquote');
@@ -129,15 +125,17 @@ export function applyStyle(editor: Editor, def: StyleDef): void {
     chain.setTextSelection(anchorPos(editor).pos);
   }
 
+  const resetToParagraph = () => chain.setParagraph().updateAttributes('paragraph', { class: null }).run();
+
   switch (def.kind) {
     case 'heading':
-      if (isStyleActive(editor, def)) chain.setParagraph().updateAttributes('paragraph', { class: null }).run();
+      if (isStyleActive(editor, def)) resetToParagraph();
       else {
         chain.setNode('heading', { level: def.level }).updateAttributes('heading', { class: def.className }).run();
       }
       break;
     case 'paragraph':
-      if (isStyleActive(editor, def)) chain.setParagraph().updateAttributes('paragraph', { class: null }).run();
+      if (isStyleActive(editor, def)) resetToParagraph();
       else chain.setParagraph().updateAttributes('paragraph', { class: def.className }).run();
       break;
     case 'blockquote':
