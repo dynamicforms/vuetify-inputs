@@ -9,7 +9,7 @@ or a field, with an inline density for table cells. Built for
 - **One layout for every field**: the components share one base, so a row mixing a text field, a select, a checkbox
   and a date picker is aligned without per-component adjustments
 - **A density that fits a table cell**: `default`, `comfortable` and `compact` are Vuetify's; `inline` is this
-  library's own, and strips a field of its decoration until it fits inside a cell
+  library's own: it removes the outline, the floating label and the padding, so that a field fits inside a table cell
 - **Set the look once, override anywhere**: density and variant are read from the prop, then the field, then a
   `provide` from any ancestor, then the plugin defaults — most specific first
 - **The field carries its own presentation**: a `@dynamicforms/vue-forms` field holds the label, hint, placeholder,
