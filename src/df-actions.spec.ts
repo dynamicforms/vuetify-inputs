@@ -31,6 +31,18 @@ describe('DfActions', () => {
     });
   };
 
+  const pendingAction = (): [Action, () => void] => {
+    let release: () => void = () => {};
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const action = new Action({
+      value: { name: 'save', label: 'Save', showLabel: true },
+      actions: [new ExecuteAction(() => pending)],
+    });
+    return [action, release];
+  };
+
   it('renders one button per action', () => {
     const actions = [
       createMockAction('save', 'Save', 'save-outline'),
@@ -216,44 +228,18 @@ describe('DfActions', () => {
   });
 
   describe('defaultConfirm / defaultReject colour', () => {
-    it('colours the button primary when defaultConfirm is set', () => {
+    it.each([
+      { confirm: true, reject: false, color: 'primary' },
+      { confirm: false, reject: true, color: 'secondary' },
+      { confirm: true, reject: true, color: 'primary' },
+      { confirm: false, reject: false, color: undefined },
+    ])('defaultConfirm $confirm, defaultReject $reject colours the button $color', ({ confirm, reject, color }) => {
       const action = createMockAction('save', 'Save');
-      action.value.defaultConfirm = true;
+      action.value.defaultConfirm = confirm;
+      action.value.defaultReject = reject;
 
-      const wrapper = mountActions([action]);
-
-      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
-      expect(buttonComponent.props('color')).toBe('primary');
-    });
-
-    it('colours the button secondary when defaultReject is set', () => {
-      const action = createMockAction('cancel', 'Cancel');
-      action.value.defaultReject = true;
-
-      const wrapper = mountActions([action]);
-
-      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
-      expect(buttonComponent.props('color')).toBe('secondary');
-    });
-
-    it('defaultConfirm takes precedence over defaultReject when both are set', () => {
-      const action = createMockAction('close', 'Close');
-      action.value.defaultConfirm = true;
-      action.value.defaultReject = true;
-
-      const wrapper = mountActions([action]);
-
-      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
-      expect(buttonComponent.props('color')).toBe('primary');
-    });
-
-    it('leaves the button without a colour when neither defaultConfirm nor defaultReject is set', () => {
-      const action = createMockAction('neutral', 'Neutral');
-
-      const wrapper = mountActions([action]);
-
-      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
-      expect(buttonComponent.props('color')).toBeUndefined();
+      const buttonComponent = mountActions([action]).findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('color')).toBe(color);
     });
   });
 
@@ -311,18 +297,6 @@ describe('DfActions', () => {
   });
 
   describe('busy', () => {
-    const pendingAction = (): [Action, () => void] => {
-      let release: () => void = () => {};
-      const pending = new Promise<void>((resolve) => {
-        release = resolve;
-      });
-      const action = new Action({
-        value: { name: 'save', label: 'Save', showLabel: true },
-        actions: [new ExecuteAction(() => pending)],
-      });
-      return [action, release];
-    };
-
     it('disables the button and shows it loading until the run settles', async () => {
       const [action, release] = pendingAction();
 
@@ -385,22 +359,14 @@ describe('DfActions', () => {
   });
 
   describe('visibility', () => {
-    it('adds the d-none class when visibility is HIDDEN', () => {
+    it.each([
+      ['hidden', 'd-none'],
+      ['invisible', 'invisible'],
+    ] as const)('visibility %s adds the %s class', (visibility, cssClass) => {
       const action = createMockAction('save', 'Save');
-      action.visibility = 'hidden';
+      action.visibility = visibility;
 
-      const wrapper = mountActions([action]);
-
-      expect(wrapper.find('.v-btn').classes()).toContain('d-none');
-    });
-
-    it('adds the invisible class when visibility is invisible', () => {
-      const action = createMockAction('save', 'Save');
-      action.visibility = 'invisible';
-
-      const wrapper = mountActions([action]);
-
-      expect(wrapper.find('.v-btn').classes()).toContain('invisible');
+      expect(mountActions([action]).find('.v-btn').classes()).toContain(cssClass);
     });
 
     it('renders no button when visibility is SUPPRESS', () => {
@@ -594,11 +560,7 @@ describe('DfActions', () => {
     });
 
     it('is disabled and aria-busy while a run is in flight', async () => {
-      let release: () => void = () => {};
-      const pending = new Promise<void>((resolve) => {
-        release = resolve;
-      });
-      const action = new Action({ value: { label: 'Save' }, actions: [new ExecuteAction(() => pending)] });
+      const [action, release] = pendingAction();
       const wrapper = mountSimple([action]);
       const button = wrapper.find('button');
       expect(button.attributes('aria-busy')).toBeUndefined();
