@@ -45,9 +45,7 @@ export type VuetifyButtonSize = 'x-small' | 'small' | 'default' | 'large' | 'x-l
 /**
  * The presentation an element carries for the components in this library.
  *
- * Every one of these is also a prop, and the prop wins where both state something: a call site is more specific
- * than the element it renders. What the element carries is what a form declared in code says about itself, so a
- * field that names its own label needs no attribute at the tag that draws it.
+ * Every one of these is also a prop; where both are set, the prop takes precedence.
  *
  * `Extras` is @dynamicforms/vue-forms' augmentation point for exactly this, so these properties are typed on every
  * element in an application that installs this library, the fields written inline in a `Group` declaration
