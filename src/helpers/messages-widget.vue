@@ -139,9 +139,11 @@ const render = () => {
 </script>
 
 <style>
-/* no margins for markdown at the very top and very bottom */
+/* no margins for markdown at the very top and very bottom; in a label, also for nested first and last children */
 .df-messages-widget-markdown > :first-child,
-.df-messages-widget-markdown > :last-child {
+.df-messages-widget-markdown > :last-child,
+.df-label .df-messages-widget-markdown :first-child,
+.df-label .df-messages-widget-markdown :last-child {
   margin-top: 0 !important;
   padding-top: 0 !important;
   margin-bottom: 0 !important;

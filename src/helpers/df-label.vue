@@ -47,13 +47,4 @@ const content = computed(() => new RenderableValue(lbl.value));
 .df-label .icon {
   width: 1.25em;
 }
-
-.df-label .df-messages-widget-markdown :first-child,
-.df-label .df-messages-widget-markdown :last-child {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-  line-height: 1.35em !important; /* inspired by vitepress' aggressive settings */
-}
 </style>
