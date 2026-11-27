@@ -1,5 +1,5 @@
 ---
-description: 'Live examples of every input, from text and select to date/time, file, rich text and actions, each on the same shared layout.'
+description: 'Live examples of every input, from text and select to date/time, file, rich text and actions.'
 ---
 
 # Examples
