@@ -306,8 +306,6 @@ const submitAction = new Action({
 `form` here is a `Group`: `value` is what it sends, and `fullValue` what it holds, disabled members included. Each
 member's `access` sets what `value` contains for it; `visibility` affects neither.
 
-The presentation (the `Action` and its render options) is separate from the logic (the `ExecuteAction` handlers).
-
 ## Button Grouping
 
 `showAsGroup` sets the grouping of buttons:
