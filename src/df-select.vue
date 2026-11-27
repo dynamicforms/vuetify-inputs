@@ -313,7 +313,7 @@ function setResultingValue(newValue: any) {
     // control holds. Deep comparison: multiple selection reads back as a new array. Next tick: under v-model the parent
     // passes modelValue back on re-render; an earlier read reverts the write, and the two swap values without end.
     nextTick(() => {
-      const current = multipleCompliantValue(resultingValue.value, multiple.value);
+      const current = currentValue();
       if (!isEqual(current, newValue)) {
         syncSelected(current);
       }
@@ -563,10 +563,7 @@ async function fetchQuery(queryValue: any, idValue: any, chosenOnly = false): Pr
     const newChoices = chosenOnly ? fetched.filter((choice) => ids.includes(choice.id)) : fetched;
     // Taken after the fetch, from the value: choices resolveValueChoices() loaded while this call was in flight
     // must survive the search results replacing the rest.
-    const selectedChoices = getSelectedChoices(
-      loadedChoices.value,
-      multipleCompliantValue(resultingValue.value, multiple.value),
-    );
+    const selectedChoices = getSelectedChoices(loadedChoices.value, currentValue());
     loaded.value = unionBy([...selectedChoices, ...newChoices], 'id');
     takeLoaded.value = true;
   } catch (error) {
