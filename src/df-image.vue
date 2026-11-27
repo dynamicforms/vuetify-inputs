@@ -11,9 +11,8 @@
       <upload-progress v-if="loading" :progress="progress" />
     </template>
     <template #default="slotProps">
-      <!-- click.stop: v-field's own click handler calls preventDefault whenever the click target isn't already
-           the focused element, which would silently cancel a <label>'s file-picker default action before it
-           can reach the input it targets. -->
+      <!-- click.stop: v-field's click handler calls preventDefault when the target is not the focused element,
+           which cancels the <label>'s opening of the file chooser -->
       <div
         class="d-flex w-100 position-relative df-input-wrapper df-image-wrapper"
         :class="[density, { 'df-image-dragging': isDragging, 'df-image-disabled': isDisabled }]"
