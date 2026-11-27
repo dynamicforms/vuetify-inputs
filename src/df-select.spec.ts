@@ -55,6 +55,12 @@ describe('DfSelect', () => {
   const mountSelect = (props: Record<string, any>) => mount(DfSelect, { props: { label: 'Select', ...props } });
 
   const chipTexts = (wrapper: ReturnType<typeof mountSelect>) => wrapper.findAll('.v-chip').map((chip) => chip.text());
+  const closeLabels = (wrapper: ReturnType<typeof mountSelect>) =>
+    wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
+  const itemTitles = (
+    wrapper: ReturnType<typeof mountSelect>,
+    component: typeof VAutocomplete | typeof components.VCombobox = VAutocomplete,
+  ) => (wrapper.findComponent(component).props('items') as { title: string }[]).map((item) => item.title);
 
   describe('with fetchChoices', () => {
     it('keeps a multiple value while its choices are being fetched', async () => {
@@ -406,8 +412,7 @@ describe('DfSelect', () => {
       const wrapper = mountSelect({ control: new Field({ value: [1, 2] }), multiple: true, choices: ALL_CHOICES });
       await flushPromises();
 
-      const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
-      expect(labels).toEqual(['Remove Choice 1', 'Remove Choice 2']);
+      expect(closeLabels(wrapper)).toEqual(['Remove Choice 1', 'Remove Choice 2']);
     });
 
     it.each(['Enter', ' '])('removes a chip with %j on its close button and focuses the next one', async (key) => {
@@ -454,8 +459,7 @@ describe('DfSelect', () => {
       const wrapper = mountSelect({ control: new Field({ value: [1, 2] }), multiple: true, choices });
       await flushPromises();
 
-      const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
-      expect(labels).toEqual(['Remove Size {0}', 'Remove Size {choice}']);
+      expect(closeLabels(wrapper)).toEqual(['Remove Size {0}', 'Remove Size {choice}']);
     });
 
     it('removes a chip on a click on its close button', async () => {
@@ -526,8 +530,7 @@ describe('DfSelect', () => {
       });
       await flushPromises();
 
-      const items = wrapper.findComponent(VAutocomplete).props('items') as { title: string }[];
-      expect(items.map((item) => item.title)).toEqual(ALL_CHOICES.map((choice) => choice.text));
+      expect(itemTitles(wrapper)).toEqual(ALL_CHOICES.map((choice) => choice.text));
       expect(wrapper.findAll('.v-chip')).toHaveLength(0);
       expect(onDisplay).toHaveBeenLastCalledWith([]);
       expect(control.value).toBe(blank);
@@ -537,7 +540,7 @@ describe('DfSelect', () => {
       const control = new Field<any>({ value: [1, ''] });
       const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
       await flushPromises();
-      expect(wrapper.findAll('.v-chip').map((chip) => chip.text())).toEqual(['Choice 1']);
+      expect(chipTexts(wrapper)).toEqual(['Choice 1']);
 
       await wrapper.find('.v-chip__close').trigger('click');
       await flushPromises();
@@ -578,8 +581,6 @@ describe('DfSelect', () => {
     };
     const options = () => Array.from(document.querySelectorAll('.v-overlay-container [role="option"]'));
     const noData = () => document.querySelector('.v-overlay-container .df-select-no-data');
-    const itemTitles = (wrapper: ReturnType<typeof mountSelect>) =>
-      (wrapper.findComponent(VAutocomplete).props('items') as { title: string }[]).map((item) => item.title);
     const useFakeTimeouts = () => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
 
     describe('choice text as content', () => {
@@ -622,8 +623,7 @@ describe('DfSelect', () => {
         await flushPromises();
 
         expect(itemTitles(wrapper)).toEqual(['Koper Train and Bus', 'Kranj']);
-        const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
-        expect(labels).toEqual(['Remove Koper Train and Bus', 'Remove Kranj']);
+        expect(closeLabels(wrapper)).toEqual(['Remove Koper Train and Bus', 'Remove Kranj']);
       });
 
       it('reads a function text on every render', async () => {
@@ -641,8 +641,7 @@ describe('DfSelect', () => {
 
         expect(chipTexts(wrapper)).toEqual(['Vlak', 'Avtobus']);
         expect(itemTitles(wrapper)).toEqual(['Vlak', 'Avtobus']);
-        const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
-        expect(labels).toEqual(['Remove Vlak', 'Remove Avtobus']);
+        expect(closeLabels(wrapper)).toEqual(['Remove Vlak', 'Remove Avtobus']);
       });
 
       it('shows any other value as its string, and emits the choices as given', async () => {
@@ -818,8 +817,7 @@ describe('DfSelect', () => {
         expect(fetchChoices).toHaveBeenCalledExactlyOnceWith(undefined, 2);
         await release();
 
-        const items = wrapper.findComponent(components.VCombobox).props('items') as { title: string }[];
-        expect(items.map((item) => item.title)).toEqual(['Choice 2']);
+        expect(itemTitles(wrapper, components.VCombobox)).toEqual(['Choice 2']);
         expect(chipTexts(wrapper)).toEqual(['Choice 2']);
         expect(control.value).toBe(2);
       });
