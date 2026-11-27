@@ -36,3 +36,16 @@ export async function dropFile(
   }, file);
   await target.dispatchEvent('drop', { dataTransfer });
 }
+
+// focuses `target` and dispatches a paste whose clipboard holds `data` as `type`
+export async function pasteData(target: Locator, type: string, data: string) {
+  await target.evaluate(
+    (el, { type, data }) => {
+      (el as HTMLElement).focus();
+      const clipboardData = new DataTransfer();
+      clipboardData.setData(type, data);
+      el.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }));
+    },
+    { type, data },
+  );
+}

@@ -1,5 +1,7 @@
 import { expect, Page, test } from '@playwright/test';
 
+import { pasteData } from './helpers';
+
 // A tiny valid PNG (10x10 red square) - real pixel data isn't the point, just something the <img> can decode so
 // TipTap's resize NodeView actually shows the node view (it stays hidden until the image's load/error event fires).
 const RED_SQUARE =
@@ -24,14 +26,7 @@ const WORD_TABLE_WITH_BLACK_SHADING = `<html xmlns:o="urn:schemas-microsoft-com:
 
 async function pasteHtml(page: Page, html: string) {
   await page.click('.rtf-content');
-  await page.evaluate((htmlContent) => {
-    const el = document.querySelector('.rtf-content');
-    if (!el) throw new Error('.rtf-content not found');
-    (el as HTMLElement).focus();
-    const dataTransfer = new DataTransfer();
-    dataTransfer.setData('text/html', htmlContent);
-    el.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dataTransfer, bubbles: true, cancelable: true }));
-  }, html);
+  await pasteData(page.locator('.rtf-content'), 'text/html', html);
   await page.waitForTimeout(300);
 }
 

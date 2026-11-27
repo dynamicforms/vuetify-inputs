@@ -1,11 +1,13 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
-function priceInput(page: Page): Locator {
-  return page.locator('.v-number-input', { hasText: 'Price' }).locator('input');
+import { pasteData } from './helpers';
+
+function numberInput(page: Page, label: string): Locator {
+  return page.locator('.v-number-input', { hasText: label }).locator('input');
 }
 
 async function setPrice(page: Page, text: string) {
-  const price = priceInput(page);
+  const price = numberInput(page, 'Price');
   await price.fill(text);
   await price.press('Tab');
 }
@@ -13,11 +15,11 @@ async function setPrice(page: Page, text: string) {
 test.beforeEach(async ({ page }) => {
   await page.goto('/examples/df-input');
   await setPrice(page, '12');
-  await expect(priceInput(page)).toHaveValue('12.00');
+  await expect(numberInput(page, 'Price')).toHaveValue('12.00');
 });
 
 test('typing over a selected value with trailing zeros replaces it', async ({ page }) => {
-  const price = priceInput(page);
+  const price = numberInput(page, 'Price');
 
   await price.fill('7');
 
@@ -25,8 +27,8 @@ test('typing over a selected value with trailing zeros replaces it', async ({ pa
 });
 
 test('a field entered with the keyboard replaces its value with the typed text', async ({ page }) => {
-  const price = priceInput(page);
-  await page.locator('.v-number-input', { hasText: 'Quantity' }).locator('input').click();
+  const price = numberInput(page, 'Price');
+  await numberInput(page, 'Quantity').click();
   for (let i = 0; i < 5 && !(await price.evaluate((input) => input === document.activeElement)); i += 1) {
     await page.keyboard.press('Tab');
   }
@@ -38,7 +40,7 @@ test('a field entered with the keyboard replaces its value with the typed text',
 });
 
 test('typing after a click appends to the value', async ({ page }) => {
-  const price = priceInput(page);
+  const price = numberInput(page, 'Price');
 
   await price.click();
   await price.press('End');
@@ -48,8 +50,8 @@ test('typing after a click appends to the value', async ({ page }) => {
 });
 
 test('typing over a selected value replaces it when leaving another field re-renders the form', async ({ page }) => {
-  const price = priceInput(page);
-  await page.locator('.v-number-input', { hasText: 'Quantity' }).locator('input').fill('3');
+  const price = numberInput(page, 'Price');
+  await numberInput(page, 'Quantity').fill('3');
 
   await price.fill('7');
 
@@ -57,12 +59,8 @@ test('typing over a selected value replaces it when leaving another field re-ren
 });
 
 test.describe('with anyDecimalSeparator', () => {
-  function amountInput(page: Page): Locator {
-    return page.locator('.v-number-input', { hasText: 'Amount' }).locator('input');
-  }
-
   test('a typed comma is the decimal separator and a second separator is ignored', async ({ page }) => {
-    const amount = amountInput(page);
+    const amount = numberInput(page, 'Amount');
 
     await amount.click();
     await page.keyboard.type('3,2.5');
@@ -72,14 +70,10 @@ test.describe('with anyDecimalSeparator', () => {
   });
 
   test('pasted text keeps its last separator as the decimal separator', async ({ page }) => {
-    const amount = amountInput(page);
+    const amount = numberInput(page, 'Amount');
     await amount.click();
 
-    await amount.evaluate((input) => {
-      const clipboardData = new DataTransfer();
-      clipboardData.setData('text/plain', '1.234,56');
-      input.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }));
-    });
+    await pasteData(amount, 'text/plain', '1.234,56');
 
     await expect(amount).toHaveValue('1234.56');
     await expect(page.locator('.value-item', { hasText: 'Amount:' })).toContainText('1234.56');
