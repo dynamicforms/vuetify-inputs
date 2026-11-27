@@ -1,11 +1,11 @@
 import Form, { ValidationError } from '@dynamicforms/vue-forms';
-import { computed, inject, onBeforeUnmount, ref, watch, type Ref } from 'vue';
+import { computed, onBeforeUnmount, ref, watch, type Ref } from 'vue';
 
 import type { DfFileProps } from '../dynamicforms-component-props';
 
 import { FileGoneError } from './df-file.interface';
 import { namespaced } from './error-namespace';
-import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
+import { useSettings } from './use-settings';
 
 /**
  * The upload state of `<df-file>`/`<df-image>`.
@@ -25,7 +25,7 @@ export function useFileUpload(
   value: Ref<string | null>,
   touched: Ref<boolean>,
 ) {
-  const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+  const settings = useSettings();
 
   // the file of the latest upload, kept once it succeeds; null when the value holds no upload of this component
   const currentFile = ref<File | null>(null);

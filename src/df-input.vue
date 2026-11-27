@@ -24,20 +24,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, shallowRef, toRefs, unref, watch } from 'vue';
+import { computed, nextTick, shallowRef, toRefs, unref, watch } from 'vue';
 import { useLocale } from 'vuetify';
 
 import { DfInputProps } from './dynamicforms-component-props';
-import {
-  BaseEmits,
-  defaultBaseProps,
-  DfInputHint,
-  DfLabel,
-  useInputBase,
-  type VuetifyInputsSettings,
-  vuetifyInputsSettingsKey,
-} from './helpers';
+import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 import { normalizeDecimalSeparators } from './helpers/decimal-separator';
+import { useSettings } from './helpers/use-settings';
 
 const props = withDefaults(defineProps<DfInputProps>(), {
   ...defaultBaseProps,
@@ -55,7 +48,7 @@ const emits = defineEmits<Emits>();
 
 const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 const { inputType, max, min, precision, step } = toRefs(props);
-const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+const settings = useSettings();
 const { decimalSeparator: localeDecimalSeparator } = useLocale();
 
 const isNumber = computed(() => inputType.value === 'number');

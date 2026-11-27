@@ -3,17 +3,17 @@
 </template>
 
 <script setup lang="ts">
-import { h, inject, mergeProps, resolveComponent, type VNodeChild } from 'vue';
+import { h, mergeProps, resolveComponent, type VNodeChild } from 'vue';
 
 import type { MessagesWidgetProps } from '../dynamicforms-component-props';
 
 import { type ErrorInput, errorText } from './error-text';
 import { renderMarkdown } from './markdown';
 import { type MdString, RenderableValue, type RenderContentNonCallable } from './render-content';
-import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
+import { useSettings } from './use-settings';
 
 const props = defineProps<MessagesWidgetProps>();
-const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+const settings = useSettings();
 
 const htmlElements = new Set([
   'div',

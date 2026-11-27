@@ -16,8 +16,8 @@ import {
 import { type ErrorInput, toErrorDescription } from './error-text';
 import { inputContextKey } from './input-context';
 import { type RenderContentNonCallable, renderContentText } from './render-content';
-import { VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
 import { selectShownErrors } from './shown-errors';
+import { useSettings } from './use-settings';
 
 /** A field's label: its content, and an icon shown before it. */
 export class Label {
@@ -126,7 +126,7 @@ export function useInputBase<T = any>(
   emit: BaseEmits<T>,
   componentErrors?: () => ValidationError[],
 ) {
-  const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+  const settings = useSettings();
   const injectedDensity = inject<FieldDensity | null>('field-density', null);
   const injectedVariant = inject<FieldVariant | null>('field-variant', null);
   const internalValue = ref<T | null>(null);

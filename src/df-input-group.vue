@@ -40,17 +40,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, provide, ref } from 'vue';
+import { computed, provide, ref } from 'vue';
 
 import { DfInputGroupProps } from './dynamicforms-component-props';
 import { DfInputHint, DfLabel, useInputBase } from './helpers';
-import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './helpers/settings';
 import { selectShownErrorsDeep } from './helpers/shown-errors';
+import { useSettings } from './helpers/use-settings';
 
 const props = withDefaults(defineProps<DfInputGroupProps>(), { enabled: undefined, direction: 'row' });
 const emits = defineEmits<{ (e: 'update:modelValue', value: any): void; (e: 'click:clear'): void }>();
 
-const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+const settings = useSettings();
 const { densityClass, isRendered, shownErrors, visibilityClass, vuetifyBindings } = useInputBase(props, emits);
 
 // the children render inside this field's frame, without frames, labels or message rows of their own

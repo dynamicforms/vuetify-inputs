@@ -1,7 +1,8 @@
 import { createTranslatable, type Translatable } from '@dynamicforms/translatable';
-import { getCurrentInstance, inject } from 'vue';
+import { getCurrentInstance } from 'vue';
 
-import { type VuetifyInputsSettings, vuetifyInputsSettingsKey } from './settings';
+import type { VuetifyInputsSettings } from './settings';
+import { useSettings } from './use-settings';
 
 const defaults = {
   Cancel: 'Cancel',
@@ -108,7 +109,7 @@ function translatableOf(settings: VuetifyInputsSettings | undefined): Translatab
  * own `translate`. An event handler or a timer reads no setting; it uses `useTranslate()`.
  */
 export function translate(key: Key, params?: Record<string, unknown>): string {
-  const settings = getCurrentInstance() ? inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {}) : undefined;
+  const settings = getCurrentInstance() ? useSettings() : undefined;
   return translatableOf(settings).translate(key, params);
 }
 
@@ -117,6 +118,6 @@ export function translate(key: Key, params?: Record<string, unknown>): string {
  * handler or a timer. Called in a component's setup.
  */
 export function useTranslate(): (key: Key, params?: Record<string, unknown>) => string {
-  const translatable = translatableOf(inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {}));
+  const translatable = translatableOf(useSettings());
   return (key, params) => translatable.translate(key, params);
 }

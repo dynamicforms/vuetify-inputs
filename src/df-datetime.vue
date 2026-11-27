@@ -124,7 +124,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns';
-import { ref, computed, inject, watch, toRefs, unref, useId, type Ref } from 'vue';
+import { ref, computed, watch, toRefs, unref, useId, type Ref } from 'vue';
 
 import { DfDateTimeProps } from './dynamicforms-component-props';
 import {
@@ -135,8 +135,6 @@ import {
   type InputBaseControlProps,
   translate,
   useInputBase,
-  type VuetifyInputsSettings,
-  vuetifyInputsSettingsKey,
 } from './helpers';
 import { useClientRendered } from './helpers/client-rendered';
 import ConfirmActions from './helpers/confirm-actions.vue';
@@ -144,6 +142,7 @@ import { controlAria } from './helpers/control-aria';
 import { parseDateInput, parseTimeInput, setInputError } from './helpers/date-time-input';
 import { namespaced } from './helpers/error-namespace';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
+import { useSettings } from './helpers/use-settings';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {
   ...defaultBaseProps,
@@ -155,7 +154,7 @@ const props = withDefaults(defineProps<DfDateTimeProps>(), {
 interface Emits extends BaseEmits {}
 const emits = defineEmits<Emits>();
 
-const settings = inject<VuetifyInputsSettings>(vuetifyInputsSettingsKey, {});
+const settings = useSettings();
 const currentLocale = computed(
   () => props.locale ?? unref(settings.dateTimeLocale) ?? unref(DateTimeLocaleConfig.dateTimeLocale),
 );
