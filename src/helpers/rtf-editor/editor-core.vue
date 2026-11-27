@@ -157,8 +157,7 @@ const editor = useEditor({
   },
 });
 
-// External writes (a reset, a different record loaded into the same form) are applied without re-emitting: the
-// third `setContent` argument suppresses the `update` this would otherwise trigger straight back out.
+// a value set from outside is applied with setContent's emitUpdate: false, so it emits no update:modelValue
 watch(
   () => props.modelValue,
   (value) => {
