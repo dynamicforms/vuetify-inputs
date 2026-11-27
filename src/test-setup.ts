@@ -4,7 +4,6 @@ import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
-import { translateStrings } from '@/helpers/translations';
 
 vi.mock('vue-cached-icon', () => ({
   CachedIcon: {
@@ -31,5 +30,6 @@ config.global.plugins = [createVuetify({ components, directives })];
 // unmounts every mounted wrapper after its test
 enableAutoUnmount(afterEach);
 
-// restores the English defaults that a test may have replaced with translateStrings
-afterEach(() => translateStrings((key) => key));
+// restores the English defaults that a test may have replaced with translateStrings; imported here, not at the top,
+// so that a spec's vi.mock('vue') applies to the helpers the import loads
+afterEach(async () => (await import('@/helpers/translations')).translateStrings((key) => key));
