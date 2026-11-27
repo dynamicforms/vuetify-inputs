@@ -72,13 +72,6 @@ it off for one field.
 
 The Amount field in the [number input example](#number-input) has the option on.
 
-The number input supports:
-
-- Integer and decimal values
-- Step controls for incrementing/decrementing
-- Precision control for decimal places
-- Min/max value restrictions
-
 ## Events
 
 This component emits the [common events of InputBase](./input-base#events).
