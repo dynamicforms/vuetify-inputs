@@ -1,7 +1,7 @@
 # @dynamicforms/vuetify-inputs
 
-Vuetify input components with guaranteed visual consistency across all form fields — unified density/variant system,
-globally configurable, with inline mode for table cells. Built for
+Vuetify input components that share one layout: one density and variant system, set for the application, a section
+or a field, with an inline density for table cells. Built for
 [@dynamicforms/vue-forms](https://github.com/dynamicforms/vue-forms).
 
 ## What matters most
