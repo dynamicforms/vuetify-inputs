@@ -495,15 +495,3 @@ of the component they render in; a `label`, `errors` or `hint` prop given to the
 
 The resulting component takes a `control` or a `v-model`, applies the visibility a `ConditionalVisibilityAction`
 sets, uses the application's density and variant, shows its errors once touched, and accepts `passthroughAttrs`.
-
-## Appearance and Behaviour
-
-InputBase is built from Vuetify components. All input components share:
-
-- Field label display
-- Error handling and error message display
-- The label, the message row and the error state exposed to assistive technology (see
-  [Accessibility](#accessibility))
-- Responsive design
-- Support for value clearing
-- Support for disabled and read-only modes
