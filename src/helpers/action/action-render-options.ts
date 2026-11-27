@@ -98,9 +98,8 @@ export type ResolvedActionRenderOptions = Omit<ActionRenderOptions, 'label'> & {
  * not, so an action holding nothing but a label - which is all a `@dynamicforms/vue-forms` `Action` declares -
  * renders as a button showing that label.
  *
- * `label` and `icon` come back only where the matching flag says they are shown, and the flags come back false
- * where there is no text or name to show, so a caller renders each member on its own flag and never on emptiness.
- * `accessibleLabel` is the plain text of the label regardless of `showLabel`, to name a button that does not show it.
+ * `label` and `icon` are set only where `showLabel` / `showIcon` is true; each flag is false where the label or icon
+ * is empty. `accessibleLabel` is the plain text of the label regardless of `showLabel`.
  */
 export function getRenderOptionsForBreakpoint(
   value: ActionValue,
