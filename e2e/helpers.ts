@@ -15,3 +15,24 @@ export async function openDensityDemo(page: Page, viewport: { width: number; hei
 export async function chooseDensityVariant(page: Page, variant: string) {
   await chooseOption(page, page.locator('.density-demo .v-field').first(), variant);
 }
+
+// clicks `selector` and returns the native file chooser it opens
+export async function openFileChooser(page: Page, selector: string) {
+  const [chooser] = await Promise.all([page.waitForEvent('filechooser'), page.click(selector)]);
+  return chooser;
+}
+
+// dispatches a drop of one file on `target`; the content is `base64` decoded, or `text`
+export async function dropFile(
+  page: Page,
+  target: Locator,
+  file: { name: string; type: string; base64?: string; text?: string },
+) {
+  const dataTransfer = await page.evaluateHandle(({ name, type, base64, text }) => {
+    const content = base64 === undefined ? (text ?? '') : Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+    const dt = new DataTransfer();
+    dt.items.add(new File([content], name, { type }));
+    return dt;
+  }, file);
+  await target.dispatchEvent('drop', { dataTransfer });
+}
