@@ -36,10 +36,8 @@ export type FieldVariant =
   'outlined' | 'plain' | 'underlined' | 'filled' | 'solo' | 'solo-inverted' | 'solo-filled' | 'inverted';
 export type VuetifyDensity = 'default' | 'comfortable' | 'compact';
 export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
-/** Vuetify's own `size` prop (`v-btn`, `v-icon`, ...) also accepts an arbitrary CSS length or number, so this
- *  keeps that but still offers the named sizes for autocomplete: `(string & {})` is a plain `string` to the type
- *  checker (any string is still assignable) but not to a union with string literals, which is what makes an IDE
- *  suggest the literals instead of collapsing them into `string`. */
+/** Vuetify's `size`: a named size, or any CSS length or number. `(string & {})` keeps the named sizes in IDE
+ *  suggestions. */
 export type VuetifyButtonSize = 'x-small' | 'small' | 'default' | 'large' | 'x-large' | (string & {}) | number;
 
 /**
