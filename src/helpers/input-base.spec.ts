@@ -46,13 +46,15 @@ describe('input-base', () => {
       mockInjectValues.clear();
     });
 
+    const base = <T = any>(props: BaseProps<T> = {}) => {
+      const emit = vi.fn();
+      return { emit, ...useInputBase(props, emit) };
+    };
+
     describe('value computed property', () => {
       it('reads and writes from control.value when control is provided', async () => {
         const control = new Form.Field<string>({ value: 'initial' });
-        const props: BaseProps<string> = { control };
-        const emit = vi.fn();
-
-        const { value } = useInputBase(props, emit);
+        const { value, emit } = base<string>({ control });
 
         expect(value.value).toBe('initial');
 
@@ -64,10 +66,7 @@ describe('input-base', () => {
       });
 
       it('reads and writes from modelValue when provided', async () => {
-        const props: BaseProps<string> = { modelValue: 'initial' };
-        const emit = vi.fn();
-
-        const { value } = useInputBase(props, emit);
+        const { value, emit } = base<string>({ modelValue: 'initial' });
 
         expect(value.value).toBe('initial');
 
@@ -78,10 +77,7 @@ describe('input-base', () => {
       });
 
       it('uses internal state when neither control nor modelValue is provided', async () => {
-        const props: BaseProps<string> = {};
-        const emit = vi.fn();
-
-        const { value } = useInputBase(props, emit);
+        const { value, emit } = base<string>();
 
         expect(value.value).toBeNull();
 
@@ -101,9 +97,7 @@ describe('input-base', () => {
             return supr(field, newValue, oldValue);
           }),
         );
-        const emit = vi.fn();
-
-        const { value } = useInputBase<string>({ control }, emit);
+        const { value, emit } = base<string>({ control });
 
         value.value = 'typed';
         await nextTick();
@@ -119,9 +113,7 @@ describe('input-base', () => {
             throw new Error('refused');
           }),
         );
-        const emit = vi.fn();
-
-        const { value } = useInputBase<string>({ control }, emit);
+        const { value } = base<string>({ control });
 
         expect(() => {
           value.value = 'refused';
@@ -136,9 +128,7 @@ describe('input-base', () => {
 
       it('takes an array write the control accepted as accepted', async () => {
         const control = new Form.Field<number[]>({ value: [] });
-        const emit = vi.fn();
-
-        const { value } = useInputBase<number[]>({ control }, emit);
+        const { value, emit } = base<number[]>({ control });
 
         const written = [1, 2, 3];
         value.value = written;
@@ -157,10 +147,7 @@ describe('input-base', () => {
       });
 
       it('emits update:modelValue on value change', async () => {
-        const props: BaseProps<number> = { modelValue: 42 };
-        const emit = vi.fn();
-
-        const { value } = useInputBase(props, emit);
+        const { value, emit } = base<number>({ modelValue: 42 });
 
         value.value = 100;
         await nextTick();
@@ -172,28 +159,19 @@ describe('input-base', () => {
     describe('control validation', () => {
       it('throws error if control is not a FieldBase instance', () => {
         const invalidControl = { value: 'test' } as any;
-        const props: BaseProps = { control: invalidControl };
-        const emit = vi.fn();
-
-        expect(() => useInputBase(props, emit)).toThrow('control prop is not a vue-form control instance');
+        expect(() => base({ control: invalidControl })).toThrow('control prop is not a vue-form control instance');
       });
 
       it('does not throw error if control is a FieldBase instance', () => {
         const validControl = new Form.Field({ value: 'test' });
-        const props: BaseProps = { control: validControl };
-        const emit = vi.fn();
-
-        expect(() => useInputBase(props, emit)).not.toThrow();
+        expect(() => base({ control: validControl })).not.toThrow();
       });
     });
 
     describe('touched', () => {
       it('binds to control.touched when control is provided', async () => {
         const control = new Form.Field({ value: 'test' });
-        const props: BaseProps = { control };
-        const emit = vi.fn();
-
-        const { touched } = useInputBase(props, emit);
+        const { touched } = base({ control });
 
         expect(touched.value).toBe(false);
 
@@ -209,10 +187,7 @@ describe('input-base', () => {
       });
 
       it('uses standalone ref when control is not provided', async () => {
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { touched } = useInputBase(props, emit);
+        const { touched } = base();
 
         expect(touched.value).toBe(false);
 
@@ -226,19 +201,13 @@ describe('input-base', () => {
     describe('valid', () => {
       it('returns control.valid when control is provided', () => {
         const control = new Form.Field({ value: 'test' });
-        const props: BaseProps = { control };
-        const emit = vi.fn();
-
-        const { valid } = useInputBase(props, emit);
+        const { valid } = base({ control });
 
         expect(valid.value).toBe(control.valid);
       });
 
       it('returns true when control is not provided', () => {
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { valid } = useInputBase(props, emit);
+        const { valid } = base();
 
         expect(valid.value).toBe(true);
       });
@@ -248,20 +217,14 @@ describe('input-base', () => {
       it('returns control.errors when control is provided', () => {
         const control = new Form.Field({ value: '' });
         control.errors = [new ValidationError('vue-forms.required', {}, 'Required field')];
-        const props: BaseProps = { control };
-        const emit = vi.fn();
-
-        const { errors } = useInputBase(props, emit);
+        const { errors } = base({ control });
 
         expect(errors.value).toEqual(control.errors);
         expect(errors.value).toHaveLength(1);
       });
 
       it('converts props.errors to application errors whose detail is the text when control is not provided', () => {
-        const props: BaseProps = { errors: ['Error 1', 'Error 2'] };
-        const emit = vi.fn();
-
-        const { errors } = useInputBase(props, emit);
+        const { errors } = base({ errors: ['Error 1', 'Error 2'] });
 
         expect(errors.value).toHaveLength(2);
         expect(errors.value[0]).toBeInstanceOf(ValidationError);
@@ -272,10 +235,7 @@ describe('input-base', () => {
       });
 
       it('returns empty array when no errors and no control', () => {
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { errors } = useInputBase(props, emit);
+        const { errors } = base();
 
         expect(errors.value).toEqual([]);
       });
@@ -283,10 +243,7 @@ describe('input-base', () => {
       it('shownErrors holds an error back until the control is touched', async () => {
         const control = new Form.Field({ value: '' });
         control.errors = [new ValidationError('vue-forms.required', {}, 'Required field')];
-        const props: BaseProps = { control };
-        const emit = vi.fn();
-
-        const { shownErrors, touched } = useInputBase(props, emit);
+        const { shownErrors, touched } = base({ control });
 
         expect(shownErrors.value).toEqual([]);
 
@@ -300,7 +257,7 @@ describe('input-base', () => {
         const control = new Form.Field({ value: '' });
         control.errors = [new ValidationError('taken', {}, 'Taken', 'server')];
 
-        const { shownErrors, touched } = useInputBase({ control }, vi.fn());
+        const { shownErrors, touched } = base({ control });
 
         expect(touched.value).toBe(false);
         expect(shownErrors.value).toHaveLength(1);
@@ -312,7 +269,7 @@ describe('input-base', () => {
         control.errors = [new ValidationError('taken', {}, 'Taken', 'server')];
         control.touched = true;
 
-        const { shownErrors } = useInputBase({ control }, vi.fn());
+        const { shownErrors } = base({ control });
 
         expect(section.fields.control.effectiveAccess).toBe('disabled');
         expect(shownErrors.value).toEqual([]);
@@ -321,10 +278,7 @@ describe('input-base', () => {
       it('anyErrors returns space when touched and has errors', async () => {
         const control = new Form.Field({ value: '' });
         control.errors = [new ValidationError('vue-forms.required', {}, 'Required field')];
-        const props: BaseProps = { control };
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        const result = base({ control });
 
         expect(result.vuetifyBindings.value.errorMessages).toBeUndefined();
 
@@ -338,30 +292,20 @@ describe('input-base', () => {
     describe('enabled', () => {
       it('returns control.enabled when control is provided', () => {
         const control = new Form.Field({ value: 'test', access: 'disabled' });
-        const props: BaseProps = { control };
-        const emit = vi.fn();
-
-        const { enabled } = useInputBase(props, emit);
+        const { enabled } = base({ control });
 
         expect(enabled.value).toBe(false);
       });
 
       it('returns props.enabled !== false when control is not provided', () => {
-        const props1: BaseProps = { enabled: true };
-        const props2: BaseProps = { enabled: false };
-        const props3: BaseProps = {};
-        const emit = vi.fn();
-
-        expect(useInputBase(props1, emit).enabled.value).toBe(true);
-        expect(useInputBase(props2, emit).enabled.value).toBe(false);
-        expect(useInputBase(props3, emit).enabled.value).toBe(true);
+        expect(base({ enabled: true }).enabled.value).toBe(true);
+        expect(base({ enabled: false }).enabled.value).toBe(false);
+        expect(base().enabled.value).toBe(true);
       });
 
       it('is false while a container above the element is disabled', () => {
         const section = new Form.Group({ amount: new Form.Field({ value: 1 }) });
-        const emit = vi.fn();
-
-        const { enabled, vuetifyBindings } = useInputBase({ control: section.fields.amount }, emit);
+        const { enabled, vuetifyBindings } = base({ control: section.fields.amount });
 
         expect(enabled.value).toBe(true);
 
@@ -375,9 +319,7 @@ describe('input-base', () => {
 
       it('draws an element of a read-only container read-only, not disabled', () => {
         const section = new Form.Group({ amount: new Form.Field({ value: 1 }) }, { access: 'readonly' });
-        const emit = vi.fn();
-
-        const { enabled, vuetifyBindings } = useInputBase({ control: section.fields.amount }, emit);
+        const { enabled, vuetifyBindings } = base({ control: section.fields.amount });
 
         expect(enabled.value).toBe(false);
         expect(vuetifyBindings.value.readonly).toBe(true);
@@ -386,18 +328,14 @@ describe('input-base', () => {
 
       it("draws a 'disabled-null' element disabled", () => {
         const control = new Form.Field({ value: 1, access: 'disabled-null' });
-        const emit = vi.fn();
-
-        const { vuetifyBindings } = useInputBase({ control }, emit);
+        const { vuetifyBindings } = base({ control });
 
         expect(vuetifyBindings.value.readonly).toBe(true);
         expect(vuetifyBindings.value.disabled).toBe(true);
       });
 
       it('draws an input disabled by the enabled prop disabled', () => {
-        const emit = vi.fn();
-
-        const { vuetifyBindings } = useInputBase({ enabled: false }, emit);
+        const { vuetifyBindings } = base({ enabled: false });
 
         expect(vuetifyBindings.value.readonly).toBe(true);
         expect(vuetifyBindings.value.disabled).toBe(true);
@@ -412,71 +350,52 @@ describe('input-base', () => {
 
       it('returns control.visibility when control is provided', () => {
         const control = new Form.Field({ value: 'test', visibility: 'hidden' });
-        const props: BaseProps = { control };
-        const emit = vi.fn();
-
-        const { visibility } = useInputBase(props, emit);
+        const { visibility } = base({ control });
 
         expect(visibility.value).toBe('hidden');
       });
 
       it('takes the visibility it names', () => {
-        const emit = vi.fn();
-
-        const { visibility, isRendered } = useInputBase({ visibility: 'hidden' }, emit);
+        const { visibility, isRendered } = base({ visibility: 'hidden' });
 
         expect(visibility.value).toBe('hidden');
         expect(isRendered.value).toBe(true);
       });
 
       it('refuses a string that is none of the four visibilities', () => {
-        const emit = vi.fn();
-
-        const { visibility } = useInputBase({ visibility: 'hiden' as Form.Visibility }, emit);
+        const { visibility } = base({ visibility: 'hiden' as Form.Visibility });
 
         expect(() => visibility.value).toThrow("'hiden' is not a visibility");
       });
 
       it("is 'full' when the prop names nothing", () => {
-        const emit = vi.fn();
-
-        const { visibility } = useInputBase({}, emit);
+        const { visibility } = base();
 
         expect(visibility.value).toBe('full');
       });
 
       it('control.visibility takes precedence over the visibility prop', () => {
         const control = new Form.Field({ value: 'test', visibility: 'suppress' });
-        const props: BaseProps = { control, visibility: 'full' };
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        const result = base({ control, visibility: 'full' });
 
         expect(result.visibility.value).toBe('suppress');
         expect(result.isRendered.value).toBe(false);
       });
 
       it('isRendered is false only for SUPPRESS when driven by control', () => {
-        const emit = vi.fn();
-
-        expect(useInputBase(fromControl('full'), emit).isRendered.value).toBe(true);
-        expect(useInputBase(fromControl('hidden'), emit).isRendered.value).toBe(true);
-        expect(useInputBase(fromControl('suppress'), emit).isRendered.value).toBe(false);
+        expect(base(fromControl('full')).isRendered.value).toBe(true);
+        expect(base(fromControl('hidden')).isRendered.value).toBe(true);
+        expect(base(fromControl('suppress')).isRendered.value).toBe(false);
       });
 
       it('isRendered is false only for SUPPRESS when driven by the visibility prop', () => {
-        const emit = vi.fn();
-
-        expect(useInputBase(fromProp('full'), emit).isRendered.value).toBe(true);
-        expect(useInputBase(fromProp('hidden'), emit).isRendered.value).toBe(true);
-        expect(useInputBase(fromProp('suppress'), emit).isRendered.value).toBe(false);
+        expect(base(fromProp('full')).isRendered.value).toBe(true);
+        expect(base(fromProp('hidden')).isRendered.value).toBe(true);
+        expect(base(fromProp('suppress')).isRendered.value).toBe(false);
       });
 
       it('isRendered is true when no control and no visibility prop', () => {
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { isRendered } = useInputBase(props, emit);
+        const { isRendered } = base();
 
         expect(isRendered.value).toBe(true);
       });
@@ -487,37 +406,26 @@ describe('input-base', () => {
         ['hidden', { 'd-none': true, invisible: false }],
         ['suppress', { 'd-none': false, invisible: false }],
       ] as const)('visibilityClass for %s, driven by the control and by the prop alike', (visibility, classes) => {
-        const emit = vi.fn();
-
-        expect(useInputBase(fromControl(visibility), emit).visibilityClass.value).toEqual(classes);
-        expect(useInputBase(fromProp(visibility), emit).visibilityClass.value).toEqual(classes);
+        expect(base(fromControl(visibility)).visibilityClass.value).toEqual(classes);
+        expect(base(fromProp(visibility)).visibilityClass.value).toEqual(classes);
       });
 
       it('visibilityClass follows the control rather than the visibility prop', () => {
         const control = new Form.Field({ value: 'test', visibility: 'hidden' });
-        const props: BaseProps = { control, visibility: 'full' };
-        const emit = vi.fn();
-
-        const { visibilityClass } = useInputBase(props, emit);
+        const { visibilityClass } = base({ control, visibility: 'full' });
 
         expect(visibilityClass.value).toEqual({ 'd-none': true, invisible: false });
       });
 
       it('visibilityClass sets no class when no control and no visibility prop', () => {
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { visibilityClass } = useInputBase(props, emit);
+        const { visibilityClass } = base();
 
         expect(visibilityClass.value).toEqual({ 'd-none': false, invisible: false });
       });
 
       it('isRendered and visibilityClass follow control.visibility changes', async () => {
         const control = new Form.Field({ value: 'test' });
-        const props: BaseProps = { control };
-        const emit = vi.fn();
-
-        const { isRendered, visibilityClass } = useInputBase(props, emit);
+        const { isRendered, visibilityClass } = base({ control });
 
         expect(isRendered.value).toBe(true);
         expect(visibilityClass.value).toEqual({ 'd-none': false, invisible: false });
@@ -536,10 +444,7 @@ describe('input-base', () => {
 
     describe('label', () => {
       it('converts string label to Label object', () => {
-        const props: BaseProps = { label: 'Test Label' };
-        const emit = vi.fn();
-
-        const { label } = useInputBase(props, emit);
+        const { label } = base({ label: 'Test Label' });
 
         expect(label.value).toBeInstanceOf(Label);
         expect(label.value.text).toBe('Test Label');
@@ -547,10 +452,7 @@ describe('input-base', () => {
 
       it('keeps Label object as is', () => {
         const labelObj = new Label('Test', 'icon');
-        const props: BaseProps = { label: labelObj };
-        const emit = vi.fn();
-
-        const { label } = useInputBase(props, emit);
+        const { label } = base({ label: labelObj });
 
         expect(label.value).toBe(labelObj);
         expect(label.value.text).toBe('Test');
@@ -558,10 +460,7 @@ describe('input-base', () => {
       });
 
       it('returns Label with empty string when no label provided', () => {
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { label } = useInputBase(props, emit);
+        const { label } = base();
 
         expect(label.value).toBeInstanceOf(Label);
         expect(label.value.text).toBe('');
@@ -577,9 +476,7 @@ describe('input-base', () => {
           placeholder: 'Type here',
           cssClass: 'from-field',
         });
-        const emit = vi.fn();
-
-        const { label, vuetifyBindings } = useInputBase({ control }, emit);
+        const { label, vuetifyBindings } = base({ control });
 
         expect(label.value.text).toBe('From the field');
         expect(vuetifyBindings.value.hint).toBe('A hint');
@@ -590,9 +487,7 @@ describe('input-base', () => {
       it('lets the prop win over what the element carries', () => {
         const control = new Form.Field({ value: '' });
         control.setExtendedValues({ label: 'From the field', density: 'compact' });
-        const emit = vi.fn();
-
-        const { label, density } = useInputBase({ control, label: 'From the tag', density: 'comfortable' }, emit);
+        const { label, density } = base({ control, label: 'From the tag', density: 'comfortable' });
 
         expect(label.value.text).toBe('From the tag');
         expect(density.value).toBe('comfortable');
@@ -603,9 +498,7 @@ describe('input-base', () => {
         mockInjectValues.set('field-variant', 'underlined');
         const control = new Form.Field({ value: '' });
         control.setExtendedValues({ density: 'inline', variant: 'outlined' });
-        const emit = vi.fn();
-
-        const { density, vuetifyBindings } = useInputBase({ control }, emit);
+        const { density, vuetifyBindings } = base({ control });
 
         expect(density.value).toBe('inline');
         expect(vuetifyBindings.value.variant).toBe('outlined');
@@ -613,9 +506,7 @@ describe('input-base', () => {
 
       it('follows a later write of the presentation', async () => {
         const control = new Form.Field({ value: '' });
-        const emit = vi.fn();
-
-        const { label } = useInputBase({ control }, emit);
+        const { label } = base({ control });
 
         expect(label.value.text).toBe('');
 
@@ -628,14 +519,11 @@ describe('input-base', () => {
 
     describe('placeholder, hint, cssClass', () => {
       it('returns provided values', () => {
-        const props: BaseProps = {
+        const result = base({
           placeholder: 'Enter value',
           hint: 'This is hint',
           cssClass: 'custom-class',
-        };
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        });
 
         expect(result.vuetifyBindings.value.placeholder).toBe('Enter value');
         expect(result.vuetifyBindings.value.hint).toBe('This is hint');
@@ -643,10 +531,7 @@ describe('input-base', () => {
       });
 
       it('returns empty strings as defaults', () => {
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        const result = base();
 
         expect(result.vuetifyBindings.value.placeholder).toBe('');
         expect(result.vuetifyBindings.value.hint).toBe('');
@@ -656,20 +541,14 @@ describe('input-base', () => {
 
     describe('density', () => {
       it('uses props.density when provided', () => {
-        const props: BaseProps = { density: 'compact' };
-        const emit = vi.fn();
-
-        const { density } = useInputBase(props, emit);
+        const { density } = base({ density: 'compact' });
 
         expect(density.value).toBe('compact');
       });
 
       it('uses injected field-density when props.density is not provided', () => {
         mockInjectValues.set('field-density', 'comfortable');
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { density } = useInputBase(props, emit);
+        const { density } = base();
 
         expect(density.value).toBe('comfortable');
       });
@@ -677,19 +556,13 @@ describe('input-base', () => {
       it('uses settings.defaultDensity when no props or inject', () => {
         const settings: VuetifyInputsSettings = { defaultDensity: 'compact' };
         mockInjectValues.set(vuetifyInputsSettingsKey, settings);
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { density } = useInputBase(props, emit);
+        const { density } = base();
 
         expect(density.value).toBe('compact');
       });
 
       it('defaults to "default" when nothing is provided', () => {
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { density } = useInputBase(props, emit);
+        const { density } = base();
 
         expect(density.value).toBe('default');
       });
@@ -697,19 +570,15 @@ describe('input-base', () => {
       it('defaults to "default" with an empty settings object', () => {
         mockInjectValues.set(vuetifyInputsSettingsKey, {});
 
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const { density } = useInputBase(props, emit);
+        const { density } = base();
 
         expect(density.value).toBe('default');
       });
 
       it('follows a change of the density prop', async () => {
         const props: BaseProps = reactive({ density: 'compact' });
-        const emit = vi.fn();
 
-        const { density, densityClass } = useInputBase(props, emit);
+        const { density, densityClass } = base(props);
 
         expect(density.value).toBe('compact');
 
@@ -721,28 +590,19 @@ describe('input-base', () => {
       });
 
       it('boundDensity converts inline to default', () => {
-        const props: BaseProps = { density: 'inline' };
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        const result = base({ density: 'inline' });
 
         expect(result.vuetifyBindings.value.density).toBe('default');
       });
 
       it('boundDensity keeps other values as is', () => {
-        const props: BaseProps = { density: 'compact' };
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        const result = base({ density: 'compact' });
 
         expect(result.vuetifyBindings.value.density).toBe('compact');
       });
 
       it('densityClass returns correct class name', () => {
-        const props: BaseProps = { density: 'compact' };
-        const emit = vi.fn();
-
-        const { densityClass } = useInputBase(props, emit);
+        const { densityClass } = base({ density: 'compact' });
 
         expect(densityClass.value).toBe('df-density-compact');
       });
@@ -750,20 +610,14 @@ describe('input-base', () => {
 
     describe('variant', () => {
       it('uses props.variant when provided', () => {
-        const props: BaseProps = { variant: 'outlined' };
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        const result = base({ variant: 'outlined' });
 
         expect(result.vuetifyBindings.value.variant).toBe('outlined');
       });
 
       it('uses injected field-variant when props.variant is not provided', () => {
         mockInjectValues.set('field-variant', 'filled');
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        const result = base();
 
         expect(result.vuetifyBindings.value.variant).toBe('filled');
       });
@@ -771,32 +625,26 @@ describe('input-base', () => {
       it('uses settings.defaultVariant when no props or inject', () => {
         const settings: VuetifyInputsSettings = { defaultVariant: 'solo' };
         mockInjectValues.set(vuetifyInputsSettingsKey, settings);
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        const result = base();
 
         expect(result.vuetifyBindings.value.variant).toBe('solo');
       });
 
       it('defaults to "underlined" when nothing is provided', () => {
-        const props: BaseProps = {};
-        const emit = vi.fn();
-
-        const result = useInputBase(props, emit);
+        const result = base();
 
         expect(result.vuetifyBindings.value.variant).toBe('underlined');
       });
 
       it('binds "inverted" as solo on the surface-variant background', () => {
-        const result = useInputBase({ variant: 'inverted' }, vi.fn());
+        const result = base({ variant: 'inverted' });
 
         expect(result.vuetifyBindings.value.variant).toBe('solo');
         expect(result.vuetifyBindings.value.bgColor).toBe('surface-variant');
       });
 
       it('binds no background for a Vuetify variant', () => {
-        const result = useInputBase({ variant: 'solo-inverted' }, vi.fn());
+        const result = base({ variant: 'solo-inverted' });
 
         expect(result.vuetifyBindings.value.variant).toBe('solo-inverted');
         expect(result.vuetifyBindings.value.bgColor).toBeUndefined();
@@ -807,7 +655,7 @@ describe('input-base', () => {
       it('maps all properties correctly', () => {
         // fieldName is a read-only accessor the containing Group writes, so the field is declared inside one
         const control = new Form.Group({ testField: new Form.Field({ value: 'test' }) }).fields.testField;
-        const props: BaseProps = {
+        const { vuetifyBindings } = base({
           control,
           label: 'Test Label',
           placeholder: 'Enter text',
@@ -816,10 +664,7 @@ describe('input-base', () => {
           density: 'compact',
           variant: 'outlined',
           passthroughAttrs: { 'data-test': 'value' },
-        };
-        const emit = vi.fn();
-
-        const { vuetifyBindings } = useInputBase(props, emit);
+        });
 
         const bindings = vuetifyBindings.value;
 
@@ -841,24 +686,18 @@ describe('input-base', () => {
       });
 
       it('sets persistent-placeholder to false when placeholder is empty', () => {
-        const props: BaseProps = { placeholder: '' };
-        const emit = vi.fn();
-
-        const { vuetifyBindings } = useInputBase(props, emit);
+        const { vuetifyBindings } = base({ placeholder: '' });
 
         expect(vuetifyBindings.value['persistent-placeholder']).toBe(false);
       });
 
       it('merges passthroughAttrs into bindings', () => {
-        const props: BaseProps = {
+        const { vuetifyBindings } = base({
           passthroughAttrs: {
             'custom-attr': 'custom-value',
             'another-attr': 123,
           },
-        };
-        const emit = vi.fn();
-
-        const { vuetifyBindings } = useInputBase(props, emit);
+        });
 
         // @ts-expect-error vuetifyBindings doesn't have a declaration for passthroughAttrs
         expect(vuetifyBindings.value['custom-attr']).toBe('custom-value');
@@ -867,15 +706,12 @@ describe('input-base', () => {
       });
 
       it('passthroughAttrs can override default bindings', () => {
-        const props: BaseProps = {
+        const { vuetifyBindings } = base({
           hint: 'original hint',
           passthroughAttrs: {
             hint: 'overridden hint',
           },
-        };
-        const emit = vi.fn();
-
-        const { vuetifyBindings } = useInputBase(props, emit);
+        });
 
         expect(vuetifyBindings.value.hint).toBe('overridden hint');
       });
