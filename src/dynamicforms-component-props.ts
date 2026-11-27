@@ -152,9 +152,7 @@ export interface DfRtfEditorProps extends BaseProps {
    * `buttonSize` for the grouped clusters). See https://vuetifyjs.com/en/api/v-btn/#props-size */
   toolbarButtonSize?: VuetifyButtonSize;
   /** `font-family` of the editing area and its named block styles (Title, Subtitle, Info box, Side quote, article
-   * category). Defaults to `'inherit'`: the component loads no font of its own, so the editor renders in whatever
-   * font the surrounding page already set. Pass any valid CSS `font-family` value to override it; loading the
-   * font itself, if it isn't a system font, is the application's responsibility. */
+   * category). Default `'inherit'`. The component loads no font. */
   fontFamily?: string;
 }
 
