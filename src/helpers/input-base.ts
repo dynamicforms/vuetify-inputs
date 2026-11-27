@@ -205,8 +205,7 @@ export function useInputBase<T = any>(
     const access = props.control.effectiveAccess;
     return access === 'disabled' || access === 'disabled-null';
   });
-  // A control states its own visibility - vue-forms refuses anything that is not one of the four. The prop is held to
-  // the same, so an unrecognised visibility is refused here as loudly as it is there.
+  // the visibility prop accepts only the four visibilities vue-forms accepts for a control; any other value throws
   const visibility = computed((): Form.Visibility => {
     if (props.control) return props.control.visibility;
     if (props.visibility == null) return Form.defaultVisibility;
