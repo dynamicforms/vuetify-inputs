@@ -549,8 +549,7 @@ This is safe to apply everywhere you render content saved by this library, past 
    supplied per-locale editor language before, that concern no longer exists to configure.
 3. Find every place outside `<df-rtf-editor>` that renders HTML this component saved - marketing pages, PDF
    generation, **templated emails** - and add `li p, td p, th p { margin: 0; }` (or that renderer's equivalent) to
-   its stylesheet. Check a rendered list and a rendered table specifically; this is easy to miss until content
-   with a list or a table happens to go out through that particular renderer.
+   its stylesheet. Check a rendered list and a rendered table in each renderer.
 4. If your own styling targeted CKEditor-specific classes or DOM structure (rather than the semantic HTML this
    library always documented as its saved format), re-check it against the new output.
 
