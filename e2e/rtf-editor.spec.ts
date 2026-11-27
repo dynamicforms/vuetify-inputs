@@ -2,8 +2,7 @@ import { expect, Page, test } from './test';
 
 import { pasteData } from './helpers';
 
-// A tiny valid PNG (10x10 red square) - real pixel data isn't the point, just something the <img> can decode so
-// TipTap's resize NodeView actually shows the node view (it stays hidden until the image's load/error event fires).
+// a decodable 10x10 PNG: TipTap's resize NodeView stays hidden until the image fires load or error
 const RED_SQUARE =
   'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAAEklEQVR4nGM4YWSEBzGMSmNDADQHdTFYnw0tAAAAAElFTkSuQmCC';
 
