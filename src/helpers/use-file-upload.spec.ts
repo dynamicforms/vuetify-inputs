@@ -29,23 +29,20 @@ function deferred<T>() {
 /** uploads answer with an identifier derived from the file name */
 const idFromName = async (f: File) => `id-${f.name}`;
 
-function setup(options: { initial?: string | null; touchInterval?: number; comms?: FileComms } = {}) {
-  const value = ref<string | null>(options.initial ?? null);
+function setup(
+  options: {
+    initial?: string | null;
+    control?: Form.Field<string | null>;
+    touchInterval?: number;
+    comms?: FileComms;
+  } = {},
+) {
+  const { control } = options;
+  // with a control, the value follows it both ways, as useInputBase's does
+  const value = control
+    ? computed({ get: () => control.value, set: (v) => (control.value = v) })
+    : ref<string | null>(options.initial ?? null);
   const comms = options.comms ?? makeComms(idFromName);
-  const upload = useFileUpload({
-    value,
-    touched: ref(false),
-    comms: () => comms,
-    touchInterval: () => options.touchInterval,
-    control: () => undefined,
-  });
-  return { value, comms, ...upload };
-}
-
-function setupWithControl(control: Form.Field<string | null>, options: { touchInterval?: number } = {}) {
-  const comms = makeComms(idFromName);
-  // the value follows the control both ways, as useInputBase's does
-  const value = computed({ get: () => control.value, set: (v) => (control.value = v) });
   const upload = useFileUpload({
     value,
     touched: ref(false),
@@ -53,7 +50,7 @@ function setupWithControl(control: Form.Field<string | null>, options: { touchIn
     touchInterval: () => options.touchInterval,
     control: () => control,
   });
-  return { comms, ...upload };
+  return { value, comms, ...upload };
 }
 
 describe('useFileUpload', () => {
@@ -136,7 +133,7 @@ describe('useFileUpload', () => {
 
     it("stops touching once the upload becomes the control's originalValue", async () => {
       const control = new Form.Field<string | null>({ value: null });
-      const { comms, upload } = setupWithControl(control, { touchInterval: 1_000 });
+      const { comms, upload } = setup({ control, touchInterval: 1_000 });
       await upload(file('a'));
       await nextTick();
       await vi.advanceTimersByTimeAsync(1_000);
@@ -150,7 +147,7 @@ describe('useFileUpload', () => {
 
     it('clears the value and reports the error when a touch reports the file is gone', async () => {
       const control = new Form.Field<string | null>({ value: null });
-      const { comms, upload } = setupWithControl(control, { touchInterval: 1_000 });
+      const { comms, upload } = setup({ control, touchInterval: 1_000 });
       comms.touch = touchGone(GONE);
       await upload(file('a'));
       await nextTick();
@@ -274,7 +271,7 @@ describe('useFileUpload', () => {
 
     it("deletes no upload that became the control's originalValue when it clears it", async () => {
       const control = new Form.Field<string | null>({ value: null });
-      const { comms, upload, clear } = setupWithControl(control);
+      const { comms, upload, clear } = setup({ control });
       await upload(file('a'));
       control.originalValue = control.value;
 
