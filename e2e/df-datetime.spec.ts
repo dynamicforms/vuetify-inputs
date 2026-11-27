@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page, test } from '@playwright/test';
+import { expect, type Locator, type Page, test } from './test';
 
 const card = (page: Page, title: string) => page.locator('.v-card', { hasText: title }).first();
 const fieldValue = (page: Page, title: string) => card(page, title).locator('pre');

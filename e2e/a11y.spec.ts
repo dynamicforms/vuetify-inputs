@@ -3,7 +3,7 @@
 // baseline and on a baseline entry that no longer occurs. Regenerate the baseline with
 // `A11Y_UPDATE_BASELINE=1 npm run test:e2e -- e2e/a11y.spec.ts`.
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Page, test } from './test';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

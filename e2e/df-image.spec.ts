@@ -1,7 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { expect, test } from '@playwright/test';
+import { expect, test } from './test';
 
 import { dropFile, openFileChooser } from './helpers';
 
