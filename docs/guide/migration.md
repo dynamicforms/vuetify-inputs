@@ -533,9 +533,8 @@ li p, td p, th p {
 }
 ```
 
-This is safe to apply everywhere you render content saved by this library, past or future: it only matches a
-`<p>` actually nested inside a list item or cell, so content saved before this upgrade - which has no such nested
-`<p>` - is simply not touched by it.
+The rule matches only a `<p>` inside a list item or a table cell; content saved by earlier versions has none, so the
+rule applies to all saved content.
 
 ### Checklist for 0.10.0
 
