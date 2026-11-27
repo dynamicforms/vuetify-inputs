@@ -3,8 +3,6 @@ import StarterKit from '@tiptap/starter-kit';
 import { Editor } from '@tiptap/vue-3';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
 
 import { translateStrings } from '../translations';
 
@@ -19,8 +17,7 @@ function makeEditor() {
 }
 
 function mountToolbar(editor: Editor) {
-  const vuetify = createVuetify({ components });
-  return mount(RtfToolbar, { props: { editor }, global: { plugins: [vuetify] } });
+  return mount(RtfToolbar, { props: { editor } });
 }
 
 function click(wrapper: ReturnType<typeof mountToolbar>, title: string) {
@@ -28,10 +25,6 @@ function click(wrapper: ReturnType<typeof mountToolbar>, title: string) {
 }
 
 describe('RtfToolbar heading dropdown', () => {
-  afterEach(() => {
-    translateStrings((key) => key);
-  });
-
   it('shows the English default heading label for a plain paragraph', () => {
     const editor = makeEditor();
     const wrapper = mountToolbar(editor);
@@ -67,7 +60,6 @@ describe('RtfToolbar button groups', () => {
     const bold = wrapper.find('button[title="Krepko"]');
     expect(bold.attributes('aria-label')).toBe('Krepko');
 
-    translateStrings((key) => key);
     editor.destroy();
   });
 
@@ -126,41 +118,11 @@ describe('RtfToolbar button groups', () => {
     editor.destroy();
   });
 
-  it('opens the link menu without crashing', async () => {
+  it.each(['Link', 'Image', 'Insert media', 'Table'])('opens the %s menu without crashing', async (title) => {
     const editor = makeEditor();
     const wrapper = mountToolbar(editor);
 
-    await click(wrapper, 'Link');
-    await nextTick();
-
-    editor.destroy();
-  });
-
-  it('opens the image menu without crashing', async () => {
-    const editor = makeEditor();
-    const wrapper = mountToolbar(editor);
-
-    await click(wrapper, 'Image');
-    await nextTick();
-
-    editor.destroy();
-  });
-
-  it('opens the media embed menu without crashing', async () => {
-    const editor = makeEditor();
-    const wrapper = mountToolbar(editor);
-
-    await click(wrapper, 'Insert media');
-    await nextTick();
-
-    editor.destroy();
-  });
-
-  it('opens the table menu without crashing', async () => {
-    const editor = makeEditor();
-    const wrapper = mountToolbar(editor);
-
-    await click(wrapper, 'Table');
+    await click(wrapper, title);
     await nextTick();
 
     editor.destroy();

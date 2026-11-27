@@ -3,10 +3,12 @@
 // baseline and on a baseline entry that no longer occurs. Regenerate the baseline with
 // `A11Y_UPDATE_BASELINE=1 npm run test:e2e -- e2e/a11y.spec.ts`.
 import AxeBuilder from '@axe-core/playwright';
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Page, test } from './test';
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import { demo, FETCH, MIN_QUERY_TEXT, minimumQueryCheckbox, NO_DATA_TEXT } from './df-select-ajax-demo';
 
 type Baseline = Record<string, string[]>;
 
@@ -146,25 +148,22 @@ test('df-select with the menu open', async ({ page }) => {
 
 test('df-select with loaded choices: two-line options, minimum query text, no data text', async ({ page }) => {
   await open(page, 'df-select');
-  const demo = page.locator('.demo-container', { has: page.getByText('Dynamic options loading') });
-  const input = demo.locator('.v-autocomplete input').first();
+  const input = demo(page).locator('.v-autocomplete input').first();
   const menu = page.locator('.v-overlay-container .v-overlay--active');
-  // the demo's server answers after 3000 ms
-  const loaded = { timeout: 10_000 };
 
   await input.fill('Ja');
   // the debounced fetch starts; scan() waits for it to end
-  await expect(page.locator('.v-progress-linear--active')).toHaveCount(1, loaded);
-  await expect(menu.getByRole('option', { name: 'Java Statically typed' })).toBeVisible(loaded);
+  await expect(page.locator('.v-progress-linear--active')).toHaveCount(1, FETCH);
+  await expect(menu.getByRole('option', { name: 'Java Statically typed' })).toBeVisible(FETCH);
   check(states.selectLoadedOptions, await scan(page));
 
-  await demo.getByRole('checkbox', { name: 'Minimum query of two letters' }).check();
+  await minimumQueryCheckbox(page).check();
   await input.fill('J');
-  await expect(menu.getByText('Type at least two letters of the language name.')).toBeVisible();
+  await expect(menu.getByText(MIN_QUERY_TEXT)).toBeVisible();
   check(states.selectLoadedMinQuery, await scan(page));
 
   await input.fill('xyz');
-  await expect(menu.getByText('No languages found.')).toBeVisible(loaded);
+  await expect(menu.getByText(NO_DATA_TEXT)).toBeVisible(FETCH);
   check(states.selectLoadedNoData, await scan(page));
 });
 

@@ -28,20 +28,9 @@ describe('applyStyle / isStyleActive', () => {
     editor.destroy();
   });
 
-  it('leaves no class attribute behind once a heading style is reverted', () => {
+  it.each(['Title', 'CodeDark'] as const)('leaves no class attribute behind once %s is reverted', (key) => {
     const editor = makeEditor('<p>hello</p>');
-    const def = styleFor('Title');
-
-    applyStyle(editor, def);
-    applyStyle(editor, def);
-
-    expect(editor.getHTML()).not.toContain('class=');
-    editor.destroy();
-  });
-
-  it('leaves no class attribute behind once a code-block style is reverted', () => {
-    const editor = makeEditor('<p>hello</p>');
-    const def = styleFor('CodeDark');
+    const def = styleFor(key);
 
     applyStyle(editor, def);
     applyStyle(editor, def);
@@ -83,27 +72,18 @@ describe('applyStyle / isStyleActive', () => {
     editor.destroy();
   });
 
-  it('toggles Marker as an inline mark over a text selection', () => {
+  it.each([
+    ['Marker', 'marker'],
+    ['Spoiler', 'spoiler'],
+  ] as const)('toggles %s as an inline mark over a text selection', (key, cssClass) => {
     const editor = makeEditor('<p>hello world</p>');
-    const def = styleFor('Marker');
+    const def = styleFor(key);
 
     applyStyle(editor, def);
-    expect(editor.getHTML()).toContain('<span class="marker">');
+    expect(editor.getHTML()).toContain(`<span class="${cssClass}">`);
 
     applyStyle(editor, def);
-    expect(editor.getHTML()).not.toContain('marker');
-    editor.destroy();
-  });
-
-  it('toggles Spoiler as an inline mark over a text selection', () => {
-    const editor = makeEditor('<p>hello world</p>');
-    const def = styleFor('Spoiler');
-
-    applyStyle(editor, def);
-    expect(editor.getHTML()).toContain('<span class="spoiler">');
-
-    applyStyle(editor, def);
-    expect(editor.getHTML()).not.toContain('spoiler');
+    expect(editor.getHTML()).not.toContain(cssClass);
     editor.destroy();
   });
 });

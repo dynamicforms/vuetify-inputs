@@ -3,10 +3,6 @@ import { computed, ref } from 'vue';
 import { translate, translateStrings } from './translations';
 
 describe('translations', () => {
-  afterEach(() => {
-    translateStrings((key) => key);
-  });
-
   it('should answer the English defaults before translateStrings is called', () => {
     expect(translate('Cancel')).toBe('Cancel');
     expect(translate('Bold')).toBe('Bold');

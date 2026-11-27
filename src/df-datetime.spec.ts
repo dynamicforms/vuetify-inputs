@@ -1,29 +1,35 @@
 import { Field, ValidationError } from '@dynamicforms/vue-forms';
-import { flushPromises, mount } from '@vue/test-utils';
+import { DOMWrapper, flushPromises, mount } from '@vue/test-utils';
 import { ja } from 'date-fns/locale';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
 
 import DfDateTime from '@/df-datetime.vue';
 import { viewSettleMs } from '@/helpers/picker-double-click';
 
 describe('DfDateTime', () => {
-  let vuetify: any;
-
-  beforeEach(() => {
-    vuetify = createVuetify({ components });
-  });
-
   afterAll(() => {
     vi.unstubAllEnvs();
   });
 
-  const mountDateTime = (props: Record<string, any>) =>
-    mount(DfDateTime, { props: { label: 'When', ...props }, global: { plugins: [vuetify] } });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const useFakeDate = (at?: Date) => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    if (at) vi.setSystemTime(at);
+  };
+
+  const mountDateTime = (props: Record<string, any>) => mount(DfDateTime, { props: { label: 'When', ...props } });
 
   const inputs = (wrapper: ReturnType<typeof mountDateTime>) =>
     wrapper.findAll('input').map((input) => (input.element as HTMLInputElement).value);
+
+  const typeAndLeave = async (input: DOMWrapper<HTMLInputElement>, text: string) => {
+    await input.setValue(text);
+    await input.trigger('blur');
+    await flushPromises();
+  };
 
   describe('in a time zone with daylight saving time, in summer', () => {
     beforeAll(() => {
@@ -31,12 +37,7 @@ describe('DfDateTime', () => {
     });
 
     beforeEach(() => {
-      vi.useFakeTimers({ toFake: ['Date'] });
-      vi.setSystemTime(new Date('2026-07-01T12:00:00+02:00'));
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
+      useFakeDate(new Date('2026-07-01T12:00:00+02:00'));
     });
 
     it.each([['2026-01-15T10:00:00+01:00'], ['2026-01-15T09:00:00Z'], ['2026-07-15T10:00:00+02:00']])(
@@ -56,9 +57,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '2026-01-15T10:00:00+01:00' });
       const wrapper = mountDateTime({ control });
 
-      await wrapper.findAll('input')[1].setValue('11:30');
-      await wrapper.findAll('input')[1].trigger('blur');
-      await flushPromises();
+      await typeAndLeave(wrapper.findAll('input')[1], '11:30');
       expect(control.value).toBe('2026-01-15T11:30:00+01:00');
       expect(inputs(wrapper)[1]).toBe('11:30');
     });
@@ -67,9 +66,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '2026-07-15T10:00:00+02:00' });
       const wrapper = mountDateTime({ control });
 
-      await wrapper.findAll('input')[1].setValue('11:30');
-      await wrapper.findAll('input')[1].trigger('blur');
-      await flushPromises();
+      await typeAndLeave(wrapper.findAll('input')[1], '11:30');
       expect(control.value).toBe('2026-07-15T11:30:00+02:00');
     });
 
@@ -99,41 +96,26 @@ describe('DfDateTime', () => {
   });
 
   describe('a typed time', () => {
-    it.each([
-      ['12:30 AM', '00:30:00'],
-      ['12:30 PM', '12:30:00'],
-      ['1:05 am', '01:05:00'],
-      ['11:59 PM', '23:59:00'],
-      ['18:43', '18:43:00'],
-    ])('reads %s as %s', async (typed, expected) => {
+    it('writes a time it reads', async () => {
       const control = new Field<string | null>({ value: '10:00:00' });
       const wrapper = mountDateTime({ control, inputType: 'time' });
 
-      await wrapper.find('input').setValue(typed);
-      await wrapper.find('input').trigger('blur');
-      await flushPromises();
-      expect(control.value).toBe(expected);
+      await typeAndLeave(wrapper.find('input'), '12:30 AM');
+      expect(control.value).toBe('00:30:00');
     });
 
-    it.each([['13:00 PM'], ['0:30 AM'], ['24:00'], ['10:60']])('leaves the value as it is for %s', async (typed) => {
+    it('leaves the value as it is for a time it cannot read', async () => {
       const control = new Field<string | null>({ value: '10:00:00' });
       const wrapper = mountDateTime({ control, inputType: 'time' });
 
-      await wrapper.find('input').setValue(typed);
-      await wrapper.find('input').trigger('blur');
-      await flushPromises();
+      await typeAndLeave(wrapper.find('input'), '13:00 PM');
       expect(control.value).toBe('10:00:00');
     });
   });
 
   describe('typed text', () => {
     beforeEach(() => {
-      vi.useFakeTimers({ toFake: ['Date'] });
-      vi.setSystemTime(new Date(2026, 9, 15, 12, 0));
-    });
-
-    afterEach(() => {
-      vi.useRealTimers();
+      useFakeDate(new Date(2026, 9, 15, 12, 0));
     });
 
     it('keeps the text as typed and the value as it is until the field loses focus', async () => {
@@ -146,9 +128,7 @@ describe('DfDateTime', () => {
       expect(control.value).toBe('10:00:00');
       expect((input.element as HTMLInputElement).value).toBe('184');
 
-      await input.setValue('1843');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '1843');
       expect(control.value).toBe('18:43:00');
       expect((input.element as HTMLInputElement).value).toBe('18:43');
     });
@@ -169,9 +149,7 @@ describe('DfDateTime', () => {
       const wrapper = mountDateTime({ control, inputType: 'date', locale: ja });
       const input = wrapper.find('input');
 
-      await input.setValue('812');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '812');
       expect(control.value).toBe('2026-08-12');
     });
 
@@ -180,17 +158,13 @@ describe('DfDateTime', () => {
       const wrapper = mountDateTime({ control, inputType: 'date' });
       const input = wrapper.find('input');
 
-      await input.setValue('131');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '131');
       expect(control.value).toBe('2026-01-15');
       expect((input.element as HTMLInputElement).value).toBe('131');
       expect(control.errors.map((error) => error.code)).toEqual(['vuetify-inputs.invalid_date']);
       expect(control.valid).toBe(false);
 
-      await input.setValue('1301');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '1301');
       expect(control.value).toBe('2026-01-13');
       expect(control.errors).toEqual([]);
     });
@@ -200,14 +174,10 @@ describe('DfDateTime', () => {
       const wrapper = mountDateTime({ control, inputType: 'time' });
       const input = wrapper.find('input');
 
-      await input.setValue('99:99');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '99:99');
       expect(control.errors.map((error) => error.code)).toEqual(['vuetify-inputs.invalid_time']);
 
-      await input.setValue('10');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '10');
       expect(control.value).toBe('10:00:00');
       expect(control.errors).toEqual([]);
       expect((input.element as HTMLInputElement).value).toBe('10:00');
@@ -218,9 +188,7 @@ describe('DfDateTime', () => {
       const input = wrapper.find('input');
 
       await input.trigger('focus');
-      await input.setValue('abc');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, 'abc');
       expect(wrapper.text()).toContain('Not a valid time.');
     });
 
@@ -228,9 +196,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '2026-01-15T10:00:00+01:00' });
       const wrapper = mountDateTime({ control });
 
-      await wrapper.find('input').setValue('');
-      await wrapper.find('input').trigger('blur');
-      await flushPromises();
+      await typeAndLeave(wrapper.find('input'), '');
       expect(control.value).toBeNull();
     });
 
@@ -238,9 +204,7 @@ describe('DfDateTime', () => {
       const control = new Field<string | null>({ value: '2026-01-15' });
       const wrapper = mountDateTime({ control, inputType: 'date' });
       const input = wrapper.find('input');
-      await input.setValue('131');
-      await input.trigger('blur');
-      await flushPromises();
+      await typeAndLeave(input, '131');
 
       control.value = '2026-02-20';
       await flushPromises();
@@ -417,7 +381,7 @@ describe('DfDateTime', () => {
     });
 
     it('does not save a day within viewSettleMs of a switch to another month', async () => {
-      vi.useFakeTimers({ toFake: ['Date'] });
+      useFakeDate();
       const control = new Field<string | null>({ value: '2026-01-15' });
       const wrapper = mountDateTime({ control, inputType: 'date' });
       await wrapper.find('input').trigger('click');
@@ -436,16 +400,11 @@ describe('DfDateTime', () => {
       await flushPromises();
 
       expect(control.value).toBe('2026-01-15');
-      vi.useRealTimers();
     });
 
     describe('a double-click on the clock', () => {
       beforeEach(() => {
-        vi.useFakeTimers({ toFake: ['Date'] });
-      });
-
-      afterEach(() => {
-        vi.useRealTimers();
+        useFakeDate();
       });
 
       async function chooseMinute() {

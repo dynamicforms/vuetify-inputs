@@ -1,14 +1,12 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from './test';
+
+import { chooseDensityVariant, openDensityDemo } from "./helpers";
 
 test("every field of the inverted variant has the surface-variant background, focused or not", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 1800, height: 1000 });
-  await page.goto("/examples/density");
-  await page.locator(".density-demo .v-field").first().click();
-  await page
-    .locator(".v-overlay-container .v-list-item", { hasText: /^inverted$/i })
-    .click();
+  await openDensityDemo(page, { width: 1800, height: 1000 });
+  await chooseDensityVariant(page, "inverted");
 
   // the outer field of each cell; df-checkbox has none
   const fields = page.locator(

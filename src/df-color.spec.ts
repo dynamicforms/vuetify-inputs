@@ -1,9 +1,6 @@
 import { Field } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
 
 import { hexagonCells } from './helpers/hexagon-palette';
 import HexagonPalette from './helpers/hexagon-palette.vue';
@@ -12,10 +9,8 @@ import { translateStrings } from './helpers/translations';
 
 import DfColor from '@/df-color.vue';
 
-const vuetify = createVuetify({ components, directives });
-
 function mountColor(props: Record<string, any>, settings: VuetifyInputsSettings = {}) {
-  return mount(DfColor, { props, global: { plugins: [vuetify], provide: { [vuetifyInputsSettingsKey]: settings } } });
+  return mount(DfColor, { props, global: { provide: { [vuetifyInputsSettingsKey]: settings } } });
 }
 
 async function touch(wrapper: ReturnType<typeof mountColor>) {
@@ -130,16 +125,35 @@ describe('DfColor', () => {
       template: '<div class="color-picker-stub"><div class="v-color-picker-canvas" /></div>',
     };
 
-    async function openPicker(control: Field<string>, props: Record<string, any> = {}) {
-      const wrapper = mount(DfColor, {
+    function mountPicker(control: Field<string>, props: Record<string, any> = {}, slots: Record<string, string> = {}) {
+      return mount(DfColor, {
         props: { control, ...props },
-        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
+        slots,
+        global: { stubs: { VColorPicker: ColorPickerStub } },
         attachTo: document.body,
       });
+    }
+
+    type PickerWrapper = ReturnType<typeof mountPicker>;
+
+    async function openMenu(wrapper: PickerWrapper) {
       await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
       await flushPromises();
+    }
+
+    async function openPicker(
+      control: Field<string>,
+      props: Record<string, any> = {},
+      slots: Record<string, string> = {},
+    ) {
+      const wrapper = mountPicker(control, props, slots);
+      await openMenu(wrapper);
       return wrapper;
     }
+
+    const pickerButtons = (wrapper: PickerWrapper, text: string) =>
+      wrapper.findAllComponents({ name: 'VBtn' }).filter((button) => button.text() === text);
+    const pickerButton = (wrapper: PickerWrapper, text: string) => pickerButtons(wrapper, text)[0];
 
     it('writes a picked colour when OK confirms it, and marks the field touched', async () => {
       const control = new Field<string>({ value: '#f00' });
@@ -149,28 +163,24 @@ describe('DfColor', () => {
       await flushPromises();
       expect(control.value).toBe('#f00');
 
-      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
-      await ok!.trigger('click');
+      await pickerButton(wrapper, 'OK').trigger('click');
 
       expect(control.value).toBe('#00ff00');
       expect(control.touched).toBe(true);
-      wrapper.unmount();
     });
 
     it('enables Cancel before a change and OK after one', async () => {
       const control = new Field<string>({ value: '#f00' });
       const wrapper = await openPicker(control);
-      const button = (text: string) => wrapper.findAllComponents({ name: 'VBtn' }).filter((b) => b.text() === text);
 
-      expect(button('Cancel')).toHaveLength(1);
-      expect(button('OK')).toHaveLength(1);
-      expect(button('Cancel')[0].props('disabled')).toBe(false);
-      expect(button('OK')[0].props('disabled')).toBe(true);
+      expect(pickerButtons(wrapper, 'Cancel')).toHaveLength(1);
+      expect(pickerButtons(wrapper, 'OK')).toHaveLength(1);
+      expect(pickerButton(wrapper, 'Cancel').props('disabled')).toBe(false);
+      expect(pickerButton(wrapper, 'OK').props('disabled')).toBe(true);
 
       wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ff00');
       await flushPromises();
-      expect(button('OK')[0].props('disabled')).toBe(false);
-      wrapper.unmount();
+      expect(pickerButton(wrapper, 'OK').props('disabled')).toBe(false);
     });
 
     it("labels the buttons with the library's strings", async () => {
@@ -179,8 +189,6 @@ describe('DfColor', () => {
 
       const labels = wrapper.findAllComponents({ name: 'VBtn' }).map((b) => b.text());
       expect(labels).toEqual(expect.arrayContaining(['Prekliči', 'Potrdi']));
-      translateStrings((key) => key);
-      wrapper.unmount();
     });
 
     it('writes a picked colour on a double-click on the canvas', async () => {
@@ -193,14 +201,12 @@ describe('DfColor', () => {
 
       expect(control.value).toBe('#00ff00');
       expect(control.touched).toBe(true);
-      wrapper.unmount();
     });
     it('sizes the menu to the picker, not to the field', async () => {
       const wrapper = await openPicker(new Field<string>({ value: '#f00' }));
 
       expect(Number(wrapper.findComponent({ name: 'VMenu' }).props('minWidth'))).toBe(0);
       expect(Number(wrapper.findComponent(ColorPickerStub).props('elevation'))).toBe(0);
-      wrapper.unmount();
     });
 
     it('runs the picker in hexa mode with all its modes by default', async () => {
@@ -209,7 +215,6 @@ describe('DfColor', () => {
 
       expect(picker.props('mode')).toBe('hexa');
       expect(picker.props('modes')).toBeUndefined();
-      wrapper.unmount();
     });
 
     it('runs the picker in hex mode without alpha modes under alpha: false', async () => {
@@ -218,7 +223,6 @@ describe('DfColor', () => {
 
       expect(picker.props('mode')).toBe('hex');
       expect(picker.props('modes')).toEqual(['hex', 'rgb', 'hsl']);
-      wrapper.unmount();
     });
 
     it('keeps the raw colour in the picker and writes it normalised on OK', async () => {
@@ -230,11 +234,9 @@ describe('DfColor', () => {
       await flushPromises();
       expect(picker.props('modelValue')).toBe('#00ffaa');
 
-      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
-      await ok!.trigger('click');
+      await pickerButton(wrapper, 'OK').trigger('click');
 
       expect(control.value).toBe('#00FFAA');
-      wrapper.unmount();
     });
 
     it('emits the pending colour as preview on opening and on every change, and null on closing', async () => {
@@ -246,28 +248,22 @@ describe('DfColor', () => {
       await flushPromises();
       expect(wrapper.emitted('preview')!.at(-1)).toEqual(['#00FFAA']);
 
-      const cancel = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'Cancel');
-      await cancel!.trigger('click');
+      await pickerButton(wrapper, 'Cancel').trigger('click');
       await flushPromises();
 
       expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
       expect(control.value).toBe('#ff0000');
-      wrapper.unmount();
     });
 
     it('renders the picker-prepend slot above the picker with the pending colour', async () => {
-      const wrapper = mount(DfColor, {
-        props: { control: new Field<string>({ value: '#ff0000' }), normalize: (value: string) => value.toUpperCase() },
-        slots: {
-          'picker-prepend': '<template #picker-prepend="{ color }"><i class="prepended">{{ color }}</i></template>',
-        },
-        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
-        attachTo: document.body,
-      });
+      const wrapper = mountPicker(
+        new Field<string>({ value: '#ff0000' }),
+        { normalize: (value: string) => value.toUpperCase() },
+        { 'picker-prepend': '<template #picker-prepend="{ color }"><i class="prepended">{{ color }}</i></template>' },
+      );
       expect(document.querySelector('.prepended')).toBeNull();
 
-      await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
-      await flushPromises();
+      await openMenu(wrapper);
       const card = document.querySelector('.df-color-picker')!;
       const prepended = card.querySelector('.prepended')!;
       const picker = card.querySelector('.color-picker-stub')!;
@@ -277,22 +273,18 @@ describe('DfColor', () => {
       wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ffaa');
       await flushPromises();
       expect(card.querySelector('.prepended')!.textContent).toBe('#00FFAA');
-      wrapper.unmount();
     });
 
     it('makes a colour selected through the picker-prepend slot pending, written by OK', async () => {
       const control = new Field<string>({ value: '#ff0000' });
-      const wrapper = mount(DfColor, {
-        props: { control, normalize: (value: string) => value.toUpperCase() },
-        slots: {
+      const wrapper = await openPicker(
+        control,
+        { normalize: (value: string) => value.toUpperCase() },
+        {
           'picker-prepend':
             '<template #picker-prepend="{ select }"><b class="pick" @click="select(\'#00ffaa\')" /></template>',
         },
-        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
-        attachTo: document.body,
-      });
-      await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
-      await flushPromises();
+      );
 
       (document.querySelector('.pick') as HTMLElement).click();
       await flushPromises();
@@ -300,27 +292,22 @@ describe('DfColor', () => {
       expect(wrapper.emitted('preview')!.at(-1)).toEqual(['#00FFAA']);
       expect(control.value).toBe('#ff0000');
 
-      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
-      await ok!.trigger('click');
+      await pickerButton(wrapper, 'OK').trigger('click');
       expect(control.value).toBe('#00FFAA');
-      wrapper.unmount();
     });
 
     it("shows only the picker-prepend slot under picker 'none', and save writes the pending colour", async () => {
       const control = new Field<string>({ value: '#ff0000' });
-      const wrapper = mount(DfColor, {
-        props: { control, picker: 'none' },
-        slots: {
+      const wrapper = await openPicker(
+        control,
+        { picker: 'none' },
+        {
           'picker-prepend':
             '<template #picker-prepend="{ select, save }">' +
             '<b class="pick" @click="select(\'#00ffaa\'); save()" /></template>',
         },
-        global: { plugins: [vuetify], stubs: { VColorPicker: ColorPickerStub } },
-        attachTo: document.body,
-      });
+      );
       const menu = wrapper.findComponent({ name: 'VMenu' });
-      await menu.vm.$emit('update:modelValue', true);
-      await flushPromises();
       expect(wrapper.findComponent(ColorPickerStub).exists()).toBe(false);
       expect(wrapper.findComponent(HexagonPalette).exists()).toBe(false);
       expect(document.querySelector('.df-color-picker .pick')).not.toBeNull();
@@ -330,7 +317,6 @@ describe('DfColor', () => {
 
       expect(control.value).toBe('#00ffaa');
       expect(menu.props('modelValue')).toBe(false);
-      wrapper.unmount();
     });
 
     it('emits a null preview when OK closes the picker', async () => {
@@ -339,12 +325,10 @@ describe('DfColor', () => {
       wrapper.findComponent(ColorPickerStub).vm.$emit('update:modelValue', '#00ffaa');
       await flushPromises();
       expect(wrapper.emitted('preview')!.at(-1)).toEqual(['#00ffaa']);
-      const ok = wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK');
-      await ok!.trigger('click');
+      await pickerButton(wrapper, 'OK').trigger('click');
       await flushPromises();
 
       expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
-      wrapper.unmount();
     });
 
     it('emits a null preview when the menu closes by a click outside', async () => {
@@ -354,31 +338,26 @@ describe('DfColor', () => {
       await flushPromises();
 
       expect(wrapper.emitted('preview')).toEqual([['#ff0000'], [null]]);
-      wrapper.unmount();
     });
     describe('hexagon', () => {
       const hexagon = { picker: 'hexagon' };
-      const palette = (wrapper: Awaited<ReturnType<typeof openPicker>>) => wrapper.findComponent(HexagonPalette);
-      const cellsOf = (wrapper: Awaited<ReturnType<typeof openPicker>>) => palette(wrapper).findAll('.df-hexagon-cell');
-      const okButton = (wrapper: Awaited<ReturnType<typeof openPicker>>) =>
-        wrapper.findAllComponents({ name: 'VBtn' }).find((button) => button.text() === 'OK')!;
+      const palette = (wrapper: PickerWrapper) => wrapper.findComponent(HexagonPalette);
+      const cellsOf = (wrapper: PickerWrapper) => palette(wrapper).findAll('.df-hexagon-cell');
 
       it('replaces the generic picker with the hexagon palette', async () => {
         const wrapper = await openPicker(new Field<string>({ value: '#f00' }), hexagon);
 
         expect(wrapper.findComponent(ColorPickerStub).exists()).toBe(false);
         expect(cellsOf(wrapper)).toHaveLength(61);
-        wrapper.unmount();
       });
 
       it('lays out hexagonRings rings', async () => {
         const wrapper = await openPicker(new Field<string>({ value: '#f00' }), { ...hexagon, hexagonRings: 3 });
 
         expect(cellsOf(wrapper)).toHaveLength(19);
-        wrapper.unmount();
       });
 
-      const levels = (wrapper: Awaited<ReturnType<typeof openPicker>>) => ({
+      const levels = (wrapper: PickerWrapper) => ({
         slider: palette(wrapper).findComponent({ name: 'VSlider' }).exists(),
         toggle: palette(wrapper).find('.df-hexagon-palette__levels').exists(),
         bar: palette(wrapper).find('.df-hexagon-palette__segments').exists(),
@@ -388,7 +367,6 @@ describe('DfColor', () => {
         const wrapper = await openPicker(new Field<string>({ value: '#f00' }), hexagon);
 
         expect(levels(wrapper)).toEqual({ slider: true, toggle: false, bar: false });
-        wrapper.unmount();
       });
 
       it('offers fewer than 16 levels with level buttons and no selector for one level', async () => {
@@ -404,7 +382,6 @@ describe('DfColor', () => {
         expect(palette(three).find('.df-hexagon-palette__level').attributes('aria-label')).toBe('Lightness 1');
         expect(levels(array)).toEqual({ slider: false, toggle: true, bar: false });
         expect(levels(one)).toEqual({ slider: false, toggle: false, bar: false });
-        [three, array, one].forEach((wrapper) => wrapper.unmount());
       });
 
       it('lays out the level buttons as a grid of one column per level', async () => {
@@ -418,7 +395,6 @@ describe('DfColor', () => {
         const viewBoxWidth = Number(palette(wrapper).find('svg').attributes('viewBox')!.split(' ')[2]);
         const ratio = Number((palette(wrapper).element as HTMLElement).style.getPropertyValue('--df-cell-ratio'));
         expect(ratio).toBeCloseTo((2 * 0.95) / Math.sqrt(3) / viewBoxWidth, 6);
-        wrapper.unmount();
       });
 
       it('selects a level button by the arrow keys', async () => {
@@ -431,10 +407,9 @@ describe('DfColor', () => {
         expect(button(2).attributes('aria-checked')).toBe('true');
         expect(button(2).element).toBe(document.activeElement);
         await flushPromises();
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.4)[20].color);
-        wrapper.unmount();
       });
 
       it('offers 16 or more levels with a segmented bar', async () => {
@@ -447,7 +422,6 @@ describe('DfColor', () => {
         const checked = segments.filter((segment) => segment.attributes('aria-checked') === 'true');
         expect(checked).toHaveLength(1);
         expect(checked[0].attributes('tabindex')).toBe('0');
-        wrapper.unmount();
       });
 
       it('selects a segment by a click and by the arrow keys, keeping the place of the selected cell', async () => {
@@ -462,10 +436,9 @@ describe('DfColor', () => {
         expect(segment(6).attributes('aria-checked')).toBe('true');
         expect(segment(6).element).toBe(document.activeElement);
         await flushPromises();
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.3)[20].color);
-        wrapper.unmount();
       });
 
       it('selects the exact lightness of the value in the full range, and writes along the slider', async () => {
@@ -478,10 +451,9 @@ describe('DfColor', () => {
         slider.vm.$emit('update:modelValue', 0.8);
         await flushPromises();
         expect(Number(slider.props('modelValue'))).toBe(0.8);
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.8)[33].color);
-        wrapper.unmount();
       });
 
       it('selects the level and the cell nearest to the value on opening', async () => {
@@ -498,7 +470,6 @@ describe('DfColor', () => {
         const checked = cellsOf(wrapper).filter((cell) => cell.attributes('aria-checked') === 'true');
         expect(checked.map((cell) => cell.attributes('aria-label'))).toEqual([cells[30].color]);
         expect(checked[0].attributes('tabindex')).toBe('0');
-        wrapper.unmount();
       });
 
       it('writes a clicked cell when OK confirms it', async () => {
@@ -511,10 +482,9 @@ describe('DfColor', () => {
         expect(control.value).toBe('#808080');
         expect(cell.attributes('aria-checked')).toBe('true');
 
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
         expect(control.value).toBe(cell.attributes('aria-label'));
         expect(control.touched).toBe(true);
-        wrapper.unmount();
       });
 
       it('writes a cell on a double-click', async () => {
@@ -526,7 +496,6 @@ describe('DfColor', () => {
         await cell.trigger('dblclick');
 
         expect(control.value).toBe(cell.attributes('aria-label'));
-        wrapper.unmount();
       });
 
       it('writes the cell at the same place of another level when the level changes', async () => {
@@ -535,10 +504,9 @@ describe('DfColor', () => {
 
         await palette(wrapper).findAll('.df-hexagon-palette__level')[0].trigger('click');
         await flushPromises();
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
 
         expect(control.value).toBe(hexagonCells(5, 0.45)[20].color);
-        wrapper.unmount();
       });
 
       it('applies normalize to the preview and the written value, not to the pending one', async () => {
@@ -552,11 +520,10 @@ describe('DfColor', () => {
         expect(wrapper.emitted('preview')).toEqual([['#808080'], [raw.toUpperCase()]]);
         expect(cell.attributes('aria-checked')).toBe('true');
 
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
         await flushPromises();
         expect(control.value).toBe(raw.toUpperCase());
         expect(wrapper.emitted('preview')!.at(-1)).toEqual([null]);
-        wrapper.unmount();
       });
 
       it('moves the focus with the arrow keys and picks with Enter', async () => {
@@ -570,9 +537,8 @@ describe('DfColor', () => {
         expect(focused.element).not.toBe(center.element);
 
         await focused.trigger('keydown', { key: 'Enter' });
-        await okButton(wrapper).trigger('click');
+        await pickerButton(wrapper, 'OK').trigger('click');
         expect(control.value).toBe(focused.attributes('aria-label'));
-        wrapper.unmount();
       });
     });
   });

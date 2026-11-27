@@ -6,14 +6,12 @@ import { FileComms, FileGoneError } from './df-file.interface';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings';
 import { setFileGoneError, useFileUpload } from './use-file-upload';
 
-const mockInjectValues = new Map<any, any>();
-vi.mock('vue', async () => {
-  const actual = await vi.importActual('vue');
-  return {
-    ...actual,
-    inject: (key: any, defaultValue?: any) => mockInjectValues.get(key) ?? defaultValue,
-  };
-});
+import { makeComms, touchGone } from '@/test-utils/files';
+import { mockInjectValues } from '@/test-utils/mock-inject';
+
+const GONE = 'The file is gone';
+
+vi.mock('vue', async () => (await import('@/test-utils/mock-inject')).mockVueInject());
 
 const file = (name: string) => new File([new Uint8Array([1])], name);
 
@@ -28,31 +26,23 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-function makeComms(): FileComms {
-  return {
-    upload: vi.fn(async (f: File) => `id-${f.name}`),
-    delete: vi.fn(async () => {}),
-    touch: vi.fn(async () => {}),
-  };
-}
+/** uploads answer with an identifier derived from the file name */
+const idFromName = async (f: File) => `id-${f.name}`;
 
-function setup(options: { initial?: string | null; touchInterval?: number; comms?: FileComms } = {}) {
-  const value = ref<string | null>(options.initial ?? null);
-  const comms = options.comms ?? makeComms();
-  const upload = useFileUpload({
-    value,
-    touched: ref(false),
-    comms: () => comms,
-    touchInterval: () => options.touchInterval,
-    control: () => undefined,
-  });
-  return { value, comms, ...upload };
-}
-
-function setupWithControl(control: Form.Field<string | null>, options: { touchInterval?: number } = {}) {
-  const comms = makeComms();
-  // the value follows the control both ways, as useInputBase's does
-  const value = computed({ get: () => control.value, set: (v) => (control.value = v) });
+function setup(
+  options: {
+    initial?: string | null;
+    control?: Form.Field<string | null>;
+    touchInterval?: number;
+    comms?: FileComms;
+  } = {},
+) {
+  const { control } = options;
+  // with a control, the value follows it both ways, as useInputBase's does
+  const value = control
+    ? computed({ get: () => control.value, set: (v) => (control.value = v) })
+    : ref<string | null>(options.initial ?? null);
+  const comms = options.comms ?? makeComms(idFromName);
   const upload = useFileUpload({
     value,
     touched: ref(false),
@@ -60,7 +50,7 @@ function setupWithControl(control: Form.Field<string | null>, options: { touchIn
     touchInterval: () => options.touchInterval,
     control: () => control,
   });
-  return { comms, ...upload };
+  return { value, comms, ...upload };
 }
 
 describe('useFileUpload', () => {
@@ -143,7 +133,7 @@ describe('useFileUpload', () => {
 
     it("stops touching once the upload becomes the control's originalValue", async () => {
       const control = new Form.Field<string | null>({ value: null });
-      const { comms, upload } = setupWithControl(control, { touchInterval: 1_000 });
+      const { comms, upload } = setup({ control, touchInterval: 1_000 });
       await upload(file('a'));
       await nextTick();
       await vi.advanceTimersByTimeAsync(1_000);
@@ -157,10 +147,8 @@ describe('useFileUpload', () => {
 
     it('clears the value and reports the error when a touch reports the file is gone', async () => {
       const control = new Form.Field<string | null>({ value: null });
-      const { comms, upload } = setupWithControl(control, { touchInterval: 1_000 });
-      comms.touch = vi.fn(async () => {
-        throw new FileGoneError('The file is gone');
-      });
+      const { comms, upload } = setup({ control, touchInterval: 1_000 });
+      comms.touch = touchGone(GONE);
       await upload(file('a'));
       await nextTick();
 
@@ -192,7 +180,7 @@ describe('useFileUpload', () => {
 
       await upload(file('b'));
       await nextTick();
-      touch.reject(new FileGoneError('The file is gone'));
+      touch.reject(new FileGoneError(GONE));
       await vi.advanceTimersByTimeAsync(0);
       expect(value.value).toBe('id-b');
     });
@@ -200,7 +188,7 @@ describe('useFileUpload', () => {
 
   describe('uploading', () => {
     it('writes only the latest upload when an earlier one answers last', async () => {
-      const comms = makeComms();
+      const comms = makeComms(idFromName);
       const answers = { a: deferred<string>(), b: deferred<string>() };
       comms.upload = vi.fn((f: File) => answers[f.name as 'a' | 'b'].promise);
       const { value, upload, currentFile } = setup({ comms });
@@ -219,7 +207,7 @@ describe('useFileUpload', () => {
     });
 
     it('writes nothing for an upload that answers after a value was set on the field', async () => {
-      const comms = makeComms();
+      const comms = makeComms(idFromName);
       const answer = deferred<string>();
       comms.upload = vi.fn(() => answer.promise);
       const { value, upload, currentFile } = setup({ comms });
@@ -283,7 +271,7 @@ describe('useFileUpload', () => {
 
     it("deletes no upload that became the control's originalValue when it clears it", async () => {
       const control = new Form.Field<string | null>({ value: null });
-      const { comms, upload, clear } = setupWithControl(control);
+      const { comms, upload, clear } = setup({ control });
       await upload(file('a'));
       control.originalValue = control.value;
 
@@ -293,7 +281,7 @@ describe('useFileUpload', () => {
     });
 
     it('writes nothing for an upload that answers after the field was cleared', async () => {
-      const comms = makeComms();
+      const comms = makeComms(idFromName);
       const answer = deferred<string>();
       comms.upload = vi.fn(() => answer.promise);
       const { value, upload, clear } = setup({ comms });
@@ -311,19 +299,19 @@ describe('useFileUpload', () => {
 
 describe('setFileGoneError', () => {
   it('does nothing when no control is given', () => {
-    expect(() => setFileGoneError(undefined, 'The file is gone')).not.toThrow();
+    expect(() => setFileGoneError(undefined, GONE)).not.toThrow();
   });
 
   it('sets control.errors to a single error carrying the given text', () => {
     const control = new Form.Field<string>({ value: 'file-1' });
 
-    setFileGoneError(control, 'The file is gone');
+    setFileGoneError(control, GONE);
 
     expect(control.errors).toHaveLength(1);
     expect(control.errors[0]).toBeInstanceOf(ValidationError);
     expect(control.errors[0]).toMatchObject({
       code: 'vuetify-inputs.file_gone',
-      detail: 'The file is gone',
+      detail: GONE,
       origin: 'server',
     });
   });

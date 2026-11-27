@@ -18,6 +18,7 @@ import {
   MdString,
   type VuetifyInputsSettings,
 } from '@/index';
+import { makeComms } from '@/test-utils/files';
 
 function render(component: Component, props: Record<string, unknown>, settings: VuetifyInputsSettings = {}) {
   const app = createSSRApp({ render: () => h(component, props) });
@@ -26,7 +27,7 @@ function render(component: Component, props: Record<string, unknown>, settings: 
   return renderToString(app);
 }
 
-const comms = { upload: async () => 'id', delete: async () => {}, touch: async () => {} };
+const comms = makeComms();
 
 describe('server-side rendering', () => {
   it('renders a select as a text field holding the chosen choice', async () => {

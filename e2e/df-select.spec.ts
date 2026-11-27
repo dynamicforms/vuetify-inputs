@@ -1,4 +1,4 @@
-import { expect, type Page, test } from '@playwright/test';
+import { expect, type Page, test } from './test';
 
 const basicSelect = (page: Page) => page.locator('.demo-container').first().locator('.v-input').first();
 

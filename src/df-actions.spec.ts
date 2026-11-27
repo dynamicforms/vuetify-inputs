@@ -1,20 +1,20 @@
 import { Action as FormAction, ExecuteAction, Field, Group, SubmitAction, Validators } from '@dynamicforms/vue-forms';
-import { flushPromises, mount } from '@vue/test-utils';
+import { flushPromises, GlobalMountOptions, mount } from '@vue/test-utils';
 import { vi } from 'vitest';
 import { nextTick, Ref, ref } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
-import { createVuetify } from 'vuetify';
 import { VBtn } from 'vuetify/components';
 
 import DfActions from '@/df-actions.vue';
+import { DfActionsProps } from '@/dynamicforms-component-props';
 import { Action, HtmlString } from '@/helpers';
 
 describe('DfActions', () => {
-  let vuetify: any;
-
-  beforeEach(() => {
-    vuetify = createVuetify({ components: { VBtn } });
-  });
+  const mountActions = (
+    actions: DfActionsProps['actions'],
+    props: Partial<DfActionsProps> = {},
+    global: GlobalMountOptions = {},
+  ) => mount(DfActions, { props: { actions, ...props }, global });
 
   const createMockAction = (name: string, label: string, icon?: string): Action => {
     const executeAction = new ExecuteAction(vi.fn());
@@ -31,16 +31,25 @@ describe('DfActions', () => {
     });
   };
 
+  const pendingAction = (): [Action, () => void] => {
+    let release: () => void = () => {};
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const action = new Action({
+      value: { name: 'save', label: 'Save', showLabel: true },
+      actions: [new ExecuteAction(() => pending)],
+    });
+    return [action, release];
+  };
+
   it('renders one button per action', () => {
     const actions = [
       createMockAction('save', 'Save', 'save-outline'),
       createMockAction('cancel', 'Cancel', 'close-outline'),
     ];
 
-    const wrapper = mount(DfActions, {
-      props: { actions },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(actions);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(2);
   });
@@ -48,10 +57,7 @@ describe('DfActions', () => {
   it('shows the label and the icon', () => {
     const actions = [createMockAction('save', 'Save', 'save-outline')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(actions);
 
     const button = wrapper.find('.v-btn');
     expect(button.text()).toContain('Save');
@@ -63,20 +69,14 @@ describe('DfActions', () => {
     const action = createMockAction('save', 'Save');
     action.execute = mockExecute;
 
-    const wrapper = mount(DfActions, {
-      props: { actions: [action] },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions([action]);
 
     await wrapper.find('.v-btn').trigger('click');
     expect(mockExecute).toHaveBeenCalledTimes(1);
   });
 
   it('renders nothing without actions', () => {
-    const wrapper = mount(DfActions, {
-      props: { actions: [] },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions([]);
 
     expect(wrapper.find('.v-btn').exists()).toBe(false);
   });
@@ -84,10 +84,7 @@ describe('DfActions', () => {
   it('uses the button-group class when showAsGroup is set', () => {
     const actions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions, showAsGroup: 'grouped' },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(actions, { showAsGroup: 'grouped' });
 
     expect(wrapper.find('.button-group').exists()).toBe(true);
     expect(wrapper.find('.with-border').exists()).toBe(true);
@@ -96,10 +93,7 @@ describe('DfActions', () => {
   it('sets the button size', () => {
     const actions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions, buttonSize: 'large' },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(actions, { buttonSize: 'large' });
 
     const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
     expect(buttonComponent.props('size')).toBe('large');
@@ -108,10 +102,10 @@ describe('DfActions', () => {
     const action = createMockAction('save', 'Save');
     action.value.renderAs = 'text';
 
-    const wrapper = mount(DfActions, {
-      props: { actions: [action] },
-      global: {
-        plugins: [vuetify],
+    const wrapper = mountActions(
+      [action],
+      {},
+      {
         stubs: {
           'v-btn': {
             template: '<button class="v-btn" :data-variant="variant"><slot /></button>',
@@ -119,7 +113,7 @@ describe('DfActions', () => {
           },
         },
       },
-    });
+    );
 
     const button = wrapper.find('.v-btn');
     expect(button.attributes('data-variant')).toBe('text');
@@ -128,10 +122,7 @@ describe('DfActions', () => {
   it('shows a spacer between the icon and the label', () => {
     const action = createMockAction('save', 'Save', 'save-outline');
 
-    const wrapper = mount(DfActions, {
-      props: { actions: [action] },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions([action]);
 
     const spacer = wrapper.find('span[style*="width: 0.5rem"]');
     expect(spacer.exists()).toBe(true);
@@ -140,10 +131,7 @@ describe('DfActions', () => {
   it('shows no spacer without an icon or a label', () => {
     const actionOnlyIcon = createMockAction('save', '', 'save-outline');
 
-    const wrapper = mount(DfActions, {
-      props: { actions: [actionOnlyIcon] },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions([actionOnlyIcon]);
 
     const spacer = wrapper.find('span[style*="width: .5rem"]');
     expect(spacer.exists()).toBe(false);
@@ -152,10 +140,7 @@ describe('DfActions', () => {
   it('sets the grouping CSS classes', () => {
     const actions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions, showAsGroup: 'grouped-no-borders' },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(actions, { showAsGroup: 'grouped-no-borders' });
 
     const container = wrapper.find('div');
     expect(container.classes()).toContain('button-group');
@@ -164,10 +149,7 @@ describe('DfActions', () => {
   it('follows changes to the actions prop', async () => {
     const initialActions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions: initialActions },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(initialActions);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(1);
 
@@ -189,10 +171,7 @@ describe('DfActions', () => {
       createMockAction('cancel', 'Cancel'),
     ];
 
-    const wrapper = mount(DfActions, {
-      props: { actions: initialActions },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(initialActions);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(3);
 
@@ -204,10 +183,7 @@ describe('DfActions', () => {
   it('hides when all actions are removed', async () => {
     const initialActions = [createMockAction('save', 'Save')];
 
-    const wrapper = mount(DfActions, {
-      props: { actions: initialActions },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(initialActions);
 
     expect(wrapper.find('.v-btn').exists()).toBe(true);
 
@@ -220,10 +196,7 @@ describe('DfActions', () => {
   it('follows changes to a reactive actions ref', async () => {
     const actionsRef = <Ref<Action[]>>ref([createMockAction('save', 'Save')]);
 
-    const wrapper = mount(DfActions, {
-      props: { actions: actionsRef },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(actionsRef);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(1);
 
@@ -242,10 +215,7 @@ describe('DfActions', () => {
       ])
     );
 
-    const wrapper = mount(DfActions, {
-      props: { actions: actionsRef },
-      global: { plugins: [vuetify] },
-    });
+    const wrapper = mountActions(actionsRef);
 
     expect(wrapper.findAll('.v-btn')).toHaveLength(3);
 
@@ -258,56 +228,18 @@ describe('DfActions', () => {
   });
 
   describe('defaultConfirm / defaultReject colour', () => {
-    it('colours the button primary when defaultConfirm is set', () => {
+    it.each([
+      { confirm: true, reject: false, color: 'primary' },
+      { confirm: false, reject: true, color: 'secondary' },
+      { confirm: true, reject: true, color: 'primary' },
+      { confirm: false, reject: false, color: undefined },
+    ])('defaultConfirm $confirm, defaultReject $reject colours the button $color', ({ confirm, reject, color }) => {
       const action = createMockAction('save', 'Save');
-      action.value.defaultConfirm = true;
+      action.value.defaultConfirm = confirm;
+      action.value.defaultReject = reject;
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
-
-      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
-      expect(buttonComponent.props('color')).toBe('primary');
-    });
-
-    it('colours the button secondary when defaultReject is set', () => {
-      const action = createMockAction('cancel', 'Cancel');
-      action.value.defaultReject = true;
-
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
-
-      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
-      expect(buttonComponent.props('color')).toBe('secondary');
-    });
-
-    it('defaultConfirm takes precedence over defaultReject when both are set', () => {
-      const action = createMockAction('close', 'Close');
-      action.value.defaultConfirm = true;
-      action.value.defaultReject = true;
-
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
-
-      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
-      expect(buttonComponent.props('color')).toBe('primary');
-    });
-
-    it('leaves the button without a colour when neither defaultConfirm nor defaultReject is set', () => {
-      const action = createMockAction('neutral', 'Neutral');
-
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
-
-      const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
-      expect(buttonComponent.props('color')).toBeUndefined();
+      const buttonComponent = mountActions([action]).findComponent({ name: 'v-btn' });
+      expect(buttonComponent.props('color')).toBe(color);
     });
   });
 
@@ -316,10 +248,7 @@ describe('DfActions', () => {
       const action = createMockAction('save', 'Save');
       action.access = 'disabled';
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('disabled')).toBe(true);
@@ -328,10 +257,7 @@ describe('DfActions', () => {
     it('enables the button when action.enabled is true (default)', () => {
       const action = createMockAction('save', 'Save');
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('disabled')).toBe(false);
@@ -342,10 +268,7 @@ describe('DfActions', () => {
       const form = new Group({ save: action });
       form.access = 'disabled';
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       expect(action.enabled).toBe(true);
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -360,10 +283,7 @@ describe('DfActions', () => {
       });
       const form: Group = new Group({ name, save });
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [save] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([save]);
       await flushPromises();
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
@@ -377,25 +297,10 @@ describe('DfActions', () => {
   });
 
   describe('busy', () => {
-    const pendingAction = (): [Action, () => void] => {
-      let release: () => void = () => {};
-      const pending = new Promise<void>((resolve) => {
-        release = resolve;
-      });
-      const action = new Action({
-        value: { name: 'save', label: 'Save', showLabel: true },
-        actions: [new ExecuteAction(() => pending)],
-      });
-      return [action, release];
-    };
-
     it('disables the button and shows it loading until the run settles', async () => {
       const [action, release] = pendingAction();
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('disabled')).toBe(false);
@@ -417,10 +322,7 @@ describe('DfActions', () => {
       const [action, release] = pendingAction();
       const executeSpy = vi.spyOn(action, 'execute');
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       await wrapper.find('.v-btn').trigger('click');
       await nextTick();
@@ -437,10 +339,7 @@ describe('DfActions', () => {
     it('renders an action that carries only a label', () => {
       const action = new FormAction({ value: { label: 'Save' } });
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.text()).toContain('Save');
@@ -452,10 +351,7 @@ describe('DfActions', () => {
       const executed = vi.fn();
       const action = new FormAction({ value: { label: 'Save' }, actions: [new ExecuteAction(executed)] });
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       await wrapper.find('.v-btn').trigger('click');
       expect(executed).toHaveBeenCalledTimes(1);
@@ -463,28 +359,14 @@ describe('DfActions', () => {
   });
 
   describe('visibility', () => {
-    it('adds the d-none class when visibility is HIDDEN', () => {
+    it.each([
+      ['hidden', 'd-none'],
+      ['invisible', 'invisible'],
+    ] as const)('visibility %s adds the %s class', (visibility, cssClass) => {
       const action = createMockAction('save', 'Save');
-      action.visibility = 'hidden';
+      action.visibility = visibility;
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
-
-      expect(wrapper.find('.v-btn').classes()).toContain('d-none');
-    });
-
-    it('adds the invisible class when visibility is invisible', () => {
-      const action = createMockAction('save', 'Save');
-      action.visibility = 'invisible';
-
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
-
-      expect(wrapper.find('.v-btn').classes()).toContain('invisible');
+      expect(mountActions([action]).find('.v-btn').classes()).toContain(cssClass);
     });
 
     it('renders no button when visibility is SUPPRESS', () => {
@@ -492,10 +374,7 @@ describe('DfActions', () => {
       const suppressedAction = createMockAction('secret', 'Secret');
       suppressedAction.visibility = 'suppress';
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [shownAction, suppressedAction] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([shownAction, suppressedAction]);
 
       const buttons = wrapper.findAll('.v-btn');
       expect(buttons).toHaveLength(1);
@@ -505,10 +384,7 @@ describe('DfActions', () => {
     it('adds no classes when visibility is FULL (default)', () => {
       const action = createMockAction('save', 'Save');
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       const button = wrapper.find('.v-btn');
       expect(button.classes()).not.toContain('d-none');
@@ -520,10 +396,7 @@ describe('DfActions', () => {
       const action = createMockAction('save', 'Save');
       action.value.passthroughAttrs = { block: true, rounded: 'lg' };
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('block')).toBe(true);
@@ -535,19 +408,13 @@ describe('DfActions', () => {
       action.value.defaultConfirm = true;
       action.value.passthroughAttrs = { color: 'error' };
 
-      const wrapper = mount(DfActions, {
-        props: { actions: [action] },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountActions([action]);
 
       const buttonComponent = wrapper.findComponent({ name: 'v-btn' });
       expect(buttonComponent.props('color')).toBe('error');
     });
   });
   describe('accessible name', () => {
-    const mountActions = (actions: Action[]) =>
-      mount(DfActions, { props: { actions }, global: { plugins: [vuetify] } });
-
     it('names an icon-only button with aria-label and title', () => {
       const action = createMockAction('save', 'Save', 'save-outline');
       action.value.showLabel = false;
@@ -622,8 +489,8 @@ describe('DfActions', () => {
   });
 
   describe('simple', () => {
-    const mountSimple = (actions: Action[], props: Record<string, unknown> = {}) =>
-      mount(DfActions, { props: { actions, simple: true, ...props }, global: { plugins: [vuetify] } });
+    const mountSimple = (actions: Action[], props: Partial<DfActionsProps> = {}) =>
+      mountActions(actions, { simple: true, ...props });
 
     it('renders native buttons instead of v-btn', () => {
       const wrapper = mountSimple([createMockAction('save', 'Save'), createMockAction('cancel', 'Cancel')]);
@@ -693,11 +560,7 @@ describe('DfActions', () => {
     });
 
     it('is disabled and aria-busy while a run is in flight', async () => {
-      let release: () => void = () => {};
-      const pending = new Promise<void>((resolve) => {
-        release = resolve;
-      });
-      const action = new Action({ value: { label: 'Save' }, actions: [new ExecuteAction(() => pending)] });
+      const [action, release] = pendingAction();
       const wrapper = mountSimple([action]);
       const button = wrapper.find('button');
       expect(button.attributes('aria-busy')).toBeUndefined();

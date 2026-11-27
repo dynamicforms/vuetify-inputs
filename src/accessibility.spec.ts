@@ -1,9 +1,7 @@
 import { Field, Validators } from '@dynamicforms/vue-forms';
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { type Component } from 'vue';
-import { createVuetify } from 'vuetify';
-import * as components from 'vuetify/components';
 
 import DfCheckbox from '@/df-checkbox.vue';
 import DfColor from '@/df-color.vue';
@@ -14,8 +12,9 @@ import DfInput from '@/df-input.vue';
 import DfRtfEditor from '@/df-rtf-editor.vue';
 import DfSelect from '@/df-select.vue';
 import DfTextArea from '@/df-text-area.vue';
+import { makeComms } from '@/test-utils/files';
 
-const comms = { upload: async () => 'id', delete: async () => {}, touch: async () => {} };
+const comms = makeComms();
 
 interface Case {
   name: string;
@@ -63,18 +62,11 @@ const cases: Case[] = [
 
 const inputBaseHosted: Component[] = [DfDateTime, DfFile, DfImage, DfRtfEditor];
 
-const mounted: VueWrapper[] = [];
-afterEach(() => {
-  mounted.splice(0).forEach((wrapper) => wrapper.unmount());
-});
-
 async function mountCase(testCase: Case, control: Field, extra: Record<string, unknown> = {}) {
   const wrapper = mount(testCase.component, {
     props: { control, label: 'Field label', hint: 'Hint text', ...testCase.props, ...extra },
-    global: { plugins: [createVuetify({ components })] },
     attachTo: document.body,
   });
-  mounted.push(wrapper);
   await flushPromises();
   return wrapper;
 }

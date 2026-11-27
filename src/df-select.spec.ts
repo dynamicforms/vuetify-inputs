@@ -1,6 +1,6 @@
 import { Field, Group, ValueChangedAction } from '@dynamicforms/vue-forms';
 import { flushPromises, mount } from '@vue/test-utils';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref, toRaw } from 'vue';
 import { createVuetify } from 'vuetify';
 import * as components from 'vuetify/components';
@@ -8,6 +8,7 @@ import { VAutocomplete } from 'vuetify/components';
 
 import DfSelect from '@/df-select.vue';
 import { HtmlString, MdString, SelectChoice } from '@/helpers';
+import { withPlugins } from '@/test-utils/plugins';
 
 const ALL_CHOICES: SelectChoice[] = [1, 2, 3, 4].map((id) => ({ id, text: `Choice ${id}` }));
 // A search returns at most this many choices, the way a paginated endpoint does: not every choice is loaded by one.
@@ -40,17 +41,31 @@ function deferredFetchChoices(available: SelectChoice[] = ALL_CHOICES) {
   return { fetchChoices, release };
 }
 
+// records every value written to the control
+function recordWrites(control: Field<any>): unknown[] {
+  const writes: unknown[] = [];
+  control.registerAction(
+    new ValueChangedAction((field, supr, newValue, oldValue) => {
+      writes.push(newValue);
+      return supr(field, newValue, oldValue);
+    }),
+  );
+  return writes;
+}
+
 describe('DfSelect', () => {
-  let vuetify: any;
-
-  beforeEach(() => {
-    vuetify = createVuetify({ components });
-  });
-
-  const mountSelect = (props: Record<string, any>) =>
-    mount(DfSelect, { props: { label: 'Select', ...props }, global: { plugins: [vuetify] } });
+  const mountSelect = (props: Record<string, any>) => mount(DfSelect, { props: { label: 'Select', ...props } });
+  // mounted in the document, so that focus moves and the menu can be opened and read
+  const mountAttached = (props: Record<string, any>) =>
+    mount(DfSelect, { props: { label: 'Select', ...props }, attachTo: document.body });
 
   const chipTexts = (wrapper: ReturnType<typeof mountSelect>) => wrapper.findAll('.v-chip').map((chip) => chip.text());
+  const closeLabels = (wrapper: ReturnType<typeof mountSelect>) =>
+    wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
+  const itemTitles = (
+    wrapper: ReturnType<typeof mountSelect>,
+    component: typeof VAutocomplete | typeof components.VCombobox = VAutocomplete,
+  ) => (wrapper.findComponent(component).props('items') as { title: string }[]).map((item) => item.title);
 
   describe('with fetchChoices', () => {
     it('keeps a multiple value while its choices are being fetched', async () => {
@@ -188,18 +203,12 @@ describe('DfSelect', () => {
       { name: 'an id that is not among the choices', value: 99, multiple: false, allowNull: true },
     ])('leave $name as it is', async ({ value, multiple, allowNull }) => {
       const control = new Field<any>({ value });
-      const changed = vi.fn();
-      control.registerAction(
-        new ValueChangedAction((field, supr, newValue, oldValue) => {
-          changed(newValue);
-          return supr(field, newValue, oldValue);
-        }),
-      );
+      const writes = recordWrites(control);
       const wrapper = mountSelect({ control, multiple, allowNull, choices: ALL_CHOICES });
       await flushPromises();
 
       expect(toRaw(control.value)).toBe(value);
-      expect(changed).not.toHaveBeenCalled();
+      expect(writes).toEqual([]);
       expect(wrapper.emitted('update:modelValue')).toBeUndefined();
     });
   });
@@ -225,20 +234,14 @@ describe('DfSelect', () => {
 
     it('the clear button sets null', async () => {
       const control = new Field<number[] | null>({ value: [1, 2] });
-      const values: any[] = [];
-      control.registerAction(
-        new ValueChangedAction((field, supr, newValue, oldValue) => {
-          values.push(newValue);
-          return supr(field, newValue, oldValue);
-        }),
-      );
+      const writes = recordWrites(control);
       const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
       await flushPromises();
 
       await wrapper.find('.v-field__clearable .v-icon').trigger('click');
       await flushPromises();
       expect(control.value).toBeNull();
-      expect(values).toEqual([null]);
+      expect(writes).toEqual([null]);
     });
   });
 
@@ -354,7 +357,7 @@ describe('DfSelect', () => {
             },
           }),
       });
-      const wrapper = mount(Parent, { global: { plugins: [vuetify] } });
+      const wrapper = mount(Parent);
       return { wrapper, model, updates };
     };
 
@@ -402,17 +405,12 @@ describe('DfSelect', () => {
       const wrapper = mountSelect({ control: new Field({ value: [1, 2] }), multiple: true, choices: ALL_CHOICES });
       await flushPromises();
 
-      const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
-      expect(labels).toEqual(['Remove Choice 1', 'Remove Choice 2']);
+      expect(closeLabels(wrapper)).toEqual(['Remove Choice 1', 'Remove Choice 2']);
     });
 
     it.each(['Enter', ' '])('removes a chip with %j on its close button and focuses the next one', async (key) => {
       const control = new Field<number[] | null>({ value: [1, 2, 3] });
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', control, multiple: true, choices: ALL_CHOICES },
-        global: { plugins: [vuetify] },
-        attachTo: document.body,
-      });
+      const wrapper = mountAttached({ control, multiple: true, choices: ALL_CHOICES });
       await flushPromises();
 
       const button = wrapper.findAll('.v-chip__close')[1];
@@ -425,7 +423,6 @@ describe('DfSelect', () => {
       expect(control.value).toEqual([1, 3]);
       expect(wrapper.findComponent(VAutocomplete).props('menu')).toBe(false);
       expect(document.activeElement?.getAttribute('aria-label')).toBe('Remove Choice 3');
-      wrapper.unmount();
     });
 
     it('removes no chip on a repeated Space keydown and keeps it from the autocomplete', async () => {
@@ -452,8 +449,7 @@ describe('DfSelect', () => {
       const wrapper = mountSelect({ control: new Field({ value: [1, 2] }), multiple: true, choices });
       await flushPromises();
 
-      const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
-      expect(labels).toEqual(['Remove Size {0}', 'Remove Size {choice}']);
+      expect(closeLabels(wrapper)).toEqual(['Remove Size {0}', 'Remove Size {choice}']);
     });
 
     it('removes a chip on a click on its close button', async () => {
@@ -470,11 +466,7 @@ describe('DfSelect', () => {
 
     it('focuses the input once no closable chip remains', async () => {
       const control = new Field<number[] | null>({ value: [1, 2] });
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', control, multiple: true, allowNull: false, choices: ALL_CHOICES },
-        global: { plugins: [vuetify] },
-        attachTo: document.body,
-      });
+      const wrapper = mountAttached({ control, multiple: true, allowNull: false, choices: ALL_CHOICES });
       await flushPromises();
 
       wrapper
@@ -484,7 +476,6 @@ describe('DfSelect', () => {
 
       expect(control.value).toEqual([2]);
       expect(document.activeElement).toBe(wrapper.find('input').element);
-      wrapper.unmount();
     });
 
     it('leaves other keys on a chip to the autocomplete', async () => {
@@ -501,11 +492,7 @@ describe('DfSelect', () => {
     });
 
     it('hides choice icons in chips and options from assistive technology', async () => {
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', control: new Field({ value: [1] }), multiple: true, choices: ICON_CHOICES },
-        global: { plugins: [vuetify] },
-        attachTo: document.body,
-      });
+      const wrapper = mountAttached({ control: new Field({ value: [1] }), multiple: true, choices: ICON_CHOICES });
       await flushPromises();
 
       const chipIcons = wrapper.findAll('.v-chip .cached-icon-wrapper');
@@ -517,20 +504,15 @@ describe('DfSelect', () => {
       const optionIcons = document.querySelectorAll('.v-overlay-container .v-list-item .cached-icon-wrapper');
       expect(optionIcons).toHaveLength(ICON_CHOICES.length);
       optionIcons.forEach((icon) => expect(icon.getAttribute('aria-hidden')).toBe('true'));
-      wrapper.unmount();
     });
 
     it.each(['', '  '])('gives a blank id outside the choices no choice and keeps it (%j)', async (blank) => {
       const control = new Field<any>({ value: blank });
       const onDisplay = vi.fn();
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', control, choices: ALL_CHOICES, 'onUpdate:modelValueDisplay': onDisplay },
-        global: { plugins: [vuetify] },
-      });
+      const wrapper = mountSelect({ control, choices: ALL_CHOICES, 'onUpdate:modelValueDisplay': onDisplay });
       await flushPromises();
 
-      const items = wrapper.findComponent(VAutocomplete).props('items') as { title: string }[];
-      expect(items.map((item) => item.title)).toEqual(ALL_CHOICES.map((choice) => choice.text));
+      expect(itemTitles(wrapper)).toEqual(ALL_CHOICES.map((choice) => choice.text));
       expect(wrapper.findAll('.v-chip')).toHaveLength(0);
       expect(onDisplay).toHaveBeenLastCalledWith([]);
       expect(control.value).toBe(blank);
@@ -540,7 +522,7 @@ describe('DfSelect', () => {
       const control = new Field<any>({ value: [1, ''] });
       const wrapper = mountSelect({ control, multiple: true, choices: ALL_CHOICES });
       await flushPromises();
-      expect(wrapper.findAll('.v-chip').map((chip) => chip.text())).toEqual(['Choice 1']);
+      expect(chipTexts(wrapper)).toEqual(['Choice 1']);
 
       await wrapper.find('.v-chip__close').trigger('click');
       await flushPromises();
@@ -564,23 +546,10 @@ describe('DfSelect', () => {
   });
 
   describe('search states', () => {
-    const mounted: ReturnType<typeof mountSelect>[] = [];
-
     afterEach(() => {
       vi.useRealTimers();
-      mounted.splice(0).forEach((wrapper) => wrapper.unmount());
     });
 
-    // mounted in the document, so that the menu can be opened and read
-    const mountAttached = (props: Record<string, any>) => {
-      const wrapper = mount(DfSelect, {
-        props: { label: 'Select', ...props },
-        global: { plugins: [vuetify] },
-        attachTo: document.body,
-      });
-      mounted.push(wrapper);
-      return wrapper;
-    };
     const openMenu = async (wrapper: ReturnType<typeof mountSelect>) => {
       await wrapper.find('.v-field').trigger('mousedown');
       await flushPromises();
@@ -591,8 +560,6 @@ describe('DfSelect', () => {
     };
     const options = () => Array.from(document.querySelectorAll('.v-overlay-container [role="option"]'));
     const noData = () => document.querySelector('.v-overlay-container .df-select-no-data');
-    const itemTitles = (wrapper: ReturnType<typeof mountSelect>) =>
-      (wrapper.findComponent(VAutocomplete).props('items') as { title: string }[]).map((item) => item.title);
     const useFakeTimeouts = () => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
 
     describe('choice text as content', () => {
@@ -635,8 +602,7 @@ describe('DfSelect', () => {
         await flushPromises();
 
         expect(itemTitles(wrapper)).toEqual(['Koper Train and Bus', 'Kranj']);
-        const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
-        expect(labels).toEqual(['Remove Koper Train and Bus', 'Remove Kranj']);
+        expect(closeLabels(wrapper)).toEqual(['Remove Koper Train and Bus', 'Remove Kranj']);
       });
 
       it('reads a function text on every render', async () => {
@@ -654,8 +620,7 @@ describe('DfSelect', () => {
 
         expect(chipTexts(wrapper)).toEqual(['Vlak', 'Avtobus']);
         expect(itemTitles(wrapper)).toEqual(['Vlak', 'Avtobus']);
-        const labels = wrapper.findAll('.v-chip__close').map((button) => button.attributes('aria-label'));
-        expect(labels).toEqual(['Remove Vlak', 'Remove Avtobus']);
+        expect(closeLabels(wrapper)).toEqual(['Remove Vlak', 'Remove Avtobus']);
       });
 
       it('shows any other value as its string, and emits the choices as given', async () => {
@@ -665,14 +630,11 @@ describe('DfSelect', () => {
           { id: 2, text: html },
         ];
         const onDisplay = vi.fn();
-        const wrapper = mount(DfSelect, {
-          props: {
-            control: new Field({ value: [1, 2] }),
-            multiple: true,
-            choices,
-            'onUpdate:modelValueDisplay': onDisplay,
-          },
-          global: { plugins: [vuetify] },
+        const wrapper = mountSelect({
+          control: new Field({ value: [1, 2] }),
+          multiple: true,
+          choices,
+          'onUpdate:modelValueDisplay': onDisplay,
         });
         await flushPromises();
 
@@ -832,8 +794,7 @@ describe('DfSelect', () => {
         expect(fetchChoices).toHaveBeenCalledExactlyOnceWith(undefined, 2);
         await release();
 
-        const items = wrapper.findComponent(components.VCombobox).props('items') as { title: string }[];
-        expect(items.map((item) => item.title)).toEqual(['Choice 2']);
+        expect(itemTitles(wrapper, components.VCombobox)).toEqual(['Choice 2']);
         expect(chipTexts(wrapper)).toEqual(['Choice 2']);
         expect(control.value).toBe(2);
       });
@@ -969,7 +930,7 @@ describe('DfSelect', () => {
   it('renders the autocomplete once mounted where Vuetify is created for server-side rendering', async () => {
     const ssrVuetify = createVuetify({ ssr: true, components });
     const choices = [{ id: 1, text: 'One' }];
-    const wrapper = mount(DfSelect, { props: { choices, modelValue: 1 }, global: { plugins: [ssrVuetify] } });
+    const wrapper = withPlugins([ssrVuetify], () => mount(DfSelect, { props: { choices, modelValue: 1 } }));
 
     await flushPromises();
 
