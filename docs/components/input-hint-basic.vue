@@ -27,7 +27,6 @@
       <v-card-title>Standalone</v-card-title>
       <v-card-text>
         <!-- #region template -->
-        <!-- Standalone, with a plain string in each of the two props -->
         <df-select
           v-model="errorSource"
           :choices="errorSources"
@@ -36,6 +35,7 @@
           class="mb-4"
         />
 
+        <!-- Standalone, with a plain string in each of the two props -->
         <div class="row-frame">
           <df-input-hint
             :errors="standaloneErrors"
