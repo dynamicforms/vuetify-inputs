@@ -254,4 +254,130 @@ describe('MessagesWidget', () => {
       expect(divs.map((d) => d.text())).toEqual(['']);
     });
   });
+
+  describe('itemAttrs', () => {
+    const attrs = { role: 'cell', 'aria-label': 'Label' };
+
+    it('binds the attributes on the span of a plain message, as item 0', () => {
+      let asked: [string, number] | undefined;
+      const itemAttrs = (item: RenderableValue, index: number) => {
+        asked = [item.componentBody as string, index];
+        return attrs;
+      };
+      const span = buildWrapper({ message: 'Plain', classes: 'text-error', itemAttrs }).find('span');
+
+      expect(asked).toEqual(['Plain', 0]);
+      expect(span.attributes('role')).toBe('cell');
+      expect(span.attributes('aria-label')).toBe('Label');
+      expect(span.classes()).toEqual(['text-error']);
+    });
+
+    it('binds the attributes on the div of a text item', () => {
+      const div = buildWrapper({ message: [new RenderableValue('Text', 'own')], classes: 'w', itemAttrs: attrs }).find(
+        'div',
+      );
+
+      expect(div.attributes('role')).toBe('cell');
+      expect(div.text()).toBe('Text');
+      expect(div.classes()).toEqual(['w', 'own']);
+    });
+
+    it('binds the attributes on the div of an HTML item', () => {
+      const wrapper = buildWrapper({ message: [new HtmlString('<b>bold</b>')], itemAttrs: attrs });
+
+      expect(wrapper.find('div[role="cell"] b').text()).toBe('bold');
+    });
+
+    it('binds the attributes on the markdown wrapper', () => {
+      const wrapper = buildWrapper({ message: [new MdString('**md**')], classes: 'w', itemAttrs: attrs });
+      const markdown = wrapper.find('.df-messages-widget-markdown');
+
+      expect(markdown.attributes('role')).toBe('cell');
+      expect(markdown.classes()).toEqual(expect.arrayContaining(['w', 'df-messages-widget-markdown']));
+      expect(markdown.find('strong').text()).toBe('md');
+    });
+
+    it('binds the attributes on an html element of a component definition, merged with its props', () => {
+      const content = { componentName: 'span', componentProps: { class: 'own', title: 't', role: 'note' } };
+      const wrapper = buildWrapper({
+        message: [new RenderableValue(content)],
+        classes: 'w',
+        itemAttrs: { ...attrs, class: 'extra' },
+      });
+      const span = wrapper.find('span');
+
+      expect(span.classes()).toEqual(['w', 'own', 'extra']);
+      expect(span.attributes('title')).toBe('t');
+      expect(span.attributes('role')).toBe('cell');
+      expect(span.attributes('aria-label')).toBe('Label');
+    });
+
+    it('replaces an attribute of the item and keeps its classes and styles', () => {
+      const content = { componentName: 'span', componentProps: { class: 'own', style: 'color: red', title: 'own' } };
+      const itemAttrs = Object.freeze({ title: 'attrs' });
+      const span = buildWrapper({ message: [new RenderableValue(content)], classes: 'w', itemAttrs }).find('span');
+
+      expect(span.attributes('title')).toBe('attrs');
+      expect(span.classes()).toEqual(['w', 'own']);
+      expect(span.attributes('style')).toContain('color: red');
+    });
+
+    it('adds a style of the attributes to the style of the item', () => {
+      const content = { componentName: 'span', componentProps: { style: { color: 'red' } } };
+      const itemAttrs = { style: { fontWeight: 'bold' } };
+      const span = buildWrapper({ message: [new RenderableValue(content)], itemAttrs }).find('span');
+
+      expect(span.attributes('style')).toContain('color: red');
+      expect(span.attributes('style')).toContain('font-weight: bold');
+    });
+
+    it('binds the attributes on a registered component, beside its props', () => {
+      const message = [new RenderableValue({ componentName: 'custom-alert', componentProps: { type: 'warning' } })];
+
+      const alert = buildWrapper({ message, itemAttrs: attrs }).find('.custom-alert-mock');
+
+      expect(alert.attributes('type')).toBe('warning');
+      expect(alert.attributes('role')).toBe('cell');
+    });
+
+    it('calls both the item listener and the itemAttrs listener', async () => {
+      const calls: string[] = [];
+      const content = { componentName: 'button', componentProps: { onClick: () => calls.push('own') } };
+      const wrapper = buildWrapper({
+        message: [new RenderableValue(content)],
+        itemAttrs: { onClick: () => calls.push('attrs') },
+      });
+
+      await wrapper.find('button').trigger('click');
+
+      expect(calls).toEqual(['own', 'attrs']);
+    });
+
+    it('does not bind the attributes on the children of a component', () => {
+      const content = { componentName: 'p', children: [{ componentName: 'em', children: 'child' }] };
+      const wrapper = buildWrapper({ message: [new RenderableValue(content)], itemAttrs: attrs });
+
+      expect(wrapper.find('p').attributes('role')).toBe('cell');
+      expect(wrapper.find('em').attributes('role')).toBeUndefined();
+    });
+
+    it('gives the function each item with its index, an error as its text', () => {
+      const asked: [string, number][] = [];
+      const message = [new RenderableValue('First'), new ValidationError('x', {}, 'Second detail')];
+      const itemAttrs = (item: RenderableValue, index: number) => {
+        asked.push([item.componentBody as string, index]);
+        return index === 0 ? { 'aria-colindex': index + 1 } : undefined;
+      };
+
+      const divs = buildWrapper({ message, itemAttrs }).findAll('div');
+
+      expect(asked).toEqual([
+        ['First', 0],
+        ['Second detail', 1],
+      ]);
+      expect(divs[0].attributes('aria-colindex')).toBe('1');
+      expect(divs[1].attributes('aria-colindex')).toBeUndefined();
+      expect(divs[1].text()).toBe('Second detail');
+    });
+  });
 });

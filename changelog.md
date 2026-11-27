@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   has not changed for that long; an empty search text and loading the choices for the value's ids are not delayed.
 - Peer dependency `markdown-it` (`^14.1.0 || ^15.0.0`) in place of `vue-markdown-render`: `MessagesWidget` renders an
   `MdString` with it into a `<div>`, with the string's `options` and `plugins`, as before.
+- `MessagesWidget`: prop `itemAttrs`, attributes for the element of every rendered item, or a function
+  `(item, index)` that gives them per item. They merge with the item's own bindings as Vue merges props: classes,
+  styles and listeners add up, any other attribute replaces the item's own.
 
 ### Fixed
 
