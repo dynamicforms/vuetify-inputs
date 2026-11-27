@@ -194,8 +194,7 @@ async function pasteFromClipboard() {
 </script>
 
 <style>
-/* .df-sub-field caps itself at the height of a single-line input; without lifting that cap here, the taller
-   image area would keep the field's own layout box small and just paint over whatever follows it on the page. */
+/* lifts the single-line max-height of .df-sub-field, so the field's box takes the height of the image area */
 .df-image-field .df-sub-field {
   max-height: revert;
 }
