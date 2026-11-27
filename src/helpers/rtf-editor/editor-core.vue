@@ -149,9 +149,7 @@ const editor = useEditor({
     transformPastedHTML: (html: string) => stripWordArtifacts(html),
     handlePaste: createImagePasteHandler(() => editor.value),
   },
-  // ProseMirror's schema never lets the document itself be empty - a cleared editor still holds one empty
-  // paragraph, whose serialised HTML is '<p></p>'. Emitting that instead of '' would make a `required` rule
-  // checking for a falsy modelValue pass on a field the user never actually typed or pasted anything into.
+  // a cleared document is one empty paragraph ('<p></p>'); it is emitted as '', which Required rejects
   onUpdate: ({ editor: instance }) => {
     emit('update:modelValue', instance.isEmpty ? '' : instance.getHTML());
   },
