@@ -37,8 +37,9 @@ The value is the string `comms.upload` resolves to, and the component renders it
 lookup from an identifier to a URL, so it must be a URL the browser can load. The same URL is passed to `comms.delete`
 and `comms.touch`, and is stored in the form data when using DynamicForms.
 
-Otherwise df-file's [FileComms interface](/examples/df-file#filecomms-interface),
-[value format](/examples/df-file#value-format), [temporary uploads](/examples/df-file#temporary-uploads) and
+Otherwise df-file's [FileComms interface](/examples/df-file#filecomms-interface), its rules for an upload that runs
+while the field is disabled or is superseded ([value format](/examples/df-file#value-format)),
+[temporary uploads](/examples/df-file#temporary-uploads) and
 [upload progress and `FileGoneError` handling](/examples/df-file#upload-progress) apply unchanged, with the URL in place
 of the file identifier. A `FileGoneError` from a touch also clears the preview. `getDownloadUrl` is not used.
 
