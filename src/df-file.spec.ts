@@ -50,8 +50,7 @@ describe('DfFile', () => {
     await pickFile(wrapper, pdfFile());
 
     expect(comms.upload).toHaveBeenCalledTimes(1);
-    const emitted = wrapper.emitted('update:modelValue') as any[];
-    expect(emitted[emitted.length - 1]).toEqual(['file-id-1']);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['file-id-1']);
   });
 
   it('shows drag feedback while dragging over the field', async () => {
@@ -69,8 +68,7 @@ describe('DfFile', () => {
     await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
 
     expect(comms.delete).toHaveBeenCalledWith('file-id-1');
-    const emitted = wrapper.emitted('update:modelValue') as any[];
-    expect(emitted[emitted.length - 1]).toEqual([null]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null]);
   });
 
   it('clears a file it was given without deleting it', async () => {
@@ -223,8 +221,7 @@ describe('DfFile', () => {
     await vi.advanceTimersByTimeAsync(1_000);
     await wrapper.vm.$nextTick();
 
-    const emitted = wrapper.emitted('update:modelValue') as any[];
-    expect(emitted[emitted.length - 1]).toEqual([null]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null]);
   });
 
   it('leaves the field untouched when touch rejects with a transient error', async () => {
@@ -237,8 +234,7 @@ describe('DfFile', () => {
     await vi.advanceTimersByTimeAsync(1_000);
     await wrapper.vm.$nextTick();
 
-    const emitted = wrapper.emitted('update:modelValue') as any[];
-    expect(emitted[emitted.length - 1]).toEqual(['file-id-1']);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['file-id-1']);
   });
 
   it('takes the css class the bound control carries', () => {

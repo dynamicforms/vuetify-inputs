@@ -81,9 +81,7 @@ describe('DfImage', () => {
     await pickImage(wrapper, pngFile());
 
     expect(comms.upload).toHaveBeenCalledTimes(1);
-    expect(wrapper.emitted('update:modelValue')).toBeTruthy();
-    const emitted = wrapper.emitted('update:modelValue') as any[];
-    expect(emitted[emitted.length - 1]).toEqual(['https://example.com/uploaded.png']);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['https://example.com/uploaded.png']);
   });
 
   it('uploads a dropped image', async () => {
@@ -124,8 +122,7 @@ describe('DfImage', () => {
     await wrapper.findComponent({ name: 'VField' }).vm.$emit('click:clear');
 
     expect(comms.delete).toHaveBeenCalledWith('https://example.com/uploaded.png');
-    const emitted = wrapper.emitted('update:modelValue') as any[];
-    expect(emitted[emitted.length - 1]).toEqual([null]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null]);
   });
 
   it('clears an image it was given without deleting it', async () => {
@@ -220,8 +217,7 @@ describe('DfImage', () => {
     await vi.advanceTimersByTimeAsync(1_000);
     await wrapper.vm.$nextTick();
 
-    const emitted = wrapper.emitted('update:modelValue') as any[];
-    expect(emitted[emitted.length - 1]).toEqual([null]);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([null]);
   });
 
   it('leaves the field untouched when touch rejects with a transient error', async () => {
@@ -234,8 +230,7 @@ describe('DfImage', () => {
     await vi.advanceTimersByTimeAsync(1_000);
     await wrapper.vm.$nextTick();
 
-    const emitted = wrapper.emitted('update:modelValue') as any[];
-    expect(emitted[emitted.length - 1]).toEqual(['https://example.com/uploaded.png']);
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['https://example.com/uploaded.png']);
   });
 
   describe('clipboard', () => {
