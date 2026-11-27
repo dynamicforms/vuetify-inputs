@@ -107,6 +107,8 @@ import { ref } from 'vue';
 
 import { DfInput, DfInputGroup, DfSelect, DfCheckbox, DfDateTime, DfFile, DfTextArea, DfColor } from '../../src';
 
+import { mockFileComms } from './demo-file-comms';
+
 const selectedVariant = ref('outlined');
 const fullscreen = ref(false);
 
@@ -141,23 +143,7 @@ const selectChoices = [
   { id: 'option3', text: 'Option 3' },
 ];
 
-// Mock file communications for df-file component
-const mockFileComms = {
-  upload: async (file, progressCallback) => {
-    // Simulate upload progress
-    for (let i = 0; i <= 100; i += 20) {
-      if (progressCallback) progressCallback(i, 100);
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-    return `file-${Date.now()}`;
-  },
-  delete: async (fileId) => {
-    console.log('Delete file:', fileId);
-  },
-  touch: async (fileId) => {
-    console.log('Touch file:', fileId);
-  },
-};
+const fileComms = mockFileComms({ steps: 5, stepMs: 100, result: () => `file-${Date.now()}` });
 
 const components = [
   {
@@ -200,7 +186,7 @@ const components = [
     label: 'df-file',
     component: DfFile,
     model: 'file',
-    props: { comms: mockFileComms },
+    props: { comms: fileComms },
   },
   {
     name: 'textarea',
