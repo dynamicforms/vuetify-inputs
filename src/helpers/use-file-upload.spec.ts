@@ -6,7 +6,9 @@ import { FileComms, FileGoneError } from './df-file.interface';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings';
 import { setFileGoneError, useFileUpload } from './use-file-upload';
 
-import { makeComms } from '@/test-utils/files';
+import { makeComms, touchGone } from '@/test-utils/files';
+
+const GONE = 'The file is gone';
 
 const mockInjectValues = new Map<any, any>();
 vi.mock('vue', async () => {
@@ -155,9 +157,7 @@ describe('useFileUpload', () => {
     it('clears the value and reports the error when a touch reports the file is gone', async () => {
       const control = new Form.Field<string | null>({ value: null });
       const { comms, upload } = setupWithControl(control, { touchInterval: 1_000 });
-      comms.touch = vi.fn(async () => {
-        throw new FileGoneError('The file is gone');
-      });
+      comms.touch = touchGone(GONE);
       await upload(file('a'));
       await nextTick();
 
@@ -189,7 +189,7 @@ describe('useFileUpload', () => {
 
       await upload(file('b'));
       await nextTick();
-      touch.reject(new FileGoneError('The file is gone'));
+      touch.reject(new FileGoneError(GONE));
       await vi.advanceTimersByTimeAsync(0);
       expect(value.value).toBe('id-b');
     });
@@ -308,19 +308,19 @@ describe('useFileUpload', () => {
 
 describe('setFileGoneError', () => {
   it('does nothing when no control is given', () => {
-    expect(() => setFileGoneError(undefined, 'The file is gone')).not.toThrow();
+    expect(() => setFileGoneError(undefined, GONE)).not.toThrow();
   });
 
   it('sets control.errors to a single error carrying the given text', () => {
     const control = new Form.Field<string>({ value: 'file-1' });
 
-    setFileGoneError(control, 'The file is gone');
+    setFileGoneError(control, GONE);
 
     expect(control.errors).toHaveLength(1);
     expect(control.errors[0]).toBeInstanceOf(ValidationError);
     expect(control.errors[0]).toMatchObject({
       code: 'vuetify-inputs.file_gone',
-      detail: 'The file is gone',
+      detail: GONE,
       origin: 'server',
     });
   });

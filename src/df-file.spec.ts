@@ -3,8 +3,10 @@ import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import DfFile from '@/df-file.vue';
-import { FileComms, FileGoneError } from '@/helpers';
-import { fileList, makeComms } from '@/test-utils/files';
+import { FileComms } from '@/helpers';
+import { fileList, makeComms, touchGone } from '@/test-utils/files';
+
+const GONE = 'The uploaded file is no longer available on the server.';
 
 const pdfFile = (name = 'doc.pdf') => new File([new Uint8Array([37, 80, 68, 70])], name, { type: 'application/pdf' });
 
@@ -157,9 +159,7 @@ describe('DfFile', () => {
   });
 
   it('clears the field and reports the error on control when touch reports the file is gone', async () => {
-    comms.touch = vi.fn(async () => {
-      throw new FileGoneError('The uploaded file is no longer available on the server.');
-    });
+    comms.touch = touchGone(GONE);
     const control = new Form.Field<string>({ value: '' });
     const wrapper = mountFile({ control, touchInterval: 1_000 });
     await pickFile(wrapper, pdfFile());
@@ -169,7 +169,7 @@ describe('DfFile', () => {
 
     expect(control.value).toBeFalsy();
     expect(control.errors).toHaveLength(1);
-    expect(control.errors[0].detail).toBe('The uploaded file is no longer available on the server.');
+    expect(control.errors[0].detail).toBe(GONE);
   });
 
   it('marks a bound field touched when the upload returns', async () => {
@@ -183,9 +183,7 @@ describe('DfFile', () => {
   });
 
   it('drops the file_gone error when a new file is uploaded', async () => {
-    comms.touch = vi.fn(async () => {
-      throw new FileGoneError('The uploaded file is no longer available on the server.');
-    });
+    comms.touch = touchGone(GONE);
     const control = new Form.Field<string | null>({ value: null });
     const wrapper = mountFile({ control, touchInterval: 1_000 });
     await pickFile(wrapper, pdfFile());
@@ -202,9 +200,7 @@ describe('DfFile', () => {
   });
 
   it('clears a disabled field when touch reports the file is gone', async () => {
-    comms.touch = vi.fn(async () => {
-      throw new FileGoneError('The uploaded file is no longer available on the server.');
-    });
+    comms.touch = touchGone(GONE);
     const control = new Form.Field<string | null>({ value: null });
     const wrapper = mountFile({ control, touchInterval: 1_000 });
     await pickFile(wrapper, pdfFile());
@@ -220,9 +216,7 @@ describe('DfFile', () => {
   });
 
   it('clears the field without throwing when touch reports the file is gone and no control is bound', async () => {
-    comms.touch = vi.fn(async () => {
-      throw new FileGoneError('The uploaded file is no longer available on the server.');
-    });
+    comms.touch = touchGone(GONE);
     const wrapper = mountFile({ touchInterval: 1_000 });
     await pickFile(wrapper, pdfFile());
 

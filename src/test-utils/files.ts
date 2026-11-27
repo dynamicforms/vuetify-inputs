@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import { FileComms } from '@/helpers/df-file.interface';
+import { FileComms, FileGoneError } from '@/helpers/df-file.interface';
 
 /** A `FileComms` whose members are `vi.fn` mocks; `upload` resolves through the given function. */
 export function makeComms(upload: (file: File) => Promise<string> = async () => 'file-id'): FileComms {
@@ -22,3 +22,9 @@ export function fileList(files: File[]): FileList {
 export const PNG_BYTES = new Uint8Array([137, 80, 78, 71]);
 
 export const pngFile = (name = 'picture.png') => new File([PNG_BYTES], name, { type: 'image/png' });
+
+/** A `touch` mock that reports the file as gone on the server. */
+export const touchGone = (message: string) =>
+  vi.fn(async () => {
+    throw new FileGoneError(message);
+  });

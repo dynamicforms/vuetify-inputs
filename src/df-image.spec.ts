@@ -3,8 +3,10 @@ import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import DfImage from '@/df-image.vue';
-import { FileComms, FileGoneError } from '@/helpers';
-import { fileList, makeComms, PNG_BYTES, pngFile } from '@/test-utils/files';
+import { FileComms } from '@/helpers';
+import { fileList, makeComms, PNG_BYTES, pngFile, touchGone } from '@/test-utils/files';
+
+const GONE = 'The uploaded image is no longer available on the server.';
 
 const textFile = (name = 'notes.txt') => new File(['hello'], name, { type: 'text/plain' });
 
@@ -180,9 +182,7 @@ describe('DfImage', () => {
   });
 
   it('clears the field and preview and reports the error on control when touch reports the image is gone', async () => {
-    comms.touch = vi.fn(async () => {
-      throw new FileGoneError('The uploaded image is no longer available on the server.');
-    });
+    comms.touch = touchGone(GONE);
     const control = new Form.Field<string>({ value: '' });
     const wrapper = mountImage({ control, touchInterval: 1_000 });
     await pickImage(wrapper, pngFile());
@@ -192,14 +192,12 @@ describe('DfImage', () => {
 
     expect(control.value).toBeFalsy();
     expect(control.errors).toHaveLength(1);
-    expect(control.errors[0].detail).toBe('The uploaded image is no longer available on the server.');
+    expect(control.errors[0].detail).toBe(GONE);
     expect(wrapper.findComponent({ name: 'VImg' }).exists()).toBe(false);
   });
 
   it('clears a disabled field when touch reports the image is gone', async () => {
-    comms.touch = vi.fn(async () => {
-      throw new FileGoneError('The uploaded image is no longer available on the server.');
-    });
+    comms.touch = touchGone(GONE);
     const control = new Form.Field<string | null>({ value: null });
     const wrapper = mountImage({ control, touchInterval: 1_000 });
     await pickImage(wrapper, pngFile());
@@ -215,9 +213,7 @@ describe('DfImage', () => {
   });
 
   it('clears the field without throwing when touch reports the image is gone and no control is bound', async () => {
-    comms.touch = vi.fn(async () => {
-      throw new FileGoneError('The uploaded image is no longer available on the server.');
-    });
+    comms.touch = touchGone(GONE);
     const wrapper = mountImage({ touchInterval: 1_000 });
     await pickImage(wrapper, pngFile());
 
