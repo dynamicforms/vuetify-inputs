@@ -6,6 +6,8 @@ import { FileComms, FileGoneError } from './df-file.interface';
 import { vuetifyInputsSettingsKey, type VuetifyInputsSettings } from './settings';
 import { setFileGoneError, useFileUpload } from './use-file-upload';
 
+import { makeComms } from '@/test-utils/files';
+
 const mockInjectValues = new Map<any, any>();
 vi.mock('vue', async () => {
   const actual = await vi.importActual('vue');
@@ -28,17 +30,12 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-function makeComms(): FileComms {
-  return {
-    upload: vi.fn(async (f: File) => `id-${f.name}`),
-    delete: vi.fn(async () => {}),
-    touch: vi.fn(async () => {}),
-  };
-}
+/** uploads answer with an identifier derived from the file name */
+const idFromName = async (f: File) => `id-${f.name}`;
 
 function setup(options: { initial?: string | null; touchInterval?: number; comms?: FileComms } = {}) {
   const value = ref<string | null>(options.initial ?? null);
-  const comms = options.comms ?? makeComms();
+  const comms = options.comms ?? makeComms(idFromName);
   const upload = useFileUpload({
     value,
     touched: ref(false),
@@ -50,7 +47,7 @@ function setup(options: { initial?: string | null; touchInterval?: number; comms
 }
 
 function setupWithControl(control: Form.Field<string | null>, options: { touchInterval?: number } = {}) {
-  const comms = makeComms();
+  const comms = makeComms(idFromName);
   // the value follows the control both ways, as useInputBase's does
   const value = computed({ get: () => control.value, set: (v) => (control.value = v) });
   const upload = useFileUpload({
@@ -200,7 +197,7 @@ describe('useFileUpload', () => {
 
   describe('uploading', () => {
     it('writes only the latest upload when an earlier one answers last', async () => {
-      const comms = makeComms();
+      const comms = makeComms(idFromName);
       const answers = { a: deferred<string>(), b: deferred<string>() };
       comms.upload = vi.fn((f: File) => answers[f.name as 'a' | 'b'].promise);
       const { value, upload, currentFile } = setup({ comms });
@@ -219,7 +216,7 @@ describe('useFileUpload', () => {
     });
 
     it('writes nothing for an upload that answers after a value was set on the field', async () => {
-      const comms = makeComms();
+      const comms = makeComms(idFromName);
       const answer = deferred<string>();
       comms.upload = vi.fn(() => answer.promise);
       const { value, upload, currentFile } = setup({ comms });
@@ -293,7 +290,7 @@ describe('useFileUpload', () => {
     });
 
     it('writes nothing for an upload that answers after the field was cleared', async () => {
-      const comms = makeComms();
+      const comms = makeComms(idFromName);
       const answer = deferred<string>();
       comms.upload = vi.fn(() => answer.promise);
       const { value, upload, clear } = setup({ comms });

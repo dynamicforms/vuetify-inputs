@@ -11,7 +11,7 @@ import DfInput from '@/df-input.vue';
 import DfRtfEditor from '@/df-rtf-editor.vue';
 import DfSelect from '@/df-select.vue';
 import DfTextArea from '@/df-text-area.vue';
-import { FileComms } from '@/helpers';
+import { makeComms } from '@/test-utils/files';
 
 vi.mock('@/helpers/rtf-editor/editor-core.vue', () => ({
   default: {
@@ -20,11 +20,7 @@ vi.mock('@/helpers/rtf-editor/editor-core.vue', () => ({
   },
 }));
 
-const comms: FileComms = {
-  upload: vi.fn(async () => 'file-id'),
-  delete: vi.fn(async () => {}),
-  touch: vi.fn(async () => {}),
-};
+const comms = makeComms();
 
 const inputComponents: [string, any, Record<string, any>][] = [
   ['DfCheckbox', DfCheckbox, {}],

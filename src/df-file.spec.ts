@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import DfFile from '@/df-file.vue';
 import { FileComms, FileGoneError } from '@/helpers';
+import { makeComms } from '@/test-utils/files';
 
 const pdfFile = (name = 'doc.pdf') => new File([new Uint8Array([37, 80, 68, 70])], name, { type: 'application/pdf' });
 
@@ -31,11 +32,7 @@ describe('DfFile', () => {
   };
 
   beforeEach(() => {
-    comms = {
-      upload: vi.fn(async () => 'file-id-1'),
-      delete: vi.fn(async () => {}),
-      touch: vi.fn(async () => {}),
-    };
+    comms = makeComms(async () => 'file-id-1');
     vi.useFakeTimers();
   });
 

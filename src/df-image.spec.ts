@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import DfImage from '@/df-image.vue';
 import { FileComms, FileGoneError } from '@/helpers';
+import { makeComms } from '@/test-utils/files';
 
 const pngFile = (name = 'photo.png') => new File([new Uint8Array([137, 80, 78, 71])], name, { type: 'image/png' });
 const textFile = (name = 'notes.txt') => new File(['hello'], name, { type: 'text/plain' });
@@ -18,11 +19,7 @@ describe('DfImage', () => {
   let comms: FileComms;
 
   beforeEach(() => {
-    comms = {
-      upload: vi.fn(async () => 'https://example.com/uploaded.png'),
-      delete: vi.fn(async () => {}),
-      touch: vi.fn(async () => {}),
-    };
+    comms = makeComms(async () => 'https://example.com/uploaded.png');
     globalThis.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
     globalThis.URL.revokeObjectURL = vi.fn();
     vi.useFakeTimers();

@@ -12,8 +12,9 @@ import DfInput from '@/df-input.vue';
 import DfRtfEditor from '@/df-rtf-editor.vue';
 import DfSelect from '@/df-select.vue';
 import DfTextArea from '@/df-text-area.vue';
+import { makeComms } from '@/test-utils/files';
 
-const comms = { upload: async () => 'id', delete: async () => {}, touch: async () => {} };
+const comms = makeComms();
 
 interface Case {
   name: string;
