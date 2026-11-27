@@ -14,13 +14,11 @@ import { BreakpointNames, BreakpointsJSON, ResponsiveRenderOptions } from './res
 import { shownFlag } from './shown-flag';
 
 export interface ActionRenderOptions extends ActionValue {
-  /** The text of the action, rendered when {@link showLabel} is set and the text is not empty. `ActionValue`
-   * types this `unknown`, leaving what a label is to the rendering library; here it is a string, a ref to one or a
-   * function returning one. A ref or a function is read while the action renders, so a label that follows the
-   * locale is `() => t('Save')`. */
+  /** The text of the action: a string, a ref to one or a function returning one, read while the action renders
+   * (e.g. `() => t('Save')`). Rendered when {@link showLabel} is set and the text is not empty. */
   label?: MaybeRefOrGetter<string>;
-  /** The icon of the action, a name `vue-cached-icon` resolves, rendered when {@link showIcon} is set and the
-   * name is not empty. Typed here for the same reason `label` is. */
+  /** The icon of the action, a name `vue-cached-icon` resolves. Rendered when {@link showIcon} is set and the name
+   * is not empty. */
   icon?: string;
   /** Identifier of the action; not used for rendering. */
   name?: string;
