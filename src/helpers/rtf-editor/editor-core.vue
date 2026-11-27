@@ -266,8 +266,7 @@ function toggleBubbleLink() {
   height: auto;
 }
 
-/* TipTap's image resize NodeView (@tiptap/extension-image's `resize` option) builds the handle elements below
-   with no visual styling of their own - position only - so the consuming app is expected to supply the look. */
+/* the look of the resize handles that TipTap's image NodeView (`resize` option) creates; TipTap positions them only */
 .rtf-content [data-resize-handle] {
   background: rgb(var(--v-theme-primary));
   border: 1px solid rgb(var(--v-theme-surface));
