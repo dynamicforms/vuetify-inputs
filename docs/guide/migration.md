@@ -513,11 +513,9 @@ import deTranslations from 'ckeditor5/translations/de.js';
 setCkEditorLanguage('de', deTranslations);
 ```
 
-TipTap is headless: `<df-rtf-editor>`'s entire toolbar is built from this library's own Vuetify components, so
-every one of its labels is already a `translatableStrings` key, translated the same way as the rest of this
-library's text, through `translateStrings()` - see [Localisation](/examples/localisation). Drop the
-`setCkEditorLanguage` call and the translation-bundle import; nothing replaces them, because there is no longer a
-separate vendor UI language to configure.
+TipTap is headless: `<df-rtf-editor>`'s toolbar consists of this library's Vuetify components, and its labels are
+`translatableStrings` keys, translated through `translateStrings()` like the rest of this library's text (see
+[Localisation](/examples/localisation)). Remove the `setCkEditorLanguage` call and the translation-bundle import.
 
 ### List items and table cells wrap their text in a `<p>` now
 
@@ -542,8 +540,7 @@ This is safe to apply everywhere you render content saved by this library, past 
 ### Checklist for 0.10.0
 
 1. Swap `@ckeditor/ckeditor5-vue` and `ckeditor5` for the `@tiptap/*` set above in your own `package.json`.
-2. Search your project for `setCkEditorLanguage` and drop the call and its translation-bundle import; if you
-   supplied per-locale editor language before, that concern no longer exists to configure.
+2. Remove `setCkEditorLanguage` calls and their translation-bundle imports.
 3. Find every place outside `<df-rtf-editor>` that renders HTML this component saved - marketing pages, PDF
    generation, **templated emails** - and add `li p, td p, th p { margin: 0; }` (or that renderer's equivalent) to
    its stylesheet. Check a rendered list and a rendered table in each renderer.
