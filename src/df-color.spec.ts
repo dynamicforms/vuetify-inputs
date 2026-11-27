@@ -125,18 +125,32 @@ describe('DfColor', () => {
       template: '<div class="color-picker-stub"><div class="v-color-picker-canvas" /></div>',
     };
 
-    async function openPicker(control: Field<string>, props: Record<string, any> = {}) {
-      const wrapper = mount(DfColor, {
+    function mountPicker(control: Field<string>, props: Record<string, any> = {}, slots: Record<string, string> = {}) {
+      return mount(DfColor, {
         props: { control, ...props },
+        slots,
         global: { stubs: { VColorPicker: ColorPickerStub } },
         attachTo: document.body,
       });
+    }
+
+    type PickerWrapper = ReturnType<typeof mountPicker>;
+
+    async function openMenu(wrapper: PickerWrapper) {
       await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
       await flushPromises();
+    }
+
+    async function openPicker(
+      control: Field<string>,
+      props: Record<string, any> = {},
+      slots: Record<string, string> = {},
+    ) {
+      const wrapper = mountPicker(control, props, slots);
+      await openMenu(wrapper);
       return wrapper;
     }
 
-    type PickerWrapper = Awaited<ReturnType<typeof openPicker>>;
     const pickerButtons = (wrapper: PickerWrapper, text: string) =>
       wrapper.findAllComponents({ name: 'VBtn' }).filter((button) => button.text() === text);
     const pickerButton = (wrapper: PickerWrapper, text: string) => pickerButtons(wrapper, text)[0];
@@ -242,18 +256,14 @@ describe('DfColor', () => {
     });
 
     it('renders the picker-prepend slot above the picker with the pending colour', async () => {
-      const wrapper = mount(DfColor, {
-        props: { control: new Field<string>({ value: '#ff0000' }), normalize: (value: string) => value.toUpperCase() },
-        slots: {
-          'picker-prepend': '<template #picker-prepend="{ color }"><i class="prepended">{{ color }}</i></template>',
-        },
-        global: { stubs: { VColorPicker: ColorPickerStub } },
-        attachTo: document.body,
-      });
+      const wrapper = mountPicker(
+        new Field<string>({ value: '#ff0000' }),
+        { normalize: (value: string) => value.toUpperCase() },
+        { 'picker-prepend': '<template #picker-prepend="{ color }"><i class="prepended">{{ color }}</i></template>' },
+      );
       expect(document.querySelector('.prepended')).toBeNull();
 
-      await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
-      await flushPromises();
+      await openMenu(wrapper);
       const card = document.querySelector('.df-color-picker')!;
       const prepended = card.querySelector('.prepended')!;
       const picker = card.querySelector('.color-picker-stub')!;
@@ -267,17 +277,14 @@ describe('DfColor', () => {
 
     it('makes a colour selected through the picker-prepend slot pending, written by OK', async () => {
       const control = new Field<string>({ value: '#ff0000' });
-      const wrapper = mount(DfColor, {
-        props: { control, normalize: (value: string) => value.toUpperCase() },
-        slots: {
+      const wrapper = await openPicker(
+        control,
+        { normalize: (value: string) => value.toUpperCase() },
+        {
           'picker-prepend':
             '<template #picker-prepend="{ select }"><b class="pick" @click="select(\'#00ffaa\')" /></template>',
         },
-        global: { stubs: { VColorPicker: ColorPickerStub } },
-        attachTo: document.body,
-      });
-      await wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', true);
-      await flushPromises();
+      );
 
       (document.querySelector('.pick') as HTMLElement).click();
       await flushPromises();
@@ -291,19 +298,16 @@ describe('DfColor', () => {
 
     it("shows only the picker-prepend slot under picker 'none', and save writes the pending colour", async () => {
       const control = new Field<string>({ value: '#ff0000' });
-      const wrapper = mount(DfColor, {
-        props: { control, picker: 'none' },
-        slots: {
+      const wrapper = await openPicker(
+        control,
+        { picker: 'none' },
+        {
           'picker-prepend':
             '<template #picker-prepend="{ select, save }">' +
             '<b class="pick" @click="select(\'#00ffaa\'); save()" /></template>',
         },
-        global: { stubs: { VColorPicker: ColorPickerStub } },
-        attachTo: document.body,
-      });
+      );
       const menu = wrapper.findComponent({ name: 'VMenu' });
-      await menu.vm.$emit('update:modelValue', true);
-      await flushPromises();
       expect(wrapper.findComponent(ColorPickerStub).exists()).toBe(false);
       expect(wrapper.findComponent(HexagonPalette).exists()).toBe(false);
       expect(document.querySelector('.df-color-picker .pick')).not.toBeNull();
