@@ -85,8 +85,9 @@ export type VuetifyDensity = 'default' | 'comfortable' | 'compact';
 export type FieldDensity = 'default' | 'comfortable' | 'compact' | 'inline';
 ```
 
-`inline` is a density in addition to Vuetify's. It hides the outline and the floating label and removes the margins
-and padding of the remaining elements, so the control takes the least space.
+`inline` is a density in addition to Vuetify's, described under [Density options](/examples/density#density-options).
+The variants, including the library's own `inverted`, are described under
+[Variant options](/examples/density#variant-options).
 
 The order in which a field's density and variant are resolved is described under
 [Where density and variant come from](/examples/configuration#where-density-and-variant-come-from). The

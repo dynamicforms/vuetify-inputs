@@ -23,11 +23,10 @@ model. `@dynamicforms/vue-forms` is a peer dependency in every case, because the
 Both are resolved by the same code for every component; a change to either applies to every field.
 
 - **Density**: the vertical compactness of a field: `default`, `comfortable`, `compact` or `inline`. The first
-  three are Vuetify's. `inline` is this library's own: it removes the outline, the floating label and the padding,
-  so that a field fits inside a table cell.
+  three are Vuetify's, `inline` is this library's own. See [Density options](/examples/density#density-options).
 - **Variant**: the visual style: `outlined`, `plain`, `underlined`, `filled`, `solo`, `solo-inverted`,
-  `solo-filled` or `inverted`. The first seven are Vuetify's. `inverted` is this library's own: `solo-inverted` with the
-  colours inverted always, not only while focused.
+  `solo-filled` or `inverted`. The first seven are Vuetify's, `inverted` is this library's own. See
+  [Variant options](/examples/density#variant-options).
 
 Each is set in one of four places; the most specific applies: the prop on the tag, then the field itself, then a
 `provide` from any ancestor, then the plugin's defaults. The whole application is switched from `underlined` to
