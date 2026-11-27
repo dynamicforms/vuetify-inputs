@@ -202,7 +202,7 @@ The demo, without the cards it is laid out in:
 
 ## Key Features Demonstrated
 
-- **One row, two sources**: errors when there are any, the message otherwise
+- **Errors or message**: the row renders the errors when there are any, the message otherwise
 - **Whitespace is not an error**: a blank `errors` string leaves the message in place
 - **Per-state classes**: `errorClasses` and `messageClasses` apply to whichever value is rendered
 - **Rendering errors**: each error renders through `MessagesWidget`, as the `errorText` setting's content for it or
