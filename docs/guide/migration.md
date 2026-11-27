@@ -472,10 +472,10 @@ factory runs, so an application already rebuilding its actions on a locale chang
 
 `<df-rtf-editor>` is built on [TipTap](https://tiptap.dev/) instead of CKEditor 5. CKEditor 5's core is
 dual-licensed GPL/commercial, which put every application built on this library under the same terms unless it
-paid for a commercial CKEditor licence; TipTap's core and the extensions this component uses are MIT. Three
-things follow from that swap: a peer dependency change, a removed API, and a change to the HTML the editor
-produces that reaches further than this library - the third is the one worth reading carefully even if you never
-touch this component's config. There is a [checklist](#checklist-for-0-10-0) at the end of this section.
+paid for a commercial CKEditor licence; TipTap's core and the extensions this component uses are MIT. The
+release changes the peer dependencies, removes `setCkEditorLanguage()`, and changes the saved HTML of list items and
+table cells, which affects every renderer of that HTML, also in applications that do not configure this component.
+There is a [checklist](#checklist-for-0-10-0) at the end of this section.
 
 ### The peer dependencies change
 
