@@ -1,5 +1,5 @@
 <template>
-  <div class="actions-demo pa-4">
+  <div class="demo-container actions-demo pa-4">
     <div class="d-flex align-center justify-space-between mb-4">
       <div class="mb-0">
         <div>
@@ -153,10 +153,5 @@ const currentBreakpoint = computed(() => {
   border: 0.1em dashed rgba(var(--v-border-color), var(--v-border-opacity));
   padding: 1em;
   border-radius: 0.5em;
-}
-
-.size-select :deep(.v-field__input) {
-  padding-top: 5px;
-  padding-bottom: 5px;
 }
 </style>

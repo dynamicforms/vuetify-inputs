@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="demo-container">
     <div class="mb-4">
       <v-btn-toggle v-model="selectedLocaleIndex" mandatory color="primary">
         <v-btn value="0" size="small">🇸🇮 Slovenščina</v-btn>

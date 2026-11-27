@@ -1,5 +1,5 @@
 <template>
-  <div class="group-demo">
+  <div class="demo-container">
     <v-card class="mb-4">
       <v-card-title>Trip Budget</v-card-title>
       <v-card-text>
@@ -57,7 +57,7 @@
     <v-card>
       <v-card-title>Form Value</v-card-title>
       <v-card-text>
-        <pre class="output">{{ JSON.stringify(form.value, null, 2) }}</pre>
+        <pre class="demo-output">{{ JSON.stringify(form.value, null, 2) }}</pre>
       </v-card-text>
     </v-card>
   </div>
@@ -134,20 +134,3 @@ const total = computed(() => tripTotal());
 // the group's own errors, shown by the rule the inputs follow
 const formErrors = useShownErrors(form);
 </script>
-
-<style scoped>
-.group-demo {
-  margin: 2rem 0;
-}
-
-.output {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 1rem;
-  border-radius: 4px;
-  white-space: pre-wrap;
-}
-
-:deep(hr) {
-  margin: 0 !important;
-}
-</style>

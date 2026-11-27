@@ -47,10 +47,6 @@ function webSafe(value: string): string {
 </script>
 
 <style scoped>
-.demo-container {
-  margin-bottom: 20px;
-}
-
 .preview {
   height: 56px;
   border-radius: 4px;

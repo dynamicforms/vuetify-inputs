@@ -1,0 +1,28 @@
+/* styles shared by the demos in docs/components */
+.demo-container {
+  margin: 1rem 0;
+}
+
+.demo-container pre {
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
+  padding: 0.5rem;
+  border-radius: 4px;
+  max-height: 100px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+/* a form's whole value */
+.demo-container pre.demo-output {
+  padding: 1rem;
+  max-height: none;
+}
+
+.demo-error-text {
+  color: #ff5252;
+}
+
+/* VitePress gives every hr in a page a margin; v-number-input draws its control separators as hr */
+.demo-container .v-number-input hr {
+  margin: 0 !important;
+}

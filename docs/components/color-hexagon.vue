@@ -50,10 +50,6 @@ const twoColor = ref('#8064a2');
 </script>
 
 <style scoped>
-.demo-container {
-  margin-bottom: 20px;
-}
-
 .preview {
   height: 56px;
   border-radius: 4px;

@@ -43,7 +43,7 @@
         <div v-if="inputField.errors.length > 0" class="mt-4">
           <strong>Validation errors:</strong>
           <ul>
-            <li v-for="(error, index) in inputField.errors" :key="index" class="error-text">
+            <li v-for="(error, index) in inputField.errors" :key="index" class="demo-error-text">
               {{ error.detail }}
             </li>
           </ul>
@@ -120,20 +120,3 @@ function getHintForType(type: string) {
   }
 }
 </script>
-
-<style scoped>
-.demo-container {
-  margin-bottom: 20px;
-}
-
-pre {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 10px;
-  border-radius: 4px;
-  overflow: auto;
-}
-
-.error-text {
-  color: #ff5252;
-}
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="density-demo" :class="{ fullscreen }">
+  <div class="demo-container density-demo" :class="{ fullscreen }">
     <v-card class="mb-4">
       <v-card-title>Density and Variant Demo</v-card-title>
       <v-card-text>
@@ -199,6 +199,7 @@ const components = [
 .fullscreen {
   position: fixed;
   inset: 0;
+  margin: 0;
   z-index: 1000;
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="input-group-demo">
+  <div class="demo-container input-group-demo">
     <v-card>
       <v-card-text>
         <v-row>
@@ -83,9 +83,3 @@ const form = new Group({
   hours: new Field({ value: '17:00' }),
 });
 </script>
-
-<style scoped>
-.input-group-demo {
-  margin: 2rem 0;
-}
-</style>

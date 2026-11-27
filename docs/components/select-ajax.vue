@@ -75,17 +75,3 @@ const fetchLanguages = async (query) => {
   return programmingLanguages.filter((lang) => lang.name.toLowerCase().includes(search)).map(toChoice);
 };
 </script>
-
-<style scoped>
-.demo-container {
-  margin-bottom: 20px;
-}
-
-pre {
-  background-color: rgba(var(--v-theme-on-surface), 0.04);
-  padding: 10px;
-  border-radius: 4px;
-  max-height: 100px;
-  overflow: auto;
-}
-</style>

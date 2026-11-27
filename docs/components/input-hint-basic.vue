@@ -1,5 +1,5 @@
 <template>
-  <div class="input-hint-demo">
+  <div class="demo-container">
     <v-card class="mb-4">
       <v-card-title>Inside an input</v-card-title>
       <v-card-text>
@@ -118,10 +118,6 @@ credentials.registerAction(
 </script>
 
 <style scoped>
-.input-hint-demo {
-  margin: 2rem 0;
-}
-
 .row-frame {
   border: 1px dashed rgba(0, 0, 0, 0.2);
   border-radius: 4px;

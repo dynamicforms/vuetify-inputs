@@ -69,21 +69,3 @@ function setColor(color) {
   colorField.value = color;
 }
 </script>
-
-<style scoped>
-.demo-container {
-  margin-bottom: 20px;
-}
-
-.color-preview {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.error-text {
-  color: #ff5252;
-}
-</style>
