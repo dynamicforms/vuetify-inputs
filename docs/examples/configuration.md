@@ -117,7 +117,7 @@ render unaligned and `inline` density renders like `default`.
 
 ## Where density and variant come from
 
-Both values are resolved the same way, in one place, when the field is created:
+Both values are resolved the same way when the field is created:
 
 ```typescript
 const injectedDensity = inject<FieldDensity | null>('field-density', null);
