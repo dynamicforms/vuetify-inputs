@@ -431,8 +431,8 @@ value the field holds.
 | aria-invalid | `'true'` while errors are shown, `undefined` otherwise |
 
 `errorMessages` is a single space, not the messages: it puts the Vuetify control into its error state, and
-`DfInputHint` renders the messages from `shownErrors`. An error therefore renders as the content the
-[`errorText` setting](/examples/configuration) returns for its `code`: plain text, markdown, HTML or a component.
+`DfInputHint` renders the messages from `shownErrors`. An error therefore renders through the
+[`errorText` setting](/examples/localisation#translating-errors).
 
 Vuetify passes `aria-invalid`, which is not its prop, on to the native control.
 

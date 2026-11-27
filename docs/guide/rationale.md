@@ -62,9 +62,9 @@ looks like.
   declared on vue-forms' `Extras` augmentation point, so a form declared in code states them where the field is
   declared, and the tag that renders it needs no presentation attributes.
   [Presentation on the element](/examples/input-base#presentation-carried-by-the-element)
-- **Errors and hints** in one row, rendered through this library's `MessagesWidget`. An error renders as
-  the plain text, markdown or component the application's `errorText` setting returns for its `code` and `params`,
-  and as its `detail` otherwise. [df-input-hint](/examples/df-input-hint)
+- **Errors and hints** in one row, rendered through this library's `MessagesWidget`. An error renders through the
+  application's [`errorText` setting](/examples/localisation#translating-errors).
+  [df-input-hint](/examples/df-input-hint)
 - **Labels with icons, markdown, HTML or a component.** A label is a string, an `MdString`, an `HtmlString`, a
   `SimpleComponentDef`, or a `Label` carrying one of them and an icon.
   [Label](/examples/input-base#label)

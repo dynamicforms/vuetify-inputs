@@ -48,10 +48,9 @@ Binding `form.errors` directly shows the message whenever the total exceeds the 
 touched.
 
 `DfInputHint` renders a non-empty `errors` value with `errorClasses` (`text-error` by default); for an empty array it
-renders `message`, so a form within the budget shows nothing. An error renders as the content the
-[`errorText` setting](/examples/localisation#translating-errors) returns for it, which may be plain text, an `MdString`
-for markdown or a component definition, and otherwise as its `detail`. The budget error carries `total` and `over` in
-its `params`; the docs' `errorText` renders `app.over_budget` from them, as markdown while the
+renders `message`, so a form within the budget shows nothing. An error renders through the
+[`errorText` setting](/examples/localisation#translating-errors). The budget error carries `total` and `over` in its
+`params`; the docs' `errorText` renders `app.over_budget` from them, as markdown while the
 [validation and i18n demo](/examples/validators)'s markdown setting is on.
 
 ## Writing a group-level validator
