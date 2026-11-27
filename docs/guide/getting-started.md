@@ -36,8 +36,8 @@ import { dfInputComponentsByTag } from '@dynamicforms/vuetify-inputs';
 const components = { ...dfInputComponentsByTag, ...myOwnComponents };
 ```
 
-[`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:) passes this map to its layout renderer. A
-component added to this library in a later version is in the map; a hand-written list does not contain it.
+[`@dynamicforms/vuetify-modal-form-kit`](:vuetify-modal-form-kit:) passes this map to its layout renderer. The
+map contains every component of the installed version.
 
 ## Basic Usage
 
