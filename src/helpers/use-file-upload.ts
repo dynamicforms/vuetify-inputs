@@ -43,27 +43,30 @@ export function useFileUpload(
   let uploadSeq = 0;
   let inFlight = false;
 
-  function deleteQuietly(id: string) {
-    props.comms.delete(id).catch((err) => {
+  function deleteIgnoringGone(id: string): Promise<void> {
+    return props.comms.delete(id).catch((err) => {
       if (!(err instanceof FileGoneError)) throw err;
     });
   }
 
-  function reset() {
-    uploadSeq++;
+  function stopUpload() {
     inFlight = false;
-    ownUpload.value = null;
     currentFile.value = null;
     progress.value = 0;
+  }
+
+  function clearValue() {
+    uploadSeq++;
+    stopUpload();
+    ownUpload.value = null;
+    value.value = null;
   }
 
   // a value set on the field from outside supersedes an upload in flight and the file shown for the last one
   watch(value, (newValue) => {
     if (inFlight || (currentFile.value && newValue !== ownUpload.value)) {
       uploadSeq++;
-      inFlight = false;
-      currentFile.value = null;
-      progress.value = 0;
+      stopUpload();
     }
   });
 
@@ -79,13 +82,11 @@ export function useFileUpload(
       });
     } catch (err) {
       if (seq !== uploadSeq) return;
-      inFlight = false;
-      currentFile.value = null;
-      progress.value = 0;
+      stopUpload();
       throw err;
     }
     if (seq !== uploadSeq) {
-      deleteQuietly(id);
+      deleteIgnoringGone(id);
       return;
     }
     const replaced = temporaryUpload.value;
@@ -95,21 +96,14 @@ export function useFileUpload(
     progress.value = 100;
     // a picked file concludes the edit: the file dialog and a drop have no blur of the field
     touched.value = true;
-    if (replaced && replaced !== id) deleteQuietly(replaced);
+    if (replaced && replaced !== id) deleteIgnoringGone(replaced);
   }
 
   async function clear() {
     const temporary = temporaryUpload.value;
-    reset();
-    value.value = null;
+    clearValue();
     touched.value = true;
-    if (temporary) {
-      try {
-        await props.comms.delete(temporary);
-      } catch (err) {
-        if (!(err instanceof FileGoneError)) throw err;
-      }
-    }
+    if (temporary) await deleteIgnoringGone(temporary);
   }
 
   let touchHandle: number | null = null;
@@ -124,8 +118,7 @@ export function useFileUpload(
     touchHandle = window.setInterval(() => {
       props.comms.touch(id).catch((err) => {
         if (!(err instanceof FileGoneError) || value.value !== id) return;
-        reset();
-        value.value = null;
+        clearValue();
         setFileGoneError(props.control, err.errorText);
       });
     }, interval);
