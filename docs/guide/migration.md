@@ -607,9 +607,9 @@ draws, and anything else that reads the action's `enabled` reads a run in flight
 
 ## Upgrading to v0.9.0 (from v0.8.x)
 
-This release follows `@dynamicforms/vue-forms` 0.17.0. Nothing this library exports is renamed or removed, so most
-projects compile untouched; the work is in your own use of the peer library, plus five points on this library's own
-surface. There is a [checklist](#checklist-for-0-9-0) at the end of this section.
+This release follows `@dynamicforms/vue-forms` 0.17.0. No export of this library is renamed or removed. The changes
+are in the peer library's API and in the eight points on this library's own surface below. There is a
+[checklist](#checklist-for-0-9-0) at the end of this section.
 
 ### The peer ranges and the node floor
 
