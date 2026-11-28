@@ -5,6 +5,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 
 import DfDateTime from '@/df-datetime.vue';
 import { viewSettleMs } from '@/helpers/picker-double-click';
+import { vuetifyInputsSettingsKey } from '@/helpers/settings';
 
 describe('DfDateTime', () => {
   afterAll(() => {
@@ -92,6 +93,110 @@ describe('DfDateTime', () => {
       await flushPromises();
       expect(inputs(wrapper)[0]).toBe('15. 01. 26');
       expect(control.value).toBe('2026-01-15');
+    });
+  });
+
+  // America/New_York skips 2:00-3:00 on 2026-03-08 and repeats 1:00-2:00 on 2026-11-01
+  describe('wall time, in a time zone with daylight saving time', () => {
+    beforeAll(() => {
+      vi.stubEnv('TZ', 'America/New_York');
+    });
+
+    const mountWall = (props: Record<string, any>) =>
+      mountDateTime({ timeZone: 'wall', displayFormatDate: 'yyyy-MM-dd', ...props });
+
+    it.each([
+      ['2026-03-08T02:30:00', '02:30'],
+      ['2026-03-08T02:30', '02:30'],
+      ['2026-11-01T01:30:00', '01:30'],
+      ['2026-07-15T10:00:00+02:00', '10:00'],
+      ['2026-01-15T09:00:00Z', '09:00'],
+      ['2026-01-15T09:00:00.250-08:00', '09:00'],
+    ])('shows the wall-clock time of %s without writing into the field', async (value, shown) => {
+      const control = new Field<string | null>({ value });
+      const wrapper = mountWall({ control });
+
+      await flushPromises();
+      expect(inputs(wrapper)).toEqual([value.slice(0, 10), shown]);
+      expect(control.value).toBe(value);
+      expect(control.isChanged).toBe(false);
+    });
+
+    it('writes a time the browser zone skips as typed, without an offset', async () => {
+      const control = new Field<string | null>({ value: '2026-03-08T01:00:00' });
+      const wrapper = mountWall({ control });
+
+      await typeAndLeave(wrapper.findAll('input')[1], '2:30');
+      expect(control.value).toBe('2026-03-08T02:30:00');
+      expect(inputs(wrapper)[1]).toBe('02:30');
+    });
+
+    it('writes a time the browser zone repeats as typed, without an offset', async () => {
+      const control = new Field<string | null>({ value: '2026-11-01T00:30:00' });
+      const wrapper = mountWall({ control });
+
+      await typeAndLeave(wrapper.findAll('input')[1], '1:45');
+      expect(control.value).toBe('2026-11-01T01:45:00');
+    });
+
+    it('keeps the time when the date is moved onto a day the zone skips it', async () => {
+      const control = new Field<string | null>({ value: '2026-03-07T02:30:00' });
+      const wrapper = mountWall({ control });
+
+      await typeAndLeave(wrapper.findAll('input')[0], '2026-03-08');
+      expect(control.value).toBe('2026-03-08T02:30:00');
+      expect(inputs(wrapper)).toEqual(['2026-03-08', '02:30']);
+    });
+
+    it('writes the wall-clock part of a value given with an offset once it is edited', async () => {
+      const control = new Field<string | null>({ value: '2026-07-15T10:00:00+02:00' });
+      const wrapper = mountWall({ control });
+
+      await typeAndLeave(wrapper.findAll('input')[1], '11:30');
+      expect(control.value).toBe('2026-07-15T11:30:00');
+    });
+
+    it('applies the timeZone setting where the prop is not given', async () => {
+      const control = new Field<string | null>({ value: '2026-03-08T01:00:00' });
+      const wrapper = mount(DfDateTime, {
+        props: { label: 'When', control },
+        global: { provide: { [vuetifyInputsSettingsKey]: { timeZone: 'wall' } } },
+      });
+
+      await typeAndLeave(wrapper.findAll('input')[1], '2:30');
+      expect(control.value).toBe('2026-03-08T02:30:00');
+    });
+
+    it('lets the prop override the timeZone setting', async () => {
+      const control = new Field<string | null>({ value: '2026-07-15T10:00:00-04:00' });
+      const wrapper = mount(DfDateTime, {
+        props: { label: 'When', control, timeZone: 'America/New_York' },
+        global: { provide: { [vuetifyInputsSettingsKey]: { timeZone: 'wall' } } },
+      });
+
+      await typeAndLeave(wrapper.findAll('input')[1], '11:30');
+      expect(control.value).toBe('2026-07-15T11:30:00-04:00');
+    });
+
+    it('shows and writes a time the zone skips today in time mode', async () => {
+      useFakeDate(new Date('2026-03-08T12:00:00-04:00'));
+      const control = new Field<string | null>({ value: '02:30:00' });
+      const wrapper = mountWall({ control, inputType: 'time' });
+
+      await flushPromises();
+      expect(inputs(wrapper)).toEqual(['02:30']);
+      await typeAndLeave(wrapper.find('input'), '2:15');
+      expect(control.value).toBe('02:15:00');
+    });
+
+    it('shows and writes a date in date mode', async () => {
+      const control = new Field<string | null>({ value: '2026-03-08' });
+      const wrapper = mountWall({ control, inputType: 'date' });
+
+      await flushPromises();
+      expect(inputs(wrapper)).toEqual(['2026-03-08']);
+      await typeAndLeave(wrapper.find('input'), '2026-11-01');
+      expect(control.value).toBe('2026-11-01');
     });
   });
 

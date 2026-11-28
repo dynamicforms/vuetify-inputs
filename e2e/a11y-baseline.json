@@ -1,16 +1,4 @@
 {
-  "density": [
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"df-color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"df-color\" > div.v-field"
-  ],
   "df-actions": [
     "color-contrast: df-select-single \"Button size\" > div.df-label"
   ],
@@ -20,51 +8,7 @@
   "df-checkbox": [
     "aria-conditional-attr: v-checkbox \"Ternary checkbox should wrap all the way\" > input"
   ],
-  "df-color": [
-    "aria-allowed-attr: v-text-field \"15 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"2 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"21 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"6 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Choose a color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Direct v-model color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Full lightness range\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Web-safe color\" > div.v-field"
-  ],
-  "df-color: hexagon palette open": [
-    "aria-allowed-attr: v-text-field \"15 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"2 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"21 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"6 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Choose a color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Direct v-model color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Full lightness range\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Web-safe color\" > div.v-field"
-  ],
-  "df-color: picker open": [
-    "aria-allowed-attr: v-text-field \"15 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"2 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"21 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"6 levels\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Choose a color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Direct v-model color\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Full lightness range\" > div.v-field",
-    "aria-allowed-attr: v-text-field \"Web-safe color\" > div.v-field"
-  ],
-  "df-datetime": [
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-time > div.v-field",
-    "aria-allowed-attr: df-datetime-time > div.v-field",
-    "aria-allowed-attr: df-datetime-time > div.v-field"
-  ],
   "df-datetime: picker open": [
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-time > div.v-field",
-    "aria-allowed-attr: df-datetime-time > div.v-field",
-    "aria-allowed-attr: df-datetime-time > div.v-field",
     "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
     "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
     "color-contrast: menu div.v-sheet > div.v-date-picker-month__day",
@@ -75,8 +19,6 @@
     "image-alt: df-image-field \"Profile picture\" > img.v-img__img"
   ],
   "localisation": [
-    "aria-allowed-attr: df-datetime-date > div.v-field",
-    "aria-allowed-attr: df-datetime-time > div.v-field",
     "color-contrast: div.v-input \"Izberite datum in čas\" > div.df-label",
     "color-contrast: div.v-input \"Izberite datum in čas\" > span"
   ]

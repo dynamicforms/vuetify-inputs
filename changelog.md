@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `aria-label` (`Clear {label}`), `onClick`, `onKeydown` (Enter and Space clear) and `onFocus` / `onBlur`: bound on a
   `<button>`, they make it a clear button in the tab order. It is rendered where the clear button is.
 - Translatable string `ClearField` (`Clear {label}`): the accessible name of a field's clear button.
+- `DfDateTime`: prop `timeZone` and setting `timeZone` (default: the browser's zone) for datetime mode. An IANA name
+  shows and edits the value's wall-clock date and time in that zone and writes it with that zone's offset at that time
+  (a skipped time moves forward by the gap, a repeated time takes its first occurrence); a bound value with an offset is
+  converted to that zone. `'wall'` reads and writes the value without an offset (`YYYY-MM-DDTHH:mm:ss`) and without
+  conversion, also where the browser's zone skips or repeats that time; a bound value's offset is ignored. An unknown
+  name is reported with `console.warn` and the browser's zone is used.
 
 ### Fixed
 
@@ -24,6 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `DfSelect`: the input is described by the text of the chips of the chosen choices, which an input that shows chips
   does not hold as its own text, followed by the field's message row and the application's `aria-describedby`. An
   `aria-describedby` the application passes no longer replaces the message row.
+- `DfDateTime`: time mode no longer shifts the time on a day the browser's zone changes its offset.
+- `DfDateTime`, `DfColor`: the input that opens the picker carries its popup semantics: `role="combobox"`,
+  `aria-haspopup="dialog"`, `aria-expanded` and, while the picker is shown, `aria-controls`; the picker's menu has
+  `role="dialog"` and the field's name. The field's `div.v-field` no longer carries `aria-haspopup`, `aria-expanded`,
+  `aria-controls` and `aria-owns` (axe `aria-allowed-attr`). A read-only field carries none of them.
 
 ## [0.16.5] - 2026-11-27
 

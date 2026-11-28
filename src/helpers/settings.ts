@@ -44,6 +44,8 @@ export interface VuetifyInputsSettings {
    * `DateTimeLocaleConfig.dateTimeLocale`. A component's `locale` prop takes precedence.
    */
   dateTimeLocale?: MaybeRef<Locale>;
+  /** The default of `<df-date-time>`'s `timeZone` prop: an IANA time zone name or `'wall'`. */
+  timeZone?: string;
   /** The default of `<df-input>`'s `anyDecimalSeparator` prop: `.` and `,` both act as a number's decimal separator. */
   anyDecimalSeparator?: boolean;
 }

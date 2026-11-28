@@ -63,6 +63,18 @@ export interface DfDateTimeProps extends BaseProps {
   displayFormatDate?: string;
   displayFormatTime?: string;
   locale?: Locale;
+  /**
+   * The time zone of the value's date and time in `datetime` mode; `date` and `time` modes ignore it.
+   * - not set: the browser's zone; the value is written with the offset in force on its date.
+   * - an IANA name (`'Europe/Ljubljana'`, `'UTC'`): the field shows and edits the wall-clock date and time in that
+   *   zone; the value is written with that zone's offset at that time. A bound value without an offset is read as
+   *   wall-clock time in that zone.
+   * - `'wall'`: the value is wall-clock time without an offset (`YYYY-MM-DDTHH:mm:ss`), read and written without
+   *   conversion; a bound value's offset is ignored.
+   *
+   * An unknown name is reported with `console.warn` and the browser's zone is used. Defaults to the `timeZone` setting.
+   */
+  timeZone?: string;
 }
 
 interface FileUploadProps extends BaseProps {

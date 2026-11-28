@@ -2,10 +2,11 @@
   <v-text-field
     v-if="isRendered"
     v-model="value"
+    v-input-role="hasPopup ? 'combobox' : undefined"
     :class="[densityClass, visibilityClass]"
     :clearable="offersClear"
     type="text"
-    v-bind="vuetifyBindings"
+    v-bind="{ ...vuetifyBindings, ...dialogPopupAria(hasPopup, dropdownShown, popupId) }"
     @blur="commitTyped"
     @keydown.enter="commitTyped"
   >
@@ -29,6 +30,8 @@
         :close-on-content-click="false"
         :disabled="vuetifyBindings.readonly"
         activator="parent"
+        :activator-props="fieldMenuActivatorProps"
+        :content-props="dialogPopupContentProps(popupId, { 'aria-label': vuetifyBindings.label })"
         min-width="0"
       >
         <v-confirm-edit
@@ -76,7 +79,7 @@
 
 <script setup lang="ts">
 import { ValidationError } from '@dynamicforms/vue-forms';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useId, watch } from 'vue';
 
 import { DfColorProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
@@ -87,6 +90,7 @@ import { namespaced } from './helpers/error-namespace';
 import { hexColorPattern, lightnessLevelsOf, opaqueHexColorPattern } from './helpers/hexagon-palette';
 import HexagonPalette from './helpers/hexagon-palette.vue';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
+import { dialogPopupAria, dialogPopupContentProps, fieldMenuActivatorProps, vInputRole } from './helpers/popup-aria';
 
 const props = withDefaults(defineProps<DfColorProps>(), {
   ...defaultBaseProps,
@@ -144,7 +148,10 @@ const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindin
 );
 const offersClear = computed(() => props.allowNull && !vuetifyBindings.value.readonly);
 const dropdownShown = ref(false);
+// the field is the combobox that opens the picker
+const popupId = `${useId()}-picker`;
 const clientRendered = useClientRendered();
+const hasPopup = computed(() => clientRendered.value && !vuetifyBindings.value.readonly);
 const colorChoices = '.v-color-picker-canvas';
 const hexagonChoices = '.df-hexagon-cell';
 const paletteLevels = computed(() => lightnessLevelsOf(props.lightnessLevels));

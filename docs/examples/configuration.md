@@ -37,6 +37,7 @@ flags.
 | `translate` | `TranslateFunction` | unset, so the function `translateStrings` set applies | The translation function of the library's strings in this app, shaped like vue-i18n's `t`. See [Localisation](/examples/localisation#translatestrings) |
 | `translateNamespace` | `string` | unset | The namespace `translate` looks the library's keys up under |
 | `dateTimeLocale` | `MaybeRef<Locale>` | unset, so `DateTimeLocaleConfig.dateTimeLocale` applies | The date-fns locale `<df-date-time>` formats and parses with in this app; a component's `locale` prop takes precedence |
+| `timeZone` | `string` | unset, so the browser's zone applies | The time zone of `<df-date-time>` values in this app: an IANA name or `'wall'`; a component's `timeZone` prop takes precedence. See [Time zone](/examples/df-datetime#time-zone) |
 | `errorText` | `ErrorText`: `(error: ErrorDescription) => RenderContentNonCallable \| undefined` | unset | Converts an error into the content it renders as. It runs while the errors are rendered, and what it reads reactively is tracked. See [Translating errors](/examples/localisation#translating-errors) |
 | `anyDecimalSeparator` | `boolean` | unset, so `false` applies | Whether `.` and `,` both act as the decimal separator of `<df-input input-type="number">` in this app; a component's `anyDecimalSeparator` prop takes precedence. See [Any decimal separator](/examples/df-input#any-decimal-separator) |
 

@@ -26,6 +26,10 @@ The strings the components add (`Date`, `Time`, `RemoveChoice`, `ClearField`, `N
 - An input carries `aria-invalid="true"` while errors are shown.
 - While errors are shown, the hint stays in the message row, visually hidden, so it is read with the errors.
 - `df-rtf-editor` carries `aria-readonly="true"` while the field accepts no input.
+- `df-date-time` and `df-color`: each input that opens a picker (the date, the time, the colour) is a `combobox` with
+  `aria-haspopup="dialog"` and `aria-expanded`, and `aria-controls` while the picker is shown. The picker's menu is a
+  `dialog`, named by the field label (`df-date-time`: and the part, `Date` or `Time`); the focus stays in the input.
+  A read-only field has no picker and none of these attributes.
 - A required field has no marker and no `aria-required`: a vue-forms field does not state that it is required. State
   it in the field's `hint`, together with the other constraints on its value (minimum, pattern …); no ARIA attribute
   announces those.
