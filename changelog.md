@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.6] - 2026-11-28
+
+### Added
+
+- `DfDateTime`: prop `wallTime` and setting `wallTime` (default `false`). The value is wall-clock time, read and written
+  without conversion through the browser's time zone: datetime mode writes `YYYY-MM-DDTHH:mm:ss` without an offset, a
+  bound value is shown as written also where the browser's zone skips or repeats that time, and a bound value with an
+  offset is shown by its date and time as written.
+
 ## [0.16.5] - 2026-11-27
 
 ### Added

@@ -63,6 +63,11 @@ export interface DfDateTimeProps extends BaseProps {
   displayFormatDate?: string;
   displayFormatTime?: string;
   locale?: Locale;
+  /**
+   * The value is wall-clock time, without an offset, read and written without conversion through the browser's time
+   * zone. Defaults to the `wallTime` setting, else `false`.
+   */
+  wallTime?: boolean;
 }
 
 interface FileUploadProps extends BaseProps {

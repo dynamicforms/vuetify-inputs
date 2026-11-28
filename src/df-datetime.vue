@@ -150,6 +150,7 @@ const props = withDefaults(defineProps<DfDateTimeProps>(), {
   inputType: 'datetime',
   displayFormatDate: 'P',
   displayFormatTime: 'p',
+  wallTime: undefined,
 });
 
 interface Emits extends BaseEmits {}
@@ -159,6 +160,7 @@ const settings = useSettings();
 const currentLocale = computed(
   () => props.locale ?? unref(settings.dateTimeLocale) ?? unref(DateTimeLocaleConfig.dateTimeLocale),
 );
+const wallTime = computed(() => props.wallTime ?? settings.wallTime ?? false);
 const firstDayOfWeek = computed(() => currentLocale.value.options?.weekStartsOn ?? 1);
 // a typed date or time that cannot be read leaves the value as it is and reports an error until it is corrected
 const dateInvalid = ref(false);
@@ -256,7 +258,7 @@ const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, '
 const valueISOFull = ref<string | null>(null);
 // the date part and the time part without fractional seconds of an ISO string
 function isoParts(value: string): [string, string] {
-  const [date, time = ''] = value.split(/[TZ]/g);
+  const [date, time = ''] = value.split(/[T Z]/g);
   return [date, time.split('.')[0]];
 }
 
@@ -267,7 +269,19 @@ function mergeParts(base: string, newISOValue: string, dateOrTimeIdx: number) {
   return vif;
 }
 
-const naiveFromParts = (vif: string[]) => formatNaive(new Date(`${vif[0]}T${vif[1]}`));
+// `HH:mm:ss` of the hours, minutes and optional seconds a time starts with; an offset after them is dropped
+function wallTimeOf(time: string) {
+  const match = /^(\d{2}):(\d{2})(?::(\d{2}))?/.exec(time || '00:00');
+  return match && `${match[1]}:${match[2]}:${match[3] ?? '00'}`;
+}
+
+// The naive value of a date part and a time part. Wall time takes them as written, null where they are not in ISO
+// form; otherwise they are read as local time, and a time the browser's zone skips moves forward by the gap.
+function naiveFromParts(vif: string[]) {
+  if (!wallTime.value) return formatNaive(new Date(`${vif[0]}T${vif[1]}`));
+  const time = wallTimeOf(vif[1]);
+  return /^\d{4}-\d{2}-\d{2}$/.test(vif[0]) && time ? `${vif[0]}T${time}` : null;
+}
 
 // Reading the field's value (dateOrTimeIdx -1) only sets what the control shows: the field keeps the string it holds
 // until the user edits the date or the time. parseISO reads a date without a time as local midnight, where the Date
@@ -278,26 +292,48 @@ function setValueISOFull(newISOValue: string | null, dateOrTimeIdx: number) {
   } else if (dateOrTimeIdx === -1) {
     if (unref(inputType) === 'time') {
       valueISOFull.value = naiveFromParts(mergeParts(formatNaive(new Date()), `T${newISOValue}`, 1));
+    } else if (wallTime.value) {
+      valueISOFull.value = naiveFromParts(isoParts(newISOValue));
     } else {
       valueISOFull.value = formatNaive(parseISO(newISOValue));
     }
   } else {
     const vif = mergeParts(valueISOFull.value ?? formatNaive(new Date()), newISOValue, dateOrTimeIdx);
-    valueISOFull.value = naiveFromParts(vif);
+    const naive = naiveFromParts(vif);
+    valueISOFull.value = naive;
+    if (naive == null) return;
     if (unref(inputType) === 'date') value.value = vif[0];
-    else if (unref(inputType) === 'time') value.value = valueISOFull.value.split('T')[1];
+    else if (unref(inputType) === 'time') value.value = naive.split('T')[1];
+    else if (wallTime.value) value.value = naive;
     // the offset is the one in force on the date written, not today's: across a DST change the two differ by an hour
-    else value.value = valueISOFull.value + format(new Date(valueISOFull.value), 'XXX');
+    else value.value = naive + format(new Date(naive), 'XXX');
   }
 }
 
 watch(value, (newValue: string | null) => setValueISOFull(newValue, -1), { immediate: true });
 
+// A Date whose local date and time are those of a wall-clock value. Where the browser's zone skips that time, it is
+// the same time on a following day.
+function wallClockDate(naive: string) {
+  const [year, month, day, hours, minutes, seconds] = naive.split(/[-T:]/).map(Number);
+  for (let shift = 0; shift < 7; shift++) {
+    const res = new Date(year, month - 1, day + shift, hours, minutes, seconds);
+    if (res.getHours() === hours && res.getMinutes() === minutes) return res;
+  }
+  return new Date(year, month - 1, day, hours, minutes, seconds);
+}
+
+// the start of a wall-clock value's day in the browser's zone, on that day also where the zone skips midnight
+function wallClockDay(naive: string) {
+  const [year, month, day] = isoParts(naive)[0].split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
 const valueAsDate = computed({
   get() {
     const uValue = unref(valueISOFull);
     if (uValue == null) return null;
-    const res = new Date(uValue);
+    const res = wallTime.value ? wallClockDay(uValue) : new Date(uValue);
     return !Number.isNaN(res.getTime()) ? res : null;
   },
   set(newValue: Date) {
@@ -404,13 +440,19 @@ function keepSelectionOnPointerFocus(event: MouseEvent) {
   pointerFocus = false;
 }
 
-const display = (displayFormat: Ref<string>) =>
+// the value a wall-clock time is formatted from, with its time where the browser's zone skips it
+const valueAsTimeDate = computed(() => {
+  const uValue = unref(valueISOFull);
+  return wallTime.value && uValue != null ? wallClockDate(uValue) : unref(valueAsDate);
+});
+
+const display = (displayFormat: Ref<string>, source: Ref<Date | null>) =>
   computed(() => {
-    const vad = unref(valueAsDate);
+    const vad = unref(source);
     return vad == null ? '' : format(vad, unref(displayFormat), { locale: currentLocale.value });
   });
-const dateDisplay = display(displayFormatDate);
-const timeDisplay = display(displayFormatTime);
+const dateDisplay = display(displayFormatDate, valueAsDate);
+const timeDisplay = display(displayFormatTime, valueAsTimeDate);
 const partDisplay = { date: dateDisplay, time: timeDisplay };
 
 // The fields hold the text as typed; it is read into the value when the field loses focus or on Enter, and replaced
