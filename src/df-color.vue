@@ -3,7 +3,7 @@
     v-if="isRendered"
     v-model="value"
     :class="[densityClass, visibilityClass]"
-    :clearable="allowNull && !vuetifyBindings.readonly"
+    :clearable="offersClear"
     type="text"
     v-bind="vuetifyBindings"
     @blur="commitTyped"
@@ -12,6 +12,9 @@
     <template #label="labelData"><df-label :data="labelData" /></template>
     <template #message="{ message }">
       <df-input-hint :message="message" />
+    </template>
+    <template v-if="offersClear" #clear="{ props: clearProps }">
+      <df-clear-button :field="clearProps" :label="vuetifyBindings.label" />
     </template>
     <template #prepend-inner>
       <div
@@ -79,6 +82,7 @@ import { DfColorProps } from './dynamicforms-component-props';
 import { BaseEmits, defaultBaseProps, DfInputHint, DfLabel, useInputBase } from './helpers';
 import { useClientRendered } from './helpers/client-rendered';
 import ConfirmActions from './helpers/confirm-actions.vue';
+import DfClearButton from './helpers/df-clear-button.vue';
 import { namespaced } from './helpers/error-namespace';
 import { hexColorPattern, lightnessLevelsOf, opaqueHexColorPattern } from './helpers/hexagon-palette';
 import HexagonPalette from './helpers/hexagon-palette.vue';
@@ -138,6 +142,7 @@ const { densityClass, isRendered, touched, value, visibilityClass, vuetifyBindin
   emits,
   hexColorErrors,
 );
+const offersClear = computed(() => props.allowNull && !vuetifyBindings.value.readonly);
 const dropdownShown = ref(false);
 const clientRendered = useClientRendered();
 const colorChoices = '.v-color-picker-canvas';

@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.6] - 2026-11-28
+
+### Added
+
+- `DfSelect`: slot `clear`, which replaces the clear button. It takes Vuetify's `clear` slot props, with `props` holding
+  `aria-label` (`Clear {label}`), `onClick`, `onKeydown` (Enter and Space clear) and `onFocus` / `onBlur`: bound on a
+  `<button>`, they make it a clear button in the tab order. It is rendered where the clear button is.
+- Translatable string `ClearField` (`Clear {label}`): the accessible name of a field's clear button.
+
+### Fixed
+
+- The clear button of `DfSelect`, `DfColor`, `DfDateTime`, `DfFile`, `DfImage` and `DfRtfEditor` is a native
+  button in the tab order, named `Clear <label>`, shown while the field holds a value and accepts input. A click,
+  Enter or Space clears the value (a held Space clears once) and focus moves to the field's input; Enter does not open
+  the menu of a `DfSelect`.
+- `DfRtfEditor`: the clear button empties the text.
+- `DfSelect`: the input is described by the text of the chips of the chosen choices, which an input that shows chips
+  does not hold as its own text, followed by the field's message row and the application's `aria-describedby`. An
+  `aria-describedby` the application passes no longer replaces the message row.
+
 ## [0.16.5] - 2026-11-27
 
 ### Added
