@@ -29,6 +29,7 @@ translation function reads, such as the locale.
 | `Loading` | `Loading` | `<df-select>`, the accessible label of the progress bar shown while choices are being fetched, and the menu's text while it has no choices and choices are being fetched or a debounced fetch is waiting |
 | `Uploading` | `Uploading` | `<df-file>` and `<df-image>`, the accessible label of the upload progress bar |
 | `RemoveChoice` | `Remove {choice}` | `<df-select multiple>`, the accessible label of a chip's close button; `choice` is the chip's text |
+| `ClearField` | `Clear {label}` | The accessible label of the clear button of `<df-select>`, `<df-color>`, `<df-date-time>`, `<df-file>`, `<df-image>` and `<df-rtf-editor>`; `label` is the field label's text |
 | `NoChoices` | `No choices` | `<df-select>`, the menu's text while it has no choices to show; `noDataText` replaces it |
 | `MinQuery` | `Type at least {count} characters` | `<df-select>` with `minQueryLength`, the menu's text while the search text is shorter; `count` is `minQueryLength`; `minQueryText` replaces it |
 | `Paragraph` | `Paragraph` | `<df-rtf-editor>` heading dropdown, "no heading" entry |

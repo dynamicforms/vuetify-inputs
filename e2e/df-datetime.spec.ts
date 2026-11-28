@@ -100,3 +100,18 @@ test('up and down open a closed picker and keep the focus in the field', async (
   await expect(picker(page)).toBeVisible();
   await expect(input).toBeFocused();
 });
+
+test('Tab reaches the clear button; Enter clears the value and focuses the input', async ({ page }) => {
+  const input = card(page, 'Date Only Example').locator('input');
+  await input.click();
+  await page.keyboard.press('Enter');
+  await expect(fieldValue(page, 'Date Only Example')).not.toHaveText('null');
+
+  await page.keyboard.press('Tab');
+  const clear = card(page, 'Date Only Example').getByRole('button', { name: 'Clear Select date' });
+  await expect(clear).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(fieldValue(page, 'Date Only Example')).toHaveText('null');
+  await expect(input).toBeFocused();
+  await expect(clear).toBeHidden();
+});

@@ -13,6 +13,7 @@ const defaults = {
   Loading: 'Loading',
   Uploading: 'Uploading',
   RemoveChoice: 'Remove {choice}',
+  ClearField: 'Clear {label}',
   NoChoices: 'No choices',
   MinQuery: 'Type at least {count} characters',
   Paragraph: 'Paragraph',

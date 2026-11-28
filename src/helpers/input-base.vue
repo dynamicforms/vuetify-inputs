@@ -35,6 +35,9 @@
             <slot v-bind="{ ...slotProps, props: controlProps(slotProps.props, id.value) }" />
           </div>
         </template>
+        <template v-if="isClearable" #clear="{ props: clearProps }">
+          <df-clear-button :field="{ ...clearProps, onClick: () => clear(id.value) }" :label="vuetifyBindings.label" />
+        </template>
         <template #loader="loaderProps"><slot name="loader" v-bind="loaderProps" /></template>
         <template v-if="$slots['prepend-inner']" #prepend-inner="prependInnerProps">
           <slot name="prepend-inner" v-bind="prependInnerProps" />
@@ -51,6 +54,7 @@
 <script setup lang="ts">
 import { computed, ref, unref } from 'vue';
 
+import DfClearButton from './df-clear-button.vue';
 import DfInputHint from './df-input-hint.vue';
 import DfLabel from './df-label.vue';
 import { BaseEmits, BaseProps, type InputBaseControlProps, type InputBaseSlotProps, useInputBase } from './input-base';
@@ -78,6 +82,12 @@ function controlProps(fieldProps: Record<string, unknown>, id: string): InputBas
     'aria-label': vuetifyBindings.value.label || undefined,
     'aria-invalid': vuetifyBindings.value['aria-invalid'],
   };
+}
+
+// the clear button leaves the field with the value; focus moves to the control, which carries the field's id
+function clear(id: string) {
+  document.getElementById(id)?.focus();
+  emits('click:clear');
 }
 
 function setFocused(isFocused: boolean) {

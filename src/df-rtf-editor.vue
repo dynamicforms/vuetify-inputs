@@ -1,5 +1,5 @@
 <template>
-  <input-base v-bind="props" class="rtf-editor" :class="densityClass" @click="focusFromLabel">
+  <input-base v-bind="props" class="rtf-editor" :class="densityClass" @click="focusFromLabel" @click:clear="value = ''">
     <template #default="slotProps">
       <rtf-editor-core
         ref="editorRef"

@@ -245,6 +245,72 @@ describe('DfSelect', () => {
     });
   });
 
+  describe('the input', () => {
+    const mountWithAttrs = (props: Record<string, any>, attrs: Record<string, any> = {}) =>
+      mount(DfSelect, { props: { label: 'Select', ...props }, attrs, attachTo: document.body });
+    // the text of the elements the input's aria-describedby names, in order
+    const description = (wrapper: ReturnType<typeof mountSelect>) =>
+      (wrapper.find('input').attributes('aria-describedby') ?? '')
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((id) => document.getElementById(id)?.textContent?.trim());
+
+    it('is described by the chosen choice of a single select', async () => {
+      const wrapper = mountWithAttrs({ modelValue: 2, choices: ALL_CHOICES, hint: 'Pick one' });
+      await flushPromises();
+
+      expect(description(wrapper)).toEqual(['Choice 2', 'Pick one']);
+      wrapper.unmount();
+    });
+
+    it('is described by every chip text of a multiple select', async () => {
+      const wrapper = mountWithAttrs({ modelValue: [1, 3], multiple: true, choices: ALL_CHOICES });
+      await flushPromises();
+
+      expect(description(wrapper)).toEqual(['Choice 1', 'Choice 3']);
+      wrapper.unmount();
+    });
+
+    it('is described by no chip without a value', async () => {
+      const wrapper = mountWithAttrs({ modelValue: null, choices: ALL_CHOICES });
+      await flushPromises();
+
+      expect(wrapper.find('input').attributes('aria-describedby')).toBeUndefined();
+      wrapper.unmount();
+    });
+
+    it("keeps the application's aria-describedby, with the chips and the messages row", async () => {
+      const help = document.createElement('p');
+      help.id = 'app-help';
+      help.textContent = 'Help text';
+      document.body.append(help);
+      const wrapper = mountWithAttrs(
+        { modelValue: 2, choices: ALL_CHOICES, hint: 'Pick one' },
+        { 'aria-describedby': 'app-help' },
+      );
+      await flushPromises();
+
+      expect(description(wrapper)).toEqual(['Choice 2', 'Pick one', 'Help text']);
+      wrapper.unmount();
+      help.remove();
+    });
+
+    it('takes the aria attributes the application passes, the wrapper does not', async () => {
+      const wrapper = mountWithAttrs(
+        { modelValue: 2, choices: ALL_CHOICES, passthroughAttrs: { 'aria-keyshortcuts': 'Alt+S' } },
+        { 'aria-description': 'Stop search', 'data-test': 'stop' },
+      );
+      await flushPromises();
+
+      const input = wrapper.find('input');
+      expect(input.attributes('aria-description')).toBe('Stop search');
+      expect(input.attributes('aria-keyshortcuts')).toBe('Alt+S');
+      expect(wrapper.find('.v-input').attributes('aria-description')).toBeUndefined();
+      expect(wrapper.find('.v-input').attributes('data-test')).toBe('stop');
+      wrapper.unmount();
+    });
+  });
+
   describe('with allowTags', () => {
     it('keeps a value set after mount that no choice covers', async () => {
       const control = new Field<string | null>({ value: null });

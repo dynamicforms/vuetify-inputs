@@ -11,13 +11,15 @@ What the components give assistive technology, and what the application sets up 
 - `df-actions`: a button that does not show its label is named by the label's plain text, so an icon-only action
   takes a `label` with `showLabel: false`. [df-actions](/examples/df-actions#action-value-configuration)
 - `df-select`: the choice text names the option and the chip; an option whose text is rendered content is named by
-  the content's text, a line break read as a space. Choice icons are hidden from assistive technology. The menu's text
-  while it has no choices (`noDataText`, `minQueryText`, `Loading`) is a list item, not an option, in the menu's polite
-  live region.
+  the content's text, a line break read as a space. The input is described by the text of the chips of the chosen
+  choices, then the message row, then an `aria-describedby` the application passes; the input shows chips, not the
+  chosen text, so this is how the chosen value is read on focus. Choice icons are hidden from assistive technology.
+  The menu's text while it has no choices (`noDataText`, `minQueryText`, `Loading`) is a list item, not an option,
+  in the menu's polite live region.
 - Progress bars are named `Loading` (`df-select`) and `Uploading` (`df-file`, `df-image`).
 
-The strings the components add (`Date`, `Time`, `RemoveChoice`, `NoChoices`, `MinQuery`, `Loading`, `Uploading`)
-are translation keys; see [Localisation](/examples/localisation).
+The strings the components add (`Date`, `Time`, `RemoveChoice`, `ClearField`, `NoChoices`, `MinQuery`,
+`Loading`, `Uploading`) are translation keys; see [Localisation](/examples/localisation).
 
 ## States
 
@@ -34,6 +36,10 @@ are translation keys; see [Localisation](/examples/localisation).
 - `df-select`: a chip's close button is a native button named `Remove <choice>`. A click, Enter or Space removes the
   chip (a held Space removes one), Enter does not open the menu, and focus moves to the next chip's close button, or to
   the input when no closable chip remains.
+- Clear button (`df-select`, `df-color`, `df-date-time`, `df-file`, `df-image`, `df-rtf-editor`): a native button in
+  the tab order after the input, named `Clear <label>`, rendered while the field holds a value and accepts input. A
+  click, Enter or Space clears the value (a held Space clears once), Enter does not open a select's menu, and focus
+  moves to the field's input.
 - `df-actions` with `simple`: each action is a native `<button type="button">`, reached with Tab and activated with
   Enter or Space. [df-actions](/examples/df-actions#simple-mode)
 
