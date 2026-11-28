@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `DfSelect`: slot `clear`, which replaces the clear button. It takes Vuetify's `clear` slot props, with `props` holding
+  `aria-label` (`Clear {label}`), `onClick`, `onKeydown` (Enter and Space clear) and `onFocus` / `onBlur`: bound on a
+  `<button>`, they make it a clear button in the tab order. It is rendered where the clear button is.
+- Translatable string `ClearField` (`Clear {label}`): the accessible name of a field's clear button.
 - `DfDateTime`: prop `timeZone` and setting `timeZone` (default: the browser's zone) for datetime mode. An IANA name
   shows and edits the value's wall-clock date and time in that zone and writes it with that zone's offset at that time
   (a skipped time moves forward by the gap, a repeated time takes its first occurrence); a bound value with an offset is
@@ -18,6 +22,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The clear button of `DfSelect`, `DfColor`, `DfDateTime`, `DfFile`, `DfImage` and `DfRtfEditor` is a native
+  button in the tab order, named `Clear <label>`, shown while the field holds a value and accepts input. A click,
+  Enter or Space clears the value (a held Space clears once) and focus moves to the field's input; Enter does not open
+  the menu of a `DfSelect`.
+- `DfRtfEditor`: the clear button empties the text.
+- `DfSelect`: the input is described by the text of the chips of the chosen choices, which an input that shows chips
+  does not hold as its own text, followed by the field's message row and the application's `aria-describedby`. An
+  `aria-describedby` the application passes no longer replaces the message row.
 - `DfDateTime`: time mode no longer shifts the time on a day the browser's zone changes its offset.
 - `DfDateTime`, `DfColor`: the input that opens the picker carries its popup semantics: `role="combobox"`,
   `aria-haspopup="dialog"`, `aria-expanded` and, while the picker is shown, `aria-controls`; the picker's menu has

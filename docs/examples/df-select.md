@@ -32,6 +32,9 @@ minimum query length:
 - A chip's close button is labelled `Remove <text>` and removes the chip on a click, Enter or Space; focus then moves
   to the close button of the next chip, or to the input when no closable chip remains
 - A `null` selection under `allowNull`, and an empty array for a multiple select
+- The clear button (under `allowNull`, while the select holds a value and accepts input) is a native button in the tab
+  order, named `Clear <label>`; a click, Enter or Space clears the value and focus moves to the input
+- The input is described (`aria-describedby`) by the chips' text, so the chosen value is read on focus
 - Search with filtering
 - A text in the menu when there are no choices to show, and a minimum length of the search text before choices are
   fetched for it
@@ -152,6 +155,26 @@ Two slots are forwarded to the underlying `v-autocomplete` / `v-combobox`, with 
 
 - `append-inner`
 - `prepend-inner`
+
+`clear` replaces the clear button. It is rendered where the button is: under `allowNull`, while the select accepts
+input, and shown while it holds a value. It takes Vuetify's `clear` slot props, with `props` holding the attributes of
+a clear button in the tab order: `aria-label` (`Clear <label>`, translatable key `ClearField`), `onClick`, `onKeydown`
+(Enter and Space clear, and the select does not see the key) and `onFocus` / `onBlur`. Clearing moves focus to the
+input.
+
+```vue
+<df-select v-model="stop" :choices="stops" label="Stop">
+  <template #clear="{ props }">
+    <button type="button" class="my-clear" v-bind="props"><v-icon icon="mdi-close" /></button>
+  </template>
+</df-select>
+```
+
+## Attributes
+
+Attributes the application passes to `df-select` (`aria-*` among them) are set on the input, except `class`, `style`
+and `data-*`, which are set on the root element; `id` is the input's id. An
+`aria-describedby` is added to the input's own: the chips of the chosen choices and the message row.
 
 ## Examples
 

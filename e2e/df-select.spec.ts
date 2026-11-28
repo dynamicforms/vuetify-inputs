@@ -69,3 +69,37 @@ test('Enter and Space on a chip close button remove that chip only and move focu
   await expect(chips).toHaveText(['Durian', 'Elderflower']);
   await expect(page.getByRole('button', { name: 'Remove Durian' })).toBeFocused();
 });
+
+for (const [name, key] of [
+  ['Enter', 'Enter'],
+  ['Space', ' '],
+]) {
+  test(`Tab reaches the clear button; ${name} clears the value and focuses the input`, async ({ page }) => {
+    await page.goto('/examples/df-select');
+    await expect(basicSelect(page)).toHaveClass(/v-autocomplete/);
+    const chips = basicSelect(page).locator('.v-chip');
+    const input = basicSelect(page).locator('input');
+    const clear = basicSelect(page).getByRole('button', { name: 'Clear Choose your fruit' });
+    await expect(chips).toHaveText(['Cherry']);
+
+    await input.focus();
+    await page.keyboard.press('Tab');
+    await expect(clear).toBeFocused();
+
+    await page.keyboard.press(key);
+    await expect(chips).toHaveCount(0);
+    await expect(input).toBeFocused();
+    await expect(input).toHaveAttribute('aria-expanded', 'false');
+    await expect(clear).toBeHidden();
+  });
+}
+
+test('the input is described by the chosen choices', async ({ page }) => {
+  await page.goto('/examples/df-select');
+  await expect(basicSelect(page)).toHaveClass(/v-autocomplete/);
+  const input = basicSelect(page).locator('input');
+  await expect(input).toHaveAccessibleDescription('Cherry');
+
+  await pickFruits(page);
+  await expect(input).toHaveAccessibleDescription('Apple Banana Cherry Durian Elderflower');
+});

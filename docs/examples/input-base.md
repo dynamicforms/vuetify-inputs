@@ -34,8 +34,10 @@ state and the visibility. The `modelValue`, `errors`, `enabled` and `visibility`
 
 `clearable` is read where the field renders its own clear button: `df-date-time`, `df-file` and `df-image` pass the
 prop through to `InputBase`. `df-select` and `df-color` render theirs from their own
-`allowNull` prop. `df-rtf-editor` binds its whole prop set to `InputBase`, so the button is rendered, but the component
-handles no `click:clear`; pressing it leaves the text unchanged.
+`allowNull` prop. `df-rtf-editor` binds its whole prop set to `InputBase` and empties the text on `click:clear`.
+
+The clear button is a native button in the tab order, named `Clear <label>` (translatable key `ClearField`). A click,
+Enter or Space clears the field, and focus moves to the field's control.
 
 ### Presentation carried by the element
 
@@ -101,8 +103,8 @@ The order in which a field's density and variant are resolved is described under
 | click:clear | - | Triggered when the clear button is clicked |
 
 Both events are declared by `BaseEmits`, so every component accepts a listener for them. `click:clear` is emitted by
-[InputBase](#the-inputbase-component); `df-date-time` and `df-file` host their control in it and handle the event
-themselves, clearing the value and deleting the uploaded file respectively.
+[InputBase](#the-inputbase-component); `df-date-time`, `df-file`, `df-image` and `df-rtf-editor` host their control in
+it and handle the event themselves: they clear the value, and `df-file` and `df-image` delete a temporary upload.
 
 ## Display Modes
 
@@ -258,7 +260,7 @@ It emits `BaseEmits` plus one event of its own:
 
 | Event | Arguments | Description |
 |-------|-----------|-------------|
-| click:clear | - | The clear button was clicked. The button is rendered only while `clearable` is set and the value is not empty |
+| click:clear | - | The clear button was pressed. The button is rendered only while `clearable` is set, the value is not empty and the field accepts input. Focus moves to the element carrying the default slot's `props.id` before the event is emitted |
 | blur | - | The hosted control lost focus. `touched` is set to `true` before this is emitted, so a listener already reads the field as touched |
 
 The root element is a `v-input`, rendered only when the visibility is not `'suppress'`, carrying the `name`,

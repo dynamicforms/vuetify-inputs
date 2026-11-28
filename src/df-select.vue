@@ -3,7 +3,7 @@
     v-if="isRendered && !clientRendered"
     :class="[densityClass, visibilityClass]"
     :model-value="chosenText"
-    v-bind="vuetifyBindings"
+    v-bind="{ ...vuetifyBindings, ...inputAttrs(0) }"
     readonly
   >
     <template #label="labelData"><df-label :data="labelData" /></template>
@@ -23,21 +23,21 @@
     chips
     :auto-select-first="true"
     :closable-chips="allowNull || (multiple && selected.length > 1)"
-    :clearable="allowNull && !vuetifyBindings.readonly"
+    :clearable="offersClear"
     :multiple="multiple"
     :loading="loading"
     :hide-selected="false"
     :menu-props="{ maxHeight: '400' }"
     :list-props="listProps"
     :search="searchText"
-    v-bind="vuetifyBindings"
+    v-bind="{ ...vuetifyBindings, ...inputAttrs(chipCount()) }"
     @update:search="(query: any) => queryOptions(query, undefined)"
     @update:model-value="onSelect"
     @click:clear="onClear"
     @blur="touched = true"
     @mousedown.capture="onMouseDown($event)"
   >
-    <template #chip="{ item }">
+    <template #chip="{ item, index }">
       <v-chip
         :key="item.value"
         label
@@ -50,7 +50,7 @@
         <template #prepend>
           <cached-icon v-if="item.raw?.icon" class="me-1" :name="item.raw.icon" aria-hidden="true" />
         </template>
-        <span :class="{ 'text-body-1': !multiple }">
+        <span :id="chipTextId(index)" :class="{ 'text-body-1': !multiple }">
           <messages-widget v-if="isRich(item.raw?.content)" :message="[choiceRenderable(item.raw.content)]" />
           <template v-else>{{ item.title }}</template>
         </span>
@@ -95,6 +95,14 @@
     <template #message="{ message }">
       <df-input-hint :message="message" />
     </template>
+    <template v-if="offersClear" #clear="clearData">
+      <slot
+        v-if="$slots.clear"
+        name="clear"
+        v-bind="{ ...clearData, props: clearControlProps(clearData.props, vuetifyBindings.label) }"
+      />
+      <df-clear-button v-else :field="clearData.props" :label="vuetifyBindings.label" />
+    </template>
     <template v-if="$slots['append-inner']" #append-inner="props">
       <slot name="append-inner" v-bind="props" />
     </template>
@@ -106,7 +114,7 @@
 
 <script setup lang="ts">
 import { castArray, isEqual, unionBy } from 'lodash-es';
-import { computed, type Directive, nextTick, onBeforeUnmount, ref, toRefs, unref, watch } from 'vue';
+import { computed, type Directive, nextTick, onBeforeUnmount, ref, toRefs, unref, useAttrs, useId, watch } from 'vue';
 import { CachedIcon } from 'vue-cached-icon';
 import { VAutocomplete, VCombobox } from 'vuetify/components';
 
@@ -124,7 +132,9 @@ import {
   translate,
   useInputBase,
 } from './helpers';
+import { clearControlProps } from './helpers/clear-control';
 import { useClientRendered } from './helpers/client-rendered';
+import DfClearButton from './helpers/df-clear-button.vue';
 import {
   choiceContent,
   choiceText,
@@ -134,6 +144,9 @@ import {
   uncoveredIds,
   updateSelectedFromValue,
 } from './helpers/df-select.helper';
+
+// the attributes reach the input through inputAttrs()
+defineOptions({ inheritAttrs: false });
 
 const propsWithDefaults = withDefaults(defineProps<DfSelectProps>(), {
   ...defaultBaseProps,
@@ -157,6 +170,7 @@ interface Emits extends BaseEmits {
 const emits = defineEmits<Emits>();
 defineSlots<{
   'append-inner'?: (props: any) => any;
+  clear?: (props: any) => any;
   'prepend-inner'?: (props: any) => any;
 }>();
 
@@ -244,6 +258,37 @@ function withHiddenIds(ids: any[]): any[] {
 }
 
 const options = computed(() => convertItems(displayChoices.value));
+
+const attrs = useAttrs();
+const generatedId = `input-${useId()}`;
+const fieldId = () => String(attrs.id ?? (vuetifyBindings.value as Record<string, unknown>).id ?? generatedId);
+const chipTextId = (index: number) => `${fieldId()}-choice-${index}`;
+// the number of chips the select shows
+function chipCount(): number {
+  const shown = selected.value;
+  if (shown == null) return 0;
+  return Array.isArray(shown) ? shown.length : 1;
+}
+
+/**
+ * The attributes the application passes, the field's id, and the input's aria-describedby: the chips' text, then
+ * Vuetify's message row while it is rendered, then the application's aria-describedby. An input that shows the
+ * chosen choices as chips holds no text of its own, so the chips describe it. Read on every render.
+ */
+function inputAttrs(chips: number): Record<string, unknown> {
+  const id = fieldId();
+  const bindings = vuetifyBindings.value as Record<string, unknown>;
+  const hasMessages = !!bindings.hint || !!bindings.errorMessages;
+  const describedBy = [
+    ...Array.from({ length: chips }, (_, index) => chipTextId(index)),
+    hasMessages ? `${id}-messages` : undefined,
+    bindings['aria-describedby'],
+    attrs['aria-describedby'],
+  ].filter(Boolean);
+  return { ...attrs, id, 'aria-describedby': describedBy.length ? describedBy.join(' ') : undefined };
+}
+// the clear button is offered under allowNull to a select that accepts input; Vuetify shows it while there is a value
+const offersClear = computed(() => allowNull.value && !vuetifyBindings.value.readonly);
 // The menu's list is a listbox only while it shows options; a list (role list) does not allow aria-multiselectable,
 // which the autocomplete passes in either case. The no-data item is mounted while the list shows no options.
 const menuEmpty = ref(false);
