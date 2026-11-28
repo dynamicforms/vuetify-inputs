@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bound value is shown as written also where the browser's zone skips or repeats that time, and a bound value with an
   offset is shown by its date and time as written.
 
+### Fixed
+
+- `DfDateTime`, `DfColor`: the input that opens the picker carries its popup semantics: `role="combobox"`,
+  `aria-haspopup="dialog"`, `aria-expanded` and, while the picker is shown, `aria-controls`; the picker's menu has
+  `role="dialog"` and the field's name. The field's `div.v-field` no longer carries `aria-haspopup`, `aria-expanded`,
+  `aria-controls` and `aria-owns` (axe `aria-allowed-attr`). A read-only field carries none of them.
+
 ## [0.16.5] - 2026-11-27
 
 ### Added

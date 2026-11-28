@@ -30,6 +30,7 @@
           :id="index === 0 ? slotProps.props.id : undefined"
           :key="part.which"
           v-model="part.text.value"
+          v-input-role="hasPopup ? 'combobox' : undefined"
           :class="`df-datetime-${part.which}`"
           :style="{ flexGrow: part.flexGrow }"
           density="compact"
@@ -61,6 +62,12 @@
               v-model="part.menuShown.value"
               :close-on-content-click="false"
               activator="parent"
+              :activator-props="fieldMenuActivatorProps"
+              :content-props="
+                dialogPopupContentProps(popupId(part.which), {
+                  'aria-labelledby': partAttrs(part.which, slotProps.props)['aria-labelledby'],
+                })
+              "
             >
               <v-confirm-edit v-model="part.model.value" hide-actions @cancel="dropdown = ''" @save="concludeEdit">
                 <template #default="{ model: proxyModel, save, cancel, isPristine }">
@@ -143,6 +150,7 @@ import { parseDateInput, parseTimeInput, setInputError } from './helpers/date-ti
 import { namespaced } from './helpers/error-namespace';
 import { isFramelessVariant } from './helpers/frameless-variant';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
+import { dialogPopupAria, dialogPopupContentProps, fieldMenuActivatorProps, vInputRole } from './helpers/popup-aria';
 import { useSettings } from './helpers/use-settings';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {
@@ -187,6 +195,7 @@ type DateTimePart = 'date' | 'time';
 const nameId = useId();
 const partLabel = (which: DateTimePart) => t(which === 'date' ? 'Date' : 'Time');
 const partNameId = (which: DateTimePart) => `${nameId}-${which}`;
+const popupId = (which: DateTimePart) => `${nameId}-${which}-picker`;
 const partName = (which: DateTimePart) =>
   vuetifyBindings.value.name ? `${vuetifyBindings.value.name}-${which}` : undefined;
 const partErrorCodes = { date: invalidDateError.code, time: invalidTimeError.code };
@@ -201,11 +210,14 @@ function partAttrs(which: DateTimePart, controlProps: InputBaseControlProps) {
     'aria-labelledby': `${aria['aria-labelledby']} ${partNameId(which)}`,
     'aria-label': [aria['aria-label'], partLabel(which)].filter(Boolean).join(' '),
     'aria-invalid': invalid ? 'true' : undefined,
+    ...dialogPopupAria(hasPopup.value, menusShown[which].value, popupId(which)),
   };
 }
 
 const dropdown = ref('');
 const clientRendered = useClientRendered();
+// a part is the combobox that opens its picker
+const hasPopup = computed(() => clientRendered.value && !vuetifyBindings.value.readonly);
 const menuShown = (which: DateTimePart) =>
   computed({
     get() {
