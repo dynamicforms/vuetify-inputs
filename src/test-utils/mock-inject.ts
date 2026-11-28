@@ -4,7 +4,7 @@ import { vi } from 'vitest';
 export const mockInjectValues = new Map<any, any>();
 
 /** A `vue` module whose `inject` reads `mockInjectValues`, falling back to the given default. */
-export async function mockVueInject() {
+export async function mockVueInject(): Promise<typeof import('vue')> {
   const actual = await vi.importActual<typeof import('vue')>('vue');
   return {
     ...actual,
