@@ -151,6 +151,7 @@ import { namespaced } from './helpers/error-namespace';
 import { isFramelessVariant } from './helpers/frameless-variant';
 import { usePickerDoubleClick } from './helpers/picker-double-click';
 import { dialogPopupAria, dialogPopupContentProps, fieldMenuActivatorProps, vInputRole } from './helpers/popup-aria';
+import { fromWallClock, isKnownTimeZone, wallClockIn } from './helpers/time-zone';
 import { useSettings } from './helpers/use-settings';
 
 const props = withDefaults(defineProps<DfDateTimeProps>(), {
@@ -158,7 +159,7 @@ const props = withDefaults(defineProps<DfDateTimeProps>(), {
   inputType: 'datetime',
   displayFormatDate: 'P',
   displayFormatTime: 'p',
-  wallTime: undefined,
+  timeZone: undefined,
 });
 
 interface Emits extends BaseEmits {}
@@ -168,7 +169,6 @@ const settings = useSettings();
 const currentLocale = computed(
   () => props.locale ?? unref(settings.dateTimeLocale) ?? unref(DateTimeLocaleConfig.dateTimeLocale),
 );
-const wallTime = computed(() => props.wallTime ?? settings.wallTime ?? false);
 const firstDayOfWeek = computed(() => currentLocale.value.options?.weekStartsOn ?? 1);
 // a typed date or time that cannot be read leaves the value as it is and reports an error until it is corrected
 const dateInvalid = ref(false);
@@ -189,6 +189,16 @@ const t = translate;
 // without a control, input-base shows the errors it is given; a bound control holds them in its own errors
 const shownInputErrors = computed(() => [...(props.errors ?? []), ...inputErrors()]);
 const { inputType, displayFormatDate, displayFormatTime } = toRefs(props);
+
+// The zone of the value's wall-clock time: 'wall' (no offset), an IANA name, or undefined for the browser's zone.
+// Time mode is always 'wall', date mode always the browser's zone.
+const zone = computed(() => {
+  if (inputType.value === 'time') return 'wall';
+  if (inputType.value === 'date') return undefined;
+  const timeZone = props.timeZone ?? settings.timeZone;
+  return timeZone == null || timeZone === 'wall' || isKnownTimeZone(timeZone) ? timeZone : undefined;
+});
+const ianaZone = computed(() => (zone.value === 'wall' ? undefined : zone.value));
 
 // Each part is named by the field label and its own name; the field label's `for` is the first part's id.
 type DateTimePart = 'date' | 'time';
@@ -266,6 +276,9 @@ function clear() {
 
 const pad2 = (n: number) => n.toString().padStart(2, '0');
 const formatNaive = (val: Date) => `${format(val, 'yyyy-MM-dd')}T${format(val, 'HH:mm')}:00`;
+// the current wall-clock date and time in the value's zone
+const nowNaive = () =>
+  ianaZone.value ? `${wallClockIn(Date.now(), ianaZone.value).slice(0, 16)}:00` : formatNaive(new Date());
 
 const valueISOFull = ref<string | null>(null);
 // the date part and the time part without fractional seconds of an ISO string
@@ -287,12 +300,34 @@ function wallTimeOf(time: string) {
   return match && `${match[1]}:${match[2]}:${match[3] ?? '00'}`;
 }
 
-// The naive value of a date part and a time part. Wall time takes them as written, null where they are not in ISO
-// form; otherwise they are read as local time, and a time the browser's zone skips moves forward by the gap.
+// The naive value of a date part and a time part, null where they are not in ISO form. 'wall' takes them as written,
+// an IANA zone and the browser's zone move a time they skip forward by the gap.
 function naiveFromParts(vif: string[]) {
-  if (!wallTime.value) return formatNaive(new Date(`${vif[0]}T${vif[1]}`));
+  if (zone.value == null) return formatNaive(new Date(`${vif[0]}T${vif[1]}`));
   const time = wallTimeOf(vif[1]);
-  return /^\d{4}-\d{2}-\d{2}$/.test(vif[0]) && time ? `${vif[0]}T${time}` : null;
+  const naive = /^\d{4}-\d{2}-\d{2}$/.test(vif[0]) && time ? `${vif[0]}T${time}` : null;
+  return naive && ianaZone.value ? fromWallClock(naive, ianaZone.value).naive : naive;
+}
+
+const hasOffset = (value: string) => /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(value.slice(10));
+
+// the naive value of a bound value: its wall-clock time in the value's zone
+function naiveOfValue(value: string) {
+  if (unref(inputType) === 'time') return naiveFromParts(mergeParts(nowNaive(), `T${value}`, 1));
+  if (zone.value == null) return formatNaive(parseISO(value));
+  if (!ianaZone.value || !hasOffset(value)) return naiveFromParts(isoParts(value));
+  const instant = parseISO(value).getTime();
+  return Number.isNaN(instant) ? null : wallClockIn(instant, ianaZone.value);
+}
+
+// the value written for a naive value
+function valueOfNaive(naive: string) {
+  if (unref(inputType) === 'date') return isoParts(naive)[0];
+  if (unref(inputType) === 'time') return naive.split('T')[1];
+  if (zone.value === 'wall') return naive;
+  if (ianaZone.value) return naive + fromWallClock(naive, ianaZone.value).offset;
+  // the offset is the one in force on the date written, not today's: across a DST change the two differ by an hour
+  return naive + format(new Date(naive), 'XXX');
 }
 
 // Reading the field's value (dateOrTimeIdx -1) only sets what the control shows: the field keeps the string it holds
@@ -302,27 +337,15 @@ function setValueISOFull(newISOValue: string | null, dateOrTimeIdx: number) {
   if (newISOValue == null) {
     valueISOFull.value = null;
   } else if (dateOrTimeIdx === -1) {
-    if (unref(inputType) === 'time') {
-      valueISOFull.value = naiveFromParts(mergeParts(formatNaive(new Date()), `T${newISOValue}`, 1));
-    } else if (wallTime.value) {
-      valueISOFull.value = naiveFromParts(isoParts(newISOValue));
-    } else {
-      valueISOFull.value = formatNaive(parseISO(newISOValue));
-    }
+    valueISOFull.value = naiveOfValue(newISOValue);
   } else {
-    const vif = mergeParts(valueISOFull.value ?? formatNaive(new Date()), newISOValue, dateOrTimeIdx);
-    const naive = naiveFromParts(vif);
+    const naive = naiveFromParts(mergeParts(valueISOFull.value ?? nowNaive(), newISOValue, dateOrTimeIdx));
     valueISOFull.value = naive;
-    if (naive == null) return;
-    if (unref(inputType) === 'date') value.value = vif[0];
-    else if (unref(inputType) === 'time') value.value = naive.split('T')[1];
-    else if (wallTime.value) value.value = naive;
-    // the offset is the one in force on the date written, not today's: across a DST change the two differ by an hour
-    else value.value = naive + format(new Date(naive), 'XXX');
+    if (naive != null) value.value = valueOfNaive(naive);
   }
 }
 
-watch(value, (newValue: string | null) => setValueISOFull(newValue, -1), { immediate: true });
+watch([value, zone], ([newValue]) => setValueISOFull(newValue, -1), { immediate: true });
 
 // A Date whose local date and time are those of a wall-clock value. Where the browser's zone skips that time, it is
 // the same time on a following day.
@@ -345,7 +368,7 @@ const valueAsDate = computed({
   get() {
     const uValue = unref(valueISOFull);
     if (uValue == null) return null;
-    const res = wallTime.value ? wallClockDay(uValue) : new Date(uValue);
+    const res = wallClockDay(uValue);
     return !Number.isNaN(res.getTime()) ? res : null;
   },
   set(newValue: Date) {
@@ -390,8 +413,7 @@ const timeSteps: Record<string, number> = { ArrowLeft: -60, ArrowRight: 60, Arro
 
 // a step of the picker's time in minutes, wrapping around midnight
 function stepTime(time: string, minutes: number) {
-  const now = new Date();
-  const [hours, mins] = time ? time.split(':').map(Number) : [now.getHours(), now.getMinutes()];
+  const [hours, mins] = (time || isoParts(nowNaive())[1]).split(':').map(Number);
   const total = (((hours * 60 + mins + minutes) % 1440) + 1440) % 1440;
   return `${pad2(Math.floor(total / 60))}:${pad2(total % 60)}`;
 }
@@ -427,7 +449,7 @@ function onKeydown(event: KeyboardEvent) {
   } else if (shown && edit && event.key in dateSteps) {
     handled();
     if (which === 'date') {
-      edit.model.value = stepDate(edit.model.value ?? new Date(), event.key);
+      edit.model.value = stepDate(edit.model.value ?? wallClockDay(nowNaive()), event.key);
     } else {
       edit.model.value = stepTime(edit.model.value, timeSteps[event.key]);
       timeViewMode.value = event.key === 'ArrowLeft' || event.key === 'ArrowRight' ? 'hour' : 'minute';
@@ -452,10 +474,12 @@ function keepSelectionOnPointerFocus(event: MouseEvent) {
   pointerFocus = false;
 }
 
-// the value a wall-clock time is formatted from, with its time where the browser's zone skips it
+// the value a wall-clock time is formatted from, with its time also where the browser's zone skips it
 const valueAsTimeDate = computed(() => {
   const uValue = unref(valueISOFull);
-  return wallTime.value && uValue != null ? wallClockDate(uValue) : unref(valueAsDate);
+  if (uValue == null) return null;
+  const res = wallClockDate(uValue);
+  return !Number.isNaN(res.getTime()) ? res : null;
 });
 
 const display = (displayFormat: Ref<string>, source: Ref<Date | null>) =>

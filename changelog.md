@@ -9,13 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `DfDateTime`: prop `wallTime` and setting `wallTime` (default `false`). The value is wall-clock time, read and written
-  without conversion through the browser's time zone: datetime mode writes `YYYY-MM-DDTHH:mm:ss` without an offset, a
-  bound value is shown as written also where the browser's zone skips or repeats that time, and a bound value with an
-  offset is shown by its date and time as written.
+- `DfDateTime`: prop `timeZone` and setting `timeZone` (default: the browser's zone) for datetime mode. An IANA name
+  shows and edits the value's wall-clock date and time in that zone and writes it with that zone's offset at that time
+  (a skipped time moves forward by the gap, a repeated time takes its first occurrence); a bound value with an offset is
+  converted to that zone. `'wall'` reads and writes the value without an offset (`YYYY-MM-DDTHH:mm:ss`) and without
+  conversion, also where the browser's zone skips or repeats that time; a bound value's offset is ignored. An unknown
+  name is reported with `console.warn` and the browser's zone is used.
 
 ### Fixed
 
+- `DfDateTime`: time mode no longer shifts the time on a day the browser's zone changes its offset.
 - `DfDateTime`, `DfColor`: the input that opens the picker carries its popup semantics: `role="combobox"`,
   `aria-haspopup="dialog"`, `aria-expanded` and, while the picker is shown, `aria-controls`; the picker's menu has
   `role="dialog"` and the field's name. The field's `div.v-field` no longer carries `aria-haspopup`, `aria-expanded`,

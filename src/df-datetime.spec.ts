@@ -103,7 +103,7 @@ describe('DfDateTime', () => {
     });
 
     const mountWall = (props: Record<string, any>) =>
-      mountDateTime({ wallTime: true, displayFormatDate: 'yyyy-MM-dd', ...props });
+      mountDateTime({ timeZone: 'wall', displayFormatDate: 'yyyy-MM-dd', ...props });
 
     it.each([
       ['2026-03-08T02:30:00', '02:30'],
@@ -156,22 +156,22 @@ describe('DfDateTime', () => {
       expect(control.value).toBe('2026-07-15T11:30:00');
     });
 
-    it('applies the wallTime setting where the prop is not given', async () => {
+    it('applies the timeZone setting where the prop is not given', async () => {
       const control = new Field<string | null>({ value: '2026-03-08T01:00:00' });
       const wrapper = mount(DfDateTime, {
         props: { label: 'When', control },
-        global: { provide: { [vuetifyInputsSettingsKey]: { wallTime: true } } },
+        global: { provide: { [vuetifyInputsSettingsKey]: { timeZone: 'wall' } } },
       });
 
       await typeAndLeave(wrapper.findAll('input')[1], '2:30');
       expect(control.value).toBe('2026-03-08T02:30:00');
     });
 
-    it('lets the prop override the wallTime setting', async () => {
+    it('lets the prop override the timeZone setting', async () => {
       const control = new Field<string | null>({ value: '2026-07-15T10:00:00-04:00' });
       const wrapper = mount(DfDateTime, {
-        props: { label: 'When', control, wallTime: false },
-        global: { provide: { [vuetifyInputsSettingsKey]: { wallTime: true } } },
+        props: { label: 'When', control, timeZone: 'America/New_York' },
+        global: { provide: { [vuetifyInputsSettingsKey]: { timeZone: 'wall' } } },
       });
 
       await typeAndLeave(wrapper.findAll('input')[1], '11:30');

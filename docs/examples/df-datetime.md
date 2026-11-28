@@ -111,45 +111,56 @@ In addition to [common props from InputBase](./input-base), this component suppo
 | displayFormatDate | `string` | `'P'`        | Date display format (date-fns format)              |
 | displayFormatTime | `string` | `'p'`        | Time display format (date-fns format)              |
 | locale            | `Locale` | `undefined`  | date-fns locale object for formatting and parsing. Without it, the `dateTimeLocale` setting applies, and without that `DateTimeLocaleConfig` |
-| wallTime          | `boolean` | `undefined` | The value is wall-clock time, without an offset; see [Wall time](#wall-time). Without it, the `wallTime` setting applies, and without that `false` |
+| timeZone          | `string` | `undefined` | The time zone of the value in datetime mode: an IANA name or `'wall'`; see [Time zone](#time-zone). Without it, the `timeZone` setting applies, and without that the browser's zone |
 
 ## Value Format
 
 The component accepts and outputs values in the following formats:
 
-- **datetime** mode: ISO 8601 format (`YYYY-MM-DDTHH:mm:ssXXX`); with `wallTime`, without the offset
-  (`YYYY-MM-DDTHH:mm:ss`). The value written carries the offset of the user's
-  local time zone in force on that date; in a zone with daylight saving time a January value carries the winter
-  offset regardless of the date of editing.
+- **datetime** mode: ISO 8601 format (`YYYY-MM-DDTHH:mm:ssXXX`); with `timeZone: 'wall'`, without the offset
+  (`YYYY-MM-DDTHH:mm:ss`). The value written carries the offset of the user's local time zone, or of the zone
+  `timeZone` names, in force on that date and time; in a zone with daylight saving time a January value carries the
+  winter offset regardless of the date of editing. A zero offset is written as `Z`.
 - **date** mode: ISO 8601 date format (`YYYY-MM-DD`). A date without a time is read as that day in local time.
-- **time** mode: 24-hour time format (`HH:mm:ss`)
+- **time** mode: 24-hour time format (`HH:mm:ss`). The time is read and written as given, also on a day the browser's
+  zone changes its offset.
 
 The component writes a value only when the user edits the date or the time. A bound value is shown in the user's
-local time and kept in the field as given, with its own offset (`Z` included), so displaying a record neither changes
-the field nor marks it as changed.
+local time, in the zone `timeZone` names, or, with `'wall'`, by its date and time as written, and kept in the field as
+given, with its own offset (`Z` included), so displaying a record neither changes the field nor marks it as changed.
 
-## Wall time
+## Time zone
 
-With `wallTime`, the value is wall-clock time: the date and the time as the user enters them, without an offset, for an
-app that places them in a time zone of its own, such as the zone of a public-transport stop. The component reads and
-writes such a value without conversion through the browser's time zone:
+`timeZone` sets the time zone of a datetime-mode value, for an app that places dates and times in a zone of its own,
+such as the zone of a public-transport stop. Date and time modes ignore it. The date picker and the time picker show the
+day and the time in that zone, whatever the browser's zone.
 
-- A value is shown as written in any browser zone, also a time that zone skips or repeats at a daylight saving time
-  change: `2026-03-08T02:30:00` shows 02:30 in `America/New_York`, where that night goes from 2:00 to 3:00.
-- **datetime** mode writes `YYYY-MM-DDTHH:mm:ss`. A bound value may omit the seconds (`YYYY-MM-DDTHH:mm`) and may be
-  separated by a space in place of `T`.
-- A bound value with an offset (`Z` included) or fractional seconds is shown by its date and time as written, without
-  them: `2026-07-15T10:00:00+02:00` shows 10:00 in every zone. The field keeps the value as given until the user edits
-  the date or the time; the value then written has no offset.
-- A bound value whose date is not `YYYY-MM-DD` or whose time does not start with `HH:mm` shows an empty field.
-- **date** and **time** modes write the same formats as without `wallTime`; in time mode the time is not shifted on a
-  day the browser's zone changes its offset.
+- Not set: the browser's zone.
+- An IANA name (`'Europe/Ljubljana'`, `'America/New_York'`, `'UTC'`): the field shows and edits the value's wall-clock
+  date and time in that zone. A bound value with an offset (`Z` included) is converted to that zone:
+  `2026-07-15T16:00:00+02:00` shows 10:00 on 15 July in `America/New_York`. A bound value without an offset is read as
+  wall-clock time in that zone. The value written carries the zone's offset in force at that date and time:
+  - a time the zone skips at a daylight saving time change moves forward by the gap: in `Europe/Ljubljana`,
+    2026-03-29 02:30 is written as `2026-03-29T03:30:00+02:00`;
+  - a time the zone repeats takes its first occurrence: in `Europe/Ljubljana`, 2026-10-25 02:30 is written as
+    `2026-10-25T02:30:00+02:00`.
+- `'wall'`: the value is wall-clock time without an offset, read and written without conversion:
+  - a value is shown as written in any browser zone, also a time that zone skips or repeats at a daylight saving time
+    change: `2026-03-08T02:30:00` shows 02:30 in `America/New_York`, where that night goes from 2:00 to 3:00;
+  - the value written is `YYYY-MM-DDTHH:mm:ss`; a bound value may omit the seconds (`YYYY-MM-DDTHH:mm`) and may be
+    separated by a space in place of `T`;
+  - a bound value with an offset (`Z` included) or fractional seconds is shown by its date and time as written, without
+    them: `2026-07-15T10:00:00+02:00` shows 10:00 in every zone; the value written once the user edits the date or the
+    time has no offset;
+  - a bound value whose date is not `YYYY-MM-DD` or whose time does not start with `HH:mm` shows an empty field.
+- An unknown name is reported with `console.warn`, once per name, and the browser's zone is used.
 
 ```vue
-<df-date-time v-model="departure" wall-time label="Departure" />
+<df-date-time v-model="departure" time-zone="Europe/Ljubljana" label="Departure" />
+<df-date-time v-model="arrival" time-zone="wall" label="Arrival" />
 ```
 
-An app whose date-time fields all hold wall-clock time sets the `wallTime` [setting](/examples/configuration) instead.
+An app whose date-time fields all use one zone sets the `timeZone` [setting](/examples/configuration) instead.
 
 ## Display Format
 
